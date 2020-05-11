@@ -13,7 +13,7 @@ A flat file system note taking program made with AHKv1
 - Edit notes in the preview/Edit box [Enter to save Ctrl+Enter for new line]
 - Create new notes using the search box by simply typing a new name and hitting Enter.
 - If a note already exists it will be loaded into the the new note editor.
-- - Created dates are preserved even when over writing.
+  - Created dates are preserved even when over writing.
 - Notes are stored flat on your file system, meaning that they are all induvial plain .txt files that you can easily edit with external programs.
 
 - Alt+U Brings up a theme selector 
