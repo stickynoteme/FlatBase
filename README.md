@@ -1,3 +1,7 @@
+![Screenshot one](/ScreenShots/SS_01.png)
+Format: ![Note Library Window](url)
+
+
 # FlatNotes
 A flat file system note taking program made with AHKv1
 
