@@ -1,5 +1,4 @@
 ![Screenshot one](/ScreenShots/SS_01.png)
-Format: ![Note Library Window](url)
 
 
 # FlatNotes
