@@ -10,6 +10,10 @@ FileEncoding ,UTF-8
 CoordMode, mouse, Screen
 SetBatchLines, -1
 ;TraySetIcon("FlatNotes.ico")
+Menu, Tray, Add ; separator
+Menu, Tray, Add, Library
+Menu, Tray, Add, About
+Menu, Tray, Default, Library
 ;Set script Vars
 global MyNotesArray := {}
 global FileList = ""
@@ -235,6 +239,38 @@ return
 GuiEscape: 
 Gui, Destroy
 return
+
+About:
+{
+MsgBox FlatNotes Version 1.0.0 May 2020
+return
+}
+
+Library:
+{
+if WinExist("FlatNotes - Library")
+{
+	Gui, 1:destroy
+	return
+}
+firstDown = 1
+Gui, 1:New,, FlatNotes - Library
+Gui, 1:Margin , 0, 0
+Gui, 1:Font, s10, Verdana, white
+Gui, 1:Color,%U_SBG%, %U_MBG%
+Gui, 1:Add,Edit, Cffffff w530 x-3 y0 vSearchTerm gSearch
+Gui, 1:Add, ListView, LV0x10000 -ReadOnly grid r8 w530 x-3 C%U_MFC% vLV gNoteListView +altsubmit -Multi, Title|Body|Created|FileName
+Gui, 1:Add,Edit, r0 h0  vFake,
+GuiControl, Hide, Fake
+Gui, 1:Add,Text, r1 w530 Center C%U_SFC% vNoteDetailPreviewBox gNoteDetailPreviewBoxClick,
+Gui, 1:Add,Edit,  r7 w530 x-3 yp+18 C%U_MFC% vPreviewBox,
+
+MakeFileList()
+
+Gui, 1:SHOW, w510 h338
+isFristRun = 0
+return
+}
 ;------------------------------------------
 ;Main window shortcut keys below this point
 ;------------------------------------------
