@@ -61,3 +61,9 @@ Ctrl+Enter = New Line
 
 ### Notes will not save
 When first started FlatNotes makes a folder called "MyNotes" if you delete this folder or move it you will have to restart FlatNotes or create it yourself. 
+
+
+##Themes
+![Themes Set one](/ScreenShots/THEMES_01.jpg)
+![Themes Set two](/ScreenShots/THEMES_02.jpg)
+![Themes Set three](/ScreenShots/THEMES_03.jpg)
