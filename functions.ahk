@@ -10,7 +10,7 @@ global U_MFC
 global U_MBG
 global U_SBG
 FileSafeClipBoard := RegExReplace(clipboard, "\*|\?|\||/|""|:|<|>"yyyy , Replacement := "_")
-CheckForOldNote = %A_WorkingDir%\MyNotes\%FileSafeClipBoard%.txt
+CheckForOldNote = %U_NotePath%%FileSafeClipBoard%.txt
 FileRead, OldNoteData, %CheckForOldNote%
 MouseGetPos, xPos, yPos
 xPos /= 1.5
@@ -29,7 +29,7 @@ Gui, 2:SHOW, w500 h145 x%xPos% y%yPos%
 MakeFileList(){
 FileList := ""
 MyNotesArray := {}
-Loop, Files, %A_WorkingDir%\MyNotes\*.txt
+Loop, Files, %U_NotePath%*.txt
     FileList .= A_LoopFileName "`n"
 ;trim off the extra starting newline
 	FileList := RTrim(Filelist, "`n")
@@ -37,8 +37,8 @@ Loop Parse, FileList, `n
 	{
 		NoteField := ""
 		OldNoteField = NoteField
-		FileReadLine, NoteDetails, %A_WorkingDir%\MyNotes\%A_LoopField%, 1
-		FileReadLine, NoteField, %A_WorkingDir%\MyNotes\%A_LoopField%, 2
+		FileReadLine, NoteDetails, %U_NotePath%%A_LoopField%, 1
+		FileReadLine, NoteField, %U_NotePath%%A_LoopField%, 2
 
 		DetailsSplitArray := StrSplit(NoteDetails ,"||")
 		NameField := DetailsSplitArray[1]
@@ -64,15 +64,15 @@ LV_ModifyCol(4, "0")
 MakeFileListNoRefresh(){
 FileList := ""
 MyNotesArray := {}
-Loop, Files, %A_WorkingDir%\MyNotes\*.txt
+Loop, Files, %U_NotePath%*.txt
     FileList .= A_LoopFileName "`n"
 ;trim off the extra starting newline
 	FileList := RTrim(Filelist, "`n")
 Loop Parse, FileList, `n
 	{
 		NoteField := ""
-		FileReadLine, NoteDetails, %A_WorkingDir%\MyNotes\%A_LoopField%, 1
-		FileReadLine, NoteField, %A_WorkingDir%\MyNotes\%A_LoopField%, 2
+		FileReadLine, NoteDetails, %U_NotePath%%A_LoopField%, 1
+		FileReadLine, NoteField, %U_NotePath%%A_LoopField%, 2
 		DetailsSplitArray := StrSplit(NoteDetails ,"||")
 		NameField := DetailsSplitArray[1]
 		NameField := RTrim(NameField, " ")
@@ -116,7 +116,7 @@ For Each, Note In MyNotesArray
 SaveFile(QuickNoteName,FileSafeName,QuickNoteBody){
 FormatTime, CurrentTimeStamp, %A_Now%, yy/MM/dd
 
-SaveFileName = %A_WorkingDir%\MyNotes\%FileSafeName%.txt
+SaveFileName = %U_NotePath%%FileSafeName%.txt
 FileReadLine, OldDetails, %SaveFileName%, 1
  RegExMatch(OldDetails, "\d\d/\d\d/\d\d" , CreatedDate)
  QuickNoteBody := SubStr(QuickNoteBody, InStr(QuickNoteBody, "`n") + 1)

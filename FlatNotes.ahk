@@ -10,15 +10,31 @@ FileEncoding ,UTF-8
 CoordMode, mouse, Screen
 SetBatchLines, -1
 ;TraySetIcon("FlatNotes.ico")
-Menu, Tray, Add ; separator
+Menu, Tray, NoStandard
+Menu, Tray, Add 
 Menu, Tray, Add, Library
 Menu, Tray, Add, About
+Menu, Tray, Add, Options
+Menu, Tray, Add, Exit
 Menu, Tray, Default, Library
 ;Set script Vars
 global MyNotesArray := {}
 global FileList = ""
-FileCreateDir, MyNotes
-iniPath = %A_WorkingDir%\MyNotes\settings.ini
+iniPath = %A_WorkingDir%\settings.ini
+IniRead, U_NotePath, %iniPath%, General, MyNotePath,%A_WorkingDir%\MyNotes\
+
+if (FileExist(U_NotePath)) {
+	if (U_NotePath = "") {
+	U_NotePath = %A_WorkingDir%\MyNotes\
+	FileCreateDir, MyNotes
+	}
+	}else {
+		msgbox Notes folder: %U_NotePath% could not be found. %A_WorkingDir%\MyNotes\ will be used instead.
+		FileCreateDir, MyNotes
+		IniWrite, %A_WorkingDir%\MyNotes\, %iniPath%, General, MyNotePath
+		U_NotePath = %A_WorkingDir%\MyNotes\
+		}
+global U_NotePath
 IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor , 000000
 IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor , ffffff
 IniRead, U_MFC, %iniPath%, Colors, MainFontColor , ffffff
@@ -75,7 +91,7 @@ ControlFocus, Edit2, FlatNote - QuickNote
 
 if (OldNoteData !="")
 {
-FilePath = %A_WorkingDir%\MyNotes\%FileSafeClipBoard%.txt
+FilePath = %U_NotePath%%FileSafeClipBoard%.txt
 FileRead, MyFile, %FilePath%
 MyNewFile := SubStr(MyFile, InStr(MyFile, "`n") + 1)
 GuiControl,, QuickNoteBody,%MyNewFile%
@@ -94,7 +110,7 @@ GuiControlGet, FileSafeName
 GuiControlGet, QuickNoteBody
 FormatTime, CurrentTimeStamp, %A_Now%, yy/MM/dd
 
-SaveFileName = %A_WorkingDir%\MyNotes\%FileSafeName%.txt
+SaveFileName = %U_NotePath%%FileSafeName%.txt
 FileReadLine, OldDetails, %SaveFileName%, 1
 if (OldDetails !="")
 {
@@ -189,7 +205,7 @@ if (A_GuiEvent = "RightClick")
 {
     LV_GetText(RowText, A_EventInfo)
     TmpFileSafeName := RegExReplace(RowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
-    FilePath = %A_WorkingDir%\MyNotes\%TmpFileSafeName%.txt
+    FilePath = %U_NotePath%%TmpFileSafeName%.txt
 	FileRead, MyFile, %FilePath%
 	NoteBody := SubStr(MyFile, InStr(MyFile, "`n") + 1)
     clipboard = %NoteBody%
@@ -204,8 +220,8 @@ if (A_GuiEvent == "e")
 LV_GetText(RowText, A_EventInfo,1)
 TmpFileSafeName := RegExReplace(RowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
 TmpOldFileSafeName := RegExReplace(OldRowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
-FilePath = %A_WorkingDir%\MyNotes\%TmpFileSafeName%.txt
-OldFilePath = %A_WorkingDir%\MyNotes\%TmpOldFileSafeName%.txt
+FilePath = %U_NotePath%%TmpFileSafeName%.txt
+OldFilePath = %U_NotePath%%TmpOldFileSafeName%.txt
 FileReadLine, OldDetails, %OldFilePath%, 1
 RegExMatch(OldDetails, "\d\d/\d\d/\d\d" , CreatedDate)
 FileRead, MyFile, %OldFilePath%
@@ -223,8 +239,8 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 {
 	global LVSelectedROW = A_EventInfo
     LV_GetText(RowText, A_EventInfo,4)  ; Get the text from the row's first field.
-    FileRead, NoteFile, %A_WorkingDir%\MyNotes\%RowText%
-    FileReadLine,NoteDetails, %A_WorkingDir%\MyNotes\%RowText%, 1
+    FileRead, NoteFile, %U_NotePath%%RowText%
+    FileReadLine,NoteDetails, %U_NotePath%%RowText%, 1
 	NoteBody := SubStr(NoteFile, InStr(NoteFile, "`n") + 1)
     GuiControl,, PreviewBox, %NoteBody%
     GuiControl,, NoteDetailPreviewBox, %NoteDetails%
@@ -315,7 +331,7 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			global LVSelectedROW
 			LV_GetText(RowText, LVSelectedROW)
 			TmpFileSafeName := RegExReplace(RowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
-			FilePath = %A_WorkingDir%\MyNotes\%TmpFileSafeName%.txt
+			FilePath = %U_NotePath%%TmpFileSafeName%.txt
 			FileRead, MyFile, %FilePath%
 			NoteBody := SubStr(MyFile, InStr(MyFile, "`n") + 1)
 			clipboard = %NoteBody%
@@ -335,7 +351,7 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			global LVSelectedROW
 			LV_GetText(RowText, LVSelectedROW)
 			TmpFileSafeName := RegExReplace(RowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
-			FilePath = %A_WorkingDir%\MyNotes\%TmpFileSafeName%.txt
+			FilePath = %U_NotePath%%TmpFileSafeName%.txt
 			FileReadLine, MyFile, %FilePath%,2
 			clipboard = %MyFile%
 			ToolTip Text: "%RowText%" Copied to clipboard
@@ -347,12 +363,13 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 }
 
 Enter::
+{
+
 ControlGetFocus, OutputVar, FlatNotes - Library
-		{
 		 If (OutputVar == "Edit1"){
 			GuiControlGet, SearchTerm
 			FileSafeSearchTerm := RegExReplace(SearchTerm, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
-			CheckForOldNote = %A_WorkingDir%\MyNotes\%FileSafeSearchTerm%.txt
+			CheckForOldNote = %U_NotePath%%FileSafeSearchTerm%.txt
 			FileRead, MyFile, %CheckForOldNote%
 			
 			BuildGUI2()
@@ -429,7 +446,7 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 		 IfMsgBox, No
 			Return 
 		 IfMsgBox, Yes
-			FileRecycle %A_WorkingDir%\MyNotes\%FileSafeName%.txt
+			FileRecycle %U_NotePath%%FileSafeName%.txt
 			MakeFileListNoRefresh()
 			LV_Delete(LVSelectedROW)
 			RowsCount := LV_GetCount()
@@ -442,26 +459,56 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 				
 				
 			FileSafeName := RegExReplace(NextUpName, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
-			FileReadLine,NextUpDetails,%A_WorkingDir%\MyNotes\%FileSafeName%.txt,1
-			FileRead,NextUpBody,%A_WorkingDir%\MyNotes\%FileSafeName%.txt
+			FileReadLine,NextUpDetails,%U_NotePath%%FileSafeName%.txt,1
+			FileRead,NextUpBody,%U_NotePath%%FileSafeName%.txt
 			NextUpBody := SubStr(NextUpBody, InStr(NextUpBody, "`n") + 1)
 			GuiControl,, PreviewBox,%NextUpBody%
 			GuiControl,, NoteDetailPreviewBox, %NextUpDetails%
 		 }else
 			del::del
 }
-!u::
+Options:
 {
 IniRead, U_Theme, %iniPath%, Theme, UserSetting , Aqua-Dark
-MouseGetPos, xPos, yPos
+IniRead, U_NotePath, %iniPath%, General, MyNotePath , %U_NotePath%
+
 Gui, 3:New,,FlatNotes - Options
 Gui, 3:Add,Text,,Theme Selection:
 Gui, 3:Add,DropDownList, Choose%U_Theme% vColorChoice gColorPicked, Aqua-Dark|Black|Blue-Dark|Blue-Light|Brown-Dark|Green-Dark|Green-Light|Orange-Light|Pink-Light|Violet-Dark|Violet-Light|White|Yellow-Dark|Yellow-Light
+Gui, 3:Add,Text,, Notes storage folder:
+Gui, 3:Add,Edit, disabled r1 w175 vNotesStorageFolder gFolderEdit, %U_NotePath%
+Gui, 3:Add,Button, gFolderSelect, Select a folder.
 Gui, 3:Add,Text,,Settings are saved automatically.
 Gui, 3:Add,Text,,Press Esc to exit.
-Gui, 3:SHOW, x%xPos% y%yPos%
+Gui, 3:SHOW
 WinSet, AlwaysOnTop, On, FlatNotes - Options
 Return
 }
+return
+}
+FolderEdit:
+{
+if (A_GuiEvent = "Normal")
+	{
+	tooltip %A_GuiEvent%
+	}
+return
+}
+FolderSelect:
+{
+WinSet, AlwaysOnTop, Off, FlatNotes - Options
+FileSelectFolder, NewNotesFolder, , 123
+if NewNotesFolder =
+    MsgBox, You didn't select a folder.
+else
+    GuiControl,,NotesStorageFolder,%NewNotesFolder%\
+	IniWrite, %NewNotesFolder%\, %iniPath%, General, MyNotePath
+	WinSet, AlwaysOnTop, On, FlatNotes - Options
+	return
+return
+}
+Exit:
+{
+ExitApp
 return
 }

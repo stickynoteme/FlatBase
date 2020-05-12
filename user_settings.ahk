@@ -172,10 +172,8 @@ IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor , ffffff
 IniRead, U_MFC, %iniPath%, Colors, MainFontColor , ffffff
 IniRead, U_SFC, %iniPath%, Colors, SubFontColor , 000000
 }
-send !^6
-sleep 50
-send !^6
-sleep 150
+Gui, 1:Destroy
+goto vk14
 if WinExist("FlatNotes - Options")
     WinActivate ; use the window found above
 else
