@@ -1,14 +1,57 @@
+SetUserHotKeys() {
+	IniRead, savedHK1, %iniPath%, Hotkeys, 1, #o
+	IniRead, savedHK2, %iniPath%, Hotkeys, 2, #n
+	if (savedHK1="")
+		savedHK1=#o
+		IniWrite,#o,%iniPath%,Hotkeys, 2
+	if (savedHK2="")
+		savedHK2=#n
+		IniWrite,#n,%iniPath%,Hotkeys, 2
+	Hotkey,%savedHK1%, Label1
+	Hotkey,%savedHK2%, Label2
+return
+}
+
+setHK(num,INI,GUI) {
+ If INI
+  Hotkey, %INI%, Label%num%, Off
+ If GUI
+  Hotkey, %GUI%, Label%num%, On
+ IniWrite,% GUI ? GUI:null, settings.ini, Hotkeys, %num%
+ savedHK%num%  := HK%num%
+ TrayTip, Label%num%,% !INI ? GUI " ON":!GUI ? INI " OFF":GUI " ON`n" INI " OFF"
+ return
+}
+
+BuildGUI1(){
+
+if WinExist("FlatNotes - Library") {
+	Gui, 1:destroy
+	return
+}
+firstDown = 1
+MouseGetPos, xPos, yPos	
+xPos /= 1.5
+yPos /= 1.5
+Gui, 1:New,, FlatNotes - Library
+Gui, 1:Margin , 0, 0
+Gui, 1:Font, s10, Verdana, white
+Gui, 1:Color,%U_SBG%, %U_MBG%
+Gui, 1:Add,Edit, Cffffff w530 x-3 y0 vSearchTerm gSearch
+Gui, 1:Add, ListView, LV0x10000 -ReadOnly grid r8 w530 x-3 C%U_MFC% vLV gNoteListView +altsubmit -Multi, Title|Body|Created|FileName
+Gui, 1:Add,Edit, r0 h0  vFake,
+GuiControl, Hide, Fake
+Gui, 1:Add,Text, r1 w530 Center C%U_SFC% vNoteDetailPreviewBox gNoteDetailPreviewBoxClick,
+Gui, 1:Add,Edit,  r7 w530 x-3 yp+18 C%U_MFC% vPreviewBox,
+
+MakeFileList()
+
+Gui, 1:SHOW, w510 h338 x%xPos% y%yPos%
+isFristRun = 0
+return
+}
+
 BuildGUI2(){
-global FileSafeClipBoard
-global CheckForOldNote 
-global OldNoteData
-global QuickNoteName
-global QuickNoteBody
-global FileSafeName
-global U_SFC
-global U_MFC
-global U_MBG
-global U_SBG
 FileSafeClipBoard := RegExReplace(clipboard, "\*|\?|\||/|""|:|<|>"yyyy , Replacement := "_")
 CheckForOldNote = %U_NotePath%%FileSafeClipBoard%.txt
 FileRead, OldNoteData, %CheckForOldNote%
@@ -24,6 +67,7 @@ Gui, 2:Add,Edit, -WantReturn C%U_MFC% r7 w500 vQuickNoteBody
 Gui, 2:Add,Text, C%U_SFC% x255 y3 w245 vFileSafeName,
 Gui, 2:Add, Button,x-1000 default gSaveButton y-1000, &Save
 Gui, 2:SHOW, w500 h145 x%xPos% y%yPos%
+return
 }
 
 MakeFileList(){
@@ -59,6 +103,7 @@ LV_ModifyCol(1, "145 Logical")
 LV_ModifyCol(2, "275")
 LV_ModifyCol(3, "75")
 LV_ModifyCol(4, "0")
+return
 }
 
 MakeFileListNoRefresh(){
@@ -89,6 +134,7 @@ LV_ModifyCol(1, "145 Logical")
 LV_ModifyCol(2, "275")
 LV_ModifyCol(3, "75")
 LV_ModifyCol(4, "0")
+return
 }
 
 ReFreshLV(){
@@ -111,20 +157,22 @@ For Each, Note In MyNotesArray
       LV_Add("", Note.1,Note.2,Note.3,Note.4)
 	  GuiControl, +Redraw, LV
 }
+return
 }
 
-SaveFile(QuickNoteName,FileSafeName,QuickNoteBody){
-FormatTime, CurrentTimeStamp, %A_Now%, yy/MM/dd
+SaveFile(QuickNoteName,FileSafeName,QuickNoteBody) {
+	FormatTime, CurrentTimeStamp, %A_Now%, yy/MM/dd
 
-SaveFileName = %U_NotePath%%FileSafeName%.txt
-FileReadLine, OldDetails, %SaveFileName%, 1
- RegExMatch(OldDetails, "\d\d/\d\d/\d\d" , CreatedDate)
- QuickNoteBody := SubStr(QuickNoteBody, InStr(QuickNoteBody, "`n") + 1)
-if (CreatedDate =="")
-{
-CreatedDate = %CurrentTimeStamp%
-}
-FileRecycle, %SaveFileName%
-FileLineOne = %QuickNoteName% || C:%CreatedDate% || M:%CurrentTimeStamp%`n
-FileAppend , %FileLineOne%%QuickNoteBody%, %SaveFileName%, UTF-8
+	SaveFileName = %U_NotePath%%FileSafeName%.txt
+	FileReadLine, OldDetails, %SaveFileName%, 1
+	 RegExMatch(OldDetails, "\d\d/\d\d/\d\d" , CreatedDate)
+	 QuickNoteBody := SubStr(QuickNoteBody, InStr(QuickNoteBody, "`n") + 1)
+	if (CreatedDate =="")
+	{
+	CreatedDate = %CurrentTimeStamp%
+	}
+	FileRecycle, %SaveFileName%
+	FileLineOne = %QuickNoteName% || C:%CreatedDate% || M:%CurrentTimeStamp%`n
+	FileAppend , %FileLineOne%%QuickNoteBody%, %SaveFileName%, UTF-8
+return
 }
