@@ -8,8 +8,10 @@ Label1:
 }
 Label2:
 {
-send {Ctrl Down}{c}{Ctrl up}
-clipboard := clipboard
+	IniRead,sendCtrlC,%iniPath%,General,sendCtrlC, 1
+	if (sendCtrlC="1")
+		send {Ctrl Down}{c}{Ctrl up}
+		clipboard := clipboard
 
 BuildGUI2()
 
@@ -215,7 +217,15 @@ Gui, 1:SHOW, w510 h338
 isFristRun = 0
 return
 }
-
+CtrlCToggle:
+{
+	GuiControlGet, SetCtrlC
+	if (SetCtrlC = 1)
+		IniWrite, 1, %iniPath%, General, sendCtrlC
+	if (SetCtrlC = 0)
+		IniWrite, 0, %iniPath%, General, sendCtrlC
+	return
+}
 UseCapslockToggle:
 {
 	GuiControlGet, UseCapslock
@@ -429,39 +439,43 @@ return
 
 Options:
 {
-IniRead, U_Theme, %iniPath%, Theme, UserSetting , Aqua-Dark
-IniRead, U_NotePath, %iniPath%, General, MyNotePath , %U_NotePath%
-IniRead, U_UserSetKey, %iniPath%, General, UserSetKey , 1
-
-Gui3W = 200
-Gui, 3:New,,FlatNotes - Options
-Gui, 3:Add,Text,,Theme Selection:
-Gui, 3:Add,DropDownList, Choose%U_Theme% vColorChoice gColorPicked, Aqua-Dark|Black|Blue-Dark|Blue-Light|Brown-Dark|Green-Dark|Green-Light|Orange-Light|Pink-Light|Violet-Dark|Violet-Light|White|Yellow-Dark|Yellow-Light
-Gui, 3:Add,Text,, Notes storage folder:
-Gui, 3:Add,Edit, disabled r1 w%Gui3W% vNotesStorageFolder, %U_NotePath%
-Gui, 3:Add,Button, gFolderSelect, Select a folder.
-Gui, 3:Add, CheckBox, vUseCapslock gUseCapslockToggle, Use Capslock for Library?
-GuiControl,,UseCapslock,%U_UserSetKey%
-
-HotkeyNames := ["Show Library Window","Quick New Note"]
-Loop,% 2 {
-	HotkeyNameTmp := HotkeyNames[%A_Index%]
- Gui, 3:Add, Text, xm, Hotkey to %HotkeyNameTmp%:
- IniRead, savedHK%A_Index%, settings.ini, Hotkeys, %A_Index%, %A_Space%
- If savedHK%A_Index%                                       
-	Hotkey,% savedHK%A_Index%, Label%A_Index%                 
- StringReplace, noMods, savedHK%A_Index%, ~                  
- StringReplace, noMods, noMods, #,,UseErrorLevel              
- Gui, 3:Add, Hotkey, x+5 vHK%A_Index% gLabel, %noMods%           
- Gui, 3:Add, CheckBox, x+5 vCB%A_Index% Checked%ErrorLevel%, Win  
-}                                                               
-if (U_UserSetKey = 1)
-	GuiControl, Disable, msctls_hotkey321
-Gui, 3:Add,Text,x0 w%Gui3W% +Center,Settings are saved automatically.
-Gui, 3:Add,Text,x0 w%Gui3W% +Center,Press Esc to exit and reload.
-Gui, 3:SHOW
-WinSet, AlwaysOnTop, On, FlatNotes - Options
-return
+	IniRead, U_Theme, %iniPath%, Theme, UserSetting , Aqua-Dark
+	IniRead, U_NotePath, %iniPath%, General, MyNotePath , %U_NotePath%
+	IniRead, U_UserSetKey, %iniPath%, General, UserSetKey , 1
+	IniRead, sendCtrlC, %iniPath%, General, sendCtrlC, 1
+	
+	
+	Gui3W = 200
+	Gui, 3:New,,FlatNotes - Options
+	Gui, 3:Add,CheckBox, vSetCtrlC gCtrlCToggle, Send Ctrl+C when using the quick note hotkey.
+	Gui, 3:Add,Text,,Theme Selection:
+	Gui, 3:Add,DropDownList, Choose%U_Theme% vColorChoice gColorPicked, Aqua-Dark|Black|Blue-Dark|Blue-Light|Brown-Dark|Green-Dark|Green-Light|Orange-Light|Pink-Light|Violet-Dark|Violet-Light|White|Yellow-Dark|Yellow-Light
+	Gui, 3:Add,Text,, Notes storage folder:
+	Gui, 3:Add,Edit, disabled r1 w%Gui3W% vNotesStorageFolder, %U_NotePath%
+	Gui, 3:Add,Button, gFolderSelect, Select a folder.
+	Gui, 3:Add, CheckBox, vUseCapslock gUseCapslockToggle, Use Capslock for Library?
+	GuiControl,,UseCapslock,%U_UserSetKey%
+	GuiControl,,SetCtrlC,%sendCtrlC%
+	
+	HotkeyNames := ["Show Library Window","Quick New Note"]
+	Loop,% 2 {
+		HotkeyNameTmp := HotkeyNames[A_Index]
+		Gui, 3:Add, Text, xm, Hotkey %HotkeyNameTmp%:
+		IniRead, savedHK%A_Index%, settings.ini, Hotkeys, %A_Index%, %A_Space%
+		If savedHK%A_Index%                                       
+			Hotkey,% savedHK%A_Index%, Label%A_Index%                 
+		StringReplace, noMods, savedHK%A_Index%, ~                  
+		StringReplace, noMods, noMods, #,,UseErrorLevel              
+		Gui, 3:Add, Hotkey, x+5 vHK%A_Index% gLabel, %noMods%           
+		Gui, 3:Add, CheckBox, x+5 vCB%A_Index% Checked%ErrorLevel%, Win  
+	}                                                               
+	if (U_UserSetKey = 1)
+		GuiControl, Disable, msctls_hotkey321
+	Gui, 3:Add,Text,x0 w%Gui3W% +Center,Settings are saved automatically.
+	Gui, 3:Add,Text,x0 w%Gui3W% +Center,Press Esc to exit and reload.
+	Gui, 3:SHOW
+	WinSet, AlwaysOnTop, On, FlatNotes - Options
+	return
 }
 
 

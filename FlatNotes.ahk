@@ -35,6 +35,7 @@ global UseCapslock
 global U_Capslock
 global fake
 global iniPath
+global sendCtrlC
 
 iniPath = %A_WorkingDir%\settings.ini
 IniRead, U_NotePath, %iniPath%, General, MyNotePath,%A_WorkingDir%\MyNotes\
@@ -49,8 +50,8 @@ if (FileExist(U_NotePath)) {
 		FileCreateDir, MyNotes
 		IniWrite, %A_WorkingDir%\MyNotes\, %iniPath%, General, MyNotePath
 		U_NotePath = %A_WorkingDir%\MyNotes\
-		}
-		
+}
+
 global U_NotePath
 ;-------------------------------------------------
 ;Set Default hotkeys if blank
@@ -64,7 +65,8 @@ IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor , 000000
 IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor , ffffff
 IniRead, U_MFC, %iniPath%, Colors, MainFontColor , ffffff
 IniRead, U_SFC, %iniPath%, Colors, SubFontColor , 000000
-IniRead, U_Capslock, %iniPath%, General, UserSetKey , 1	
+IniRead, U_Capslock, %iniPath%, General, UserSetKey , 1
+IniRead, sendCtrlC, %iniPath%, General, sendCtrlC, 1
 ;-------------------------------------------------
 ;Acitvate User Hotkeys if any
 ;-------------------------------------------------
