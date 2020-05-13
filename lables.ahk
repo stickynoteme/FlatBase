@@ -8,7 +8,6 @@ Label1:
 }
 Label2:
 {
-AutoTrim On
 send {Ctrl Down}{c}{Ctrl up}
 clipboard := clipboard
 

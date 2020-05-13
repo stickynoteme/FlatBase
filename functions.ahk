@@ -86,7 +86,7 @@ Loop Parse, FileList, `n
 
 		DetailsSplitArray := StrSplit(NoteDetails ,"||")
 		NameField := DetailsSplitArray[1]
-		NameField := RTrim(NameField, " ")
+		NameField := StrReplace(NameField, A_space,,, Limit := 1)
 		AddedField := DetailsSplitArray[2]
 		AddedField := LTrim(AddedField, " C:")
 		AddedField := RTrim(AddedField, " ")
