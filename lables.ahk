@@ -357,9 +357,17 @@ SortName:
 		Gui, 3:New,,FlatNotes - Options
 		Gui, 3:Add, Tab3,, General|Hotkeys|Appearance
 		Gui, 3:Tab, General
-		Gui, 3:Add,Text,, Notes storage folder:
+		Gui, 3:Add,Text,section, Notes storage folder:
 		Gui, 3:Add,Edit, disabled r1 w%Gui3W% vNotesStorageFolder, %U_NotePath%
 		Gui, 3:Add,Button, gFolderSelect, Select a folder.
+		
+		Gui, 3:Add,Text,xs,Quick Note Window Width: (Default: 500)
+		Gui, 3:Add,Edit   
+		Gui, 3:Add,UpDown,vQuickWSelect gQuickWSet range50-3000, %QuickNoteWidth%
+		
+		Gui, 3:Add,Text,xs,Main Window Width: (Default: 530)
+		Gui, 3:Add,Edit   
+		Gui, 3:Add,UpDown,vMainWSelect gMainWSet range50-3000, %LibW%
 		
 		Gui, 3:Tab, Hotkeys
 		Gui, 3:Add,CheckBox, vSetCtrlC gCtrlCToggle, Send Ctrl+C when using the quick note hotkey.
@@ -388,8 +396,8 @@ SortName:
 		
 		Gui, 3:Tab, Appearance
 		Gui, 3:Add,Text,,Font Rendering: (5 = ClearType)
-		Gui, Add, Edit,ReadOnly
-		Gui, 3:Add,UpDown, vFontRenderingSelect gSetFontRendering Range1-5, %FontRendering%
+		Gui, Add, Edit 
+		Gui, 3:Add,UpDown, vFontRenderingSelect gSetFontRendering Range0-5, %FontRendering%
 		Gui, 3:Add,Text,,Theme Selection:
 		
 		Loop, Files, %themePath%\*.ini
@@ -439,17 +447,79 @@ SortName:
 		Gui, 3:add,DropDownList, Choose%C_ResultFont% w100 vResultFontFamilySelect gSetResultFontFamily, Bahnschrift|Fixedsys|Modern|MS Sans Serif|MS Serif|Neue Haas Grotesk Text Pro|Roman|Script|Small Fonts|System|Terminal|Arial|Arial Black|Arial Nova|Calibri|Calibri Light|Cambria|Candara|Comic Sans MS|Consolas|Constantia|Corbel|Courier|Courier New|Franklin Gothic Medium|Gabriola|Georgia|Georgia Pro|Gill Sans Nova|Impact|Lucida Console|Lucida Sans|Lucida Sans Unicode|Microsoft Sans Serif|Palatino Linotype|Rockwell Nova|Segoe Print|Segoe Script|Segoe UI|Sitka Display|Sitka Text|Tahoma|Times New Roman|Trebuchet MS|Verdana|Verdana Pro 
 		CurrenResulttFontSize := ResultFontSize*0.5
 		Gui, 3:add,DropDownList, x+10 Choose%CurrenResulttFontSize% vResultFontSizeSelect gSetResultFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
-		Gui, 3:Add,text,xs, Note font settings:
+		Gui, 3:Add,text,xs section, Note font settings:
 		Gui, 3:add,DropDownList, Choose%C_PreventFont% w100 vPreviewFontFamilySelect gSetPreviewFontFamily, Bahnschrift|Fixedsys|Modern|MS Sans Serif|MS Serif|Neue Haas Grotesk Text Pro|Roman|Script|Small Fonts|System|Terminal|Arial|Arial Black|Arial Nova|Calibri|Calibri Light|Cambria|Candara|Comic Sans MS|Consolas|Constantia|Corbel|Courier|Courier New|Franklin Gothic Medium|Gabriola|Georgia|Georgia Pro|Gill Sans Nova|Impact|Lucida Console|Lucida Sans|Lucida Sans Unicode|Microsoft Sans Serif|Palatino Linotype|Rockwell Nova|Segoe Print|Segoe Script|Segoe UI|Sitka Display|Sitka Text|Tahoma|Times New Roman|Trebuchet MS|Verdana|Verdana Pro 
 		CurrentPreviewFontSize := PreviewFontSize*0.5
 		Gui, 3:add,DropDownList, x+10 Choose%CurrentPreviewFontSize% vPreviewFontSizeSelect gSetPreviewFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
+		
 		Gui, 3:Tab 
-		Gui, 3:Add,Text,x0 w%Gui3W% +Center,Settings are saved automatically.
-		Gui, 3:Add,Text,x0 w%Gui3W% +Center,Press Esc to exit and reload.
-		Gui, 3:SHOW
+		;Gui, 3:Add,Text,x0 w%Gui3W% +Center,Settings are saved automatically.
+		;Gui, 3:Add,Text,x0 w%Gui3W% +Center,Press Esc to exit and reload.
+		Gui, 3:Add, Button, Default gSaveAndReload, Save and Reload
+		Gui, 3:SHOW 
 		WinSet, AlwaysOnTop, On, FlatNotes - Options
 		return
 	}
+  
+SaveAndReload:
+{
+	GuiControlGet, U_QuickNoteWidth,,QuickWSelect	
+	IniWrite, %U_QuickNoteWidth%,%iniPath%,General, QuickNoteWidth
+	GuiControlGet, U_MainNoteWidth,,MainWSelect	
+	IniWrite, %U_MainNoteWidth%,%iniPath%,General, WindowWidth	
+	GuiControlGet, U_FontRendering,,FontRenderingSelect	
+	IniWrite, %U_FontRendering%,%iniPath%,General, FontRendering
+	GuiControlGet, U_SearchFontFamily,,SearchFontFamilySelect
+	IniWrite, %U_SearchFontFamily%,%iniPath%,General, SearchFontFamily
+	GuiControlGet, U_SearchSize,,SearchFontSizeSelect	
+	IniWrite, %U_SearchSize%,%iniPath%,General, SearchFontSize
+	GuiControlGet, U_ResultFontFamily,,ResultFontFamilySelect
+	IniWrite, %U_ResultFontFamily%,%iniPath%,General, ResultFontFamily	
+	GuiControlGet, U_ResultSize,,ResultFontSizeSelect	
+	IniWrite, %U_ResultSize%,%iniPath%,General, ResultFontSize
+	GuiControlGet, U_PreviewFontFamily,,PreviewFontFamilySelect
+	IniWrite, %U_PreviewFontFamily%,%iniPath%,General, PreviewFontFamily	
+	GuiControlGet, U_PreviewSize,,PreviewFontSizeSelect	
+	IniWrite, %U_PreviewSize%,%iniPath%,General, PreviewFontSize
+	GuiControlGet, U_FontFamily,,FontFamilySelect
+	IniWrite, %U_FontFamily%,%iniPath%,General, FontFamily	
+	GuiControlGet, U_FontSize,,FontSizeSelect	
+	IniWrite, %U_FontSize%,%iniPath%,General, FontSize
+	reload
+}
+QuickWSet:
+{
+	GuiControlGet, U_QuickNoteWidth,,QuickWSelect	
+	IniWrite, %U_QuickNoteWidth%,%iniPath%,General, QuickNoteWidth	
+	IniRead, QuickNoteWidth,%iniPath%, General,QuickNoteWidth
+	Gui, 1:Destroy
+	Gui, 2:Destroy
+	BuildGUI2()
+	if WinExist("FlatNote - QuickNote")
+		WinActivate ; use the window found above
+	else
+		WinActivate, FlatNotes
+	return
+}
+MainWSet:
+{
+	GuiControlGet, U_MainNoteWidth,,MainWSelect	
+	IniWrite, %U_MainNoteWidth%,%iniPath%,General, WindowWidth	
+	IniRead, LibW, %iniPath%, General, WindowWidth ,530
+	SubW := LibW-10	
+	libWAdjust := LibW+10
+	ColAdjust := LibW-95
+	NameColW := Round(ColAdjust*0.4)
+	BodyColW := Round(ColAdjust*0.6)
+	NameColAndBodyCOlW := NameColW+BodyColW
+	Gui, 1:Destroy 
+	BuildGUI1()
+	if WinExist("FlatNotes - Options")
+		WinActivate ; use the window found above
+	else
+		WinActivate, FlatNotes
+	return 
+}
 SetFontRendering:
 {
 	GuiControlGet, U_FontRendering,,FontRenderingSelect	
@@ -566,7 +636,7 @@ SetFontSize:
 {
 	GuiControlGet, U_FontSize,,FontSizeSelect	
 	IniWrite, %U_FontSize%,%iniPath%,General, FontSize
-	IniRead, FontSize, %iniPath%, General, FontSize ,10
+	IniRead, FontSize, %iniPath%, General, FontSize
 	Gui, 1:Destroy
 	Gui, 2:Destroy	
 	BuildGUI2()

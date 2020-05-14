@@ -34,8 +34,8 @@ BuildGUI1(){
 	xPos /= 1.5
 	yPos /= 1.5
 	Gui, 1:New,, FlatNotes - Library
-	Gui, 1:Margin , 0, 0
-	Gui, 1:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_SFC%
+	Gui, 1:Margin , 0, 0 
+	Gui, 1:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
 	Gui, 1:Color,%U_SBG%, %U_MBG%
 	Gui, 1:Add,Edit, c%U_FBCA% w%LibW% y%FontSize% x6 y8 vSearchTerm gSearch -E0x200
 	;ListBox used as background color for search area padding
@@ -64,6 +64,7 @@ BuildGUI1(){
 }
 
 BuildGUI2(){
+	QuickSubWidth := round(QuickNoteWidth*0.5)
 	FileSafeClipBoard := RegExReplace(clipboard, "\*|\?|\||/|""|:|<|>"yyyy , Replacement := "_")
 	CheckForOldNote = %U_NotePath%%FileSafeClipBoard%.txt
 	FileRead, OldNoteData, %CheckForOldNote%
@@ -74,12 +75,12 @@ BuildGUI2(){
 	Gui, 2:Margin , 0, 0 
 	Gui, 2:Font, s%FontSize% Q%FontRendering%, %FontFamily%, %U_SFC%	
 	Gui, 2:Color,%U_SBG%, %U_MBG%
-	Gui, 2:Add,Edit, C%U_MFC% w250 vQuickNoteName gQuickSafeNameUpdate -E0x200
-	Gui, 2:Add,Edit, -WantReturn C%U_MFC% r7 w500 y+1 vQuickNoteBody -E0x200
-	Gui, 2:Add,Text, C%U_SFC% x255 y3 w245 vFileSafeName,
+	Gui, 2:Add,Edit, C%U_MFC% w%QuickSubWidth% vQuickNoteName gQuickSafeNameUpdate -E0x200
+	Gui, 2:Add,Edit, -WantReturn C%U_MFC% r7 w%QuickNoteWidth% y+1 vQuickNoteBody -E0x200
+	Gui, 2:Add,Text, C%U_SFC% x%QuickSubWidth% y3 w%QuickSubWidth% vFileSafeName,
 	Gui, 2:Add, Button,x-1000 default gSaveButton y-1000, &Save
-	Gui, 2:SHOW, w500 h145 x%xPos% y%yPos% 
-	return
+	Gui, 2:SHOW, w%QuickNoteWidth% x%xPos% y%yPos% 
+	return  
 }
 
 MakeFileList(){
