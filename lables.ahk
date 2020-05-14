@@ -361,9 +361,39 @@ SortName:
 		
 		Gui3W = 200
 		Gui, 3:New,,FlatNotes - Options
+		Gui, 3:Add, Tab3,, General|Hotkeys|Appearance
+		Gui, 3:Tab, General
+		Gui, 3:Add,Text,, Notes storage folder:
+		Gui, 3:Add,Edit, disabled r1 w%Gui3W% vNotesStorageFolder, %U_NotePath%
+		Gui, 3:Add,Button, gFolderSelect, Select a folder.
+		
+		Gui, 3:Tab, Hotkeys
 		Gui, 3:Add,CheckBox, vSetCtrlC gCtrlCToggle, Send Ctrl+C when using the quick note hotkey.
+		Gui, 3:Add, CheckBox, vUseCapslock gUseCapslockToggle, Use Capslock for Library?
+		GuiControl,,UseCapslock,%U_UserSetKey%
+		GuiControl,,SetCtrlC,%sendCtrlC%
+		Gui, 3:Add,text, h1 Disabled 			
+ 		
+		HotkeyNames := ["Show Library Window","Quick New Note"]
+		Loop,% 2 {
+			HotkeyNameTmp := HotkeyNames[A_Index] 
+			Gui, 3:Add, Text, , Hotkey: %HotkeyNameTmp%
+			IniRead, savedHK%A_Index%, settings.ini, Hotkeys, %A_Index%, %A_Space%
+			If savedHK%A_Index%                                       
+				Hotkey,% savedHK%A_Index%, Label%A_Index%                 
+			StringReplace, noMods, savedHK%A_Index%, ~                  
+			StringReplace, noMods, noMods, #,,UseErrorLevel              
+			Gui, 3:Add, Hotkey, section vHK%A_Index% gLabel, %noMods%           
+			Gui, 3:Add, CheckBox, x+5  vCB%A_Index% Checked%ErrorLevel%, Win
+			Gui, 3:Add,text, h0 xs0 Disabled
+		}                                                               
+		if (U_UserSetKey = 1)
+			GuiControl, Disable, msctls_hotkey321
+		
+		
+		Gui, 3:Tab, Appearance
 		Gui, 3:Add,Text,,Theme Selection:
-				
+		
 		Loop, Files, %themePath%\*.ini
 		{
 			themeFileList .= A_LoopFileName "|"
@@ -371,27 +401,8 @@ SortName:
 			themeList := StrReplace(themeFileList, ".ini" , "")
 		}
 		Gui, 3:Add,DropDownList, Choose%U_Theme% vColorChoice gColorPicked, %themeList%
-		Gui, 3:Add,Text,, Notes storage folder:
-		Gui, 3:Add,Edit, disabled r1 w%Gui3W% vNotesStorageFolder, %U_NotePath%
-		Gui, 3:Add,Button, gFolderSelect, Select a folder.
-		Gui, 3:Add, CheckBox, vUseCapslock gUseCapslockToggle, Use Capslock for Library?
-		GuiControl,,UseCapslock,%U_UserSetKey%
-		GuiControl,,SetCtrlC,%sendCtrlC%
 		
-		HotkeyNames := ["Show Library Window","Quick New Note"]
-		Loop,% 2 {
-			HotkeyNameTmp := HotkeyNames[A_Index]
-			Gui, 3:Add, Text, xm, Hotkey %HotkeyNameTmp%:
-			IniRead, savedHK%A_Index%, settings.ini, Hotkeys, %A_Index%, %A_Space%
-			If savedHK%A_Index%                                       
-				Hotkey,% savedHK%A_Index%, Label%A_Index%                 
-			StringReplace, noMods, savedHK%A_Index%, ~                  
-			StringReplace, noMods, noMods, #,,UseErrorLevel              
-			Gui, 3:Add, Hotkey, x+5 vHK%A_Index% gLabel, %noMods%           
-			Gui, 3:Add, CheckBox, x+5 vCB%A_Index% Checked%ErrorLevel%, Win  
-		}                                                               
-		if (U_UserSetKey = 1)
-			GuiControl, Disable, msctls_hotkey321
+		Gui, 3:Tab
 		Gui, 3:Add,Text,x0 w%Gui3W% +Center,Settings are saved automatically.
 		Gui, 3:Add,Text,x0 w%Gui3W% +Center,Press Esc to exit and reload.
 		Gui, 3:SHOW
