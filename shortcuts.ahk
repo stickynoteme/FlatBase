@@ -154,7 +154,7 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 		 SaveRowNumber = %LVSelectedROW%
 		 LV_GetText(RowText, LVSelectedROW)
 		 FileSafeName := RegExReplace(RowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
-		 MsgBox , 4, Delete?, Delete: %FileSafeName%.txt
+		 MsgBox , 52, Delete - Note , Delete: %FileSafeName%.txt
 		 IfMsgBox, No
 			Return 
 		 IfMsgBox, Yes

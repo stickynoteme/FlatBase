@@ -53,7 +53,13 @@ global ReR
 global PreR
 global FontFamily 
 global FontSize
-
+global ResultFontFamily
+global ResultFontSize
+global PreviewFontFamily
+global PreviewFontSize
+global SearchFontFamily
+global SearchFontSize
+global FontRendering
 
 iniPath = %A_WorkingDir%\settings.ini
 themePath = %A_WorkingDir%\Themes
@@ -79,6 +85,7 @@ global U_NotePath
 ;-------------------------------------------------
 ; Read and/or set Colors
 ;-------------------------------------------------
+IniRead, U_Theme, %iniPath%, Theme, UserSetting , Black
 IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor , 000000 ;Everything else
 IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor , ffffff ;Details background
 IniRead, U_MFC, %iniPath%, Colors, MainFontColor , ffffff ;Result and preview
@@ -91,8 +98,19 @@ IniRead, rowSelectTextColor, %iniPath%, Colors, RowSelectTextColor , 0xffffff ;R
 ;-------------------------------------------------
 ; Read and/or set Sizing, Font, & Other
 ;-------------------------------------------------
+IniRead, FontRendering,%iniPath%, General,FontRendering,5
 IniRead, FontFamily, %iniPath%, General, FontFamily ,Verdana
 IniRead, FontSize, %iniPath%, General, FontSize ,10
+
+IniRead, SearchFontFamily, %iniPath%, General, ResultFontFamily ,Verdana
+IniRead, SearchFontSize, %iniPath%, General, ResultFontSize ,10
+
+IniRead, ResultFontFamily, %iniPath%, General, ResultFontFamily ,Verdana
+IniRead, ResultFontSize, %iniPath%, General, ResultFontSize ,10
+
+IniRead, PreviewFontFamily, %iniPath%, General, PreviewFontFamily ,Verdana
+IniRead, PreviewFontSize, %iniPath%, General, PreviewFontSize ,10
+
 IniRead, PreR, %iniPath%, General, PreviewRows ,8
 IniRead, ReR, %iniPath%, General, ResultRows ,8
 IniRead, LibW, %iniPath%, General, WindowWidth ,530
@@ -103,8 +121,9 @@ IniRead, sendCtrlC, %iniPath%, General, sendCtrlC, 1
 ;-------------------------------------------------
 IniRead, isFristRun, %iniPath%, General, isFristRun,1
 if (isFristRun = "1") {
-	IniWrite, Vendana,%iniPath%,General,FontFamily
-	IniWrite, 10,%iniPath%,General,FontSize
+	IniWrite, 0, %iniPath%, General, isFristRun	
+	IniWrite, Verdana,%iniPath%,General,FontFamily
+	IniWrite, 12,%iniPath%,General,FontSize
 	IniWrite, 8,%iniPath%,General,PreviewRows
 	IniWrite, 8,%iniPath%,General,ResultRows
 	IniWrite, 530,%iniPath%,General,WindowWidth
@@ -132,6 +151,8 @@ global NameColAndBodyCOlW := NameColW+BodyColW
 ;Acitvate User Hotkeys if any
 ;-------------------------------------------------
 SetUserHotKeys()
+;BuildGUI1()
+goto Options
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------

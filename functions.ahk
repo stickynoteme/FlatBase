@@ -35,9 +35,13 @@ BuildGUI1(){
 	yPos /= 1.5
 	Gui, 1:New,, FlatNotes - Library
 	Gui, 1:Margin , 0, 0
-	Gui, 1:Font, s%FontSize%, %FontFamily%, %U_SFC%
+	Gui, 1:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_SFC%
 	Gui, 1:Color,%U_SBG%, %U_MBG%
-	Gui, 1:Add,Edit, c%U_FBCA% w%LibW% y8 x6 vSearchTerm gSearch -E0x200
+	Gui, 1:Add,Edit, c%U_FBCA% w%LibW% y%FontSize% x6 y8 vSearchTerm gSearch -E0x200
+	;ListBox used as background color for search area padding
+	Gui, 1:Add, ListBox, +0x100 h8 w%LibW% x0 y0 -E0x200 Disabled 
+	Gui, 1:Add, ListBox, +0x100 h15 w%LibW% x0 ys0 -E0x200 Disabled
+	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%	
 	Gui, 1:Add, text, c%U_SFC% w%NameColW% center gSortName vSortName, Name
 	Gui, 1:Add, text, c%U_SFC% xp+%NameColW% yp+1 w%BodyColW% center gSortBody vSortBody, Body
 	Gui, 1:Add, text, yp+1 xp+%BodyColW% w75 center c%U_MSFC% gSortAdded vSortAdded, Added
@@ -45,14 +49,14 @@ BuildGUI1(){
 	Gui, 1:Add,Edit, r0 h0  vFake,
 	GuiControl, Hide, Fake
 	Gui, 1:Add,Text, r1 w%LibW% Center C%U_SFC% vNoteDetailPreviewBox gNoteDetailPreviewBoxClick,
+	;Allow User set prevent/edit font
+	Gui, 1:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
 	Gui, 1:Add,Edit,  -E0x200 r%PreR% w%LibW% yp+18 x0 C%U_MFC% vPreviewBox,
 	
 	MakeFileList()
 	CLV := New LV_Colors(HLV)
 	CLV.SelectionColors(rowSelectColor,rowSelectTextColor)
-	
-	;ListBox used as background color for search area padding
-	Gui, 1:Add, ListBox, h44 w%LibW% x0 y0 -E0x200 Disabled -0x100 
+ 	
 	
 	Gui, 1:SHOW, w%SubW%  x%xPos% y%yPos%
 	isFristRun = 0
@@ -67,14 +71,14 @@ BuildGUI2(){
 	xPos /= 1.5
 	yPos /= 1.15
 	Gui, 2:New,, FlatNote - QuickNote
-	Gui, 2:Margin , 0, 0
-	Gui, 2:Font, s10, Verdana, white
+	Gui, 2:Margin , 0, 0 
+	Gui, 2:Font, s%FontSize% Q%FontRendering%, %FontFamily%, %U_SFC%	
 	Gui, 2:Color,%U_SBG%, %U_MBG%
 	Gui, 2:Add,Edit, C%U_MFC% w250 vQuickNoteName gQuickSafeNameUpdate -E0x200
 	Gui, 2:Add,Edit, -WantReturn C%U_MFC% r7 w500 y+1 vQuickNoteBody -E0x200
 	Gui, 2:Add,Text, C%U_SFC% x255 y3 w245 vFileSafeName,
 	Gui, 2:Add, Button,x-1000 default gSaveButton y-1000, &Save
-	Gui, 2:SHOW, w500 h145 x%xPos% y%yPos%
+	Gui, 2:SHOW, w500 h145 x%xPos% y%yPos% 
 	return
 }
 

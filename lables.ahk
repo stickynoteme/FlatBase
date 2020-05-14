@@ -353,12 +353,6 @@ SortName:
 	
 	Options:
 	{
-		IniRead, U_Theme, %iniPath%, Theme, UserSetting , Aqua-Dark
-		IniRead, U_NotePath, %iniPath%, General, MyNotePath , %U_NotePath%
-		IniRead, U_UserSetKey, %iniPath%, General, UserSetKey , 1
-		IniRead, sendCtrlC, %iniPath%, General, sendCtrlC, 1
-		
-		
 		Gui3W = 200
 		Gui, 3:New,,FlatNotes - Options
 		Gui, 3:Add, Tab3,, General|Hotkeys|Appearance
@@ -370,28 +364,32 @@ SortName:
 		Gui, 3:Tab, Hotkeys
 		Gui, 3:Add,CheckBox, vSetCtrlC gCtrlCToggle, Send Ctrl+C when using the quick note hotkey.
 		Gui, 3:Add, CheckBox, vUseCapslock gUseCapslockToggle, Use Capslock for Library?
-		GuiControl,,UseCapslock,%U_UserSetKey%
+		GuiControl,,UseCapslock,%U_Capslock%
 		GuiControl,,SetCtrlC,%sendCtrlC%
 		Gui, 3:Add,text, h1 Disabled 			
  		
 		HotkeyNames := ["Show Library Window","Quick New Note"]
 		Loop,% 2 {
-			HotkeyNameTmp := HotkeyNames[A_Index] 
+			HotkeyNameTmp := HotkeyNames[A_Index]
 			Gui, 3:Add, Text, , Hotkey: %HotkeyNameTmp%
 			IniRead, savedHK%A_Index%, settings.ini, Hotkeys, %A_Index%, %A_Space%
-			If savedHK%A_Index%                                       
-				Hotkey,% savedHK%A_Index%, Label%A_Index%                 
+			;Sets Hotkeys, this is done else where now and editing settings relodas the script
+			;If savedHK%A_Index%                                       
+				;Hotkey,% savedHK%A_Index%, Label%A_Index%                 
 			StringReplace, noMods, savedHK%A_Index%, ~                  
 			StringReplace, noMods, noMods, #,,UseErrorLevel              
 			Gui, 3:Add, Hotkey, section vHK%A_Index% gLabel, %noMods%           
 			Gui, 3:Add, CheckBox, x+5  vCB%A_Index% Checked%ErrorLevel%, Win
 			Gui, 3:Add,text, h0 xs0 Disabled
 		}                                                               
-		if (U_UserSetKey = 1)
+		if (U_Capslock = 1)
 			GuiControl, Disable, msctls_hotkey321
 		
 		
 		Gui, 3:Tab, Appearance
+		Gui, 3:Add,Text,,Font Rendering: (5 = ClearType)
+		Gui, Add, Edit,ReadOnly
+		Gui, 3:Add,UpDown, vFontRenderingSelect gSetFontRendering Range1-5, %FontRendering%
 		Gui, 3:Add,Text,,Theme Selection:
 		
 		Loop, Files, %themePath%\*.ini
@@ -402,70 +400,239 @@ SortName:
 		}
 		Gui, 3:Add,DropDownList, Choose%U_Theme% vColorChoice gColorPicked, %themeList%
 		
-		Gui, 3:Tab
+		FontOptionsArray := ["Bahnschrift","Fixedsys","Modern","MS Sans Serif","MS Serif","Neue Haas Grotesk Text Pro","Roman","Script","Small Fonts","System","Terminal","Arial","Arial Black","Arial Nova","Calibri","Calibri Light","Cambria","Candara","Comic Sans MS","Consolas","Constantia","Corbel","Courier","Courier New","Franklin Gothic Medium","Gabriola","Georgia","Georgia Pro","Gill Sans Nova","Impact","Lucida Console","Lucida Sans","Lucida Sans Unicode","Microsoft Sans Serif","Palatino Linotype","Rockwell Nova","Segoe Print","Segoe Script","Segoe UI","Sitka Display","Sitka Text","Tahoma","Times New Roman","Trebuchet MS","Verdana","Verdana Pro"]
+		
+		
+		CurrentFont = 1
+		C_PreventFont = 1
+		C_ResultFont = 1
+		C_SearchFont = 1
+		for k, v in FontOptionsArray
+		{ 
+			if (v = FontFamily) 
+				CurrentFont := k
+		} 
+		for k, v in FontOptionsArray
+		{ 
+			if (v = PreviewFontFamily) 
+				C_PreventFont := k
+		} 
+		for k, v in FontOptionsArray
+		{ 
+			if (v = ResultFontFamily) 
+				C_ResultFont := k
+		} 
+		for k, v in FontOptionsArray
+		{ 
+			if (v = SearchFontFamily) 
+				C_SearchFont := k
+		} 
+		Gui, 3:Add,text,section, Quick Note Interface font settings:
+		Gui, 3:add,DropDownList, Choose%CurrentFont% w100 vFontFamilySelect gSetFontFamily, Bahnschrift|Fixedsys|Modern|MS Sans Serif|MS Serif|Neue Haas Grotesk Text Pro|Roman|Script|Small Fonts|System|Terminal|Arial|Arial Black|Arial Nova|Calibri|Calibri Light|Cambria|Candara|Comic Sans MS|Consolas|Constantia|Corbel|Courier|Courier New|Franklin Gothic Medium|Gabriola|Georgia|Georgia Pro|Gill Sans Nova|Impact|Lucida Console|Lucida Sans|Lucida Sans Unicode|Microsoft Sans Serif|Palatino Linotype|Rockwell Nova|Segoe Print|Segoe Script|Segoe UI|Sitka Display|Sitka Text|Tahoma|Times New Roman|Trebuchet MS|Verdana|Verdana Pro 
+		CurrentFontSize := FontSize*0.5
+		Gui, 3:add,DropDownList, x+10 Choose%CurrentFontSize% vFontSizeSelect gSetFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
+		Gui, 3:Add,text,xs section, Search Box font settings:
+		Gui, 3:add,DropDownList, Choose%C_SearchFont% w100 vSearchFontFamilySelect gSetSearchFontFamily, Bahnschrift|Fixedsys|Modern|MS Sans Serif|MS Serif|Neue Haas Grotesk Text Pro|Roman|Script|Small Fonts|System|Terminal|Arial|Arial Black|Arial Nova|Calibri|Calibri Light|Cambria|Candara|Comic Sans MS|Consolas|Constantia|Corbel|Courier|Courier New|Franklin Gothic Medium|Gabriola|Georgia|Georgia Pro|Gill Sans Nova|Impact|Lucida Console|Lucida Sans|Lucida Sans Unicode|Microsoft Sans Serif|Palatino Linotype|Rockwell Nova|Segoe Print|Segoe Script|Segoe UI|Sitka Display|Sitka Text|Tahoma|Times New Roman|Trebuchet MS|Verdana|Verdana Pro 
+		CurrenSearchFontSize := ResultFontSize*0.5
+		Gui, 3:add,DropDownList, x+10 Choose%CurrenSearchFontSize% vSearchFontSizeSelect gSetSearchFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
+		Gui, 3:Add,text,xs section, Result font settings:
+		Gui, 3:add,DropDownList, Choose%C_ResultFont% w100 vResultFontFamilySelect gSetResultFontFamily, Bahnschrift|Fixedsys|Modern|MS Sans Serif|MS Serif|Neue Haas Grotesk Text Pro|Roman|Script|Small Fonts|System|Terminal|Arial|Arial Black|Arial Nova|Calibri|Calibri Light|Cambria|Candara|Comic Sans MS|Consolas|Constantia|Corbel|Courier|Courier New|Franklin Gothic Medium|Gabriola|Georgia|Georgia Pro|Gill Sans Nova|Impact|Lucida Console|Lucida Sans|Lucida Sans Unicode|Microsoft Sans Serif|Palatino Linotype|Rockwell Nova|Segoe Print|Segoe Script|Segoe UI|Sitka Display|Sitka Text|Tahoma|Times New Roman|Trebuchet MS|Verdana|Verdana Pro 
+		CurrenResulttFontSize := ResultFontSize*0.5
+		Gui, 3:add,DropDownList, x+10 Choose%CurrenResulttFontSize% vResultFontSizeSelect gSetResultFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
+		Gui, 3:Add,text,xs, Note font settings:
+		Gui, 3:add,DropDownList, Choose%C_PreventFont% w100 vPreviewFontFamilySelect gSetPreviewFontFamily, Bahnschrift|Fixedsys|Modern|MS Sans Serif|MS Serif|Neue Haas Grotesk Text Pro|Roman|Script|Small Fonts|System|Terminal|Arial|Arial Black|Arial Nova|Calibri|Calibri Light|Cambria|Candara|Comic Sans MS|Consolas|Constantia|Corbel|Courier|Courier New|Franklin Gothic Medium|Gabriola|Georgia|Georgia Pro|Gill Sans Nova|Impact|Lucida Console|Lucida Sans|Lucida Sans Unicode|Microsoft Sans Serif|Palatino Linotype|Rockwell Nova|Segoe Print|Segoe Script|Segoe UI|Sitka Display|Sitka Text|Tahoma|Times New Roman|Trebuchet MS|Verdana|Verdana Pro 
+		CurrentPreviewFontSize := PreviewFontSize*0.5
+		Gui, 3:add,DropDownList, x+10 Choose%CurrentPreviewFontSize% vPreviewFontSizeSelect gSetPreviewFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
+		Gui, 3:Tab 
 		Gui, 3:Add,Text,x0 w%Gui3W% +Center,Settings are saved automatically.
 		Gui, 3:Add,Text,x0 w%Gui3W% +Center,Press Esc to exit and reload.
 		Gui, 3:SHOW
 		WinSet, AlwaysOnTop, On, FlatNotes - Options
 		return
 	}
-	
-	
-	Label:
-	{
-		If %A_GuiControl% in +,^,!,+^,+!,^!,+^!    ;If the hotkey contains only modifiers, return to wait for a key.
-			return
-		num := SubStr(A_GuiControl,3)              ;Get the index number of the hotkey control.
-		If (HK%num% != "") {                       ;If the hotkey is not blank...
-			Gui, Submit, NoHide
-			If CB%num%                                ;  If the 'Win' box is checked, then add its modifier (#).
-				HK%num% := "#" HK%num%
-			If !RegExMatch(HK%num%,"[#!\^\+]")        ;  If the new hotkey has no modifiers, add the (~) modifier.
-				HK%num% := "~" HK%num%                   ;    This prevents any key from being blocked.
-			Loop,% #ctrls
-				If (HK%num% = savedHK%A_Index%) {        ;  Check for duplicate hotkey...
-					dup := A_Index
-					Loop,6 {
-						GuiControl,% "Disable" b:=!b, HK%dup%  ;    Flash the original hotkey to alert the user.
-						Sleep,200
-					}
-					GuiControl,,HK%num%,% HK%num% :=""      ;    Delete the hotkey and clear the control.
-					break
+SetFontRendering:
+{
+	GuiControlGet, U_FontRendering,,FontRenderingSelect	
+	IniWrite, %U_FontRendering%,%iniPath%,General, FontRendering		
+	IniRead, FontRendering,%iniPath%, General,FontRendering
+	Gui, 1:Destroy
+	BuildGUI1()
+	if WinExist("FlatNotes - Options")
+		WinActivate ; use the window found above
+	else
+		WinActivate, FlatNotes
+	return 
+} 
+SetSearchFontFamily:
+{
+	GuiControlGet, U_SearchFontFamily,,SearchFontFamilySelect
+	IniWrite, %U_SearchFontFamily%,%iniPath%,General, SearchFontFamily	
+	IniRead, SearchFontFamily, %iniPath%, General, SearchFontFamily
+	Gui, 1:Destroy
+	BuildGUI1()
+	if WinExist("FlatNotes - Options")
+		WinActivate ; use the window found above
+	else
+		WinActivate, FlatNotes
+	GuiControl,,SearchTerm, Sample Text
+	return 
+}
+SetSearchFontSize:
+{
+	GuiControlGet, U_SearchSize,,SearchFontSizeSelect	
+	IniWrite, %U_SearchSize%,%iniPath%,General, SearchFontSize
+	IniRead, SearchFontSize, %iniPath%, General, SearchFontSize
+	Gui, 1:Destroy
+	BuildGUI1()
+	if WinExist("FlatNotes - Options")
+		WinActivate ; use the window found above
+	else
+		WinActivate, FlatNotes
+	GuiControl,,SearchTerm, Sample Text
+	return 
+}
+SetResultFontFamily:
+{
+	GuiControlGet, U_ResultFontFamily,,ResultFontFamilySelect
+	IniWrite, %U_ResultFontFamily%,%iniPath%,General, ResultFontFamily	
+	IniRead, ResultFontFamily, %iniPath%, General, ResultFontFamily
+	Gui, 1:Destroy
+	BuildGUI1()
+	if WinExist("FlatNotes - Options")
+		WinActivate ; use the window found above
+	else
+		WinActivate, FlatNotes
+	return 
+}
+SetResultFontSize:
+{
+	GuiControlGet, U_ResultSize,,ResultFontSizeSelect	
+	IniWrite, %U_ResultSize%,%iniPath%,General, ResultFontSize
+	IniRead, ResultFontSize, %iniPath%, General, ResultFontSize
+	Gui, 1:Destroy
+	BuildGUI1()
+	if WinExist("FlatNotes - Options")
+		WinActivate ; use the window found above
+	else
+		WinActivate, FlatNotes
+	return 
+}
+SetPreviewFontFamily:
+{
+	GuiControlGet, U_PreviewFontFamily,,PreviewFontFamilySelect
+	IniWrite, %U_PreviewFontFamily%,%iniPath%,General, PreviewFontFamily	
+	IniRead, PreviewFontFamily, %iniPath%, General, PreviewFontFamily
+	Gui, 1:Destroy
+	BuildGUI1()
+	if WinExist("FlatNotes - Options")
+		WinActivate ; use the window found above
+	else
+		WinActivate, FlatNotes
+	GuiControl,,PreviewBox, Sample Text 	
+	return
+}
+SetPreviewFontSize:
+{
+	GuiControlGet, U_PreviewSize,,PreviewFontSizeSelect	
+	IniWrite, %U_PreviewSize%,%iniPath%,General, PreviewFontSize
+	IniRead, PreviewFontSize, %iniPath%, General, PreviewFontSize
+	Gui, 1:Destroy
+	BuildGUI1()
+	if WinExist("FlatNotes - Options")
+		WinActivate ; use the window found above
+	else
+		WinActivate, FlatNotes
+	GuiControl,,PreviewBox, Sample Text 	
+	return
+}
+SetFontFamily:
+{ 
+	GuiControlGet, U_FontFamily,,FontFamilySelect
+	IniWrite, %U_FontFamily%,%iniPath%,General, FontFamily	
+	IniRead, FontFamily, %iniPath%, General, FontFamily ,Verdana
+	Gui, 1:Destroy
+	Gui, 2:Destroy
+	BuildGUI2()
+	if WinExist("FlatNote - QuickNote")
+		WinActivate ; use the window found above
+	else
+		WinActivate, FlatNotes
+	GuiControl,,QuickNoteName, Sample Text
+	GuiControl,,QuickNoteBody, Sample Text
+	return
+}
+
+SetFontSize:
+{
+	GuiControlGet, U_FontSize,,FontSizeSelect	
+	IniWrite, %U_FontSize%,%iniPath%,General, FontSize
+	IniRead, FontSize, %iniPath%, General, FontSize ,10
+	Gui, 1:Destroy
+	Gui, 2:Destroy	
+	BuildGUI2()
+	if WinExist("FlatNote - QuickNote")
+		WinActivate ; use the window found above
+	else
+		WinActivate, FlatNotes
+	GuiControl,,QuickNoteName, Sample Text
+	GuiControl,,QuickNoteBody, Sample Text
+	return
+}
+Label:
+{
+	If %A_GuiControl% in +,^,!,+^,+!,^!,+^!    ;If the hotkey contains only modifiers, return to wait for a key.
+		return
+	num := SubStr(A_GuiControl,3)              ;Get the index number of the hotkey control.
+	If (HK%num% != "") {                       ;If the hotkey is not blank...
+		Gui, Submit, NoHide
+		If CB%num%                                ;  If the 'Win' box is checked, then add its modifier (#).
+			HK%num% := "#" HK%num%
+		If !RegExMatch(HK%num%,"[#!\^\+]")        ;  If the new hotkey has no modifiers, add the (~) modifier.
+			HK%num% := "~" HK%num%                   ;    This prevents any key from being blocked.
+		Loop,% #ctrls
+			If (HK%num% = savedHK%A_Index%) {        ;  Check for duplicate hotkey...
+				dup := A_Index
+				Loop,6 {
+					GuiControl,% "Disable" b:=!b, HK%dup%  ;    Flash the original hotkey to alert the user.
+					Sleep,200
 				}
-		}
-		If (savedHK%num% || HK%num%)
-			setHK(num, savedHK%num%, HK%num%)
-		return
+				GuiControl,,HK%num%,% HK%num% :=""      ;    Delete the hotkey and clear the control.
+				break
+			}
 	}
-	3GuiEscape:
-	{
-		Gui, 3:Destroy
-		reload
-		return
-	}
-	2GuiEscape:
-	{
-		Gui, 2:Destroy 
-		return
-	}
-	GuiEscape:
-	{
-		Gui, Destroy
-		return
-	}
-	Exit:
-	{
-		ExitApp
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	If (savedHK%num% || HK%num%)
+		setHK(num, savedHK%num%, HK%num%)
+	return
+}
+3GuiEscape:
+{
+	Gui, 3:Destroy
+	reload
+	return
+}
+2GuiEscape:
+{
+	Gui, 2:Destroy 
+	return
+}
+GuiEscape:
+{
+	Gui, Destroy
+	return
+}
+Exit:
+{
+	ExitApp
+}
+
+
+
+
+
+
+
+
+
+
+
+
