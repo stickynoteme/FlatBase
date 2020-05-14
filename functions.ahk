@@ -60,22 +60,22 @@ BuildGUI1(){
 }
 
 BuildGUI2(){
-FileSafeClipBoard := RegExReplace(clipboard, "\*|\?|\||/|""|:|<|>"yyyy , Replacement := "_")
-CheckForOldNote = %U_NotePath%%FileSafeClipBoard%.txt
-FileRead, OldNoteData, %CheckForOldNote%
-MouseGetPos, xPos, yPos
-xPos /= 1.5
-yPos /= 1.15
-Gui, 2:New,, FlatNote - QuickNote
-Gui, 2:Margin , 0, 0
-Gui, 2:Font, s10, Verdana, white
-Gui, 2:Color,%U_SBG%, %U_MBG%
-Gui, 2:Add,Edit, C%U_MFC% w250 vQuickNoteName gQuickSafeNameUpdate
-Gui, 2:Add,Edit, -WantReturn C%U_MFC% r7 w500 vQuickNoteBody
-Gui, 2:Add,Text, C%U_SFC% x255 y3 w245 vFileSafeName,
-Gui, 2:Add, Button,x-1000 default gSaveButton y-1000, &Save
-Gui, 2:SHOW, w500 h145 x%xPos% y%yPos%
-return
+	FileSafeClipBoard := RegExReplace(clipboard, "\*|\?|\||/|""|:|<|>"yyyy , Replacement := "_")
+	CheckForOldNote = %U_NotePath%%FileSafeClipBoard%.txt
+	FileRead, OldNoteData, %CheckForOldNote%
+	MouseGetPos, xPos, yPos
+	xPos /= 1.5
+	yPos /= 1.15
+	Gui, 2:New,, FlatNote - QuickNote
+	Gui, 2:Margin , 0, 0
+	Gui, 2:Font, s10, Verdana, white
+	Gui, 2:Color,%U_SBG%, %U_MBG%
+	Gui, 2:Add,Edit, C%U_MFC% w250 vQuickNoteName gQuickSafeNameUpdate -E0x200
+	Gui, 2:Add,Edit, -WantReturn C%U_MFC% r7 w500 y+1 vQuickNoteBody -E0x200
+	Gui, 2:Add,Text, C%U_SFC% x255 y3 w245 vFileSafeName,
+	Gui, 2:Add, Button,x-1000 default gSaveButton y-1000, &Save
+	Gui, 2:SHOW, w500 h145 x%xPos% y%yPos%
+	return
 }
 
 MakeFileList(){

@@ -240,377 +240,44 @@ UseCapslockToggle:
 	}
 return
 }
+
 ColorPicked:
 {
-	if (A_GuiEvent == "Normal"){
-		
+	if (A_GuiEvent == "Normal"){	
 		GuiControlGet, ColorPicked,,ColorChoice
-		if (A_GuiEvent = "Normal" && ColorPicked = "Black" ) 
-		{
-			IniWrite, 000000,%iniPath%,Colors,MainBackgroundColor
-			IniWrite, ffffff,%iniPath%,Colors,SubBackgroundColor
-			IniWrite, ffffff,%iniPath%,Colors,MainFontColor
-			IniWrite, 000000,%iniPath%,Colors,SubFontColor
-			IniWrite, ffffff,%iniPath%,Colors,MainSortFontColor
-			IniWrite, 777700,%iniPath%,Colors,SearchBoxFontColor
-			IniWrite, 0x444444,%iniPath%,Colors,RowSelectColor
-			IniWrite, 0xffffff,%iniPath%,Colors,RowSelectTextColor
-			
-			IniWrite, 2, %iniPath%, Theme, UserSetting
-			
-			IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor
-			IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor
-			IniRead, U_MFC, %iniPath%, Colors, MainFontColor
-			IniRead, U_SFC, %iniPath%, Colors, SubFontColor
-			IniRead, U_MSFC, %iniPath%, Colors, MainSortFontColor
-			IniRead, U_FBCA, %iniPath%, Colors, SearchBoxFontColor
-			IniRead, rowSelectColor, %iniPath%, Colors, RowSelectColor
-			IniRead, rowSelectTextColor, %iniPath%, Colors, RowSelectTextColor
-		}
-		if (A_GuiEvent = "Normal" && ColorPicked = "White" ) 
-		{
-			IniWrite, ffffff,%iniPath%,Colors,MainBackgroundColor
-			IniWrite, 000000,%iniPath%,Colors,SubBackgroundColor
-			IniWrite, 000000,%iniPath%,Colors,MainFontColor
-			IniWrite, ffffff,%iniPath%,Colors,SubFontColor
-			IniWrite, 000000,%iniPath%,Colors,MainSortFontColor
-			IniWrite, bbbb00,%iniPath%,Colors,SearchBoxFontColor
-			IniWrite, 0xdddddd,%iniPath%,Colors,RowSelectColor
-			IniWrite, 0x000000,%iniPath%,Colors,RowSelectTextColor
-			
-			IniWrite, 16, %iniPath%, Theme, UserSetting
-			
-			IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor
-			IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor
-			IniRead, U_MFC, %iniPath%, Colors, MainFontColor
-			IniRead, U_SFC, %iniPath%, Colors, SubFontColor
-			IniRead, U_MSFC, %iniPath%, Colors, MainSortFontColor
-			IniRead, U_FBCA, %iniPath%, Colors, SearchBoxFontColor
-			IniRead, rowSelectColor, %iniPath%, Colors, RowSelectColor
-			IniRead, rowSelectTextColor, %iniPath%, Colors, RowSelectTextColor
-		}
-		if (A_GuiEvent = "Normal" && ColorPicked = "Chalkboard" ) 
-		{		
-			IniWrite, 003300,%iniPath%,Colors,MainBackgroundColor
-			IniWrite, 001100,%iniPath%,Colors,SubBackgroundColor
-			IniWrite, ffffff,%iniPath%,Colors,MainFontColor
-			IniWrite, aaaaff,%iniPath%,Colors,SubFontColor
-			IniWrite, ffff00,%iniPath%,Colors,MainSortFontColor
-			IniWrite, ffff00,%iniPath%,Colors,SearchBoxFontColor
-			IniWrite, 0x007700,%iniPath%,Colors,RowSelectColor
-			IniWrite, 0xaaffaa,%iniPath%,Colors,RowSelectTextColor
-			
-			IniWrite, 4, %iniPath%, Theme, UserSetting
-			
-			
-			IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor
-			IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor
-			IniRead, U_MFC, %iniPath%, Colors, MainFontColor
-			IniRead, U_SFC, %iniPath%, Colors, SubFontColor
-			IniRead, U_MSFC, %iniPath%, Colors, MainSortFontColor
-			IniRead, U_FBCA, %iniPath%, Colors, SearchBoxFontColor
-			IniRead, rowSelectColor, %iniPath%, Colors, RowSelectColor
-			IniRead, rowSelectTextColor, %iniPath%, Colors, RowSelectTextColor
-		}
-		if (A_GuiEvent = "Normal" && ColorPicked = "Rose" ) 
-		{	
-			IniWrite, 10, %iniPath%, Theme, UserSetting	
-			IniWrite, dd9999,%iniPath%,Colors,MainBackgroundColor
-			IniWrite, FFFFFF,%iniPath%,Colors,SubBackgroundColor
-			IniWrite, 000000,%iniPath%,Colors,MainFontColor
-			IniWrite, 000000,%iniPath%,Colors,SubFontColor
-			IniWrite, dd9999,%iniPath%,Colors,MainSortFontColor
-			IniWrite, 000000,%iniPath%,Colors,SearchBoxFontColor
-			IniWrite, 0xffaaaa,%iniPath%,Colors,RowSelectColor
-			IniWrite, 0x000000,%iniPath%,Colors,RowSelectTextColor
-			
-			
-			IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor
-			IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor
-			IniRead, U_MFC, %iniPath%, Colors, MainFontColor
-			IniRead, U_SFC, %iniPath%, Colors, SubFontColor
-			IniRead, U_MSFC, %iniPath%, Colors, MainSortFontColor
-			IniRead, U_FBCA, %iniPath%, Colors, SearchBoxFontColor
-			IniRead, rowSelectColor, %iniPath%, Colors, RowSelectColor
-			IniRead, rowSelectTextColor, %iniPath%, Colors, RowSelectTextColor
-		}
-		if (A_GuiEvent = "Normal" && ColorPicked = "Sugar Cookie" ) 
-		{
-			IniWrite, 14, %iniPath%, Theme, UserSetting		
-			IniWrite, ffddff,%iniPath%,Colors,MainBackgroundColor
-			IniWrite, FFFFFF,%iniPath%,Colors,SubBackgroundColor
-			IniWrite, 000000,%iniPath%,Colors,MainFontColor
-			IniWrite, 000000,%iniPath%,Colors,SubFontColor
-			IniWrite, dd99dd,%iniPath%,Colors,MainSortFontColor
-			IniWrite, 000000,%iniPath%,Colors,SearchBoxFontColor
-			IniWrite, 0xfff0ff,%iniPath%,Colors,RowSelectColor
-			IniWrite, 0x000000,%iniPath%,Colors,RowSelectTextColor
-			
-			
-			IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor
-			IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor
-			IniRead, U_MFC, %iniPath%, Colors, MainFontColor
-			IniRead, U_SFC, %iniPath%, Colors, SubFontColor
-			IniRead, U_MSFC, %iniPath%, Colors, MainSortFontColor
-			IniRead, U_FBCA, %iniPath%, Colors, SearchBoxFontColor
-			IniRead, rowSelectColor, %iniPath%, Colors, RowSelectColor
-			IniRead, rowSelectTextColor, %iniPath%, Colors, RowSelectTextColor
-			
-		}
-		if (A_GuiEvent = "Normal" && ColorPicked = "Pink" )
-		{
-			IniWrite, 9, %iniPath%, Theme, UserSetting		
-			IniWrite, dd99dd,%iniPath%,Colors,MainBackgroundColor
-			IniWrite, FFFFFF,%iniPath%,Colors,SubBackgroundColor
-			IniWrite, 000000,%iniPath%,Colors,MainFontColor
-			IniWrite, 000000,%iniPath%,Colors,SubFontColor
-			IniWrite, dd99dd,%iniPath%,Colors,MainSortFontColor
-			IniWrite, 00000r0,%iniPath%,Colors,SearchBoxFontColor
-			IniWrite, 0xffddff,%iniPath%,Colors,RowSelectColor
-			IniWrite, 0x000000,%iniPath%,Colors,RowSelectTextColor
-			
-			
-			IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor
-			IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor
-			IniRead, U_MFC, %iniPath%, Colors, MainFontColor
-			IniRead, U_SFC, %iniPath%, Colors, SubFontColor
-			IniRead, U_MSFC, %iniPath%, Colors, MainSortFontColor
-			IniRead, U_FBCA, %iniPath%, Colors, SearchBoxFontColor
-			IniRead, rowSelectColor, %iniPath%, Colors, RowSelectColor
-			IniRead, rowSelectTextColor, %iniPath%, Colors, RowSelectTextColor
-			
-		}
-		if (A_GuiEvent = "Normal" && ColorPicked = "Sensual" ) 
-		{
-			IniWrite, 12, %iniPath%, Theme, UserSetting		
-			IniWrite, 000000,%iniPath%,Colors,MainBackgroundColor
-			IniWrite, eeccee,%iniPath%,Colors,SubBackgroundColor
-			IniWrite, ffffff,%iniPath%,Colors,MainFontColor
-			IniWrite, 000000,%iniPath%,Colors,SubFontColor
-			IniWrite, ffffff,%iniPath%,Colors,MainSortFontColor
-			IniWrite, ffffff,%iniPath%,Colors,SearchBoxFontColor
-			IniWrite, 0xffddff,%iniPath%,Colors,RowSelectColor
-			IniWrite, 0x000000,%iniPath%,Colors,RowSelectTextColor
-			
-			
-			IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor
-			IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor
-			IniRead, U_MFC, %iniPath%, Colors, MainFontColor
-			IniRead, U_SFC, %iniPath%, Colors, SubFontColor
-			IniRead, U_MSFC, %iniPath%, Colors, MainSortFontColor
-			IniRead, U_FBCA, %iniPath%, Colors, SearchBoxFontColor
-			IniRead, rowSelectColor, %iniPath%, Colors, RowSelectColor
-			IniRead, rowSelectTextColor, %iniPath%, Colors, RowSelectTextColor
-		}
-		if (A_GuiEvent = "Normal" && ColorPicked = "Chocolate" ) 
-		{
-			IniWrite, 5, %iniPath%, Theme, UserSetting		
-			IniWrite, 0x331100,%iniPath%,Colors,MainBackgroundColor
-			IniWrite, 0x885533,%iniPath%,Colors,SubBackgroundColor
-			IniWrite, 0xffffff,%iniPath%,Colors,MainFontColor
-			IniWrite, 0xffffff,%iniPath%,Colors,SubFontColor
-			IniWrite, 0xaa8855,%iniPath%,Colors,MainSortFontColor
-			IniWrite, 0xffddaa,%iniPath%,Colors,SearchBoxFontColor
-			IniWrite, 0xaa8866,%iniPath%,Colors,RowSelectColor
-			IniWrite, 0x331100,%iniPath%,Colors,RowSelectTextColor
-			
-			
-			IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor
-			IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor
-			IniRead, U_MFC, %iniPath%, Colors, MainFontColor
-			IniRead, U_SFC, %iniPath%, Colors, SubFontColor
-			IniRead, U_MSFC, %iniPath%, Colors, MainSortFontColor
-			IniRead, U_FBCA, %iniPath%, Colors, SearchBoxFontColor
-			IniRead, rowSelectColor, %iniPath%, Colors, RowSelectColor
-			IniRead, rowSelectTextColor, %iniPath%, Colors, RowSelectTextColor
-		}		
-		if (A_GuiEvent = "Normal" && ColorPicked = "Velvet" )
-		{
-			IniWrite, 15, %iniPath%, Theme, UserSetting		
-			IniWrite, 0x330033,%iniPath%,Colors,MainBackgroundColor
-			IniWrite, 0x000000,%iniPath%,Colors,SubBackgroundColor
-			IniWrite, 0xffffff,%iniPath%,Colors,MainFontColor
-			IniWrite, 0xeeeeff,%iniPath%,Colors,SubFontColor
-			IniWrite, 0xdd99dd,%iniPath%,Colors,MainSortFontColor
-			IniWrite, 0xffffff,%iniPath%,Colors,SearchBoxFontColor
-			IniWrite, 0x000000,%iniPath%,Colors,RowSelectColor
-			IniWrite, 0xffffff,%iniPath%,Colors,RowSelectTextColor
-			
-			
-			IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor
-			IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor
-			IniRead, U_MFC, %iniPath%, Colors, MainFontColor
-			IniRead, U_SFC, %iniPath%, Colors, SubFontColor
-			IniRead, U_MSFC, %iniPath%, Colors, MainSortFontColor
-			IniRead, U_FBCA, %iniPath%, Colors, SearchBoxFontColor
-			IniRead, rowSelectColor, %iniPath%, Colors, RowSelectColor
-			IniRead, rowSelectTextColor, %iniPath%, Colors, RowSelectTextColor
-		}
-		if (A_GuiEvent = "Normal" && ColorPicked = "Lavender" ) 
-		{
-			IniWrite, 6, %iniPath%, Theme, UserSetting		
-			IniWrite, 0x9999dd,%iniPath%,Colors,MainBackgroundColor
-			IniWrite, 0xFFFFFF,%iniPath%,Colors,SubBackgroundColor
-			IniWrite, 0x000000,%iniPath%,Colors,MainFontColor
-			IniWrite, 0x000000,%iniPath%,Colors,SubFontColor
-			IniWrite, 0x9999dd,%iniPath%,Colors,MainSortFontColor
-			IniWrite, 0xffffff,%iniPath%,Colors,SearchBoxFontColor
-			IniWrite, 0xaaaaff,%iniPath%,Colors,RowSelectColor
-			IniWrite, 0x000000,%iniPath%,Colors,RowSelectTextColor
-			
-			
-			IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor
-			IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor
-			IniRead, U_MFC, %iniPath%, Colors, MainFontColor
-			IniRead, U_SFC, %iniPath%, Colors, SubFontColor
-			IniRead, U_MSFC, %iniPath%, Colors, MainSortFontColor
-			IniRead, U_FBCA, %iniPath%, Colors, SearchBoxFontColor
-			IniRead, rowSelectColor, %iniPath%, Colors, RowSelectColor
-			IniRead, rowSelectTextColor, %iniPath%, Colors, RowSelectTextColor
-		}
-		if (A_GuiEvent = "Normal" && ColorPicked = "Seafoam" ) 
-		{
-			IniWrite, 11, %iniPath%, Theme, UserSetting		
-			IniWrite, 0x99dddd,%iniPath%,Colors,MainBackgroundColor
-			IniWrite, 0xFFFFFF,%iniPath%,Colors,SubBackgroundColor
-			IniWrite, 0x000000,%iniPath%,Colors,MainFontColor
-			IniWrite, 0x000000,%iniPath%,Colors,SubFontColor
-			IniWrite, 0x99dddd,%iniPath%,Colors,MainSortFontColor
-			IniWrite, 0x000000,%iniPath%,Colors,SearchBoxFontColor
-			IniWrite, 0xddf0f0,%iniPath%,Colors,RowSelectColor
-			IniWrite, 0x000000,%iniPath%,Colors,RowSelectTextColor
-			
-			
-			IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor
-			IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor
-			IniRead, U_MFC, %iniPath%, Colors, MainFontColor
-			IniRead, U_SFC, %iniPath%, Colors, SubFontColor
-			IniRead, U_MSFC, %iniPath%, Colors, MainSortFontColor
-			IniRead, U_FBCA, %iniPath%, Colors, SearchBoxFontColor
-			IniRead, rowSelectColor, %iniPath%, Colors, RowSelectColor
-			IniRead, rowSelectTextColor, %iniPath%, Colors, RowSelectTextColor
-		}
-		if (A_GuiEvent = "Normal" && ColorPicked = "Sky" ) 
-		{
-			IniWrite, 13, %iniPath%, Theme, UserSetting		
-			IniWrite, 0x999dd,%iniPath%,Colors,MainBackgroundColor
-			IniWrite, 0xFFFFFF,%iniPath%,Colors,SubBackgroundColor
-			IniWrite, 0x000000,%iniPath%,Colors,MainFontColor
-			IniWrite, 0x000000,%iniPath%,Colors,SubFontColor
-			IniWrite, 0x9999dd,%iniPath%,Colors,MainSortFontColor
-			IniWrite, 0x000000,%iniPath%,Colors,SearchBoxFontColor
-			IniWrite, 0xeeeeff,%iniPath%,Colors,RowSelectColor
-			IniWrite, 0x000000,%iniPath%,Colors,RowSelectTextColor
-			
-			
-			IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor
-			IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor
-			IniRead, U_MFC, %iniPath%, Colors, MainFontColor
-			IniRead, U_SFC, %iniPath%, Colors, SubFontColor
-			IniRead, U_MSFC, %iniPath%, Colors, MainSortFontColor
-			IniRead, U_FBCA, %iniPath%, Colors, SearchBoxFontColor
-			IniRead, rowSelectColor, %iniPath%, Colors, RowSelectColor
-			IniRead, rowSelectTextColor, %iniPath%, Colors, RowSelectTextColor
-		}
-		if (A_GuiEvent = "Normal" && ColorPicked = "Notepaper" ) 
-		{
-			IniWrite, 7, %iniPath%, Theme, UserSetting		
-			IniWrite, 0xdddd99,%iniPath%,Colors,MainBackgroundColor
-			IniWrite, 0xFFFFFF,%iniPath%,Colors,SubBackgroundColor
-			IniWrite, 0x000000,%iniPath%,Colors,MainFontColor
-			IniWrite, 0x000000,%iniPath%,Colors,SubFontColor
-			IniWrite, 0xdddd99,%iniPath%,Colors,MainSortFontColor
-			IniWrite, 0x000000,%iniPath%,Colors,SearchBoxFontColor
-			IniWrite, 0xffff99,%iniPath%,Colors,RowSelectColor
-			IniWrite, 0x000000,%iniPath%,Colors,RowSelectTextColor
-			
-			
-			IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor
-			IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor
-			IniRead, U_MFC, %iniPath%, Colors, MainFontColor
-			IniRead, U_SFC, %iniPath%, Colors, SubFontColor
-			IniRead, U_MSFC, %iniPath%, Colors, MainSortFontColor
-			IniRead, U_FBCA, %iniPath%, Colors, SearchBoxFontColor
-			IniRead, rowSelectColor, %iniPath%, Colors, RowSelectColor
-			IniRead, rowSelectTextColor, %iniPath%, Colors, RowSelectTextColor
-		}
-		if (A_GuiEvent = "Normal" && ColorPicked = "Orange Cream" ) 
-		{
-			IniWrite, 8, %iniPath%, Theme, UserSetting		
-			IniWrite, 0xdd9933,%iniPath%,Colors,MainBackgroundColor
-			IniWrite, 0xFFFFFF,%iniPath%,Colors,SubBackgroundColor
-			IniWrite, 0x000000,%iniPath%,Colors,MainFontColor
-			IniWrite, 0x000000,%iniPath%,Colors,SubFontColor
-			IniWrite, 0xdd9933,%iniPath%,Colors,MainSortFontColor
-			IniWrite, 0x000000,%iniPath%,Colors,SearchBoxFontColor
-			IniWrite, 0xffaa55,%iniPath%,Colors,RowSelectColor
-			IniWrite, 0x000000,%iniPath%,Colors,RowSelectTextColor
-			
-			
-			IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor
-			IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor
-			IniRead, U_MFC, %iniPath%, Colors, MainFontColor
-			IniRead, U_SFC, %iniPath%, Colors, SubFontColor
-			IniRead, U_MSFC, %iniPath%, Colors, MainSortFontColor
-			IniRead, U_FBCA, %iniPath%, Colors, SearchBoxFontColor
-			IniRead, rowSelectColor, %iniPath%, Colors, RowSelectColor
-			IniRead, rowSelectTextColor, %iniPath%, Colors, RowSelectTextColor
-		}
-		if (A_GuiEvent = "Normal" && ColorPicked = "Aqua" ) 
-		{
-			IniWrite, 1, %iniPath%, Theme, UserSetting		
-			IniWrite, 0x005867,%iniPath%,Colors,MainBackgroundColor
-			IniWrite, 0x0088aa,%iniPath%,Colors,SubBackgroundColor
-			IniWrite, 0xffffff,%iniPath%,Colors,MainFontColor
-			IniWrite, 0xffffff,%iniPath%,Colors,SubFontColor
-			IniWrite, 0x99aaee,%iniPath%,Colors,MainSortFontColor
-			IniWrite, 0xffffff,%iniPath%,Colors,SearchBoxFontColor
-			IniWrite, 0x00aacc,%iniPath%,Colors,RowSelectColor
-			IniWrite, 0x000000,%iniPath%,Colors,RowSelectTextColor
-			
-			
-			IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor
-			IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor
-			IniRead, U_MFC, %iniPath%, Colors, MainFontColor
-			IniRead, U_SFC, %iniPath%, Colors, SubFontColor
-			IniRead, U_MSFC, %iniPath%, Colors, MainSortFontColor
-			IniRead, U_FBCA, %iniPath%, Colors, SearchBoxFontColor
-			IniRead, rowSelectColor, %iniPath%, Colors, RowSelectColor
-			IniRead, rowSelectTextColor, %iniPath%, Colors, RowSelectTextColor
-		}
-		if (A_GuiEvent = "Normal" && ColorPicked = "Brown Mustard" ) 
-		{
-			IniWrite, 3, %iniPath%, Theme, UserSetting		
-			IniWrite, 0xaa7700,%iniPath%,Colors,MainBackgroundColor
-			IniWrite, 0xFFFFFF,%iniPath%,Colors,SubBackgroundColor
-			IniWrite, 0x000000,%iniPath%,Colors,MainFontColor
-			IniWrite, 0x000000,%iniPath%,Colors,SubFontColor
-			IniWrite, 0xaa7700,%iniPath%,Colors,MainSortFontColor
-			IniWrite, 0x000000,%iniPath%,Colors,SearchBoxFontColor
-			IniWrite, 0xcc9900,%iniPath%,Colors,RowSelectColor
-			IniWrite, 0x000000,%iniPath%,Colors,RowSelectTextColor
-			
-			
-			IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor
-			IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor
-			IniRead, U_MFC, %iniPath%, Colors, MainFontColor
-			IniRead, U_SFC, %iniPath%, Colors, SubFontColor
-			IniRead, U_MSFC, %iniPath%, Colors, MainSortFontColor
-			IniRead, U_FBCA, %iniPath%, Colors, SearchBoxFontColor
-			IniRead, rowSelectColor, %iniPath%, Colors, RowSelectColor
-			IniRead, rowSelectTextColor, %iniPath%, Colors, RowSelectTextColor
-		}
+		pathToTheme = %A_WorkingDir%\Themes\%ColorPicked%.ini
 		
-		Gui, 1:Destroy
-		goto vk14
-		if WinExist("FlatNotes - Options")
-			WinActivate ; use the window found above
-		else
-			WinActivate, FlatNotes
+		IniRead, U_MBG, %pathToTheme%, Colors, MainBackgroundColor
+		IniRead, U_SBG, %pathToTheme%, Colors, SubBackgroundColor
+		IniRead, U_MFC, %pathToTheme%, Colors, MainFontColor
+		IniRead, U_SFC, %pathToTheme%, Colors, SubFontColor
+		IniRead, U_MSFC, %pathToTheme%, Colors, MainSortFontColor
+		IniRead, U_FBCA, %pathToTheme%, Colors, SearchBoxFontColor
+		IniRead, rowSelectColor, %pathToTheme%, Colors, RowSelectColor
+		IniRead, rowSelectTextColor, %pathToTheme%, Colors, RowSelectTextColor
+		IniRead, themeNumber, %pathToTheme%, Theme, UserSetting
+		
+		IniWrite, %U_MBG%,%iniPath%,Colors,MainBackgroundColor
+		IniWrite, %U_SBG%,%iniPath%,Colors,SubBackgroundColor
+		IniWrite, %U_MFC%,%iniPath%,Colors,MainFontColor
+		IniWrite, %U_SFC%,%iniPath%,Colors,SubFontColor
+		IniWrite, %U_MSFC%,%iniPath%,Colors,MainSortFontColor
+		IniWrite, %U_FBCA%,%iniPath%,Colors,SearchBoxFontColor
+		IniWrite, %rowSelectColor%,%iniPath%,Colors,RowSelectColor
+		IniWrite, %rowSelectTextColor%,%iniPath%,Colors,RowSelectTextColor
+		IniWrite, %themeNumber%, %iniPath%, Theme, UserSetting
+		
 	}
+	Gui, 1:Destroy
+	BuildGUI1()
+	if WinExist("FlatNotes - Options")
+		WinActivate ; use the window found above
+	else
+		WinActivate, FlatNotes
 	return
 }
-	SortName:
+
+SortName:
 	{
 		if (NextSortName ="1") {
 			LV_ModifyCol(1, "SortDesc")
@@ -696,7 +363,14 @@ ColorPicked:
 		Gui, 3:New,,FlatNotes - Options
 		Gui, 3:Add,CheckBox, vSetCtrlC gCtrlCToggle, Send Ctrl+C when using the quick note hotkey.
 		Gui, 3:Add,Text,,Theme Selection:
-		Gui, 3:Add,DropDownList, Choose%U_Theme% vColorChoice gColorPicked, Aqua|Black|Brown Mustard|Chalkboard|Chocolate|Lavender|Notepaper|Orange Cream|Pink|Rose|Seafoam|Sensual|Sky|Sugar Cookie|Velvet|White
+				
+		Loop, Files, %themePath%\*.ini
+		{
+			themeFileList .= A_LoopFileName "|"
+			IniWrite, %A_index%,%themePath%\%A_LoopFileName%,Theme,UserSetting
+			themeList := StrReplace(themeFileList, ".ini" , "")
+		}
+		Gui, 3:Add,DropDownList, Choose%U_Theme% vColorChoice gColorPicked, %themeList%
 		Gui, 3:Add,Text,, Notes storage folder:
 		Gui, 3:Add,Edit, disabled r1 w%Gui3W% vNotesStorageFolder, %U_NotePath%
 		Gui, 3:Add,Button, gFolderSelect, Select a folder.

@@ -37,6 +37,7 @@ global UseCapslock
 global U_Capslock
 global fake
 global iniPath
+global themePath
 global sendCtrlC
 global SortBody
 global SortName
@@ -55,6 +56,7 @@ global FontSize
 
 
 iniPath = %A_WorkingDir%\settings.ini
+themePath = %A_WorkingDir%\Themes
 IniRead, U_NotePath, %iniPath%, General, MyNotePath,%A_WorkingDir%\MyNotes\
 
 if (FileExist(U_NotePath)) {
@@ -130,7 +132,6 @@ global NameColAndBodyCOlW := NameColW+BodyColW
 ;Acitvate User Hotkeys if any
 ;-------------------------------------------------
 SetUserHotKeys()
-goto Options
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------
