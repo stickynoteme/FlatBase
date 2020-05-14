@@ -24,31 +24,39 @@ setHK(num,INI,GUI) {
 }
 
 BuildGUI1(){
-
-if WinExist("FlatNotes - Library") {
-	Gui, 1:destroy
+	
+	if WinExist("FlatNotes - Library") {
+		Gui, 1:destroy
+		return
+	}
+	firstDown = 1
+	MouseGetPos, xPos, yPos	
+	xPos /= 1.5
+	yPos /= 1.5
+	Gui, 1:New,, FlatNotes - Library
+	Gui, 1:Margin , 0, 0
+	Gui, 1:Font, s%FontSize%, %FontFamily%, %U_SFC%
+	Gui, 1:Color,%U_SBG%, %U_MBG%
+	Gui, 1:Add,Edit, c%U_FBCA% w%LibW% y8 x6 vSearchTerm gSearch -E0x200
+	Gui, 1:Add, text, c%U_SFC% w%NameColW% center gSortName vSortName, Name
+	Gui, 1:Add, text, c%U_SFC% xp+%NameColW% yp+1 w%BodyColW% center gSortBody vSortBody, Body
+	Gui, 1:Add, text, yp+1 xp+%BodyColW% w75 center c%U_MSFC% gSortAdded vSortAdded, Added
+	Gui, 1:Add, ListView, -E0x200 -hdr LV0x10000 -ReadOnly grid r%ReR% w%libWAdjust% x0 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi, Title|Body|Created|FileName
+	Gui, 1:Add,Edit, r0 h0  vFake,
+	GuiControl, Hide, Fake
+	Gui, 1:Add,Text, r1 w%LibW% Center C%U_SFC% vNoteDetailPreviewBox gNoteDetailPreviewBoxClick,
+	Gui, 1:Add,Edit,  -E0x200 r%PreR% w%LibW% yp+18 x0 C%U_MFC% vPreviewBox,
+	
+	MakeFileList()
+	CLV := New LV_Colors(HLV)
+	CLV.SelectionColors(rowSelectColor,rowSelectTextColor)
+	
+	;ListBox used as background color for search area padding
+	Gui, 1:Add, ListBox, h44 w%LibW% x0 y0 -E0x200 Disabled -0x100 
+	
+	Gui, 1:SHOW, w%SubW%  x%xPos% y%yPos%
+	isFristRun = 0
 	return
-}
-firstDown = 1
-MouseGetPos, xPos, yPos	
-xPos /= 1.5
-yPos /= 1.5
-Gui, 1:New,, FlatNotes - Library
-Gui, 1:Margin , 0, 0
-Gui, 1:Font, s10, Verdana, white
-Gui, 1:Color,%U_SBG%, %U_MBG%
-Gui, 1:Add,Edit, Cffffff w530 x-3 y0 vSearchTerm gSearch
-Gui, 1:Add, ListView, LV0x10000 -ReadOnly grid r8 w530 x-3 C%U_MFC% vLV gNoteListView +altsubmit -Multi, Title|Body|Created|FileName
-Gui, 1:Add,Edit, r0 h0  vFake,
-GuiControl, Hide, Fake
-Gui, 1:Add,Text, r1 w530 Center C%U_SFC% vNoteDetailPreviewBox gNoteDetailPreviewBoxClick,
-Gui, 1:Add,Edit,  r7 w530 x-3 yp+18 C%U_MFC% vPreviewBox,
-
-MakeFileList()
-
-Gui, 1:SHOW, w510 h338 x%xPos% y%yPos%
-isFristRun = 0
-return
 }
 
 BuildGUI2(){
@@ -71,19 +79,19 @@ return
 }
 
 MakeFileList(){
-FileList := ""
-MyNotesArray := {}
-Loop, Files, %U_NotePath%*.txt
-    FileList .= A_LoopFileName "`n"
+	FileList := ""
+	MyNotesArray := {}
+	Loop, Files, %U_NotePath%*.txt
+		FileList .= A_LoopFileName "`n"
 ;trim off the extra starting newline
 	FileList := RTrim(Filelist, "`n")
-Loop Parse, FileList, `n
+	Loop Parse, FileList, `n
 	{
 		NoteField := ""
 		OldNoteField = NoteField
 		FileReadLine, NoteDetails, %U_NotePath%%A_LoopField%, 1
 		FileReadLine, NoteField, %U_NotePath%%A_LoopField%, 2
-
+		
 		DetailsSplitArray := StrSplit(NoteDetails ,"||")
 		NameField := DetailsSplitArray[1]
 		NameField := StrReplace(NameField, A_space,,, Limit := 1)
@@ -92,18 +100,23 @@ Loop Parse, FileList, `n
 		AddedField := RTrim(AddedField, " ")
 		ModifiedField := DetailsSplitArray[2]
 		ModifiedField := LTrim(ModifiedField, " M:")
-
-
+		
+		
 		LV_Add("", NameField, NoteField, AddedField,A_LoopField)
 		if (isFristRun != 0){
 			MyNotesArray.Push({1:NameField,2:NoteField,3:AddedField,4:A_LoopField})
-			}
+		}
 	} ; File loop end
-LV_ModifyCol(1, "145 Logical")
-LV_ModifyCol(2, "275")
-LV_ModifyCol(3, "75")
-LV_ModifyCol(4, "0")
-return
+	LV_ModifyCol(1, NameColW) ; 145
+	LV_ModifyCol(1, "Logical")
+	LV_ModifyCol(2, BodyColW) ; 275
+	LV_ModifyCol(2, "Logical")
+	LV_ModifyCol(3, 75)
+	LV_ModifyCol(3, "Logical")
+	LV_ModifyCol(3, "SortDesc")
+	LV_ModifyCol(3, "Center")
+	LV_ModifyCol(4, 0)
+	return
 }
 
 MakeFileListNoRefresh(){
@@ -175,4 +188,8 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody) {
 	FileLineOne = %QuickNoteName% || C:%CreatedDate% || M:%CurrentTimeStamp%`n
 	FileAppend , %FileLineOne%%QuickNoteBody%, %SaveFileName%, UTF-8
 return
+}
+Add(x, y)
+{
+	return x + y
 }
