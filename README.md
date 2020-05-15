@@ -1,4 +1,4 @@
-![Screenshot one](/ScreenShots/SS_01.png)
+![Screenshot one](/ScreenShots/SS_01.jpg)
 Format: ![Note Library Window](url)
 
 
