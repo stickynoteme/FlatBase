@@ -13,7 +13,7 @@ A flat file system note taking program made with AHKv1
 - Create new notes using the search box by simply typing a new name and hitting Enter.
 - If a note already exists it will be loaded into the the new note editor.
 	- Created dates are preserved even when over writing.
-- Notes are stored flat on your file system, meaning that they are all induvial plain .txt files that you can easily edit with external programs.
+- Notes are stored flat on your file system, meaning they are all induvial plain .txt files that you can easily edit with external programs, synced to where you would like, and manage like any other file.
 
 ## Hotkeys and Shortcuts:
 
