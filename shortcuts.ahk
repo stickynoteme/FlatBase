@@ -28,12 +28,13 @@ return
 }
 Down::
 ControlGetFocus, OutputVar, FlatNotes - Library
-		{
-		 If (OutputVar == "Edit1"){
-			ControlFocus, SysListView321, FlatNotes - Library
-			return
+{
+	 If (OutputVar == "Edit1"){
+		ControlFocus, SysListView321, FlatNotes - Library
+		return
 		}else
 			Down::Down
+	return
 }
 ^Enter::
 {

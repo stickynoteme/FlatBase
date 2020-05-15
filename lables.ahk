@@ -185,7 +185,7 @@ if (A_GuiEvent == "e")
 	MyOldFile := SubStr(MyFile, InStr(MyFile, "`n") + 1)
 	FileRecycle,  %OldFilePath%
 	FormatTime, CurrentTimeStamp, %A_Now%, yy/MM/dd
-	FileRebuildLineOne = %RowText% || C:%CreatedDate% || M:%CurrentTimeStamp%
+	FileRebuildLineOne = %RowText%|| C:%CreatedDate% || M:%CurrentTimeStamp%
 	FileAppend , %FileRebuildLineOne%`n%MyOldFile%, %FilePath%, UTF-8
 	MakeFileListNoRefresh()
 	ReFreshLV()
@@ -207,7 +207,10 @@ return
 
 About:
 {
-MsgBox FlatNotes Version 1.1.0 May 2020
+Gui, 4:add,text,,FlatNotes Version 2.0.0 May 2020
+Gui, 4:Add,Link,,Click<a href="https://github.com/chaosdrop/FlatNotes">GitHub Page</a>
+Gui, 4:add,button,g4GuiEscape,Close
+Gui, 4:Show
 return
 }
 
@@ -764,6 +767,11 @@ Label:
 	}
 	If (savedHK%num% || HK%num%)
 		setHK(num, savedHK%num%, HK%num%)
+	return
+}
+4GuiEscape:
+{
+	Gui, 4:Destroy
 	return
 }
 3GuiEscape:
