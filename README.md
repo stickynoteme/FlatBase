@@ -22,7 +22,7 @@ A flat file system note taking program made with AHKv1
 ### Global Hotkeys: (Can be changed in options)
 Capslock: Brings up main window
 
-Win+N Opens the quick note dialog with th select text as the title.
+Win+N: Opens the quick note dialog with th select text as the title.
 
 ### Interface shortcuts: (Can not be changed yet)
 
