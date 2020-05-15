@@ -17,15 +17,13 @@ A flat file system note taking program made with AHKv1
 	- Created dates are preserved even when over writing.
 - Notes are stored flat on your file system, meaning that they are all induvial plain .txt files that you can easily edit with external programs.
 
-- Alt+U Brings up a theme selector 
-
 ## Hotkeys and Shortcuts:
 
-### Global Hotkeys:
+### Global Hotkeys: (Can be changed in options)
 Capslock: Brings up main window
 Win+N Make a fast note using selected text as the title.
 
-### Interface shortcuts:
+### Interface shortcuts: (Can not be changed yet)
 
 Move to Search box:
 Ctrl+S
@@ -52,6 +50,7 @@ Enter = Save title to clipboard
 Ctrl+Enter = Save body to clipboard
 Ctrl+Shift+Enter = Save only first line of body to clipboard
 Del = Delete selected Item
+Slow Click = Change Note & File Name
 
 Preview/edit box:
 Enter = Save
@@ -63,8 +62,9 @@ Ctrl+Enter = New Line
 ### Notes will not save
 When first started FlatNotes makes a folder called "MyNotes" if you delete this folder or move it you will have to restart FlatNotes or create it yourself. 
 
+### Weird visual glitch 
+Try deleting the settings.ini file (make a backup first)
 
-## Themes (Alt+U on the Library Window)
-![Themes Set one](/ScreenShots/THEMES_01.jpg)
-![Themes Set two](/ScreenShots/THEMES_02.jpg)
-![Themes Set three](/ScreenShots/THEMES_03.jpg)
+## Themes
+![Themes Set one](/ScreenShots/SS_02.jpg)
+
