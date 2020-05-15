@@ -72,11 +72,15 @@ if (FileExist(U_NotePath)) {
 	U_NotePath = %A_WorkingDir%\MyNotes\
 	FileCreateDir, MyNotes
 	}
+	if (U_NotePath ="\"){
+	U_NotePath = %A_WorkingDir%\MyNotes\
+	FileCreateDir, MyNotes
 	}else {
 		msgbox Notes folder: %U_NotePath% could not be found. %A_WorkingDir%\MyNotes\ will be used instead.
 		FileCreateDir, MyNotes
 		IniWrite, %A_WorkingDir%\MyNotes\, %iniPath%, General, MyNotePath
 		U_NotePath = %A_WorkingDir%\MyNotes\
+	}
 }
 
 global U_NotePath

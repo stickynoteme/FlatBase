@@ -80,6 +80,9 @@ Enter::
 ControlGetFocus, OutputVar, FlatNotes - Library
 		 If (OutputVar == "Edit1"){
 			GuiControlGet, SearchTerm
+			;Remove stray whitespace from front and back
+			;SearchTerm := Ltrim(SearchTerm," ")
+			;SearchTerm := Rtrim(SearchTerm," ")
 			FileSafeSearchTerm := RegExReplace(SearchTerm, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
 			CheckForOldNote = %U_NotePath%%FileSafeSearchTerm%.txt
 			FileRead, MyFile, %CheckForOldNote%

@@ -34,11 +34,18 @@ return
 SaveButton:
 {
 GuiControlGet, QuickNoteName
+	;Remove stray whitespace from front and back
+	;QuickNoteName := Ltrim(QuickNoteName," ")
+	;QuickNoteName := Rtrim(QuickNoteName," ")
+	GuiControlGet, FileSafeName
 if (QuickNoteName == ""){
 	MsgBox Note Name Can Not Be Empty
 	return
 }
 GuiControlGet, FileSafeName
+;Remove stray whitespace from front and back
+;FileSafeName := Ltrim(FileSafeName," ")
+;FileSafeName := Rtrim(FileSafeName," ")
 GuiControlGet, QuickNoteBody
 FormatTime, CurrentTimeStamp, %A_Now%, yy/MM/dd
 
@@ -53,7 +60,7 @@ if (CreatedDate =="")
 CreatedDate = %CurrentTimeStamp%
 }
 FileRecycle, %SaveFileName%
-FileLineOne = %QuickNoteName% || C:%CreatedDate% || M:%CurrentTimeStamp%`n
+FileLineOne = %QuickNoteName%|| C:%CreatedDate% || M:%CurrentTimeStamp%`n
 FileAppend , %FileLineOne%%QuickNoteBody%, %SaveFileName%, UTF-8
 Gui, 2:Destroy
 MakeFileList()
@@ -64,34 +71,37 @@ return
 
 QuickSafeNameUpdate:
 {
-GuiControlGet, QuickNoteName
-NewFileSafeName := RegExReplace(QuickNoteName, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
-GuiControl,, FileSafeName,%NewFileSafeName%
-return
+	GuiControlGet, QuickNoteName
+	;Remove stray whitespace from front and back
+	;QuickNoteName := Ltrim(QuickNoteName," ")
+	;QuickNoteName := Rtrim(QuickNoteName," ")
+	NewFileSafeName := RegExReplace(QuickNoteName, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
+	GuiControl,, FileSafeName,%NewFileSafeName%
+	return
 }
 Search:
 {
-global SearchTerm
-GuiControlGet, SearchTerm
-GuiControl, -Redraw, LV
-LV_Delete()
-For Each, Note In MyNotesArray
-{
-   If (SearchTerm != "")
-   {
-		If (InStr(Note.1, SearchTerm) != 0){
-         LV_Add("", Note.1, Note.2,Note.3,Note.4)
-        }Else if (InStr(Note.2, SearchTerm) != 0)
-	   {LV_Add("", Note.1, Note.2,Note.3,Note.4)
-	   }Else if (InStr(Note.3, SearchTerm) != 0)
-	   {LV_Add("", Note.1, Note.2,Note.3,Note.4)
-	   }Else if (InStr(Note.4, SearchTerm) != 0)
-	   {LV_Add("", Note.1, Note.2,Note.3,Note.4)
+	global SearchTerm
+	GuiControlGet, SearchTerm
+	GuiControl, -Redraw, LV
+	LV_Delete()
+	For Each, Note In MyNotesArray
+	{
+	   If (SearchTerm != "")
+	   {
+			If (InStr(Note.1, SearchTerm) != 0){
+			 LV_Add("", Note.1, Note.2,Note.3,Note.4)
+			}Else if (InStr(Note.2, SearchTerm) != 0)
+		   {LV_Add("", Note.1, Note.2,Note.3,Note.4)
+		   }Else if (InStr(Note.3, SearchTerm) != 0)
+		   {LV_Add("", Note.1, Note.2,Note.3,Note.4)
+		   }Else if (InStr(Note.4, SearchTerm) != 0)
+		   {LV_Add("", Note.1, Note.2,Note.3,Note.4)
+		   }
 	   }
-   }
-   Else
-      LV_Add("", Note.1,Note.2,Note.3,Note.4)
-}
+	   Else
+		  LV_Add("", Note.1,Note.2,Note.3,Note.4)
+	}
 GuiControl, +Redraw, LV
 Return
 }
@@ -158,6 +168,15 @@ if (A_GuiEvent == "e")
 	LV_GetText(RowText, A_EventInfo,1)
 	TmpFileSafeName := RegExReplace(RowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
 	TmpOldFileSafeName := RegExReplace(OldRowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
+
+	;Remove stray whitespace from front and back
+	;TmpFileSafeName := Ltrim(TmpFileSafeName," ")
+	;TmpFileSafeName := Rtrim(TmpFileSafeName," ")
+	
+	;Remove stray whitespace from front and back
+	;TmpOldFileSafeName := Ltrim(TmpOldFileSafeName," ")
+	;TmpOldFileSafeName := Rtrim(TmpOldFileSafeName," ")
+	
 	FilePath = %U_NotePath%%TmpFileSafeName%.txt
 	OldFilePath = %U_NotePath%%TmpOldFileSafeName%.txt
 	FileReadLine, OldDetails, %OldFilePath%, 1

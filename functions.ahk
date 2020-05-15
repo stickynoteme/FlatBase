@@ -13,14 +13,14 @@ return
 }
 
 setHK(num,INI,GUI) {
- If INI
-  Hotkey, %INI%, Label%num%, Off
- If GUI
-  Hotkey, %GUI%, Label%num%, On
- IniWrite,% GUI ? GUI:null, settings.ini, Hotkeys, %num%
- savedHK%num%  := HK%num%
- TrayTip, Label%num%,% !INI ? GUI " ON":!GUI ? INI " OFF":GUI " ON`n" INI " OFF"
- return
+	 If INI
+	  Hotkey, %INI%, Label%num%, Off
+	 If GUI
+	  Hotkey, %GUI%, Label%num%, On
+	 IniWrite,% GUI ? GUI:null, settings.ini, Hotkeys, %num%
+	 savedHK%num%  := HK%num%
+	 TrayTip, Label%num%,% !INI ? GUI " ON":!GUI ? INI " OFF":GUI " ON`n" INI " OFF"
+	 return
 }
 
 BuildGUI1(){
@@ -99,7 +99,7 @@ MakeFileList(){
 		
 		DetailsSplitArray := StrSplit(NoteDetails ,"||")
 		NameField := DetailsSplitArray[1]
-		NameField := StrReplace(NameField, A_space,,, Limit := 1)
+		;NameField := StrReplace(NameField, A_space,,, Limit := 1)
 		AddedField := DetailsSplitArray[2]
 		AddedField := LTrim(AddedField, " C:")
 		AddedField := RTrim(AddedField, " ")
@@ -138,7 +138,6 @@ Loop Parse, FileList, `n
 		FileReadLine, NoteField, %U_NotePath%%A_LoopField%, 2
 		DetailsSplitArray := StrSplit(NoteDetails ,"||")
 		NameField := DetailsSplitArray[1]
-		NameField := RTrim(NameField, " ")
 		AddedField := DetailsSplitArray[2]
 		AddedField := LTrim(AddedField, " C:")
 		AddedField := RTrim(AddedField, " ")
@@ -190,7 +189,7 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody) {
 	CreatedDate = %CurrentTimeStamp%
 	}
 	FileRecycle, %SaveFileName%
-	FileLineOne = %QuickNoteName% || C:%CreatedDate% || M:%CurrentTimeStamp%`n
+	FileLineOne = %QuickNoteName%|| C:%CreatedDate% || M:%CurrentTimeStamp%`n
 	FileAppend , %FileLineOne%%QuickNoteBody%, %SaveFileName%, UTF-8
 return
 }
