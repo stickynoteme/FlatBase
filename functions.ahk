@@ -71,13 +71,12 @@ BuildGUI1(xo,yo){
 	Gui, 1:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
 	Gui, 1:Add,Edit,  -E0x200 r%PreviewRows% w%LibW% yp+18 x0 C%U_MFC% vPreviewBox,
 	
-	MakeFileList()
+	MakeFileList(1)
 	CLV := New LV_Colors(HLV)
 	CLV.SelectionColors(rowSelectColor,rowSelectTextColor)
  	
 	
 	Gui, 1:SHOW, w%SubW%  %xPos% %yPos%
-	isFristRun = 0
 	return
 }
 
@@ -101,7 +100,7 @@ BuildGUI2(){
 	return  
 }
 
-MakeFileList(){
+MakeFileList(ReFreshMyNoteArray){
 	FileList := ""
 	MyNotesArray := {}
 	Loop, Files, %U_NotePath%*.txt
@@ -112,64 +111,38 @@ MakeFileList(){
 	{
 		NoteField := ""
 		OldNoteField = NoteField
-		FileReadLine, NoteDetails, %U_NotePath%%A_LoopField%, 1
-		FileReadLine, NoteField, %U_NotePath%%A_LoopField%, 2
-		
-		DetailsSplitArray := StrSplit(NoteDetails ,"||")
-		NameField := DetailsSplitArray[1]
-		;NameField := StrReplace(NameField, A_space,,, Limit := 1)
-		AddedField := DetailsSplitArray[2]
-		AddedField := LTrim(AddedField, " C:")
-		AddedField := RTrim(AddedField, " ")
-		ModifiedField := DetailsSplitArray[2]
-		ModifiedField := LTrim(ModifiedField, " M:")
-		
-		
-		LV_Add("", NameField, NoteField, AddedField,A_LoopField)
-		if (isFristRun != 0){
-			MyNotesArray.Push({1:NameField,2:NoteField,3:AddedField,4:A_LoopField})
-		}
-	} ; File loop end
-	LV_ModifyCol(1, NameColW) ; 145
-	LV_ModifyCol(1, "Logical")
-	LV_ModifyCol(2, BodyColW) ; 275
-	LV_ModifyCol(2, "Logical")
-	LV_ModifyCol(3, 75)
-	LV_ModifyCol(3, "Logical")
-	LV_ModifyCol(3, "SortDesc")
-	LV_ModifyCol(3, "Center")
-	LV_ModifyCol(4, 0)
-	return
-}
 
-MakeFileListNoRefresh(){
-FileList := ""
-MyNotesArray := {}
-Loop, Files, %U_NotePath%*.txt
-    FileList .= A_LoopFileName "`n"
-;trim off the extra starting newline
-	FileList := RTrim(Filelist, "`n")
-Loop Parse, FileList, `n
-	{
-		NoteField := ""
-		FileReadLine, NoteDetails, %U_NotePath%%A_LoopField%, 1
-		FileReadLine, NoteField, %U_NotePath%%A_LoopField%, 2
-		DetailsSplitArray := StrSplit(NoteDetails ,"||")
-		NameField := DetailsSplitArray[1]
-		AddedField := DetailsSplitArray[2]
-		AddedField := LTrim(AddedField, " C:")
-		AddedField := RTrim(AddedField, " ")
-		ModifiedField := DetailsSplitArray[2]
-		ModifiedField := LTrim(ModifiedField, " M:")
-		if (isFristRun != 0){
-			MyNotesArray.Push({1:NameField,2:NoteField,3:AddedField,4:A_LoopField})
+		FileReadLine, NoteField, %U_NotePath%%A_LoopField%, 1
+		NoteIniName := StrReplace(A_LoopField, ".txt", ".ini")
+		NoteBackupName := NoteBackupName := StrReplace(A_LoopField, ".txt", "")
+		NoteIni = %detailsPath%%NoteIniName%
+		;Only do these fo fix old notes
+		;FormatTime, DateBackup, %A_Now%, yy/MM/dd
+		;IniWrite,%NoteBackupName%,%NoteIni%, INFO, Name
+		;IniWrite,%DateBackup%,%NoteIni%, INFO, Add
+		;FileRead, FixNote, %U_NotePath%%A_LoopField%
+		;FixNoteBody := SubStr(FixNote, InStr(FixNote, "`n") + 1)
+		;FileRecycle, %U_NotePath%%A_LoopField%
+		;FileAppend , %FixNoteBody%, %U_NotePath%%A_LoopField%, UTF-8
+		;IniWrite,%DateBackup%,%NoteIni%, INFO, Mod
+		IniRead, NameField, %NoteIni%, INFO, Name
+		IniRead, AddedField, %NoteIni%, INFO, Add
+		IniRead, ModifiedField, %NoteIni%, INFO, Mod
+		if (ReFreshMyNoteArray = 1){
+			LV_Add("", NameField, NoteField, AddedField,A_LoopField)
 			}
+		MyNotesArray.Push({1:NameField,2:NoteField,3:AddedField,4:A_LoopField})
+		LV_ModifyCol(1, NameColW) ; 145
+		LV_ModifyCol(1, "Logical")
+		LV_ModifyCol(2, BodyColW) ; 275
+		LV_ModifyCol(2, "Logical")
+		LV_ModifyCol(3, 75)
+		LV_ModifyCol(3, "Logical")
+		LV_ModifyCol(3, "SortDesc")
+		LV_ModifyCol(3, "Center")
+		LV_ModifyCol(4, 0)
 	} ; File loop end
-LV_ModifyCol(1, "145 Logical")
-LV_ModifyCol(2, "275")
-LV_ModifyCol(3, "75")
-LV_ModifyCol(4, "0")
-return
+	return
 }
 
 ReFreshLV(){
@@ -199,15 +172,12 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody) {
 	FormatTime, CurrentTimeStamp, %A_Now%, yy/MM/dd
 
 	SaveFileName = %U_NotePath%%FileSafeName%.txt
-	FileReadLine, OldDetails, %SaveFileName%, 1
-	 RegExMatch(OldDetails, "\d\d/\d\d/\d\d" , CreatedDate)
-	 QuickNoteBody := SubStr(QuickNoteBody, InStr(QuickNoteBody, "`n") + 1)
-	if (CreatedDate =="")
-	{
-	CreatedDate = %CurrentTimeStamp%
-	}
+	
+	iniRead,CreatedDate,%detailsPath%%FileSafeName%.ini,INFO,Add,%CurrentTimeStamp%
 	FileRecycle, %SaveFileName%
-	FileLineOne = %QuickNoteName%|| C:%CreatedDate% || M:%CurrentTimeStamp%`n
-	FileAppend , %FileLineOne%%QuickNoteBody%, %SaveFileName%, UTF-8
+	iniWrite,%QuickNoteName%,%detailsPath%%FileSafeName%.ini,INFO,Name
+	iniWrite,%CurrentTimeStamp%,%detailsPath%%FileSafeName%.ini,INFO,Mod
+	iniWrite,%CreatedDate%,%detailsPath%%FileSafeName%.ini,INFO,Add
+	FileAppend , %QuickNoteBody%, %SaveFileName%, UTF-8
 return
 }

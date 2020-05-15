@@ -25,7 +25,6 @@ if (OldNoteData !="")
 {
 FilePath = %U_NotePath%%FileSafeClipBoard%.txt
 FileRead, MyFile, %FilePath%
-MyNewFile := SubStr(MyFile, InStr(MyFile, "`n") + 1)
 GuiControl,, QuickNoteBody,%MyNewFile%
 GuiControl, +Redraw, QuickNoteBody
 }
@@ -55,19 +54,14 @@ Label3:
 			zbody := clipboard 
 			istitle = yes
 			TmpFileSafeName := RegExReplace(ztitle, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
-			
-			SaveFileName = %U_NotePath%%TmpFileSafeName%.txt
-			FileReadLine, OldDetails, %SaveFileName%, 1
-			if (OldDetails !="")
+			FileReadLine, CheckExists, %U_NotePath%%TmpFileSafeName%.txt, 1
+			if (CheckExists !="")
 			{
 				 msgbox Note Already Exists
 				 return
 			}
-			FormatTime, CurrentTimeStamp, %A_Now%, yy/MM/dd
-			FileRecycle, %SaveFileName%
-			FileLineOne = %ztitle%|| C:%CurrentTimeStamp% || M:%CurrentTimeStamp%`n
-			FileAppend , %FileLineOne%%zbody%, %SaveFileName%, UTF-8
-			MakeFileList()
+			SaveFile(ztitle,TmpFileSafeName,zbody)
+			MakeFileList(1)
 			if WinActive("FlatNotes - Library")
 				send {space}{backspace} ;update results
 			tooltip B: %zbody%
@@ -85,37 +79,19 @@ Label4:
 }
 SaveButton:
 {
-GuiControlGet, QuickNoteName
-	;Remove stray whitespace from front and back
-	;QuickNoteName := Ltrim(QuickNoteName," ")
-	;QuickNoteName := Rtrim(QuickNoteName," ")
+	GuiControlGet, QuickNoteName
 	GuiControlGet, FileSafeName
-if (QuickNoteName == ""){
-	MsgBox Note Name Can Not Be Empty
+	if (QuickNoteName == ""){
+		MsgBox Note Name Can Not Be Empty
 	return
-}
-GuiControlGet, FileSafeName
-;Remove stray whitespace from front and back
-;FileSafeName := Ltrim(FileSafeName," ")
-;FileSafeName := Rtrim(FileSafeName," ")
-GuiControlGet, QuickNoteBody
-FormatTime, CurrentTimeStamp, %A_Now%, yy/MM/dd
+	}
 
-SaveFileName = %U_NotePath%%FileSafeName%.txt
-FileReadLine, OldDetails, %SaveFileName%, 1
-if (OldDetails !="")
-{
- RegExMatch(OldDetails, "\d\d/\d\d/\d\d" , CreatedDate)
- }
-if (CreatedDate =="")
-{
-CreatedDate = %CurrentTimeStamp%
-}
-FileRecycle, %SaveFileName%
-FileLineOne = %QuickNoteName%|| C:%CreatedDate% || M:%CurrentTimeStamp%`n
-FileAppend , %FileLineOne%%QuickNoteBody%, %SaveFileName%, UTF-8
+GuiControlGet, FileSafeName
+GuiControlGet, QuickNoteBody
+SaveFile(QuickNoteName,FileSafeName,QuickNoteBody)
 Gui, 2:Destroy
-MakeFileList()
+MakeFileList(1)
+ReFreshLV()
 if WinActive("FlatNotes - Library")
 	send {space}{backspace} ;update results
 return
@@ -207,7 +183,6 @@ if (A_GuiEvent = "RightClick")
     TmpFileSafeName := RegExReplace(RowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
     FilePath = %U_NotePath%%TmpFileSafeName%.txt
 	FileRead, MyFile, %FilePath%
-	NoteBody := SubStr(MyFile, InStr(MyFile, "`n") + 1)
     clipboard = %NoteBody%
     ToolTip Text: "%RowText%" Copied to clipboard
     SetTimer, KillToolTip, 500
@@ -220,28 +195,20 @@ if (A_GuiEvent == "e")
 	LV_GetText(RowText, A_EventInfo,1)
 	TmpFileSafeName := RegExReplace(RowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
 	TmpOldFileSafeName := RegExReplace(OldRowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
-
-	;Remove stray whitespace from front and back
-	;TmpFileSafeName := Ltrim(TmpFileSafeName," ")
-	;TmpFileSafeName := Rtrim(TmpFileSafeName," ")
 	
-	;Remove stray whitespace from front and back
-	;TmpOldFileSafeName := Ltrim(TmpOldFileSafeName," ")
-	;TmpOldFileSafeName := Rtrim(TmpOldFileSafeName," ")
 	
 	FilePath = %U_NotePath%%TmpFileSafeName%.txt
 	OldFilePath = %U_NotePath%%TmpOldFileSafeName%.txt
-	FileReadLine, OldDetails, %OldFilePath%, 1
-	RegExMatch(OldDetails, "\d\d/\d\d/\d\d" , CreatedDate)
 	FileRead, MyFile, %OldFilePath%
-	MyOldFile := SubStr(MyFile, InStr(MyFile, "`n") + 1)
 	FileRecycle,  %OldFilePath%
-	FormatTime, CurrentTimeStamp, %A_Now%, yy/MM/dd
-	FileRebuildLineOne = %RowText%|| C:%CreatedDate% || M:%CurrentTimeStamp%
-	FileAppend , %FileRebuildLineOne%`n%MyOldFile%, %FilePath%, UTF-8
-	MakeFileListNoRefresh()
+	FileRecycle,  %detailsPath%%TmpOldFileSafeName%.ini
+
+	SaveFile(RowText,TmpFileSafeName,MyOldFile)
+	MakeFileList(1)
 	ReFreshLV()
-	GuiControl,, NoteDetailPreviewBox, %FileRebuildLineOne%
+	iniRead, NewAdd,%detailsPath%%TmpFileSafeName%.ini,INFO,Add
+	iniRead, NewMod,%detailsPath%%TmpFileSafeName%.ini,INFO,Mod
+	GuiControl,, NoteDetailPreviewBox, %RowText% | %NewAdd% | %NewMod%
 }
 ;update the preview
 if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
@@ -249,10 +216,13 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 	global LVSelectedROW = A_EventInfo
     LV_GetText(RowText, A_EventInfo,4)  ; Get the text from the row's first field.
     FileRead, NoteFile, %U_NotePath%%RowText%
-    FileReadLine,NoteDetails, %U_NotePath%%RowText%, 1
-	NoteBody := SubStr(NoteFile, InStr(NoteFile, "`n") + 1)
-    GuiControl,, PreviewBox, %NoteBody%
-    GuiControl,, NoteDetailPreviewBox, %NoteDetails%
+    GuiControl,, PreviewBox, %NoteFile%
+	TMPini := StrReplace(RowText, ".txt", ".ini")
+	TMPName := StrReplace(RowText, ".txt", "")
+
+	iniRead, NoteAdd,%detailsPath%%TMPini%,INFO,Add
+	iniRead, NoteMod,%detailsPath%%TMPini%,INFO,Mod
+	GuiControl,, NoteDetailPreviewBox, %TMPName% | %NoteAdd% | %NoteMod%
 }
 return
 }

@@ -62,9 +62,12 @@ global PreviewFontSize
 global SearchFontFamily
 global SearchFontSize
 global FontRendering
+global detailsPath
 ;Var with starting values
 global istitle = yes
 
+FileCreateDir, NoteDetails
+detailsPath := A_WorkingDir "\NoteDetails\"
 iniPath = %A_WorkingDir%\settings.ini
 themePath = %A_WorkingDir%\Themes
 IniRead, U_NotePath, %iniPath%, General, MyNotePath,%A_WorkingDir%\MyNotes\

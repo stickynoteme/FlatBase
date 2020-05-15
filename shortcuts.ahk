@@ -118,8 +118,7 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			GuiControlGet, NoteDetailPreviewBox
 			GuiControlGet, PreviewBox
 			LVBodyUpdate := StrSplit(PreviewBox , "`n")  
-			ReCombine =%NoteDetailPreviewBox%`n%PreviewBox%
-			SaveFile(RowText,FileSafeName,ReCombine)
+			SaveFile(RowText,FileSafeName,NoteDetailPreviewBox)
 			ToolTip Saved 
 			LV_Modify(LVSelectedROW , ,RowText, LVBodyUpdate[1])
 			SetTimer, KillToolTip, 500
@@ -162,7 +161,8 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			Return 
 		 IfMsgBox, Yes
 			FileRecycle %U_NotePath%%FileSafeName%.txt
-			MakeFileListNoRefresh()
+			FileRecycle %detailsPath%%FileSafeName%.ini
+			MakeFileList(0)
 			LV_Delete(LVSelectedROW)
 			RowsCount := LV_GetCount()
 			if (RowsCount > SaveRowNumber) {
@@ -174,11 +174,13 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 				
 				
 			FileSafeName := RegExReplace(NextUpName, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
-			FileReadLine,NextUpDetails,%U_NotePath%%FileSafeName%.txt,1
+			iniRead,NextUpAddedDate,%detailsPath%%FileSafeName%,Add
+			iniRead,NextUpModdedDate,%detailsPath%%FileSafeName%,Mod
+
 			FileRead,NextUpBody,%U_NotePath%%FileSafeName%.txt
-			NextUpBody := SubStr(NextUpBody, InStr(NextUpBody, "`n") + 1)
+	
 			GuiControl,, PreviewBox,%NextUpBody%
-			GuiControl,, NoteDetailPreviewBox, %NextUpDetails%
+			GuiControl,, NoteDetailPreviewBox, %NextUpName%|%NextUpAddedDate%|%NextUpModdedDate%
 		 }else
 			del::del
 }
