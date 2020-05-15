@@ -1,14 +1,24 @@
 SetUserHotKeys() {
 	IniRead, savedHK1, %iniPath%, Hotkeys, 1, #o
 	IniRead, savedHK2, %iniPath%, Hotkeys, 2, #n
+	IniRead, savedHK1, %iniPath%, Hotkeys, 1, #z
+	IniRead, savedHK2, %iniPath%, Hotkeys, 2, #+z
 	if (savedHK1="")
 		savedHK1=#o
 		IniWrite,#o,%iniPath%,Hotkeys, 2
 	if (savedHK2="")
 		savedHK2=#n
 		IniWrite,#n,%iniPath%,Hotkeys, 2
+	if (savedHK3="")
+		savedHK3=#z
+		IniWrite,#z,%iniPath%,Hotkeys, 3
+	if (savedHK4="")
+		savedHK4=#+z
+		IniWrite,#+z,%iniPath%,Hotkeys, 4
 	Hotkey,%savedHK1%, Label1
 	Hotkey,%savedHK2%, Label2
+	Hotkey,%savedHK3%, Label3
+	Hotkey,%savedHK4%, Label4
 return
 }
 
@@ -200,8 +210,4 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody) {
 	FileLineOne = %QuickNoteName%|| C:%CreatedDate% || M:%CurrentTimeStamp%`n
 	FileAppend , %FileLineOne%%QuickNoteBody%, %SaveFileName%, UTF-8
 return
-}
-Add(x, y)
-{
-	return x + y
 }

@@ -31,6 +31,58 @@ GuiControl, +Redraw, QuickNoteBody
 }
 return
 }
+Label3:
+{
+	if(istitle != "no") {
+			send {Ctrl Down}{c}{Ctrl up}
+			ztitle := clipboard
+			istitle = no
+			;only first line for title to prevent fail
+			Loop, parse, clipboard, `n, `r
+				{
+					%A_Index%ztitle = %A_LoopField%
+					if (A_Index = 2)
+						break
+				}
+			;trim space and tab
+			ztitle := Trim(1ztitle," 	")
+			tooltip T: %ztitle%
+			settimer, KillToolTip, 500
+			return
+	}
+	else if(istitle = "no") {
+			send {Ctrl Down}{c}{Ctrl up}
+			zbody := clipboard 
+			istitle = yes
+			TmpFileSafeName := RegExReplace(ztitle, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
+			
+			SaveFileName = %U_NotePath%%TmpFileSafeName%.txt
+			FileReadLine, OldDetails, %SaveFileName%, 1
+			if (OldDetails !="")
+			{
+				 msgbox Note Already Exists
+				 return
+			}
+			FormatTime, CurrentTimeStamp, %A_Now%, yy/MM/dd
+			FileRecycle, %SaveFileName%
+			FileLineOne = %ztitle%|| C:%CurrentTimeStamp% || M:%CurrentTimeStamp%`n
+			FileAppend , %FileLineOne%%zbody%, %SaveFileName%, UTF-8
+			MakeFileList()
+			if WinActive("FlatNotes - Library")
+				send {space}{backspace} ;update results
+			tooltip B: %zbody%
+			settimer, KillToolTip, 500
+			return
+	}
+return
+}
+Label4:
+{
+	istitle = yes
+	tooltip cancled
+	settimer,KillToolTip,1000
+	return 
+}
 SaveButton:
 {
 GuiControlGet, QuickNoteName
@@ -301,8 +353,8 @@ SortName:
 		}
 		return
 	}
-	SortBody:
-	{
+SortBody:
+{
 		if (NextSortBody ="1") {
 			LV_ModifyCol(2, "SortDesc")
 			NextSortBody = 0
@@ -321,8 +373,8 @@ SortName:
 		}
 		return
 	}
-	SortAdded:
-	{
+SortAdded:
+{
 		if (NextSortAdded ="1") {
 			LV_ModifyCol(3, "SortDesc")
 			NextSortAdded = 0
@@ -341,8 +393,8 @@ SortName:
 		}
 		return
 	}
-	FolderSelect:
-	{
+FolderSelect:
+{
 		WinSet, AlwaysOnTop, Off, FlatNotes - Options
 		FileSelectFolder, NewNotesFolder, , 123
 		if NewNotesFolder =
@@ -353,9 +405,8 @@ SortName:
 		WinSet, AlwaysOnTop, On, FlatNotes - Options
 		return
 	}
-	
-	Options:
-	{
+Options:
+{
 		Gui, 3:New,,FlatNotes - Options
 		Gui, 3:Add, Tab3,, General|Hotkeys|Appearance
 		Gui, 3:Tab, General
@@ -390,8 +441,8 @@ SortName:
 		GuiControl,,SetCtrlC,%sendCtrlC%
 		Gui, 3:Add,text, h1 Disabled 			
  		
-		HotkeyNames := ["Show Library Window","Quick New Note"]
-		Loop,% 2 {
+		HotkeyNames := ["Show Library Window","Quick New Note","Rapid Save","Cancel Rapid Save"]
+		Loop,% 4 {
 			HotkeyNameTmp := HotkeyNames[A_Index]
 			Gui, 3:Add, Text, , Hotkey: %HotkeyNameTmp%
 			IniRead, savedHK%A_Index%, settings.ini, Hotkeys, %A_Index%, %A_Space%
@@ -476,7 +527,7 @@ SortName:
 	}
   
 SaveAndReload:
-{ ;*[FlatNotes]
+{ 
 	GuiControlGet, U_QuickNoteWidth,,QuickWSelect	
 	IniWrite, %U_QuickNoteWidth%,%iniPath%,General, QuickNoteWidth
 	GuiControlGet, U_MainNoteWidth,,MainWSelect	

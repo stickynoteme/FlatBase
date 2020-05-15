@@ -62,6 +62,8 @@ global PreviewFontSize
 global SearchFontFamily
 global SearchFontSize
 global FontRendering
+;Var with starting values
+global istitle = yes
 
 iniPath = %A_WorkingDir%\settings.ini
 themePath = %A_WorkingDir%\Themes
@@ -83,10 +85,6 @@ if InStr(FileExist(U_NotePath), "D") {
 		U_NotePath = %A_WorkingDir%\MyNotes\
 		}
 global U_NotePath
-;-------------------------------------------------
-;Set Default hotkeys if blank
-;-------------------------------------------------
-
 ;-------------------------------------------------
 ;Write default theme ini if not found
 ;-------------------------------------------------
@@ -179,6 +177,11 @@ if (U_Capslock = "0"){
 BuildGUI1(1,1)
 return
 }
+;-------------------------------------------------
+;playground 
+;-------------------------------------------------
+
+
 ;-------------------------------------------------
 ;Include external ahk  
 ;-------------------------------------------------
