@@ -50,8 +50,9 @@ global rowSelectTextColor
 global QuickNoteWidth
 ;Pre-set globals
 global LibW
-global ReR
-global PreR
+global PreviewRows
+global ResultRows
+global QuickNoteRows
 global FontFamily 
 global FontSize
 global ResultFontFamily
@@ -141,8 +142,9 @@ IniRead, ResultFontSize, %iniPath%, General, ResultFontSize ,10
 IniRead, PreviewFontFamily, %iniPath%, General, PreviewFontFamily ,Verdana
 IniRead, PreviewFontSize, %iniPath%, General, PreviewFontSize ,10
 
-IniRead, PreR, %iniPath%, General, PreviewRows ,8
-IniRead, ReR, %iniPath%, General, ResultRows ,8
+IniRead, PreviewRows, %iniPath%, General, PreviewRows ,8
+IniRead, ResultRows, %iniPath%, General, ResultRows ,8
+IniRead, QuickNoteRows, %iniPath%, General, QuickNoteRows ,7
 IniRead, LibW, %iniPath%, General, WindowWidth ,530
 IniRead, U_Capslock, %iniPath%, General, UseCapsLock , 1
 IniRead, sendCtrlC, %iniPath%, General, sendCtrlC, 1
@@ -161,7 +163,7 @@ global NameColAndBodyCOlW := NameColW+BodyColW
 ;-------------------------------------------------
 SetUserHotKeys()
 ;BuildGUI1()
-goto Options
+;goto Options
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------

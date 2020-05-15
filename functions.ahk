@@ -45,13 +45,13 @@ BuildGUI1(){
 	Gui, 1:Add, text, c%U_SFC% w%NameColW% center gSortName vSortName, Name
 	Gui, 1:Add, text, c%U_SFC% xp+%NameColW% yp+1 w%BodyColW% center gSortBody vSortBody, Body
 	Gui, 1:Add, text, yp+1 xp+%BodyColW% w75 center c%U_MSFC% gSortAdded vSortAdded, Added
-	Gui, 1:Add, ListView, -E0x200 -hdr LV0x10000 -ReadOnly grid r%ReR% w%libWAdjust% x0 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi, Title|Body|Created|FileName
+	Gui, 1:Add, ListView, -E0x200 -hdr LV0x10000 -ReadOnly grid r%ResultRows% w%libWAdjust% x0 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi, Title|Body|Created|FileName
 	Gui, 1:Add,Edit, r0 h0  vFake,
 	GuiControl, Hide, Fake
 	Gui, 1:Add,Text, r1 w%LibW% Center C%U_SFC% vNoteDetailPreviewBox gNoteDetailPreviewBoxClick,
 	;Allow User set prevent/edit font
 	Gui, 1:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
-	Gui, 1:Add,Edit,  -E0x200 r%PreR% w%LibW% yp+18 x0 C%U_MFC% vPreviewBox,
+	Gui, 1:Add,Edit,  -E0x200 r%PreviewRows% w%LibW% yp+18 x0 C%U_MFC% vPreviewBox,
 	
 	MakeFileList()
 	CLV := New LV_Colors(HLV)
@@ -76,7 +76,7 @@ BuildGUI2(){
 	Gui, 2:Font, s%FontSize% Q%FontRendering%, %FontFamily%, %U_SFC%	
 	Gui, 2:Color,%U_SBG%, %U_MBG%
 	Gui, 2:Add,Edit, C%U_MFC% w%QuickSubWidth% vQuickNoteName gQuickSafeNameUpdate -E0x200
-	Gui, 2:Add,Edit, -WantReturn C%U_MFC% r7 w%QuickNoteWidth% y+1 vQuickNoteBody -E0x200
+	Gui, 2:Add,Edit, -WantReturn C%U_MFC% r%QuickNoteRows% w%QuickNoteWidth% y+1 vQuickNoteBody -E0x200
 	Gui, 2:Add,Text, C%U_SFC% x%QuickSubWidth% y3 w%QuickSubWidth% vFileSafeName,
 	Gui, 2:Add, Button,x-1000 default gSaveButton y-1000, &Save
 	Gui, 2:SHOW, w%QuickNoteWidth% x%xPos% y%yPos% 

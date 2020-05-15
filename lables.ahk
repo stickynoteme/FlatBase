@@ -353,21 +353,32 @@ SortName:
 	
 	Options:
 	{
-		Gui3W = 200
 		Gui, 3:New,,FlatNotes - Options
 		Gui, 3:Add, Tab3,, General|Hotkeys|Appearance
 		Gui, 3:Tab, General
 		Gui, 3:Add,Text,section, Notes storage folder:
-		Gui, 3:Add,Edit, disabled r1 w%Gui3W% vNotesStorageFolder, %U_NotePath%
+		Gui, 3:Add,Edit, disabled r1 w300 vNotesStorageFolder, %U_NotePath%
 		Gui, 3:Add,Button, gFolderSelect, Select a folder.
-		
-		Gui, 3:Add,Text,xs,Quick Note Window Width: (Default: 500)
-		Gui, 3:Add,Edit   
-		Gui, 3:Add,UpDown,vQuickWSelect gQuickWSet range50-3000, %QuickNoteWidth%
 		
 		Gui, 3:Add,Text,xs,Main Window Width: (Default: 530)
 		Gui, 3:Add,Edit   
-		Gui, 3:Add,UpDown,vMainWSelect gMainWSet range50-3000, %LibW%
+		Gui, 3:Add,UpDown,vMainWSelect gSetMainW range50-3000, %LibW%
+		
+		Gui, 3:Add,Text,xs,Result Rows: (Default: 8)
+		Gui, 3:Add,Edit   
+		Gui, 3:Add,UpDown,vResultRowsSelect gSetResultRows range1-99, %ResultRows%
+		
+		Gui, 3:Add,Text,xs,Note Preview/Edit Rows: (Default: 8)
+		Gui, 3:Add,Edit   
+		Gui, 3:Add,UpDown,vPreviewRowsSelect gSetPreviewRows range1-99, %PreviewRows%
+		
+		Gui, 3:Add,Text,xs,Quick Note Window Width: (Default: 500)
+		Gui, 3:Add,Edit   
+		Gui, 3:Add,UpDown,vQuickWSelect gSetQuickW range50-3000, %QuickNoteWidth%
+		
+		Gui, 3:Add,Text,xs,Quick Note Rows: (Default: 7)
+		Gui, 3:Add,Edit   
+		Gui, 3:Add,UpDown,vQuickNoteRowsSelect gSetQuickNoteRows range1-99, %QuickNoteRows%
 		
 		Gui, 3:Tab, Hotkeys
 		Gui, 3:Add,CheckBox, vSetCtrlC gCtrlCToggle, Send Ctrl+C when using the quick note hotkey.
@@ -462,7 +473,7 @@ SortName:
 	}
   
 SaveAndReload:
-{
+{ ;*[FlatNotes]
 	GuiControlGet, U_QuickNoteWidth,,QuickWSelect	
 	IniWrite, %U_QuickNoteWidth%,%iniPath%,General, QuickNoteWidth
 	GuiControlGet, U_MainNoteWidth,,MainWSelect	
@@ -485,10 +496,65 @@ SaveAndReload:
 	IniWrite, %U_FontFamily%,%iniPath%,General, FontFamily	
 	GuiControlGet, U_FontSize,,FontSizeSelect	
 	IniWrite, %U_FontSize%,%iniPath%,General, FontSize
+	GuiControlGet, U_PreviewRows,,PreviewRowsSelect	
+	IniWrite, %U_PreviewRows%,%iniPath%,General, PreviewRows	
+	GuiControlGet, U_ResultRows,,ResultRowsSelect	
+	IniWrite, %U_ResultRows%,%iniPath%,General, ResultRows	
+	GuiControlGet, U_QuickNoteRows,,QuickNoteRowsSelect	
+	IniWrite, %U_QuickNoteRows%,%iniPath%,General, QuickNoteRows
+	GuiControlGet, U_QuickNoteWidth,,QuickWSelect	
+	IniWrite, %U_QuickNoteWidth%,%iniPath%,General, QuickNoteWidth
+	GuiControlGet, U_MainNoteWidth,,MainWSelect	
+	IniWrite, %U_MainNoteWidth%,%iniPath%,General, WindowWidth	
+	GuiControlGet, U_FontRendering,,FontRenderingSelect	
+	IniWrite, %U_FontRendering%,%iniPath%,General, FontRendering
 	reload
 }
-QuickWSet:
+
+SetPreviewRows:
 {
+	GuiControlGet, U_PreviewRows,,PreviewRowsSelect	
+	IniWrite, %U_PreviewRows%,%iniPath%,General, PreviewRows	
+	IniRead, PreviewRows, %iniPath%, General, PreviewRows
+	Gui, 1:Destroy
+	Gui, 2:Destroy	
+	BuildGUI1()
+	if WinExist("FlatNotes - Options")
+		WinActivate ; use the window found above
+	else
+		WinActivate, FlatNotes
+	return 
+}
+SetResultRows:
+{
+	GuiControlGet, U_ResultRows,,ResultRowsSelect	
+	IniWrite, %U_ResultRows%,%iniPath%,General, ResultRows		
+	IniRead, ResultRows, %iniPath%, General, ResultRows
+	Gui, 1:Destroy
+	Gui, 2:Destroy	
+	BuildGUI1()
+	if WinExist("FlatNotes - Options")
+		WinActivate ; use the window found above
+	else
+		WinActivate, FlatNotes
+	return 
+}
+SetQuickNoteRows:
+{
+	GuiControlGet, U_QuickNoteRows,,QuickNoteRowsSelect	
+	IniWrite, %U_QuickNoteRows%,%iniPath%,General, QuickNoteRows	
+	IniRead, QuickNoteRows, %iniPath%, General, QuickNoteRows
+	Gui, 1:Destroy 
+	Gui, 2:Destroy
+	BuildGUI2()
+	if WinExist("FlatNote - QuickNote")
+		WinActivate ; use the window found above
+	else
+		WinActivate, FlatNotes
+	return
+}
+SetQuickW:
+{ 
 	GuiControlGet, U_QuickNoteWidth,,QuickWSelect	
 	IniWrite, %U_QuickNoteWidth%,%iniPath%,General, QuickNoteWidth	
 	IniRead, QuickNoteWidth,%iniPath%, General,QuickNoteWidth
@@ -501,7 +567,7 @@ QuickWSet:
 		WinActivate, FlatNotes
 	return
 }
-MainWSet:
+SetMainW:
 {
 	GuiControlGet, U_MainNoteWidth,,MainWSelect	
 	IniWrite, %U_MainNoteWidth%,%iniPath%,General, WindowWidth	
@@ -512,7 +578,8 @@ MainWSet:
 	NameColW := Round(ColAdjust*0.4)
 	BodyColW := Round(ColAdjust*0.6)
 	NameColAndBodyCOlW := NameColW+BodyColW
-	Gui, 1:Destroy 
+	Gui, 1:Destroy
+	Gui, 2:Destroy	
 	BuildGUI1()
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
@@ -526,6 +593,7 @@ SetFontRendering:
 	IniWrite, %U_FontRendering%,%iniPath%,General, FontRendering		
 	IniRead, FontRendering,%iniPath%, General,FontRendering
 	Gui, 1:Destroy
+	Gui, 2:Destroy
 	BuildGUI1()
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
@@ -539,6 +607,7 @@ SetSearchFontFamily:
 	IniWrite, %U_SearchFontFamily%,%iniPath%,General, SearchFontFamily	
 	IniRead, SearchFontFamily, %iniPath%, General, SearchFontFamily
 	Gui, 1:Destroy
+	Gui, 2:Destroy
 	BuildGUI1()
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
@@ -553,6 +622,7 @@ SetSearchFontSize:
 	IniWrite, %U_SearchSize%,%iniPath%,General, SearchFontSize
 	IniRead, SearchFontSize, %iniPath%, General, SearchFontSize
 	Gui, 1:Destroy
+	Gui, 2:Destroy
 	BuildGUI1()
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
@@ -567,6 +637,7 @@ SetResultFontFamily:
 	IniWrite, %U_ResultFontFamily%,%iniPath%,General, ResultFontFamily	
 	IniRead, ResultFontFamily, %iniPath%, General, ResultFontFamily
 	Gui, 1:Destroy
+	Gui, 2:Destroy
 	BuildGUI1()
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
@@ -580,6 +651,7 @@ SetResultFontSize:
 	IniWrite, %U_ResultSize%,%iniPath%,General, ResultFontSize
 	IniRead, ResultFontSize, %iniPath%, General, ResultFontSize
 	Gui, 1:Destroy
+	Gui, 2:Destroy
 	BuildGUI1()
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
@@ -593,6 +665,7 @@ SetPreviewFontFamily:
 	IniWrite, %U_PreviewFontFamily%,%iniPath%,General, PreviewFontFamily	
 	IniRead, PreviewFontFamily, %iniPath%, General, PreviewFontFamily
 	Gui, 1:Destroy
+	Gui, 2:Destroy
 	BuildGUI1()
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
@@ -607,6 +680,7 @@ SetPreviewFontSize:
 	IniWrite, %U_PreviewSize%,%iniPath%,General, PreviewFontSize
 	IniRead, PreviewFontSize, %iniPath%, General, PreviewFontSize
 	Gui, 1:Destroy
+	Gui, 2:Destroy
 	BuildGUI1()
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
@@ -631,7 +705,6 @@ SetFontFamily:
 	GuiControl,,QuickNoteBody, Sample Text
 	return
 }
-
 SetFontSize:
 {
 	GuiControlGet, U_FontSize,,FontSizeSelect	
