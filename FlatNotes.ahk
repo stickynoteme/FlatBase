@@ -67,7 +67,7 @@ iniPath = %A_WorkingDir%\settings.ini
 themePath = %A_WorkingDir%\Themes
 IniRead, U_NotePath, %iniPath%, General, MyNotePath,%A_WorkingDir%\MyNotes\
 
-if (FileExist(U_NotePath)) {
+if InStr(FileExist(U_NotePath), "D") {
 	if (U_NotePath = "") {
 	U_NotePath = %A_WorkingDir%\MyNotes\
 	FileCreateDir, MyNotes
@@ -75,14 +75,13 @@ if (FileExist(U_NotePath)) {
 	if (U_NotePath ="\"){
 	U_NotePath = %A_WorkingDir%\MyNotes\
 	FileCreateDir, MyNotes
-	}else {
+	}
+}else {
 		msgbox Notes folder: %U_NotePath% could not be found. %A_WorkingDir%\MyNotes\ will be used instead.
 		FileCreateDir, MyNotes
 		IniWrite, %A_WorkingDir%\MyNotes\, %iniPath%, General, MyNotePath
 		U_NotePath = %A_WorkingDir%\MyNotes\
-	}
-}
-
+		}
 global U_NotePath
 ;-------------------------------------------------
 ;Set Default hotkeys if blank
