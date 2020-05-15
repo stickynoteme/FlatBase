@@ -346,7 +346,7 @@ SortName:
 		WinSet, AlwaysOnTop, Off, FlatNotes - Options
 		FileSelectFolder, NewNotesFolder, , 123
 		if NewNotesFolder =
-			MsgBox, You didn't select a folder.
+			GuiControl,,NotesStorageFolder,%U_NotePath%
 		else
 			GuiControl,,NotesStorageFolder,%NewNotesFolder%\
 		IniWrite, %NewNotesFolder%\, %iniPath%, General, MyNotePath
