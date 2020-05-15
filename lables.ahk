@@ -3,7 +3,7 @@ Label1:
 	if (U_Capslock = "1"){
 		return
 }
-	BuildGUI1()
+	BuildGUI1(1,1)
 	return
 }
 Label2:
@@ -216,28 +216,9 @@ return
 
 Library:
 {
-if WinExist("FlatNotes - Library")
-{
-	Gui, 1:destroy
+	Gui, 1:Destroy
+	BuildGUI1(0,0)
 	return
-}
-firstDown = 1
-Gui, 1:New,, FlatNotes - Library
-Gui, 1:Margin , 0, 0
-Gui, 1:Font, s10, Verdana, white
-Gui, 1:Color,%U_SBG%, %U_MBG%
-Gui, 1:Add,Edit, Cffffff w530 x-3 y0 vSearchTerm gSearch
-Gui, 1:Add, ListView, LV0x10000 -ReadOnly grid r8 w530 x-3 C%U_MFC% vLV gNoteListView +altsubmit -Multi, Title|Body|Created|FileName
-Gui, 1:Add,Edit, r0 h0  vFake,
-GuiControl, Hide, Fake
-Gui, 1:Add,Text, r1 w530 Center C%U_SFC% vNoteDetailPreviewBox gNoteDetailPreviewBoxClick,
-Gui, 1:Add,Edit,  r7 w530 x-3 yp+18 C%U_MFC% vPreviewBox,
-
-MakeFileList()
-
-Gui, 1:SHOW, w510 h338
-isFristRun = 0
-return
 }
 CtrlCToggle:
 {
@@ -291,7 +272,7 @@ ColorPicked:
 		
 	}
 	Gui, 1:Destroy
-	BuildGUI1()
+	BuildGUI1(0,0)
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
 	else
@@ -540,7 +521,7 @@ SetPreviewRows:
 	IniRead, PreviewRows, %iniPath%, General, PreviewRows
 	Gui, 1:Destroy
 	Gui, 2:Destroy	
-	BuildGUI1()
+	BuildGUI1(0,0)
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
 	else
@@ -554,7 +535,7 @@ SetResultRows:
 	IniRead, ResultRows, %iniPath%, General, ResultRows
 	Gui, 1:Destroy
 	Gui, 2:Destroy	
-	BuildGUI1()
+	BuildGUI1(0,0)
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
 	else
@@ -602,7 +583,7 @@ SetMainW:
 	NameColAndBodyCOlW := NameColW+BodyColW
 	Gui, 1:Destroy
 	Gui, 2:Destroy	
-	BuildGUI1()
+	BuildGUI1(0,0)
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
 	else
@@ -616,7 +597,7 @@ SetFontRendering:
 	IniRead, FontRendering,%iniPath%, General,FontRendering
 	Gui, 1:Destroy
 	Gui, 2:Destroy
-	BuildGUI1()
+	BuildGUI1(0,0)
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
 	else
@@ -630,7 +611,7 @@ SetSearchFontFamily:
 	IniRead, SearchFontFamily, %iniPath%, General, SearchFontFamily
 	Gui, 1:Destroy
 	Gui, 2:Destroy
-	BuildGUI1()
+	BuildGUI1(0,0)
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
 	else
@@ -645,7 +626,7 @@ SetSearchFontSize:
 	IniRead, SearchFontSize, %iniPath%, General, SearchFontSize
 	Gui, 1:Destroy
 	Gui, 2:Destroy
-	BuildGUI1()
+	BuildGUI1(0,0)
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
 	else
@@ -660,7 +641,7 @@ SetResultFontFamily:
 	IniRead, ResultFontFamily, %iniPath%, General, ResultFontFamily
 	Gui, 1:Destroy
 	Gui, 2:Destroy
-	BuildGUI1()
+	BuildGUI1(0,0)
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
 	else
@@ -674,7 +655,7 @@ SetResultFontSize:
 	IniRead, ResultFontSize, %iniPath%, General, ResultFontSize
 	Gui, 1:Destroy
 	Gui, 2:Destroy
-	BuildGUI1()
+	BuildGUI1(0,0)
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
 	else
@@ -688,7 +669,7 @@ SetPreviewFontFamily:
 	IniRead, PreviewFontFamily, %iniPath%, General, PreviewFontFamily
 	Gui, 1:Destroy
 	Gui, 2:Destroy
-	BuildGUI1()
+	BuildGUI1(0,0)
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
 	else
@@ -703,7 +684,7 @@ SetPreviewFontSize:
 	IniRead, PreviewFontSize, %iniPath%, General, PreviewFontSize
 	Gui, 1:Destroy
 	Gui, 2:Destroy
-	BuildGUI1()
+	BuildGUI1(0,0)
 	if WinExist("FlatNotes - Options")
 		WinActivate ; use the window found above
 	else

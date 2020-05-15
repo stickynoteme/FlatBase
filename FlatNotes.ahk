@@ -176,7 +176,7 @@ if (U_Capslock = "0"){
 	vk14::vk14
 	return
 }
-BuildGUI1()
+BuildGUI1(1,1)
 return
 }
 ;-------------------------------------------------

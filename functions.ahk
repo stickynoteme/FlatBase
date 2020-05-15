@@ -23,7 +23,7 @@ setHK(num,INI,GUI) {
 	 return
 }
 
-BuildGUI1(){
+BuildGUI1(xo,yo){
 	
 	if WinExist("FlatNotes - Library") {
 		Gui, 1:destroy
@@ -33,6 +33,14 @@ BuildGUI1(){
 	MouseGetPos, xPos, yPos	
 	xPos /= 1.5
 	yPos /= 1.5
+	if (xo=1)
+		xPos = x%xPos%
+		else
+			xPos = 
+	if (yo=1)
+		yPos = y%yPos%
+		else
+			yPos = 
 	Gui, 1:New,, FlatNotes - Library
 	Gui, 1:Margin , 0, 0 
 	Gui, 1:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
@@ -58,7 +66,7 @@ BuildGUI1(){
 	CLV.SelectionColors(rowSelectColor,rowSelectTextColor)
  	
 	
-	Gui, 1:SHOW, w%SubW%  x%xPos% y%yPos%
+	Gui, 1:SHOW, w%SubW%  %xPos% %yPos%
 	isFristRun = 0
 	return
 }
