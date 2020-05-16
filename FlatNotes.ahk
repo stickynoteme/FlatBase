@@ -179,12 +179,19 @@ global NameColAndBodyCOlW := NameColW+BodyColW
 ;-------------------------------------------------
 ;Acitvate User Hotkeys if any & make INI for new files
 ;-------------------------------------------------
+Progress, 0, Setting Hotkeys
 SetUserHotKeys()
+Progress, 5, Making Missing inis
 MakeAnyMissingINI()
+Progress, 10, Removing inis for deleted notes
 RemoveINIsOfMissingTXT()
+Progress, 15, Backing up your notes
 BackupNotes()
+Progress, 20, Building file index
 BuildGUI1(1,1)
+Progress, 100, Done!
 WinHide, FlatNotes - Library
+Progress, Off
 
 ;BuildGUI1()
 ;goto Options

@@ -98,6 +98,7 @@ MakeFileList(ReFreshMyNoteArray){
 		FileList .= A_LoopFileName "`n"
 ;trim off the extra starting newline
 	FileList := RTrim(Filelist, "`n")
+	Progress, 25, Building the search index
 	Loop Parse, FileList, `n
 	{
 		NoteField := ""
@@ -114,16 +115,16 @@ MakeFileList(ReFreshMyNoteArray){
 			LV_Add("", NameField, NoteField, AddedField,A_LoopField)
 			}
 		MyNotesArray.Push({1:NameField,2:NoteField,3:AddedField,4:A_LoopField})
-		LV_ModifyCol(1, NameColW) ; 145
-		LV_ModifyCol(1, "Logical")
-		LV_ModifyCol(2, BodyColW) ; 275
-		LV_ModifyCol(2, "Logical")
-		LV_ModifyCol(3, 75)
-		LV_ModifyCol(3, "Logical")
-		LV_ModifyCol(3, "SortDesc")
-		LV_ModifyCol(3, "Center")
-		LV_ModifyCol(4, 0)
 	} ; File loop end
+	LV_ModifyCol(1, NameColW) ; 145
+	LV_ModifyCol(1, "Logical")
+	LV_ModifyCol(2, BodyColW) ; 275
+	LV_ModifyCol(2, "Logical")
+	LV_ModifyCol(3, 75)
+	LV_ModifyCol(3, "Logical")
+	LV_ModifyCol(3, "SortDesc")
+	LV_ModifyCol(3, "Center")
+	LV_ModifyCol(4, 0)
 	return
 }
 
