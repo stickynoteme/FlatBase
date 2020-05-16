@@ -169,11 +169,13 @@ global NameColW := Round(ColAdjust*0.4)
 global BodyColW := Round(ColAdjust*0.6)
 global NameColAndBodyCOlW := NameColW+BodyColW
 ;-------------------------------------------------
-;Acitvate User Hotkeys if any
+;Acitvate User Hotkeys if any & make INI for new files
 ;-------------------------------------------------
 SetUserHotKeys()
+MakeAnyMissingINI()
+RemoveINIsOfMissingTXT()
 ;BuildGUI1()
-goto Options
+;goto Options
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------

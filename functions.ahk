@@ -116,15 +116,6 @@ MakeFileList(ReFreshMyNoteArray){
 		NoteIniName := StrReplace(A_LoopField, ".txt", ".ini")
 		NoteBackupName := NoteBackupName := StrReplace(A_LoopField, ".txt", "")
 		NoteIni = %detailsPath%%NoteIniName%
-		;Only do these fo fix old notes
-		;FormatTime, DateBackup, %A_Now%, yy/MM/dd
-		;IniWrite,%NoteBackupName%,%NoteIni%, INFO, Name
-		;IniWrite,%DateBackup%,%NoteIni%, INFO, Add
-		;FileRead, FixNote, %U_NotePath%%A_LoopField%
-		;FixNoteBody := SubStr(FixNote, InStr(FixNote, "`n") + 1)
-		;FileRecycle, %U_NotePath%%A_LoopField%
-		;FileAppend , %FixNoteBody%, %U_NotePath%%A_LoopField%, UTF-8
-		;IniWrite,%DateBackup%,%NoteIni%, INFO, Mod
 		IniRead, NameField, %NoteIni%, INFO, Name
 		IniRead, AddedField, %NoteIni%, INFO, Add
 		IniRead, ModifiedField, %NoteIni%, INFO, Mod
@@ -179,5 +170,40 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody) {
 	iniWrite,%CurrentTimeStamp%,%detailsPath%%FileSafeName%.ini,INFO,Mod
 	iniWrite,%CreatedDate%,%detailsPath%%FileSafeName%.ini,INFO,Add
 	FileAppend , %QuickNoteBody%, %SaveFileName%, UTF-8
+return
+}
+
+MakeAnyMissingINI(){
+	FileList := ""
+	MyNotesArray := {}
+	Loop, Files, %U_NotePath%*.txt
+		FileList .= A_LoopFileName "`n"
+	FileList := RTrim(Filelist, "`n")
+	Loop Parse, FileList, `n
+	{
+		NoteIniName := ""
+		NoteIniName := StrReplace(A_LoopField, ".txt", ".ini")
+		IfNotExist, %detailsPath%%NoteIniName%
+				NoteName := StrReplace(A_LoopField, ".txt", "")
+				FormatTime, CurrentTimeStamp, %A_Now%, yy/MM/dd
+				iniWrite,%NoteName%,%detailsPath%%NoteName%.ini,INFO,Name
+				iniWrite,%CurrentTimeStamp%,%detailsPath%%NoteName%.ini,INFO,Mod
+				iniWrite,%CurrentTimeStamp%,%detailsPath%%NoteName%.ini,INFO,Add
+	} 
+return
+}
+RemoveINIsOfMissingTXT(){
+	FileList := ""
+	MyNotesArray := {}
+	Loop, Files, %detailsPath%*.ini
+		FileList .= A_LoopFileName "`n"
+	FileList := RTrim(Filelist, "`n")
+	Loop Parse, FileList, `n
+	{
+		NoteName := ""
+		NoteName := StrReplace(A_LoopField, ".ini", ".txt")
+		IfNotExist, %U_NotePath%%NoteName%
+			FileRecycle %detailsPath%%A_LoopField%
+	} 
 return
 }
