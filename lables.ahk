@@ -113,6 +113,24 @@ Search:
 	GuiControlGet, SearchTerm
 	GuiControl, -Redraw, LV
 	LV_Delete()
+	tooltip %SearchTerm%
+	If (InStr(SearchTerm, "$$") != 0) {
+		SearchTerm := StrReplace(SearchTerm, "$$" , "")
+		For Each, Note In MyNotesArray
+		{
+		  If (SearchTerm != "")
+		  {
+			If (InStr(Note.1, SearchTerm) != 0){
+			 LV_Add("", Note.1, Note.2,Note.3,Note.4)
+			   }
+			}
+			Else
+			  LV_Add("", Note.1,Note.2,Note.3,Note.4)
+		}
+	GuiControl, +Redraw, LV
+	return
+	}
+	
 	For Each, Note In MyNotesArray
 	{
 	   If (SearchTerm != "")
