@@ -69,6 +69,7 @@ global HideScrollbars
 global backupsToKeep
 global g1Open
 global g1ID
+global isStarting
 ;Var with starting values
 global istitle = yes
 
@@ -162,6 +163,7 @@ global NameColAndBodyCOlW := NameColW+BodyColW
 ;-------------------------------------------------
 ;Acitvate User Hotkeys if any & make INI for new files
 ;-------------------------------------------------
+isStarting = 1
 Progress, 0, Setting Hotkeys
 SetUserHotKeys()
 Progress, 5,  Adding new notes
@@ -175,6 +177,7 @@ BuildGUI1(1,1)
 Progress, 100, Done!
 WinHide, FlatNotes - Library
 Progress, Off
+isStarting = 0
 
 ;BuildGUI1()
 ;goto Options

@@ -75,7 +75,7 @@ Label3:
 				 return
 			}
 			SaveFile(ztitle,TmpFileSafeName,zbody)
-			MakeFileList(1)
+			;MakeFileList(1)
 			if WinActive("FlatNotes - Library")
 				send {space}{backspace} ;update results
 			tooltip B: %zbody%
@@ -104,8 +104,7 @@ GuiControlGet, FileSafeName
 GuiControlGet, QuickNoteBody
 SaveFile(QuickNoteName,FileSafeName,QuickNoteBody)
 Gui, 2:Destroy
-MakeFileList(1)
-ReFreshLV()
+
 if WinActive("FlatNotes - Library")
 	send {space}{backspace} ;update results
 return
@@ -127,7 +126,6 @@ Search:
 	GuiControlGet, SearchTerm
 	GuiControl, -Redraw, LV
 	LV_Delete()
-	tooltip %SearchTerm%
 	If (InStr(SearchTerm, "$$") != 0) {
 		SearchTerm := StrReplace(SearchTerm, "$$" , "")
 		For Each, Note In MyNotesArray
@@ -233,10 +231,15 @@ if (A_GuiEvent == "e")
 	
 	FilePath = %U_NotePath%%TmpFileSafeName%.txt
 	OldFilePath = %U_NotePath%%TmpOldFileSafeName%.txt
+	if FileExist(FilePath)
+		{
+			 msgbox Note With This Name ALready Exists
+			 LV_Modify(A_EventInfo, ,OldRowText)
+			 return
+		}
 	FileRead, MyOldFile, %OldFilePath%
 	FileRecycle,  %OldFilePath%
 	FileRecycle,  %detailsPath%%TmpOldFileSafeName%.ini
-
 	SaveFile(RowText,TmpFileSafeName,MyOldFile)
 	MakeFileList(1)
 	ReFreshLV()

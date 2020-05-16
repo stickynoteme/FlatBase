@@ -98,7 +98,8 @@ MakeFileList(ReFreshMyNoteArray){
 		FileList .= A_LoopFileName "`n"
 ;trim off the extra starting newline
 	FileList := RTrim(Filelist, "`n")
-	Progress, 25, Building the search index
+	if (isStarting = 1)
+		Progress, 25, Building the search index
 	Loop Parse, FileList, `n
 	{
 		NoteField := ""
@@ -129,35 +130,30 @@ MakeFileList(ReFreshMyNoteArray){
 }
 
 ReFreshLV(){
-global SearchTerm
-GuiControlGet, SearchTerm
-GuiControl, -Redraw, LV
+GuiControl, -Redraw, %HLV%
 LV_Delete()
 For Each, Note In MyNotesArray
 {
-		If (InStr(Note.1, SearchTerm) != 0){
-         LV_Add("", Note.1, Note.2,Note.3,Note.4)
-        }Else if (InStr(Note.2, SearchTerm) != 0)
-	   {LV_Add("", Note.1, Note.2,Note.3,Note.4)
-	   }Else if (InStr(Note.3, SearchTerm) != 0)
-	   {LV_Add("", Note.1, Note.2,Note.3,Note.4)
-	   }Else if (InStr(Note.4, SearchTerm) != 0)
-	   {LV_Add("", Note.1, Note.2,Note.3,Note.4)
-	   }Else
-	   
-      LV_Add("", Note.1,Note.2,Note.3,Note.4)
-	  GuiControl, +Redraw, LV
+	LV_Add("", Note.1,Note.2,Note.3,Note.4)
 }
+GuiControl, +Redraw, %HLV%
 return
 }
 
 SaveFile(QuickNoteName,FileSafeName,QuickNoteBody) {
 	FormatTime, CurrentTimeStamp, %A_Now%, yy/MM/dd
-
+	FileNameTxt =%FileSafeName%.txt
 	SaveFileName = %U_NotePath%%FileSafeName%.txt
 	
 	iniRead,CreatedDate,%detailsPath%%FileSafeName%.ini,INFO,Add,%CurrentTimeStamp%
 	FileRecycle, %SaveFileName%
+	
+	MyNotesArray.Push({1:QuickNoteName,2:QuickNoteBody,3:CreatedDate,4:FileNameTxt})
+	ReFreshLV()
+	;LV_Add("", QuickNoteName, QuickNoteBody,CreatedDate,FileNameTxt)
+	GuiControl, +Redraw, LV
+
+
 	iniWrite,%QuickNoteName%,%detailsPath%%FileSafeName%.ini,INFO,Name
 	iniWrite,%CurrentTimeStamp%,%detailsPath%%FileSafeName%.ini,INFO,Mod
 	iniWrite,%CreatedDate%,%detailsPath%%FileSafeName%.ini,INFO,Add
