@@ -50,6 +50,8 @@ global NextSortName
 global rowSelectColor
 global rowSelectTextColor
 global QuickNoteWidth
+global LB1
+global LB2
 ;Pre-set globals
 global LibW
 global PreviewRows
@@ -205,6 +207,8 @@ if (g1Open=0) {
 	WinRestore, ahk_id %g1ID%
 	WinActivate, ahk_id %g1ID%
 	g1Open=1
+	ControlFocus,Edit1,FlatNotes - Library
+	sendinput {left}{right}
 	return
 }
 return

@@ -93,21 +93,23 @@ Label4:
 }
 SaveButton:
 {
-	GuiControlGet, QuickNoteName
-	GuiControlGet, FileSafeName
+	GuiControlGet,FileSafeName,,FileSafeName
 	if (QuickNoteName == ""){
 		MsgBox Note Name Can Not Be Empty
 	return
 	}
-
-GuiControlGet, FileSafeName
-GuiControlGet, QuickNoteBody
-SaveFile(QuickNoteName,FileSafeName,QuickNoteBody)
-Gui, 2:Destroy
-
-if WinActive("FlatNotes - Library")
-	send {space}{backspace} ;update results
-return
+	Gui, 2:Submit
+	SaveFile(QuickNoteName,FileSafeName,QuickNoteBody)
+	
+	;horrible fix to LV to update
+	GuiControlGet,SearchTerm
+	GuiControl,1: , SearchTerm, _
+	GuiControl,1: , SearchTerm,
+	if WinActive("FlatNotes - Library")
+		send {space}{backspace} ;update results
+	tooltip Saved
+	settimer, KillToolTip, -500
+	return
 }
 
 QuickSafeNameUpdate:

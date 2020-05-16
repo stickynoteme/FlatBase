@@ -46,8 +46,8 @@ BuildGUI1(xo,yo){
 	Gui, 1:Color,%U_SBG%, %U_MBG%
 	Gui, 1:Add,Edit, c%U_FBCA% w%LibW% y%FontSize% x6 y8 vSearchTerm gSearch -E0x200
 	;ListBox used as background color for search area padding
-	Gui, 1:Add, ListBox, +0x100 h8 w%LibW% x0 y0 -E0x200 Disabled 
-	Gui, 1:Add, ListBox, +0x100 h15 w%LibW% x0 ys0 -E0x200 Disabled
+	Gui, 1:Add, ListBox, vLB1 +0x100 h8 w%LibW% x0 y0 -E0x200 Disabled 
+	Gui, 1:Add, ListBox, vlB2 +0x100 h15 w%LibW% x0 ys0 -E0x200 Disabled
 	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%	
 	Gui, 1:Add, text, c%U_SFC% w%NameColW% center gSortName vSortName, Name
 	Gui, 1:Add, text, c%U_SFC% xp+%NameColW% yp+1 w%BodyColW% center gSortBody vSortBody, Body
@@ -130,13 +130,13 @@ MakeFileList(ReFreshMyNoteArray){
 }
 
 ReFreshLV(){
-GuiControl, -Redraw, %HLV%
+GuiControl, 1:-Redraw, LV
 LV_Delete()
 For Each, Note In MyNotesArray
 {
 	LV_Add("", Note.1,Note.2,Note.3,Note.4)
 }
-GuiControl, +Redraw, %HLV%
+GuiControl, 1:+Redraw, LV
 return
 }
 
@@ -151,8 +151,7 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody) {
 	MyNotesArray.Push({1:QuickNoteName,2:QuickNoteBody,3:CreatedDate,4:FileNameTxt})
 	ReFreshLV()
 	;LV_Add("", QuickNoteName, QuickNoteBody,CreatedDate,FileNameTxt)
-	GuiControl, +Redraw, LV
-
+	GuiControl, 1:+Redraw, LV
 
 	iniWrite,%QuickNoteName%,%detailsPath%%FileSafeName%.ini,INFO,Name
 	iniWrite,%CurrentTimeStamp%,%detailsPath%%FileSafeName%.ini,INFO,Mod
@@ -160,7 +159,6 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody) {
 	FileAppend , %QuickNoteBody%, %SaveFileName%, UTF-8
 return
 }
-
 MakeAnyMissingINI(){
 	FileList := ""
 	MyNotesArray := {}
