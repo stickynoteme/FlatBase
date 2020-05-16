@@ -424,17 +424,24 @@ Options:
 			Gui, 3:Add, Hotkey, section vHK%A_Index% gLabel, %noMods%           
 			Gui, 3:Add, CheckBox, x+5  vCB%A_Index% Checked%ErrorLevel%, Win
 			Gui, 3:Add,text, h0 xs0 Disabled
-		}                                                               
+		}                                                        
 		if (U_Capslock = 1)
 			GuiControl, Disable, msctls_hotkey321
-		
-		
+
+		;Appearance Tab
 		Gui, 3:Tab, Appearance
 		Gui, 3:Add,Text,,Font Rendering: (5 = ClearType)
 		Gui, Add, Edit 
 		Gui, 3:Add,UpDown, vFontRenderingSelect gSetFontRendering Range0-5, %FontRendering%
-		Gui, 3:Add,Text,,Theme Selection:
 		
+		Gui, 3:Add, CheckBox, vHideScrollbarsSelect gSetHideScrollbars, Hide Scroolbars where possible.
+		GuiControl,,HideScrollbarsSelect,%HideScrollbars%
+		
+		;Gui, 3:Add, CheckBox, vUseCapslock ;gUseCapslockToggle, Use Capslock for Library?
+		;GuiControl,,UseCapslock,%U_Capslock%
+		
+		
+		Gui, 3:Add,Text,,Theme Selection:
 		Loop, Files, %themePath%\*.ini
 		{
 			themeFileList .= A_LoopFileName "|"
@@ -534,7 +541,16 @@ SaveAndReload:
 	IniWrite, %U_FontRendering%,%iniPath%,General, FontRendering
 	reload
 }
-
+SetHideScrollbars:
+{
+	GuiControlGet,HideScrollbarsSelect
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%HideScrollbarsSelect%, %iniPath%, General, HideScrollbars
+		
+	}
+return
+}
 SetPreviewRows:
 {
 	GuiControlGet, U_PreviewRows,,PreviewRowsSelect	

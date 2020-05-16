@@ -63,6 +63,7 @@ global SearchFontFamily
 global SearchFontSize
 global FontRendering
 global detailsPath
+global HideScrollbars
 ;Var with starting values
 global istitle = yes
 
@@ -153,11 +154,16 @@ IniRead, LibW, %iniPath%, General, WindowWidth ,530
 IniRead, U_Capslock, %iniPath%, General, UseCapsLock , 1
 IniRead, sendCtrlC, %iniPath%, General, sendCtrlC, 1
 
+IniRead, HideScrollbars,%iniPath%,General,HideScrollbars,1
 ;-------------------------------------------------
 ;Set Globals that need values from the ini
 ;-------------------------------------------------
-global SubW := LibW-10	
-global libWAdjust := LibW+10
+global 	SubW := LibW
+global libWAdjust := LibW
+if (HideScrollbars = 1){
+	libWAdjust := LibW+10
+	SubW := LibW-10
+	}
 global ColAdjust := LibW-95
 global NameColW := Round(ColAdjust*0.4)
 global BodyColW := Round(ColAdjust*0.6)
@@ -167,7 +173,7 @@ global NameColAndBodyCOlW := NameColW+BodyColW
 ;-------------------------------------------------
 SetUserHotKeys()
 ;BuildGUI1()
-;goto Options
+goto Options
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------
