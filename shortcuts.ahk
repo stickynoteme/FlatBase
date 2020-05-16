@@ -136,15 +136,15 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			return
 			}
 		If (OutputVar == "Edit3"){
-			Gui,1:destroy 
+			gosub GuiEscape
 			return
 			}
 		If (OutputVar == "Edit1"){
-			Gui,1:destroy 
+			gosub GuiEscape 
 			return
 			}
 		If (OutputVar == "SysListView321"){
-			Gui,1:destroy 
+			gosub GuiEscape
 			return
 			}
 }

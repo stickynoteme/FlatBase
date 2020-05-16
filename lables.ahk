@@ -256,8 +256,11 @@ return
 
 Library:
 {
-	Gui, 1:Destroy
-	BuildGUI1(0,0)
+    WinGetPos,,, Width, Height, ahk_id %g1ID%
+	WinMove, ahk_id %g1ID%,, (A_ScreenWidth/2)-(Width/2), (A_ScreenHeight/2)-(Height/2)
+	g1Open=1
+	WinShow, ahk_id %g1ID%
+	WinRestore, ahk_id %g1ID%
 	return
 }
 CtrlCToggle:
@@ -835,7 +838,14 @@ Label:
 }
 GuiEscape:
 {
-	Gui, Destroy
+	WinHide, ahk_id %g1ID%
+	g1Open=0
+	return
+}
+GuiClose:
+{
+	WinHide, ahk_id %g1ID%
+	g1Open=0
 	return
 }
 Exit:

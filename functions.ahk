@@ -40,17 +40,6 @@ BuildGUI1(xo,yo){
 		return
 	}
 	firstDown = 1
-	MouseGetPos, xPos, yPos	
-	xPos /= 1.5
-	yPos /= 1.5
-	if (xo=1)
-		xPos = x%xPos%
-		else
-			xPos = 
-	if (yo=1)
-		yPos = y%yPos%
-		else
-			yPos = 
 	Gui, 1:New,, FlatNotes - Library
 	Gui, 1:Margin , 0, 0 
 	Gui, 1:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
@@ -76,7 +65,9 @@ BuildGUI1(xo,yo){
 	CLV.SelectionColors(rowSelectColor,rowSelectTextColor)
  	
 	
-	Gui, 1:SHOW, w%SubW%  %xPos% %yPos%
+	Gui, 1:SHOW, Hide w%SubW% 
+	WinGet, g1ID,, FlatNotes - Library
+	g1Open=0
 	return
 }
 

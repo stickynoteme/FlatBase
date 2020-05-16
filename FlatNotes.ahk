@@ -5,6 +5,8 @@
 FileEncoding ,UTF-8
 CoordMode, mouse, Screen
 SetBatchLines, -1
+DetectHiddenWindows, On
+
 ;-------------------------------------------------
 ;Setup Tray Menu
 ;-------------------------------------------------
@@ -65,8 +67,11 @@ global FontRendering
 global detailsPath
 global HideScrollbars
 global backupsToKeep
+global g1Open
+global g1ID
 ;Var with starting values
 global istitle = yes
+
 
 FileCreateDir, NoteDetails
 detailsPath := A_WorkingDir "\NoteDetails\"
@@ -178,18 +183,36 @@ SetUserHotKeys()
 MakeAnyMissingINI()
 RemoveINIsOfMissingTXT()
 BackupNotes()
+BuildGUI1(1,1)
+WinHide, FlatNotes - Library
+
 ;BuildGUI1()
 ;goto Options
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------
+
 vk14::
 {
 if (U_Capslock = "0"){
 	vk14::vk14
 	return
 }
-BuildGUI1(1,1)
+if (g1Open=1) {
+	WinHide, FlatNotes - Library
+	g1Open=0
+	return
+}
+if (g1Open=0) {
+	MouseGetPos, xPos, yPos	
+	xPos /= 1.5
+	yPos /= 1.5
+	WinMove, ahk_id %g1ID%, , %xPos%, %yPos%
+	WinShow, ahk_id %g1ID%
+	WinRestore, ahk_id %g1ID%
+	g1Open=1
+	return
+}
 return
 }
 ;-------------------------------------------------
