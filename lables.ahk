@@ -377,6 +377,16 @@ FolderSelect:
 	}
 Options:
 {
+
+Fontlist := "fontlist.cfg"
+FileRead, FontFile, % Fontlist
+FontOptionsArray := []
+loop, parse, FontFile, `n
+	FontOptionsArray.push(A_LoopField)
+For k, fonts in FontOptionsArray
+	FontDropDownOptions .= fonts "|"
+
+
 		Gui, 3:New,,FlatNotes - Options
 		Gui, 3:Add, Tab3,, General|Hotkeys|Appearance
 		Gui, 3:Tab, General
@@ -416,9 +426,7 @@ Options:
 			HotkeyNameTmp := HotkeyNames[A_Index]
 			Gui, 3:Add, Text, , Hotkey: %HotkeyNameTmp%
 			IniRead, savedHK%A_Index%, settings.ini, Hotkeys, %A_Index%, %A_Space%
-			;Sets Hotkeys, this is done else where now and editing settings relodas the script
-			;If savedHK%A_Index%                                       
-				;Hotkey,% savedHK%A_Index%, Label%A_Index%                 
+   
 			StringReplace, noMods, savedHK%A_Index%, ~                  
 			StringReplace, noMods, noMods, #,,UseErrorLevel              
 			Gui, 3:Add, Hotkey, section vHK%A_Index% gLabel, %noMods%           
@@ -437,8 +445,6 @@ Options:
 		Gui, 3:Add, CheckBox, vHideScrollbarsSelect gSetHideScrollbars, Hide Scroolbars where possible.
 		GuiControl,,HideScrollbarsSelect,%HideScrollbars%
 		
-		;Gui, 3:Add, CheckBox, vUseCapslock ;gUseCapslockToggle, Use Capslock for Library?
-		;GuiControl,,UseCapslock,%U_Capslock%
 		
 		
 		Gui, 3:Add,Text,,Theme Selection:
@@ -449,9 +455,6 @@ Options:
 			themeList := StrReplace(themeFileList, ".ini" , "")
 		}
 		Gui, 3:Add,DropDownList, Choose%U_Theme% vColorChoice gColorPicked, %themeList%
-		
-		FontOptionsArray := ["Bahnschrift","Fixedsys","Modern","MS Sans Serif","MS Serif","Neue Haas Grotesk Text Pro","Roman","Script","Small Fonts","System","Terminal","Arial","Arial Black","Arial Nova","Calibri","Calibri Light","Cambria","Candara","Comic Sans MS","Consolas","Constantia","Corbel","Courier","Courier New","Franklin Gothic Medium","Gabriola","Georgia","Georgia Pro","Gill Sans Nova","Impact","Lucida Console","Lucida Sans","Lucida Sans Unicode","Microsoft Sans Serif","Palatino Linotype","Rockwell Nova","Segoe Print","Segoe Script","Segoe UI","Sitka Display","Sitka Text","Tahoma","Times New Roman","Trebuchet MS","Verdana","Verdana Pro"]
-		
 		
 		CurrentFont = 1
 		C_PreventFont = 1
@@ -478,25 +481,23 @@ Options:
 				C_SearchFont := k
 		} 
 		Gui, 3:Add,text,section, Quick Note Interface font settings:
-		Gui, 3:add,DropDownList, Choose%CurrentFont% w100 vFontFamilySelect gSetFontFamily, Bahnschrift|Fixedsys|Modern|MS Sans Serif|MS Serif|Neue Haas Grotesk Text Pro|Roman|Script|Small Fonts|System|Terminal|Arial|Arial Black|Arial Nova|Calibri|Calibri Light|Cambria|Candara|Comic Sans MS|Consolas|Constantia|Corbel|Courier|Courier New|Franklin Gothic Medium|Gabriola|Georgia|Georgia Pro|Gill Sans Nova|Impact|Lucida Console|Lucida Sans|Lucida Sans Unicode|Microsoft Sans Serif|Palatino Linotype|Rockwell Nova|Segoe Print|Segoe Script|Segoe UI|Sitka Display|Sitka Text|Tahoma|Times New Roman|Trebuchet MS|Verdana|Verdana Pro 
+		Gui, 3:add,DropDownList, Choose%CurrentFont% w100 vFontFamilySelect gSetFontFamily, %FontDropDownOptions%
 		CurrentFontSize := FontSize*0.5
 		Gui, 3:add,DropDownList, x+10 Choose%CurrentFontSize% vFontSizeSelect gSetFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
 		Gui, 3:Add,text,xs section, Search Box font settings:
-		Gui, 3:add,DropDownList, Choose%C_SearchFont% w100 vSearchFontFamilySelect gSetSearchFontFamily, Bahnschrift|Fixedsys|Modern|MS Sans Serif|MS Serif|Neue Haas Grotesk Text Pro|Roman|Script|Small Fonts|System|Terminal|Arial|Arial Black|Arial Nova|Calibri|Calibri Light|Cambria|Candara|Comic Sans MS|Consolas|Constantia|Corbel|Courier|Courier New|Franklin Gothic Medium|Gabriola|Georgia|Georgia Pro|Gill Sans Nova|Impact|Lucida Console|Lucida Sans|Lucida Sans Unicode|Microsoft Sans Serif|Palatino Linotype|Rockwell Nova|Segoe Print|Segoe Script|Segoe UI|Sitka Display|Sitka Text|Tahoma|Times New Roman|Trebuchet MS|Verdana|Verdana Pro 
+		Gui, 3:add,DropDownList, Choose%C_SearchFont% w100 vSearchFontFamilySelect gSetSearchFontFamily,%FontDropDownOptions%
 		CurrenSearchFontSize := ResultFontSize*0.5
 		Gui, 3:add,DropDownList, x+10 Choose%CurrenSearchFontSize% vSearchFontSizeSelect gSetSearchFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
 		Gui, 3:Add,text,xs section, Result font settings:
-		Gui, 3:add,DropDownList, Choose%C_ResultFont% w100 vResultFontFamilySelect gSetResultFontFamily, Bahnschrift|Fixedsys|Modern|MS Sans Serif|MS Serif|Neue Haas Grotesk Text Pro|Roman|Script|Small Fonts|System|Terminal|Arial|Arial Black|Arial Nova|Calibri|Calibri Light|Cambria|Candara|Comic Sans MS|Consolas|Constantia|Corbel|Courier|Courier New|Franklin Gothic Medium|Gabriola|Georgia|Georgia Pro|Gill Sans Nova|Impact|Lucida Console|Lucida Sans|Lucida Sans Unicode|Microsoft Sans Serif|Palatino Linotype|Rockwell Nova|Segoe Print|Segoe Script|Segoe UI|Sitka Display|Sitka Text|Tahoma|Times New Roman|Trebuchet MS|Verdana|Verdana Pro 
+		Gui, 3:add,DropDownList, Choose%C_ResultFont% w100 vResultFontFamilySelect gSetResultFontFamily, %FontDropDownOptions%
 		CurrenResulttFontSize := ResultFontSize*0.5
 		Gui, 3:add,DropDownList, x+10 Choose%CurrenResulttFontSize% vResultFontSizeSelect gSetResultFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
 		Gui, 3:Add,text,xs section, Note font settings:
-		Gui, 3:add,DropDownList, Choose%C_PreventFont% w100 vPreviewFontFamilySelect gSetPreviewFontFamily, Bahnschrift|Fixedsys|Modern|MS Sans Serif|MS Serif|Neue Haas Grotesk Text Pro|Roman|Script|Small Fonts|System|Terminal|Arial|Arial Black|Arial Nova|Calibri|Calibri Light|Cambria|Candara|Comic Sans MS|Consolas|Constantia|Corbel|Courier|Courier New|Franklin Gothic Medium|Gabriola|Georgia|Georgia Pro|Gill Sans Nova|Impact|Lucida Console|Lucida Sans|Lucida Sans Unicode|Microsoft Sans Serif|Palatino Linotype|Rockwell Nova|Segoe Print|Segoe Script|Segoe UI|Sitka Display|Sitka Text|Tahoma|Times New Roman|Trebuchet MS|Verdana|Verdana Pro 
+		Gui, 3:add,DropDownList, Choose%C_PreventFont% w100 vPreviewFontFamilySelect gSetPreviewFontFamily, %FontDropDownOptions%
 		CurrentPreviewFontSize := PreviewFontSize*0.5
 		Gui, 3:add,DropDownList, x+10 Choose%CurrentPreviewFontSize% vPreviewFontSizeSelect gSetPreviewFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
 		
 		Gui, 3:Tab 
-		;Gui, 3:Add,Text,x0 w%Gui3W% +Center,Settings are saved automatically.
-		;Gui, 3:Add,Text,x0 w%Gui3W% +Center,Press Esc to exit and reload.
 		Gui, 3:Add, Button, Default gSaveAndReload, Save and Reload
 		Gui, 3:SHOW 
 		WinSet, AlwaysOnTop, On, FlatNotes - Options
