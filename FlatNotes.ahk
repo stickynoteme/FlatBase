@@ -64,6 +64,7 @@ global SearchFontSize
 global FontRendering
 global detailsPath
 global HideScrollbars
+global backupsToKeep
 ;Var with starting values
 global istitle = yes
 
@@ -155,6 +156,8 @@ IniRead, U_Capslock, %iniPath%, General, UseCapsLock , 1
 IniRead, sendCtrlC, %iniPath%, General, sendCtrlC, 1
 
 IniRead, HideScrollbars,%iniPath%,General,HideScrollbars,1
+IniRead, backupsToKeep,%iniPath%,General,backupsToKeep,3
+
 ;-------------------------------------------------
 ;Set Globals that need values from the ini
 ;-------------------------------------------------
@@ -174,6 +177,7 @@ global NameColAndBodyCOlW := NameColW+BodyColW
 SetUserHotKeys()
 MakeAnyMissingINI()
 RemoveINIsOfMissingTXT()
+BackupNotes()
 ;BuildGUI1()
 ;goto Options
 ;-------------------------------------------------

@@ -207,3 +207,31 @@ RemoveINIsOfMissingTXT(){
 	} 
 return
 }
+BackupNotes(){
+	FormatTime, CurrentTimeStamp, %A_Now%, yy-MM-dd
+	7z_exe:="7za.exe"
+	z = 0
+	BackupFileList := ""  ; Initialize to be blank.
+	Loop, %A_WorkingDir%\Backups\*.*
+		BackupFileList .= A_LoopFileName "`n"
+	Sort, BackupFileList
+	TimeToBackup := CurrentTimeStamp ".7z"
+	Loop, parse, BackupFileList, `n
+	{
+		if (A_LoopField = TimeToBackup)
+			SetTimer, CheckBackupLater, 18000000
+			return
+	}
+	Sort, BackupFileList, R  
+	Loop, parse, BackupFileList, `n
+	{
+		if (A_LoopField = "")
+			continue
+		z +=1
+		if (z>=backupsToKeep)
+		 FileRecycle %A_WorkingDir%\Backups\%A_LoopField%
+	}
+	FormatTime, CurrentTimeStamp, %A_Now%, yy-MM-dd
+	Run, %7z_exe% a -t7z "%A_WorkingDir%\Backups\%CurrentTimeStamp%.7z" "%detailsPath%" "%U_NotePath%",,Hide UseErrorLevel
+return
+}

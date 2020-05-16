@@ -48,7 +48,7 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			NoteBody := SubStr(MyFile, InStr(MyFile, "`n") + 1)
 			clipboard = %NoteBody%
 			ToolTip Text: "%RowText%" Copied to clipboard
-			SetTimer, KillToolTip, 500
+			SetTimer, KillToolTip, -500
 			Gui, 1:Destroy
 			return
 			}else
@@ -67,7 +67,7 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			FileReadLine, MyFile, %FilePath%,2
 			clipboard = %MyFile%
 			ToolTip Text: "%RowText%" Copied to clipboard
-			SetTimer, KillToolTip, 500
+			SetTimer, KillToolTip, -500
 			Gui, 1:Destroy
 			return
 			}else
@@ -107,7 +107,7 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			LV_GetText(RowText, LVSelectedROW)
 			clipboard = %RowText%
 			ToolTip Text: "%RowText%" Copied to clipboard
-			SetTimer, KillToolTip, 500
+			SetTimer, KillToolTip, -500
 			Gui, 1:Destroy
 			return
 			}
@@ -121,7 +121,7 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			SaveFile(RowText,FileSafeName,NoteDetailPreviewBox)
 			ToolTip Saved 
 			LV_Modify(LVSelectedROW , ,RowText, LVBodyUpdate[1])
-			SetTimer, KillToolTip, 500
+			SetTimer, KillToolTip, -500
 			return
 		}else
 			Enter::Enter

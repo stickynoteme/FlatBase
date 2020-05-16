@@ -46,7 +46,7 @@ Label3:
 			;trim space and tab
 			ztitle := Trim(1ztitle," 	")
 			tooltip T: %ztitle%
-			settimer, KillToolTip, 500
+			settimer, KillToolTip, -500
 			return
 	}
 	else if(istitle = "no") {
@@ -65,7 +65,7 @@ Label3:
 			if WinActive("FlatNotes - Library")
 				send {space}{backspace} ;update results
 			tooltip B: %zbody%
-			settimer, KillToolTip, 500
+			settimer, KillToolTip, -500
 			return
 	}
 return
@@ -74,7 +74,7 @@ Label4:
 {
 	istitle = yes
 	tooltip cancled
-	settimer,KillToolTip,1000
+	settimer,KillToolTip,-1000
 	return 
 }
 SaveButton:
@@ -149,7 +149,7 @@ NoteDetailPreviewBoxClick:
 {
 	GuiControlGet, NoteDetailPreviewBox
 	tooltip %NoteDetailPreviewBox%
-	SetTimer, KillToolTip, 2000
+	SetTimer, KillToolTip, -2000
 	return
 }
 
@@ -162,7 +162,7 @@ if (A_GuiEvent == "F" && firstDown == "1" && A_EventInfo == "0"){
 	send {down}{up}
 	firstDown = 0
 	Doom = 1
-	SetTimer, UnDoom, 50
+	SetTimer, UnDoom, -50
 }
 TotalItems := LV_GetCount()
 if (A_EventInfo = TotalItems && Doom = 1 && A_GuiEvent = "Normal"){
@@ -174,7 +174,7 @@ if (A_GuiEvent = "DoubleClick")
     LV_GetText(RowText, A_EventInfo)  ; Get the text from the row's first field.
     clipboard = %RowText%
     ToolTip Text: "%RowText%" Copied to clipboard
-    SetTimer, KillToolTip, 500
+    SetTimer, KillToolTip, -500
     Gui, 1:Destroy
 }
 if (A_GuiEvent = "RightClick")
@@ -185,7 +185,7 @@ if (A_GuiEvent = "RightClick")
 	FileRead, MyFile, %FilePath%
     clipboard = %NoteBody%
     ToolTip Text: "%RowText%" Copied to clipboard
-    SetTimer, KillToolTip, 500
+    SetTimer, KillToolTip, -500
     Gui, 1:Destroy
 }
 if (A_GuiEvent == "E") 
@@ -414,6 +414,9 @@ For k, fonts in FontOptionsArray
 		Gui, 3:Add,Edit   
 		Gui, 3:Add,UpDown,vQuickNoteRowsSelect gSetQuickNoteRows range1-99, %QuickNoteRows%
 		
+		Gui, 3:Add,Text,xs,How many backups to keep: (Default: 3)
+		Gui, 3:Add,Edit   
+		Gui, 3:Add,UpDown,vbackupsToKeepSelect gSet_backupsToKeep range0-99, %backupsToKeep%
 		Gui, 3:Tab, Hotkeys
 		Gui, 3:Add,CheckBox, vSetCtrlC gCtrlCToggle, Send Ctrl+C when using the quick note hotkey.
 		Gui, 3:Add, CheckBox, vUseCapslock gUseCapslockToggle, Use Capslock for Library?
@@ -540,7 +543,15 @@ SaveAndReload:
 	IniWrite, %U_MainNoteWidth%,%iniPath%,General, WindowWidth	
 	GuiControlGet, U_FontRendering,,FontRenderingSelect	
 	IniWrite, %U_FontRendering%,%iniPath%,General, FontRendering
+	GuiControlGet,HideScrollbarsSelect
+	IniWrite,%HideScrollbarsSelect%, %iniPath%, General, HideScrollbars
 	reload
+}
+Set_backupsToKeep:
+{
+	GuiControlGet,U_backupsToKeep,, backupsToKeepSelect	
+	IniWrite, %U_backupsToKeep%,%iniPath%,General, backupsToKeep
+	IniRead, backupsToKeep, %iniPath%, General, backupsToKeep
 }
 SetHideScrollbars:
 {
@@ -813,8 +824,10 @@ Exit:
 {
 	ExitApp
 }
-
-
+CheckBackupLater:
+{
+ BackupNotes()
+}
 
 
 
