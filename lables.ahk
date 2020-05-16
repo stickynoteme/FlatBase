@@ -199,7 +199,7 @@ if (A_GuiEvent == "e")
 	
 	FilePath = %U_NotePath%%TmpFileSafeName%.txt
 	OldFilePath = %U_NotePath%%TmpOldFileSafeName%.txt
-	FileRead, MyFile, %OldFilePath%
+	FileRead, MyOldFile, %OldFilePath%
 	FileRecycle,  %OldFilePath%
 	FileRecycle,  %detailsPath%%TmpOldFileSafeName%.ini
 

@@ -117,10 +117,11 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			FileSafeName := RegExReplace(RowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
 			GuiControlGet, NoteDetailPreviewBox
 			GuiControlGet, PreviewBox
-			LVBodyUpdate := StrSplit(PreviewBox , "`n")  
-			SaveFile(RowText,FileSafeName,NoteDetailPreviewBox)
+			SaveFile(RowText,FileSafeName,PreviewBox)
+			iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
+			FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
 			ToolTip Saved 
-			LV_Modify(LVSelectedROW , ,RowText, LVBodyUpdate[1])
+			LV_Modify(LVSelectedROW,,RowText,NewBodyText,OldAdd)
 			SetTimer, KillToolTip, -500
 			return
 		}else
