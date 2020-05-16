@@ -100,44 +100,27 @@ global U_NotePath
 ;-------------------------------------------------
 IniRead, isFristRun, %iniPath%, General, isFristRun,1
 if (isFristRun = "1") {
-	pathToTheme = %A_WorkingDir%\Themes\Black.ini
-	
-	IniRead, U_MBG, %pathToTheme%, Colors, MainBackgroundColor
-	IniRead, U_SBG, %pathToTheme%, Colors, SubBackgroundColor
-	IniRead, U_MFC, %pathToTheme%, Colors, MainFontColor
-	IniRead, U_SFC, %pathToTheme%, Colors, SubFontColor
-	IniRead, U_MSFC, %pathToTheme%, Colors, MainSortFontColor
-	IniRead, U_FBCA, %pathToTheme%, Colors, SearchBoxFontColor
-	IniRead, rowSelectColor, %pathToTheme%, Colors, RowSelectColor
-	IniRead, rowSelectTextColor, %pathToTheme%, Colors, RowSelectTextColor
-	IniRead, themeNumber, %pathToTheme%, Theme, UserSetting
-	
-	IniWrite, %U_MBG%,%iniPath%,Colors,MainBackgroundColor
-	IniWrite, %U_SBG%,%iniPath%,Colors,SubBackgroundColor
-	IniWrite, %U_MFC%,%iniPath%,Colors,MainFontColor
-	IniWrite, %U_SFC%,%iniPath%,Colors,SubFontColor
-	IniWrite, %U_MSFC%,%iniPath%,Colors,MainSortFontColor
-	IniWrite, %U_FBCA%,%iniPath%,Colors,SearchBoxFontColor
-	IniWrite, %rowSelectColor%,%iniPath%,Colors,RowSelectColor
-	IniWrite, %rowSelectTextColor%,%iniPath%,Colors,RowSelectTextColor
-	IniWrite, %themeNumber%, %iniPath%, Theme, UserSetting
 	IniWrite, 0, %iniPath%, General, isFristRun
 }
 ;-------------------------------------------------
-; Read and/or set Colors
+; Read from theme .ini 
 ;-------------------------------------------------
-IniRead, U_Theme, %iniPath%, Theme, UserSetting , Black
-IniRead, U_MBG, %iniPath%, Colors, MainBackgroundColor , 000000 ;Everything else
-IniRead, U_SBG, %iniPath%, Colors, SubBackgroundColor , ffffff ;Details background
-IniRead, U_MFC, %iniPath%, Colors, MainFontColor , ffffff ;Result and preview
-IniRead, U_SFC, %iniPath%, Colors, SubFontColor , 000000 ; Details font
-IniRead, U_MSFC, %iniPath%, Colors, MainSortFontColor , 777700 ;Main Sort Font
-IniRead, U_FBCA, %iniPath%, Colors, SearchBoxFontColor , ffffff ;search box font
-IniRead, rowSelectColor, %iniPath%, Colors, RowSelectColor , 0x444444 ;Row Select color
-IniRead, rowSelectTextColor, %iniPath%, Colors, RowSelectTextColor , 0xffffff ;Row Select Text color
+IniRead, StartingTheme, %iniPath%, Theme, Name, Black
+StartingTheme = %A_WorkingDir%\Themes\%StartingTheme%.ini
+
+
+IniRead, U_Theme, %StartingTheme%, Theme, UserSetting , Black
+IniRead, U_MBG, %StartingTheme%, Colors, MainBackgroundColor , 000000 ;Everything else
+IniRead, U_SBG, %StartingTheme%, Colors, SubBackgroundColor , ffffff ;Details background
+IniRead, U_MFC, %StartingTheme%, Colors, MainFontColor , ffffff ;Result and preview
+IniRead, U_SFC, %StartingTheme%, Colors, SubFontColor , 000000 ; Details font
+IniRead, U_MSFC, %StartingTheme%, Colors, MainSortFontColor , 777700 ;Main Sort Font
+IniRead, U_FBCA, %StartingTheme%, Colors, SearchBoxFontColor , ffffff ;search box font
+IniRead, rowSelectColor, %StartingTheme%, Colors, RowSelectColor , 0x444444 ;Row Select color
+IniRead, rowSelectTextColor, %StartingTheme%, Colors, RowSelectTextColor , 0xffffff ;Row Select Text color
 
 ;-------------------------------------------------
-; Read and/or set Sizing, Font, & Other
+; Read and from settings.ini
 ;-------------------------------------------------
 IniRead, QuickNoteWidth,%iniPath%, General,QuickNoteWidth,500
 IniRead, FontRendering,%iniPath%, General,FontRendering,5
@@ -181,13 +164,13 @@ global NameColAndBodyCOlW := NameColW+BodyColW
 ;-------------------------------------------------
 Progress, 0, Setting Hotkeys
 SetUserHotKeys()
-Progress, 5, Making Missing inis
+Progress, 5,  Adding new notes
 MakeAnyMissingINI()
-Progress, 10, Removing inis for deleted notes
+Progress, 10, Removing data for deleted notes
 RemoveINIsOfMissingTXT()
 Progress, 15, Backing up your notes
 BackupNotes()
-Progress, 20, Building file index
+Progress, 20, Building note index
 BuildGUI1(1,1)
 Progress, 100, Done!
 WinHide, FlatNotes - Library
@@ -217,6 +200,7 @@ if (g1Open=0) {
 	WinMove, ahk_id %g1ID%, , %xPos%, %yPos%
 	WinShow, ahk_id %g1ID%
 	WinRestore, ahk_id %g1ID%
+	WinActivate, ahk_id %g1ID%
 	g1Open=1
 	return
 }
