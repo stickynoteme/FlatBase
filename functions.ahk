@@ -46,6 +46,7 @@ BuildGUI1(){
 	Gui, 1:Color,%U_SBG%, %U_MBG%
 	Gui, 1:Add,Edit, c%U_FBCA% w%LibW% y%FontSize% x6 y8 vSearchTerm gSearch -E0x200
 	;ListBox used as background color for search area padding
+
 	Gui, 1:Add, ListBox, vLB1 +0x100 h8 w%LibW% x0 y0 -E0x200 Disabled 
 	Gui, 1:Add, ListBox, vlB2 +0x100 h15 w%LibW% x0 ys0 -E0x200 Disabled
 	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%	
@@ -65,14 +66,15 @@ BuildGUI1(){
 	MakeFileList(1)
 	CLV := New LV_Colors(HLV)
 	CLV.SelectionColors(rowSelectColor,rowSelectTextColor)
- 	
+	
 	;statusbar
 	if (ShowStatusBar=1) {
-		Gui, 1:Font, s8
+
+		Gui, 1:Font, s8 Q%FontRendering%
 		StatusWidth := SubW-185
-		Gui, 1:add,text, xs center vStatusBarCount w85, %TotalNotes% of %TotalNotes%
-		Gui, 1:add,text, x+5 center vStatusBarM w%StatusWidth%,M: 00/00/00
-		Gui, 1:add,text, x+5 right  vStatusBarA w75,A: 00/00/00
+		Gui, 1:add,text, xs center vStatusBarCount w85 C%U_SFC%, %TotalNotes% of %TotalNotes%
+		Gui, 1:add,text, x+5 center vStatusBarM w%StatusWidth% C%U_SFC%,M: 00/00/00
+		Gui, 1:add,text, x+5 right vStatusBarA w75 C%U_SFC%,A: 00/00/00
 		Gui, 1:Font, s2
 		Gui, 1:add,text, xs
 	}
