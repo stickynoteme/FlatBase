@@ -125,6 +125,7 @@ QuickSafeNameUpdate:
 }
 Search:
 {
+	
 	global SearchTerm
 	GuiControlGet, SearchTerm
 	GuiControl, -Redraw, LV
@@ -164,6 +165,23 @@ Search:
 		  LV_Add("", Note.1,Note.2,Note.3,Note.4)
 	}
 Items := LV_GetCount()
+if (Items = 1) {
+	LV_GetText(LastResultName, 1 , 1)
+	LV_GetText(LastFileName, 1 , 4)
+	LV_GetText(LastNoteAdded, 1 , 3)
+	GuiControl,,TitleBar, %LastResultName%
+	FileRead, LastResultBody,%U_NotePath%%LastFileName%
+	LastNoteIni := StrReplace(LastFileName, ".txt",".ini") 
+	iniRead,LastNoteModded,%detailsPath%%LastNoteIni%,INFO,Mod
+	GuiControl,,PreviewBox, %LastResultBody%
+	GuiControl,,StatusBarM,M: %LastNoteModded% 
+	GuiControl,,StatusBarA,A: %LastNoteAdded%
+	}else{
+		GuiControl,,TitleBar, 
+		GuiControl,,PreviewBox,
+		GuiControl,,StatusBarM,M: 00\00\00 
+		GuiControl,,StatusBarA,A: 00\00\00
+	}
 GuiControl,,StatusBarCount, %Items% of %TotalNotes%
 GuiControl, +Redraw, LV
 Return
