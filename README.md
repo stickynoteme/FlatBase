@@ -1,7 +1,20 @@
-![Screenshot one](/ScreenShots/SS_01.jpg)
+![Screenshot one](/ScreenShots/SS_01.png)
 
 # FlatNotes
 A flat file system note taking program made with AHKv1
+
+## New
+v3
+- Automatic daily backup option
+- New Statusbar and option to hide it
+- Preview first search result automatically
+- Rapid Note [default Win+Z]
+	- Win+Z Once to get title
+	- Win+Z A second time to get body and save.
+	- Win+Shift+Z to Cancel after Title.
+	- A toottip will appear showing you the title and first line of the body on each Win+Z.
+- Column width settings
+	- Set to 0 to hide 
 
 ## Feature list:
 - Quick search: 
@@ -65,5 +78,5 @@ When first started FlatNotes makes a folder called "MyNotes" if you delete this 
 Try deleting the settings.ini file (make a backup first)
 
 ## Themes
-![Themes Set one](/ScreenShots/SS_02.jpg)
+![Themes Set one](/ScreenShots/SS_02.png)
 
