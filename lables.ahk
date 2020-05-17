@@ -66,7 +66,7 @@ Label3:
 			send {Ctrl Down}{c}{Ctrl up}
 			zbody := clipboard 
 			istitle = yes
-			TmpFileSafeName := RegExReplace(ztitle, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
+			TmpFileSafeName := RegExReplace(ztitle, "\*|\?|\\|\||/|""|:|<|>" , Replacement := "_")
 			FileReadLine, CheckExists, %U_NotePath%%TmpFileSafeName%.txt, 1
 			if (CheckExists !="")
 			{
@@ -119,7 +119,7 @@ QuickSafeNameUpdate:
 	;Remove stray whitespace from front and back
 	;QuickNoteName := Ltrim(QuickNoteName," ")
 	;QuickNoteName := Rtrim(QuickNoteName," ")
-	NewFileSafeName := RegExReplace(QuickNoteName, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
+	NewFileSafeName := RegExReplace(QuickNoteName, "\*|\?|\\|\||/|""|:|<|>" , Replacement := "_")
 	GuiControl,, FileSafeName,%NewFileSafeName%
 	return
 }
@@ -165,7 +165,7 @@ Search:
 		  LV_Add("", Note.1,Note.2,Note.3,Note.4)
 	}
 Items := LV_GetCount()
-if (Items = 1) {
+if (Items != 0) {
 	LV_GetText(LastResultName, 1 , 1)
 	LV_GetText(LastFileName, 1 , 4)
 	LV_GetText(LastNoteAdded, 1 , 3)
@@ -234,7 +234,7 @@ if (A_GuiEvent = "DoubleClick")
 if (A_GuiEvent = "RightClick")
 {
     LV_GetText(RowText, A_EventInfo)
-    TmpFileSafeName := RegExReplace(RowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
+    TmpFileSafeName := RegExReplace(RowText, "\*|\?|\\|\||/|""|:|<|>" , Replacement := "_")
     FilePath = %U_NotePath%%TmpFileSafeName%.txt
 	FileRead, MyFile, %FilePath%
     clipboard = %NoteBody%
@@ -248,8 +248,8 @@ if (A_GuiEvent == "E")
 if (A_GuiEvent == "e")
 {
 	LV_GetText(RowText, A_EventInfo,1)
-	TmpFileSafeName := RegExReplace(RowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
-	TmpOldFileSafeName := RegExReplace(OldRowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
+	TmpFileSafeName := RegExReplace(RowText, "\*|\?|\\|\||/|""|:|<|>" , Replacement := "_")
+	TmpOldFileSafeName := RegExReplace(OldRowText, "\*|\?|\\|\||/|""|:|<|>" , Replacement := "_")
 	
 	
 	FilePath = %U_NotePath%%TmpFileSafeName%.txt

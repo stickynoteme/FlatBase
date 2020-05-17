@@ -42,7 +42,7 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 		if(OutputVar == "SysListView321"){
 			global LVSelectedROW
 			LV_GetText(RowText, LVSelectedROW)
-			TmpFileSafeName := RegExReplace(RowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
+			TmpFileSafeName := RegExReplace(RowText, "\*|\?|\\|\||/|""|:|<|>" , Replacement := "_")
 			FilePath = %U_NotePath%%TmpFileSafeName%.txt
 			FileRead, MyFile, %FilePath%
 			NoteBody := SubStr(MyFile, InStr(MyFile, "`n") + 1)
@@ -62,7 +62,7 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 		if(OutputVar == "SysListView321"){
 			global LVSelectedROW
 			LV_GetText(RowText, LVSelectedROW)
-			TmpFileSafeName := RegExReplace(RowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
+			TmpFileSafeName := RegExReplace(RowText, "\*|\?|\\|\||/|""|:|<|>" , Replacement := "_")
 			FilePath = %U_NotePath%%TmpFileSafeName%.txt
 			FileReadLine, MyFile, %FilePath%,2
 			clipboard = %MyFile%
@@ -83,7 +83,7 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			;Remove stray whitespace from front and back
 			;SearchTerm := Ltrim(SearchTerm," ")
 			;SearchTerm := Rtrim(SearchTerm," ")
-			FileSafeSearchTerm := RegExReplace(SearchTerm, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
+			FileSafeSearchTerm := RegExReplace(SearchTerm, "\*|\?|\\|\||/|""|:|<|>" , Replacement := "_")
 			CheckForOldNote = %U_NotePath%%FileSafeSearchTerm%.txt
 			FileRead, MyFile, %CheckForOldNote%
 			
@@ -114,7 +114,7 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 		if(OutputVar == "Edit3"){
 			global LVSelectedROW
 			LV_GetText(RowText, LVSelectedROW,1)
-			FileSafeName := RegExReplace(RowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
+			FileSafeName := RegExReplace(RowText, "\*|\?|\\|\||/|""|:|<|>" , Replacement := "_")
 			GuiControlGet, PreviewBox
 			SaveFile(RowText,FileSafeName,PreviewBox,1)
 			iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
@@ -155,7 +155,7 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 		 global LVSelectedROW
 		 SaveRowNumber = %LVSelectedROW%
 		 LV_GetText(RowText, LVSelectedROW)
-		 FileSafeName := RegExReplace(RowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
+		 FileSafeName := RegExReplace(RowText, "\*|\?|\\|\||/|""|:|<|>" , Replacement := "_")
 		 MsgBox , 52, Delete - Note , Delete: %FileSafeName%.txt
 		 IfMsgBox, No
 			Return 
@@ -173,7 +173,7 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 				LV_GetText(NextUpName, NextUp , 1)
 				
 				
-			FileSafeName := RegExReplace(NextUpName, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
+			FileSafeName := RegExReplace(NextUpName, "\*|\?|\\|\||/|""|:|<|>" , Replacement := "_")
 			iniRead,NextUpAddedDate,%detailsPath%%FileSafeName%,Add
 			iniRead,NextUpModdedDate,%detailsPath%%FileSafeName%,Mod
 

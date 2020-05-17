@@ -216,10 +216,10 @@ WinShow, ahk_id %g1ID%
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------
-!w::
-{
-goto Options
-}
+;!w::
+;{
+;goto Options
+;}
 vk14::
 {
 if (U_Capslock = "0"){

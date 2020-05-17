@@ -85,7 +85,7 @@ BuildGUI1(){
 
 BuildGUI2(){
 	QuickSubWidth := round(QuickNoteWidth*0.5)
-	FileSafeClipBoard := RegExReplace(clipboard, "\*|\?|\||/|""|:|<|>"yyyy , Replacement := "_")
+	FileSafeClipBoard := RegExReplace(clipboard, "\*|\?|\\|\||/|""|:|<|>"yyyy , Replacement := "_")
 	CheckForOldNote = %U_NotePath%%FileSafeClipBoard%.txt
 	FileRead, OldNoteData, %CheckForOldNote%
 	MouseGetPos, xPos, yPos
