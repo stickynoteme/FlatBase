@@ -52,7 +52,7 @@ BuildGUI1(){
 	Gui, 1:Add, text, c%U_SFC% w%NameColW% center gSortName vSortName, Name
 	Gui, 1:Add, text, c%U_SFC% xp+%NameColW% yp+1 w%BodyColW% center gSortBody vSortBody, Body
 	Gui, 1:Add, text, yp+1 xp+%BodyColW% w75 center c%U_MSFC% gSortAdded vSortAdded, Added
-	Gui, 1:Add, ListView, -E0x200 -hdr LV0x10000 -ReadOnly grid r%ResultRows% w%libWAdjust% x0 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi, Title|Body|Created|FileName
+	Gui, 1:Add, ListView, -E0x200 -hdr NoSort NoSortHdr LV0x10000 -ReadOnly grid r%ResultRows% w%libWAdjust% x0 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi, Title|Body|Created|FileName
 
 	Gui, 1:add, Edit, vFake h0 x-1000 y-1000
 	Gui, 1:Add,text, center xs -E0x200  x0 r1 vTitleBar C%U_SFC% w%SubW% gTitleBarClick,

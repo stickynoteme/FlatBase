@@ -71,6 +71,8 @@ global SaveMod
 global TitelBar
 global StatusBarCount
 global StatusBar
+global C_SortCol
+global C_SortDir
 ;Pre-set globals
 global LibW
 global PreviewRows
@@ -177,6 +179,10 @@ AddedPercent = 0.%oAddedPercent%
 IniRead, HideScrollbars,%iniPath%,General,HideScrollbars,1
 IniRead, backupsToKeep,%iniPath%,General,backupsToKeep,3
 
+IniRead, C_SortCol,%iniPath%,General,SortCol,3
+IniRead, C_SortDir,%iniPath%,General,SortDir,SortDesc
+
+
 ;-------------------------------------------------
 ;Set Globals that need values from the ini
 ;-------------------------------------------------
@@ -216,10 +222,12 @@ WinShow, ahk_id %g1ID%
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------
-;!w::
-;{
+!w::
+{
 ;goto Options
-;}
+gosub SortNow
+return
+}
 vk14::
 {
 if (U_Capslock = "0"){

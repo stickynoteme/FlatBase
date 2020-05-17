@@ -106,8 +106,9 @@ SaveButton:
 	GuiControlGet,SearchTerm
 	GuiControl,1: , SearchTerm, _
 	GuiControl,1: , SearchTerm,
-	if WinActive("FlatNotes - Library")
+	if WinActive("FlatNotes - Library"){
 		send {space}{backspace} ;update results
+	}
 	tooltip Saved
 	settimer, KillToolTip, -500
 	return
@@ -182,6 +183,7 @@ if (Items != 0) {
 		GuiControl,,StatusBarM,M: 00\00\00 
 		GuiControl,,StatusBarA,A: 00\00\00
 	}
+gosub SortNow
 GuiControl,,StatusBarCount, %Items% of %TotalNotes%
 GuiControl, +Redraw, LV
 Return
@@ -366,11 +368,15 @@ SortName:
 			NextSortName = 0
 			NextSortBody = 0
 			NextSortAdded = 0
+			C_SortCol = 1
+			C_SortDir = SortDesc
 		}else {
 			LV_ModifyCol(1, "Sort")
 			NextSortName = 1
 			NextSortBody = 0
 			NextSortAdded = 0
+			C_SortCol = 1
+			C_SortDir = Sort
 			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
 			GuiControl, Font, SortName
 			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%
@@ -387,15 +393,18 @@ SortBody:
 			NextSortBody = 0
 			NextSortName = 0
 			NextSortAdded = 0
+			C_SortCol = 2
+			C_SortDir = SortDesc
 		}else {
 			LV_ModifyCol(2, "Sort")
 			NextSortBody = 1
 			NextSortName = 0
 			NextSortAdded = 0
-			Gui, Font, %FontSize% c%U_MSFC%, %FontFamily%
+			C_SortCol = 2
+			C_SortDir = Sort
+			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
 			GuiControl, Font, SortBody
-			Gui, Font, %FontSize% c%U_SFC%, %FontFamily%
-			GuiControl, Font, SortName
+			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%			GuiControl, Font, SortName
 			GuiControl, Font, SortAdded
 		}
 		return
@@ -407,15 +416,18 @@ SortAdded:
 			NextSortAdded = 0
 			NextSortName = 0
 			NextSortBody = 0
+			C_SortCol = 3
+			C_SortDir = SortDesc
 		}else {
 			LV_ModifyCol(3, "Sort")
 			NextSortAdded = 1
 			NextSortName = 0
 			NextSortBody = 0
-			Gui, Font, %FontSize% c%U_MSFC%, %FontFamily%
+			C_SortCol = 3
+			C_SortDir = Sort
+			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
 			GuiControl, Font, SortAdded
-			Gui, Font, %FontSize% c%U_SFC%, %FontFamily%
-			GuiControl, Font, SortBody
+			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%			GuiControl, Font, SortBody
 			GuiControl, Font, SortName
 		}
 		return
@@ -971,7 +983,11 @@ DummyGUI1:
 	WinActivate,FlatNotes - Options
 	return
 }
-
+SortNow:
+{
+LV_ModifyCol(C_SortCol,C_SortDir)
+return
+}
 
 
 
