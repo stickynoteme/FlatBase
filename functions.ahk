@@ -33,7 +33,7 @@ setHK(num,INI,GUI) {
 	 return
 }
 
-BuildGUI1(xo,yo){
+BuildGUI1(){
 	
 	if WinExist("FlatNotes - Library") {
 		Gui, 1:destroy
@@ -53,17 +53,29 @@ BuildGUI1(xo,yo){
 	Gui, 1:Add, text, c%U_SFC% xp+%NameColW% yp+1 w%BodyColW% center gSortBody vSortBody, Body
 	Gui, 1:Add, text, yp+1 xp+%BodyColW% w75 center c%U_MSFC% gSortAdded vSortAdded, Added
 	Gui, 1:Add, ListView, -E0x200 -hdr LV0x10000 -ReadOnly grid r%ResultRows% w%libWAdjust% x0 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi, Title|Body|Created|FileName
-	Gui, 1:Add,Edit, r0 h0  vFake,
-	GuiControl, Hide, Fake
-	Gui, 1:Add,Text, r1 w%LibW% Center C%U_SFC% vNoteDetailPreviewBox gNoteDetailPreviewBoxClick,
+
+	Gui, 1:add, Edit, vFake h0 x-1000 y-1000
+	Gui, 1:Add,text, center xs -E0x200  x0 r1 vTitleBar C%U_SFC% w%SubW% gTitleBarClick,
+
+	
 	;Allow User set prevent/edit font
 	Gui, 1:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
-	Gui, 1:Add,Edit,  -E0x200 r%PreviewRows% w%LibW% yp+18 x0 C%U_MFC% vPreviewBox,
+	Gui, 1:Add,Edit, -E0x200 r%PreviewRows% w%LibW% yp+18 x0 C%U_MFC% vPreviewBox,
 	
 	MakeFileList(1)
 	CLV := New LV_Colors(HLV)
 	CLV.SelectionColors(rowSelectColor,rowSelectTextColor)
  	
+	;statusbar
+	if (ShowStatusBar=1) {
+		Gui, 1:Font, s8
+		StatusWidth := SubW-185
+		Gui, 1:add,text, xs center vStatusBarCount w85, %TotalNotes% of %TotalNotes%
+		Gui, 1:add,text, x+5 center vStatusBarM w%StatusWidth%,M: 00/00/00
+		Gui, 1:add,text, x+5 right  vStatusBarA w75,A: 00/00/00
+		Gui, 1:Font, s2
+		Gui, 1:add,text, xs
+	}
 	
 	Gui, 1:SHOW, Hide w%SubW% 
 	WinGet, g1ID,, FlatNotes - Library
@@ -129,11 +141,12 @@ MakeFileList(ReFreshMyNoteArray){
 	LV_ModifyCol(1, "Logical")
 	LV_ModifyCol(2, BodyColW) ; 275
 	LV_ModifyCol(2, "Logical")
-	LV_ModifyCol(3, 75)
+	LV_ModifyCol(3, AddColW)
 	LV_ModifyCol(3, "Logical")
 	LV_ModifyCol(3, "SortDesc")
 	LV_ModifyCol(3, "Center")
 	LV_ModifyCol(4, 0)
+	TotalNotes := MyNotesArray.MaxIndex()
 	return
 }
 
@@ -144,11 +157,12 @@ For Each, Note In MyNotesArray
 {
 	LV_Add("", Note.1,Note.2,Note.3,Note.4)
 }
+TotalNotes := MyNotesArray.MaxIndex() 
 GuiControl, 1:+Redraw, LV
 return
 }
 
-SaveFile(QuickNoteName,FileSafeName,QuickNoteBody) {
+SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
 	FormatTime, CurrentTimeStamp, %A_Now%, yy/MM/dd
 	FileNameTxt =%FileSafeName%.txt
 	SaveFileName = %U_NotePath%%FileSafeName%.txt
@@ -156,10 +170,21 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody) {
 	iniRead,CreatedDate,%detailsPath%%FileSafeName%.ini,INFO,Add,%CurrentTimeStamp%
 	FileRecycle, %SaveFileName%
 	
-	MyNotesArray.Push({1:QuickNoteName,2:QuickNoteBody,3:CreatedDate,4:FileNameTxt})
-	ReFreshLV()
-	;LV_Add("", QuickNoteName, QuickNoteBody,CreatedDate,FileNameTxt)
-	GuiControl, 1:+Redraw, LV
+	if (Modified=0){
+		MyNotesArray.Push({1:QuickNoteName,2:QuickNoteBody,3:CreatedDate,4:FileNameTxt})
+		ReFreshLV()
+		GuiControl, 1:+Redraw, LV
+	}
+	if (Modified=1){
+		for Each, Note in MyNotesArray{
+			If (Note.1 = QuickNoteName){
+				MyNotesArray.RemoveAt(Each)
+			}
+		}
+		MyNotesArray.Push({1:QuickNoteName,2:QuickNoteBody,3:CreatedDate,4:FileNameTxt})
+		ReFreshLV()
+		GuiControl, 1:+Redraw, LV
+	}
 
 	iniWrite,%QuickNoteName%,%detailsPath%%FileSafeName%.ini,INFO,Name
 	iniWrite,%CurrentTimeStamp%,%detailsPath%%FileSafeName%.ini,INFO,Mod

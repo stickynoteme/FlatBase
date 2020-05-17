@@ -115,9 +115,8 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			global LVSelectedROW
 			LV_GetText(RowText, LVSelectedROW,1)
 			FileSafeName := RegExReplace(RowText, "\*|\?|\||/|""|:|<|>" , Replacement := "_")
-			GuiControlGet, NoteDetailPreviewBox
 			GuiControlGet, PreviewBox
-			SaveFile(RowText,FileSafeName,PreviewBox)
+			SaveFile(RowText,FileSafeName,PreviewBox,1)
 			iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
 			FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
 			ToolTip Saved 
@@ -181,7 +180,9 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			FileRead,NextUpBody,%U_NotePath%%FileSafeName%.txt
 	
 			GuiControl,, PreviewBox,%NextUpBody%
-			GuiControl,, NoteDetailPreviewBox, %NextUpName%|%NextUpAddedDate%|%NextUpModdedDate%
+			GuiControl,, TitleBar, %RowText%
+			GuiControl,, StatusbarM,M: %NextUpModdedDate%
+			GuiControl,, StatusbarA,A: %NextUpAddedDate%
 		 }else
 			del::del
 }

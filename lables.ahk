@@ -34,13 +34,12 @@ GuiControl,, FileSafeName,%FileSafeClipBoard%
 GuiControl, +Redraw, FileSafeName
 GuiControl, +Redraw, QuickNoteName
 ControlFocus, Edit2, FlatNote - QuickNote 
-
 if (OldNoteData !="")
 {
-FilePath = %U_NotePath%%FileSafeClipBoard%.txt
-FileRead, MyFile, %FilePath%
-GuiControl,, QuickNoteBody,%MyNewFile%
-GuiControl, +Redraw, QuickNoteBody
+	FilePath = %U_NotePath%%FileSafeClipBoard%.txt
+	FileRead, MyFile, %FilePath%
+	GuiControl,, QuickNoteBody,%MyNewFile%
+	GuiControl, +Redraw, QuickNoteBody
 }
 return
 }
@@ -74,7 +73,7 @@ Label3:
 				 msgbox Note Already Exists
 				 return
 			}
-			SaveFile(ztitle,TmpFileSafeName,zbody)
+			SaveFile(ztitle,TmpFileSafeName,zbody,0)
 			;MakeFileList(1)
 			if WinActive("FlatNotes - Library")
 				send {space}{backspace} ;update results
@@ -99,8 +98,10 @@ SaveButton:
 	return
 	}
 	Gui, 2:Submit
-	SaveFile(QuickNoteName,FileSafeName,QuickNoteBody)
-	
+	SaveMod = 0
+	IfExist, %U_NotePath%%FileSafeName%.txt
+		SaveMod = 1
+	SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,SaveMod)
 	;horrible fix to LV to update
 	GuiControlGet,SearchTerm
 	GuiControl,1: , SearchTerm, _
@@ -162,6 +163,8 @@ Search:
 	   Else
 		  LV_Add("", Note.1,Note.2,Note.3,Note.4)
 	}
+Items := LV_GetCount()
+GuiControl,,StatusBarCount, %Items% of %TotalNotes%
 GuiControl, +Redraw, LV
 Return
 }
@@ -177,10 +180,10 @@ UnDoom:
 	Doom = 0
 return
 }
-NoteDetailPreviewBoxClick:
+TitleBarClick:
 {
-	GuiControlGet, NoteDetailPreviewBox
-	tooltip %NoteDetailPreviewBox%
+	GuiControlGet, TitleBar
+	tooltip %TitleBar%
 	SetTimer, KillToolTip, -2000
 	return
 }
@@ -235,19 +238,21 @@ if (A_GuiEvent == "e")
 	OldFilePath = %U_NotePath%%TmpOldFileSafeName%.txt
 	if FileExist(FilePath)
 		{
-			 msgbox Note With This Name ALready Exists
+			 msgbox Note With This Name Already Exists
 			 LV_Modify(A_EventInfo, ,OldRowText)
 			 return
 		}
 	FileRead, MyOldFile, %OldFilePath%
 	FileRecycle,  %OldFilePath%
 	FileRecycle,  %detailsPath%%TmpOldFileSafeName%.ini
-	SaveFile(RowText,TmpFileSafeName,MyOldFile)
+	SaveFile(RowText,TmpFileSafeName,MyOldFile,0)
 	MakeFileList(1)
 	ReFreshLV()
 	iniRead, NewAdd,%detailsPath%%TmpFileSafeName%.ini,INFO,Add
 	iniRead, NewMod,%detailsPath%%TmpFileSafeName%.ini,INFO,Mod
-	GuiControl,, NoteDetailPreviewBox, %RowText% | %NewAdd% | %NewMod%
+	GuiControl,, TitleBar, %RowText%
+	GuiControl,, StatusbarM,M: %NewMod%
+	GuiControl,, StatusbarA,A: %NewAdd%
 }
 ;update the preview
 if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
@@ -255,13 +260,14 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 	global LVSelectedROW = A_EventInfo
     LV_GetText(RowText, A_EventInfo,4)  ; Get the text from the row's first field.
     FileRead, NoteFile, %U_NotePath%%RowText%
-    GuiControl,, PreviewBox, %NoteFile%
 	TMPini := StrReplace(RowText, ".txt", ".ini")
 	TMPName := StrReplace(RowText, ".txt", "")
-
 	iniRead, NoteAdd,%detailsPath%%TMPini%,INFO,Add
 	iniRead, NoteMod,%detailsPath%%TMPini%,INFO,Mod
-	GuiControl,, NoteDetailPreviewBox, %TMPName% | %NoteAdd% | %NoteMod%
+	GuiControl,, PreviewBox, %NoteFile%
+	GuiControl,, TitleBar, %TMPName%
+	GuiControl,, StatusbarM,M: %NoteMod%
+	GuiControl,, StatusbarA,A: %NoteAdd%
 }
 return
 }
@@ -421,35 +427,19 @@ For k, fonts in FontOptionsArray
 
 
 		Gui, 3:New,,FlatNotes - Options
-		Gui, 3:Add, Tab3,, General|Hotkeys|Appearance
+		Gui, 3:Add, Tab3,, General|Hotkeys|Appearance|Window Options
 		Gui, 3:Tab, General
 		Gui, 3:Add,Text,section, Notes storage folder:
 		Gui, 3:Add,Edit, disabled r1 w300 vNotesStorageFolder, %U_NotePath%
 		Gui, 3:Add,Button, gFolderSelect, Select a folder.
 		
-		Gui, 3:Add,Text,xs,Main Window Width: (Default: 530)
-		Gui, 3:Add,Edit   
-		Gui, 3:Add,UpDown,vMainWSelect gSetMainW range50-3000, %LibW%
-		
-		Gui, 3:Add,Text,xs,Result Rows: (Default: 8)
-		Gui, 3:Add,Edit   
-		Gui, 3:Add,UpDown,vResultRowsSelect gSetResultRows range1-99, %ResultRows%
-		
-		Gui, 3:Add,Text,xs,Note Preview/Edit Rows: (Default: 8)
-		Gui, 3:Add,Edit   
-		Gui, 3:Add,UpDown,vPreviewRowsSelect gSetPreviewRows range1-99, %PreviewRows%
-		
-		Gui, 3:Add,Text,xs,Quick Note Window Width: (Default: 500)
-		Gui, 3:Add,Edit   
-		Gui, 3:Add,UpDown,vQuickWSelect gSetQuickW range50-3000, %QuickNoteWidth%
-		
-		Gui, 3:Add,Text,xs,Quick Note Rows: (Default: 7)
-		Gui, 3:Add,Edit   
-		Gui, 3:Add,UpDown,vQuickNoteRowsSelect gSetQuickNoteRows range1-99, %QuickNoteRows%
-		
-		Gui, 3:Add,Text,xs,How many backups to keep: (Default: 3)
-		Gui, 3:Add,Edit   
+		Gui, 3:Add,Text,xs,How many daily backups to keep: (Default: 3)
+		Gui, 3:Add,Edit, yp-5 x+5 w25
 		Gui, 3:Add,UpDown,vbackupsToKeepSelect gSet_backupsToKeep range0-99, %backupsToKeep%
+		Gui, 3:Add,CheckBox, xs vShowStatusBarSelect gSetShowStatusBar, Show Library Window Statusbar?
+		GuiControl,,ShowStatusBarSelect,%ShowStatusBar%
+
+		;Hotkeys Tab
 		Gui, 3:Tab, Hotkeys
 		Gui, 3:Add,CheckBox, vSetCtrlC gCtrlCToggle, Send Ctrl+C when using the quick note hotkey.
 		Gui, 3:Add, CheckBox, vUseCapslock gUseCapslockToggle, Use Capslock for Library?
@@ -522,7 +512,7 @@ For k, fonts in FontOptionsArray
 		Gui, 3:add,DropDownList, x+10 Choose%CurrentFontSize% vFontSizeSelect gSetFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
 		Gui, 3:Add,text,xs section, Search Box font settings:
 		Gui, 3:add,DropDownList, Choose%C_SearchFont% w100 vSearchFontFamilySelect gSetSearchFontFamily,%FontDropDownOptions%
-		CurrenSearchFontSize := ResultFontSize*0.5
+		CurrenSearchFontSize := SearchFontSize*0.5
 		Gui, 3:add,DropDownList, x+10 Choose%CurrenSearchFontSize% vSearchFontSizeSelect gSetSearchFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
 		Gui, 3:Add,text,xs section, Result font settings:
 		Gui, 3:add,DropDownList, Choose%C_ResultFont% w100 vResultFontFamilySelect gSetResultFontFamily, %FontDropDownOptions%
@@ -532,6 +522,43 @@ For k, fonts in FontOptionsArray
 		Gui, 3:add,DropDownList, Choose%C_PreventFont% w100 vPreviewFontFamilySelect gSetPreviewFontFamily, %FontDropDownOptions%
 		CurrentPreviewFontSize := PreviewFontSize*0.5
 		Gui, 3:add,DropDownList, x+10 Choose%CurrentPreviewFontSize% vPreviewFontSizeSelect gSetPreviewFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
+		
+		global NamePercent = 0.5
+global BodyPercent = 0.5
+global AddedPercent 
+		
+		
+		Gui, 3:Add,Text,xs,Column Width Percentage Name | Body | Added 
+		
+		Gui, Add, Edit, w50
+		Gui, 3:Add,UpDown, vNamePercentSelect gSetNamePercent Range0-100, %oNamePercent%
+		Gui, Add, Edit, w50 x+5
+		Gui, 3:Add,UpDown,  vBodyPercentSelect gSetBodyPercent Range0-100, %oBodyPercent%
+		Gui, Add, Edit, w50 x+5
+		Gui, 3:Add,UpDown,  vAddedPercentSelect gSetAddedPercent Range0-100, %oAddedPercent%
+		
+		;Window Options Tab
+		Gui, 3:Tab, Window Options
+		Gui, 3:Add,Text,section,Main Window Width: (Default: 530)
+		Gui, 3:Add,Edit   
+		Gui, 3:Add,UpDown,vMainWSelect gSetMainW range50-3000, %LibW%
+		
+		Gui, 3:Add,Text,xs,Result Rows: (Default: 8)
+		Gui, 3:Add,Edit   
+		Gui, 3:Add,UpDown,vResultRowsSelect gSetResultRows range1-99, %ResultRows%
+		
+		Gui, 3:Add,Text,xs,Note Preview/Edit Rows: (Default: 8)
+		Gui, 3:Add,Edit   
+		Gui, 3:Add,UpDown,vPreviewRowsSelect gSetPreviewRows range1-99, %PreviewRows%
+		
+		Gui, 3:Add,Text,xs,Quick Note Window Width: (Default: 500)
+		Gui, 3:Add,Edit   
+		Gui, 3:Add,UpDown,vQuickWSelect gSetQuickW range50-3000, %QuickNoteWidth%
+		
+		Gui, 3:Add,Text,xs,Quick Note Rows: (Default: 7)
+		Gui, 3:Add,Edit   
+		Gui, 3:Add,UpDown,vQuickNoteRowsSelect gSetQuickNoteRows range1-99, %QuickNoteRows%
+		
 		
 		Gui, 3:Tab 
 		Gui, 3:Add, Button, Default gSaveAndReload, Save and Reload
@@ -578,7 +605,23 @@ SaveAndReload:
 	IniWrite, %U_FontRendering%,%iniPath%,General, FontRendering
 	GuiControlGet,HideScrollbarsSelect
 	IniWrite,%HideScrollbarsSelect%, %iniPath%, General, HideScrollbars
-	reload
+	GuiControlGet,ShowStatusBarSelect
+	IniWrite,%ShowStatusBarSelect%, %iniPath%, General, ShowStatusBar
+	
+	GuiControlGet, NamePercentSelect	
+	GuiControlGet, BodyPercentSelect	
+	GuiControlGet, AddedPercentSelect	
+
+	is100 := NamePercentSelect+BodyPercentSelect+AddedPercentSelect
+	WinSet, AlwaysOnTop, Off, FlatNotes - Options
+	if (is100 >= 101){
+		msgbox Column width exceeds 100 please fix.
+		return
+	}
+	IniWrite, %NamePercentSelect%,%iniPath%,General, NamePercent		
+	IniWrite, %BodyPercentSelect%,%iniPath%,General, BodyPercent		
+	IniWrite, %AddedPercentSelect%,%iniPath%,General, AddedPercent		
+reload
 }
 Set_backupsToKeep:
 {
@@ -592,6 +635,18 @@ SetHideScrollbars:
 	
 	if (A_GuiEvent == "Normal"){
 		IniWrite,%HideScrollbarsSelect%, %iniPath%, General, HideScrollbars
+		IniRead,HideScrollbars,%iniPath%,General,HideScrollbars
+		
+	}
+return
+}
+SetShowStatusBar:
+{
+	GuiControlGet,ShowStatusBarSelect
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%ShowStatusBarSelect%, %iniPath%, General, ShowStatusBar
+		IniRead,ShowStatusBar,%iniPath%,General,ShowStatusBar
 		
 	}
 return
@@ -750,6 +805,31 @@ SetFontSize:
 	GuiControl,,QuickNoteBody, Sample Text
 	return
 }
+SetNamePercent:
+{
+	GuiControlGet, NamePercentSelect	
+	IniWrite, %NamePercentSelect%,%iniPath%,General, NamePercent		
+	IniRead, NamePercent,%iniPath%, General,NamePercent
+	gosub DummyGUI1
+	return
+}
+SetBodyPercent:
+{
+	GuiControlGet, BodyPercentSelect	
+	IniWrite, %BodyPercentSelect%,%iniPath%,General, BodyPercent		
+	IniRead, BodyPercent,%iniPath%, General,BodyPercent
+	gosub DummyGUI1
+	return
+}
+SetAddedPercent:
+{
+	GuiControlGet, AddedPercentSelect	
+	IniWrite, %AddedPercentSelect%,%iniPath%,General, AddedPercent		
+	IniRead, AddedPercent,%iniPath%, General,AddedPercent
+	gosub DummyGUI1
+	return
+}
+
 Label:
 {
 	If %A_GuiControl% in +,^,!,+^,+!,^!,+^!    ;If the hotkey contains only modifiers, return to wait for a key.
@@ -828,11 +908,27 @@ DummyGUI1:
 	Gui, 5:Add, text, c%U_SFC% xp+%NameColW% yp+1 w%BodyColW% center , Body
 	Gui, 5:Add, text, yp+1 xp+%BodyColW% w75 center c%U_MSFC% , Added
 	Gui, 5:Add, ListView, -E0x200 -hdr LV0x10000 -ReadOnly grid r%ResultRows% w%libWAdjust% x0 C%U_MFC% vLVfake hwndHLV2  -Multi, Title|Body|Created|FileName
-	Gui, 5:Add,Edit, r0 h0  vFake,
-	GuiControl, Hide, Fake
-	Gui, 5:Add,Text, r1 w%LibW% Center C%U_SFC%, Preview Text
+	
+
+	Gui, 5:Add,text, center xs -E0x200  x0 r1 C%U_SFC% w%SubW% gTitleBarClick,
+	
+	
+	
+	;Allow User set prevent/edit font
 	Gui, 5:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
-	Gui, 5:Add,Edit,  -E0x200 r%PreviewRows% w%LibW% yp+18 x0 C%U_MFC%, Preview Text
+	Gui, 5:Add,Edit, -E0x200 r%PreviewRows% w%LibW% yp+18 x0 C%U_MFC% ,
+	
+		;statusbar
+	if (ShowStatusBar=1) {
+		Gui, 5:Font, s8
+		StatusWidth := SubW-185
+		Gui, 5:add,text, xs center w85, 3 of 100
+		Gui, 5:add,text, x+5 center  w%StatusWidth%,M: 00/00/00
+		Gui, 5:add,text, x+5 right  w75,A: 00/00/00
+		Gui, 5:Font, s2
+		Gui, 5:add,text, xs
+	}
+	
 	
 	LV_Add("", "Name", "Body", "20/20/20","Sample")
 	LV_Add("", "Name", "Body", "20/20/20","Sample")
@@ -841,7 +937,7 @@ DummyGUI1:
 	LV_ModifyCol(1, "Logical")
 	LV_ModifyCol(2, BodyColW) ; 275
 	LV_ModifyCol(2, "Logical")
-	LV_ModifyCol(3, 75)
+	LV_ModifyCol(3, AddColW)
 	LV_ModifyCol(3, "Logical")
 	LV_ModifyCol(3, "SortDesc")
 	LV_ModifyCol(3, "Center")
@@ -849,6 +945,8 @@ DummyGUI1:
 	CLV2 := New LV_Colors(HLV2)
 	CLV2.SelectionColors(rowSelectColor,rowSelectTextColor)
 	fakeY := round((A_ScreenHeight/3))
+	
+	
 	Gui, 5:SHOW, w%SubW% x25 y%fakeY%
 	if WinActive("FlatNotes - Sample")
 		sendinput Sample
