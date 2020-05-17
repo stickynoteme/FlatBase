@@ -79,6 +79,14 @@ BuildGUI2(){
 	MouseGetPos, xPos, yPos
 	xPos /= 1.5
 	yPos /= 1.15
+	if (isfake = 1){
+		xPos = x50
+		fakeY := round((A_ScreenHeight/3))
+		yPos := y%fakeY%
+	}else{
+		xPos = x%xPos%
+		yPos = y%yPos%
+	}
 	Gui, 2:New,, FlatNote - QuickNote
 	Gui, 2:Margin , 0, 0 
 	Gui, 2:Font, s%FontSize% Q%FontRendering%, %FontFamily%, %U_SFC%	
@@ -87,7 +95,7 @@ BuildGUI2(){
 	Gui, 2:Add,Edit, -WantReturn C%U_MFC% r%QuickNoteRows% w%QuickNoteWidth% y+1 vQuickNoteBody -E0x200
 	Gui, 2:Add,Text, C%U_SFC% x%QuickSubWidth% y3 w%QuickSubWidth% vFileSafeName,
 	Gui, 2:Add, Button,x-1000 default gSaveButton y-1000, &Save
-	Gui, 2:SHOW, w%QuickNoteWidth% x%xPos% y%yPos% 
+	Gui, 2:SHOW, w%QuickNoteWidth% %xPos% %yPos% 
 	return  
 }
 

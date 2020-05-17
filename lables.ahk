@@ -332,11 +332,7 @@ ColorPicked:
 		IniWrite, %ColorPicked%, %iniPath%, Theme, Name
 		
 	}
-	if WinExist("FlatNotes - Options")
-		WinActivate ; use the window found above
-	else
-		WinActivate, FlatNotes
-	return
+	gosub DummyGUI1
 }
 
 SortName:
@@ -622,7 +618,11 @@ SetQuickNoteRows:
 	IniWrite, %U_QuickNoteRows%,%iniPath%,General, QuickNoteRows	
 	IniRead, QuickNoteRows, %iniPath%, General, QuickNoteRows
 	Gui, 2:Destroy
+	Gui, 5:Destroy
+	isfake = 1
 	BuildGUI2()
+	isfake = 0
+	WinMove,FlatNote - QuickNote, x25 y%fakeY%
 	if WinExist("FlatNote - QuickNote")
 		WinActivate ; use the window found above
 	else
@@ -634,7 +634,15 @@ SetQuickW:
 	GuiControlGet, U_QuickNoteWidth,,QuickWSelect	
 	IniWrite, %U_QuickNoteWidth%,%iniPath%,General, QuickNoteWidth	
 	IniRead, QuickNoteWidth,%iniPath%, General,QuickNoteWidth
-	gosub DummyGUI1
+	Gui, 2:Destroy
+	Gui, 5:Destroy
+	isfake = 1
+	BuildGUI2()
+	isfake = 0
+	if WinExist("FlatNote - QuickNote")
+		WinActivate ; use the window found above
+	else
+		WinActivate, FlatNotes
 	return
 }
 SetMainW:
@@ -712,7 +720,11 @@ SetFontFamily:
 	IniWrite, %U_FontFamily%,%iniPath%,General, FontFamily	
 	IniRead, FontFamily, %iniPath%, General, FontFamily ,Verdana
 	Gui, 2:Destroy
+	Gui, 5:Destroy
+	isfake = 1
 	BuildGUI2()
+	isfake = 0
+	WinMove,FlatNote - QuickNote, x25 y%fakeY%
 	if WinExist("FlatNote - QuickNote")
 		WinActivate ; use the window found above
 	else
@@ -726,8 +738,10 @@ SetFontSize:
 	GuiControlGet, U_FontSize,,FontSizeSelect	
 	IniWrite, %U_FontSize%,%iniPath%,General, FontSize
 	IniRead, FontSize, %iniPath%, General, FontSize
-	Gui, 2:Destroy	
+	isfake = 1
 	BuildGUI2()
+	isfake = 0
+	WinMove,FlatNote - QuickNote, x25 y%fakeY%
 	if WinExist("FlatNote - QuickNote")
 		WinActivate ; use the window found above
 	else
@@ -800,9 +814,47 @@ CheckBackupLater:
 }
 DummyGUI1:
 {
+	Gui, 5:Destroy
+	Gui, 2:Destroy
+	Gui, 5:New,, FlatNotes - Sample
+	Gui, 5:Margin , 0, 0 
+	Gui, 5:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
+	Gui, 5:Color,%U_SBG%, %U_MBG%
+	Gui, 5:Add,Edit, c%U_FBCA% w%LibW% y%FontSize% x6 y8 -E0x200, Sample Search Text
+	Gui, 5:Add, ListBox, +0x100 h8 w%LibW% x0 y0 -E0x200 Disabled 
+	Gui, 5:Add, ListBox, +0x100 h15 w%LibW% x0 ys0 -E0x200 Disabled
+	Gui, 5:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%	
+	Gui, 5:Add, text, c%U_SFC% w%NameColW% center , Name
+	Gui, 5:Add, text, c%U_SFC% xp+%NameColW% yp+1 w%BodyColW% center , Body
+	Gui, 5:Add, text, yp+1 xp+%BodyColW% w75 center c%U_MSFC% , Added
+	Gui, 5:Add, ListView, -E0x200 -hdr LV0x10000 -ReadOnly grid r%ResultRows% w%libWAdjust% x0 C%U_MFC% vLVfake hwndHLV2  -Multi, Title|Body|Created|FileName
+	Gui, 5:Add,Edit, r0 h0  vFake,
+	GuiControl, Hide, Fake
+	Gui, 5:Add,Text, r1 w%LibW% Center C%U_SFC%, Preview Text
+	Gui, 5:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
+	Gui, 5:Add,Edit,  -E0x200 r%PreviewRows% w%LibW% yp+18 x0 C%U_MFC%, Preview Text
+	
+	LV_Add("", "Name", "Body", "20/20/20","Sample")
+	LV_Add("", "Name", "Body", "20/20/20","Sample")
+	LV_Add("", "Name", "Body", "20/20/20","Sample")
+	LV_ModifyCol(1, NameColW) ; 145
+	LV_ModifyCol(1, "Logical")
+	LV_ModifyCol(2, BodyColW) ; 275
+	LV_ModifyCol(2, "Logical")
+	LV_ModifyCol(3, 75)
+	LV_ModifyCol(3, "Logical")
+	LV_ModifyCol(3, "SortDesc")
+	LV_ModifyCol(3, "Center")
+	LV_ModifyCol(4, 0)
+	CLV2 := New LV_Colors(HLV2)
+	CLV2.SelectionColors(rowSelectColor,rowSelectTextColor)
+	fakeY := round((A_ScreenHeight/3))
+	Gui, 5:SHOW, w%SubW% x25 y%fakeY%
+	if WinActive("FlatNotes - Sample")
+		sendinput Sample
+	WinActivate,FlatNotes - Options
 	return
 }
-
 
 
 

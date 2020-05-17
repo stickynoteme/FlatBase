@@ -52,6 +52,7 @@ global rowSelectTextColor
 global QuickNoteWidth
 global LB1
 global LB2
+global isfake
 ;Pre-set globals
 global LibW
 global PreviewRows
