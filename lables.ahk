@@ -371,9 +371,9 @@ SortName:
 			NextSortName = 1
 			NextSortBody = 0
 			NextSortAdded = 0
-			Gui, Font, %FontSize% c%U_MSFC%, %FontFamily%
+			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
 			GuiControl, Font, SortName
-			Gui, Font, %FontSize% c%U_SFC%, %FontFamily%
+			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%
 			GuiControl, Font, SortBody
 			GuiControl, Font, SortAdded
 			
