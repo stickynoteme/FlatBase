@@ -2,23 +2,23 @@ Label1:
 {
 	if (U_Capslock = "1"){
 		return
-}
-if (g1Open=1) {
-	WinHide, FlatNotes - Library
-	g1Open=0
-	return
-}
-if (g1Open=0) {
-	MouseGetPos, xPos, yPos	
-	xPos /= 1.5
-	yPos /= 1.5
-	WinMove, ahk_id %g1ID%, , %xPos%, %yPos%
-	WinShow, ahk_id %g1ID%
-	WinRestore, ahk_id %g1ID%
-	WinActivate, ahk_id %g1ID%
-	g1Open=1
-	return
-}
+	}
+	if (g1Open=1) {
+		WinHide, FlatNotes - Library
+		g1Open=0
+		return
+	}
+	if (g1Open=0) {
+		MouseGetPos, xPos, yPos	
+		xPos /= 1.5
+		yPos /= 1.5
+		WinMove, ahk_id %g1ID%, , %xPos%, %yPos%
+		WinShow, ahk_id %g1ID%
+		WinRestore, ahk_id %g1ID%
+		WinActivate, ahk_id %g1ID%
+		g1Open=1
+		return
+	}
 }
 Label2:
 {
@@ -46,43 +46,44 @@ return
 Label3:
 {
 	if(istitle != "no") {
-			send {Ctrl Down}{c}{Ctrl up}
-			ztitle := clipboard
-			istitle = no
-			;only first line for title to prevent fail
-			Loop, parse, clipboard, `n, `r
-				{
-					%A_Index%ztitle = %A_LoopField%
-					if (A_Index = 2)
-						break
-				}
-			;trim space and tab
-			ztitle := Trim(1ztitle," 	")
-			tooltip T: %ztitle%
-			settimer, KillToolTip, -500
-			return
-	}
-	else if(istitle = "no") {
-			send {Ctrl Down}{c}{Ctrl up}
-			zbody := clipboard 
-			istitle = yes
-			TmpFileSafeName := RegExReplace(ztitle, "\*|\?|\\|\||/|""|:|<|>" , Replacement := "_")
-			FileReadLine, CheckExists, %U_NotePath%%TmpFileSafeName%.txt, 1
-			if (CheckExists !="")
+		send {Ctrl Down}{c}{Ctrl up}
+		ztitle := clipboard
+		;only first line for title to prevent fail
+		Loop, parse, clipboard, `n, `r
 			{
-				 msgbox Note Already Exists
-				 return
+				%A_Index%ztitle = %A_LoopField%
+				if (A_Index = 2)
+					break
 			}
-			SaveFile(ztitle,TmpFileSafeName,zbody,0)
-			;MakeFileList(1)
-			if WinActive("FlatNotes - Library")
-				send {space}{backspace} ;update results
-			tooltip B: %zbody%
-			settimer, KillToolTip, -500
+		;trim space and tab
+		ztitle := Trim(1ztitle," 	")
+		IfExist, %U_NotePath%%ztitle%.txt 
+			msgbox A note with this title already exsits.
+		IfExist, %U_NotePath%%ztitle%.txt
 			return
+		
+		istitle = no
+		tooltip T: %ztitle%
+		settimer, KillToolTip, -500
+		return
 	}
-return
+	if(istitle = "no") {
+		send {Ctrl Down}{c}{Ctrl up}
+		zbody := clipboard 
+		istitle = yes
+		TmpFileSafeName := RegExReplace(ztitle, "\*|\?|\\|\||/|""|:|<|>" , Replacement := "_")
+		FileReadLine, CheckExists, %U_NotePath%%TmpFileSafeName%.txt, 1
+		SaveFile(ztitle,TmpFileSafeName,zbody,0)
+		;MakeFileList(1)
+		gosub search
+		tooltip B: %zbody%
+		settimer, KillToolTip, -500
+	}
+	return
 }
+
+
+
 Label4:
 {
 	istitle = yes
@@ -174,9 +175,11 @@ if (Items != 0) {
 	FileRead, LastResultBody,%U_NotePath%%LastFileName%
 	LastNoteIni := StrReplace(LastFileName, ".txt",".ini") 
 	iniRead,LastNoteModded,%detailsPath%%LastNoteIni%,INFO,Mod
+	FormatTime, UserTimeFormatA, %NewAdd%, %UserTimeFormat%
+	FormatTime, UserTimeFormatM, %NewMod%, %UserTimeFormat%
 	GuiControl,,PreviewBox, %LastResultBody%
-	GuiControl,,StatusBarM,M: %LastNoteModded% 
-	GuiControl,,StatusBarA,A: %LastNoteAdded%
+	GuiControl,, StatusbarM,M: %UserTimeFormatM%
+	GuiControl,, StatusbarA,A: %UserTimeFormatA%
 	}else{
 		GuiControl,,TitleBar, 
 		GuiControl,,PreviewBox,
@@ -270,9 +273,11 @@ if (A_GuiEvent == "e")
 	ReFreshLV()
 	iniRead, NewAdd,%detailsPath%%TmpFileSafeName%.ini,INFO,Add
 	iniRead, NewMod,%detailsPath%%TmpFileSafeName%.ini,INFO,Mod
+	FormatTime, UserTimeFormatA, %NewAdd%, %UserTimeFormat%
+	FormatTime, UserTimeFormatM, %NewMod%, %UserTimeFormat%
 	GuiControl,, TitleBar, %RowText%
-	GuiControl,, StatusbarM,M: %NewMod%
-	GuiControl,, StatusbarA,A: %NewAdd%
+	GuiControl,, StatusbarM,M: %UserTimeFormatM%
+	GuiControl,, StatusbarA,A: %UserTimeFormatA%
 }
 ;update the preview
 if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
@@ -284,10 +289,12 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 	TMPName := StrReplace(RowText, ".txt", "")
 	iniRead, NoteAdd,%detailsPath%%TMPini%,INFO,Add
 	iniRead, NoteMod,%detailsPath%%TMPini%,INFO,Mod
+	FormatTime, UserTimeFormatA, %NewAdd%, %UserTimeFormat%
+	FormatTime, UserTimeFormatM, %NewMod%, %UserTimeFormat%
 	GuiControl,, PreviewBox, %NoteFile%
 	GuiControl,, TitleBar, %TMPName%
-	GuiControl,, StatusbarM,M: %NoteMod%
-	GuiControl,, StatusbarA,A: %NoteAdd%
+	GuiControl,, StatusbarM,M: %UserTimeFormatM%
+	GuiControl,, StatusbarA,A: %UserTimeFormatA%
 }
 return
 }
@@ -382,6 +389,7 @@ SortName:
 			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%
 			GuiControl, Font, SortBody
 			GuiControl, Font, SortAdded
+			GuiControl, Font, SortModded
 			
 		}
 		return
@@ -404,8 +412,9 @@ SortBody:
 			C_SortDir = Sort
 			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
 			GuiControl, Font, SortBody
-			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%			GuiControl, Font, SortName
+			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%		GuiControl, Font, SortName
 			GuiControl, Font, SortAdded
+			GuiControl, Font, SortModded
 		}
 		return
 	}
@@ -427,8 +436,33 @@ SortAdded:
 			C_SortDir = Sort
 			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
 			GuiControl, Font, SortAdded
-			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%			GuiControl, Font, SortBody
+			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%		GuiControl, Font, SortBody
 			GuiControl, Font, SortName
+			GuiControl, Font, SortModded
+		}
+		return
+	}
+SortModded:
+{
+		if (NextSortAdded ="1") {
+			LV_ModifyCol(5, "SortDesc")
+			NextSortAdded = 0
+			NextSortName = 0
+			NextSortBody = 0
+			C_SortCol = 5
+			C_SortDir = SortDesc
+		}else {
+			LV_ModifyCol(5, "Sort")
+			NextSortAdded = 1
+			NextSortName = 0
+			NextSortBody = 0
+			C_SortCol = 5
+			C_SortDir = Sort
+			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
+			GuiControl, Font, SortModded
+			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%		GuiControl, Font, SortBody
+			GuiControl, Font, SortName
+			GuiControl, Font, SortAdded
 		}
 		return
 	}
@@ -457,18 +491,24 @@ For k, fonts in FontOptionsArray
 
 
 		Gui, 3:New,,FlatNotes - Options
-		Gui, 3:Add, Tab3,, General|Hotkeys|Appearance|Window Options
+		Gui, 3:Add, Tab3,, General|Hotkeys|Appearance|Window Size
 		Gui, 3:Tab, General
 		Gui, 3:Add,Text,section, Notes storage folder:
 		Gui, 3:Add,Edit, disabled r1 w300 vNotesStorageFolder, %U_NotePath%
 		Gui, 3:Add,Button, gFolderSelect, Select a folder.
 		
-		Gui, 3:Add,Text,xs,How many daily backups to keep: (Default: 3)
+		Gui, 3:Add,Text,xs section,How many daily backups to keep: (Default: 3)
 		Gui, 3:Add,Edit, yp-5 x+5 w25
 		Gui, 3:Add,UpDown,vbackupsToKeepSelect gSet_backupsToKeep range0-99, %backupsToKeep%
 		Gui, 3:Add,CheckBox, xs vShowStatusBarSelect gSetShowStatusBar, Show Library Window Statusbar?
 		GuiControl,,ShowStatusBarSelect,%ShowStatusBar%
 
+		Gui, 3:Add,text,xs section,Time format Default(yy/MM/dd) [yyyyMMMMddddhhHHmmsstt]
+		Gui, 3:Add,edit, w150 gSet_UserTimeFormat vSelect_UserTimeFormat,%UserTimeFormat%
+		
+		Gui, 3:add,DropDownList, xs section Choose%DeafultSort% AltSubmit vSelect_DeafultSort gSet_DeafultSort, Name|Body|Added|Modified
+		
+		Gui, 3:add,DropDownList, x+15 Choose%DeafultSortDir% AltSubmit vSelect_DeafultSortDir gSet_DeafultSortDir, Accending|Decending
 		;Hotkeys Tab
 		Gui, 3:Tab, Hotkeys
 		Gui, 3:Add,CheckBox, vSetCtrlC gCtrlCToggle, Send Ctrl+C when using the quick note hotkey.
@@ -553,11 +593,6 @@ For k, fonts in FontOptionsArray
 		CurrentPreviewFontSize := PreviewFontSize*0.5
 		Gui, 3:add,DropDownList, x+10 Choose%CurrentPreviewFontSize% vPreviewFontSizeSelect gSetPreviewFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
 		
-		global NamePercent = 0.5
-global BodyPercent = 0.5
-global AddedPercent 
-		
-		
 		Gui, 3:Add,Text,xs,Column Width Percentage Name | Body | Added 
 		
 		Gui, Add, Edit, w50
@@ -566,9 +601,11 @@ global AddedPercent
 		Gui, 3:Add,UpDown,  vBodyPercentSelect gSetBodyPercent Range0-100, %oBodyPercent%
 		Gui, Add, Edit, w50 x+5
 		Gui, 3:Add,UpDown,  vAddedPercentSelect gSetAddedPercent Range0-100, %oAddedPercent%
+		Gui, Add, Edit, w50 x+5
+		Gui, 3:Add,UpDown,  vModdedPercentSelect gSetModdedPercent Range0-100, %oModdedPercent%
 		
-		;Window Options Tab
-		Gui, 3:Tab, Window Options
+		;Window Size Options Tab
+		Gui, 3:Tab, Window Size
 		Gui, 3:Add,Text,section,Main Window Width: (Default: 530)
 		Gui, 3:Add,Edit   
 		Gui, 3:Add,UpDown,vMainWSelect gSetMainW range50-3000, %LibW%
@@ -650,8 +687,32 @@ SaveAndReload:
 	}
 	IniWrite, %NamePercentSelect%,%iniPath%,General, NamePercent		
 	IniWrite, %BodyPercentSelect%,%iniPath%,General, BodyPercent		
-	IniWrite, %AddedPercentSelect%,%iniPath%,General, AddedPercent		
+	IniWrite, %AddedPercentSelect%,%iniPath%,General, AddedPercent
+	GuiControlGet,Select_UserTimeFormat
+	IniWrite, %Select_UserTimeFormat%,%iniPath%,General, UserTimeFormat
+	GuiControlGet,Select_DeafultSort
+	IniWrite, %Select_DeafultSort%,%iniPath%,General, DeafultSort
+	GuiControlGet,Select_DeafultSortDir
+	IniWrite, %Select_DeafultSortDir%,%iniPath%,General, DeafultSortDir
 reload
+}
+Set_DeafultSort:
+{
+	GuiControlGet,Select_DeafultSort
+	IniWrite, %Select_DeafultSort%,%iniPath%,General, DeafultSort
+	IniRead, DeafultSort, %iniPath%, General, DeafultSort
+}
+Set_DeafultSortDir:
+{
+	GuiControlGet,Select_DeafultSortDir
+	IniWrite, %Select_DeafultSortDir%,%iniPath%,General, DeafultSortDir
+	IniRead, DeafultSortDir, %iniPath%, General, DeafultSortDir
+}
+Set_UserTimeFormat:
+{
+	GuiControlGet,Select_UserTimeFormat
+	IniWrite, %Select_UserTimeFormat%,%iniPath%,General, UserTimeFormat
+	IniRead, UserTimeFormat, %iniPath%, General, UserTimeFormat
 }
 Set_backupsToKeep:
 {
@@ -859,6 +920,14 @@ SetAddedPercent:
 	gosub DummyGUI1
 	return
 }
+SetModdedPercent:
+{
+	GuiControlGet, ModdedPercentSelect	
+	IniWrite, %ModdedPercentSelect%,%iniPath%,General, ModdedPercent		
+	IniRead, ModdedPercent,%iniPath%, General,ModdedPercent
+	gosub DummyGUI1
+	return
+}
 
 Label:
 {
@@ -884,6 +953,11 @@ Label:
 	}
 	If (savedHK%num% || HK%num%)
 		setHK(num, savedHK%num%, HK%num%)
+	return
+}
+6GuiEscape:
+{
+	Gui, 6:Destroy
 	return
 }
 4GuiEscape:
@@ -936,8 +1010,8 @@ DummyGUI1:
 	Gui, 5:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%	
 	Gui, 5:Add, text, c%U_SFC% w%NameColW% center , Name
 	Gui, 5:Add, text, c%U_SFC% xp+%NameColW% yp+1 w%BodyColW% center , Body
-	Gui, 5:Add, text, yp+1 xp+%BodyColW% w75 center c%U_MSFC% , Added
-	Gui, 5:Add, ListView, -E0x200 -hdr LV0x10000 -ReadOnly grid r%ResultRows% w%libWAdjust% x0 C%U_MFC% vLVfake hwndHLV2  -Multi, Title|Body|Created|FileName
+	Gui, 1:Add, text, yp+1 xp+%BodyColW% w%AddColW% center c%U_MSFC% gSortAdded , Added
+	Gui, 1:Add, text, yp+1 xp+%AddColW% w%ModColW% center c%U_MSFC% gSortModded , 	Gui, 5:Add, ListView, -E0x200 -hdr LV0x10000 -ReadOnly grid r%ResultRows% w%libWAdjust% x0 C%U_MFC% vLVfake hwndHLV2  -Multi, Title|Body|Created|FileName
 	
 
 	Gui, 5:Add,text, center xs -E0x200  x0 r1 C%U_SFC% w%SubW% gTitleBarClick,
@@ -950,15 +1024,14 @@ DummyGUI1:
 	
 		;statusbar
 	if (ShowStatusBar=1) {
-		Gui, 1:Font, s8 Q%FontRendering%
+		Gui, 5:Font, s8 Q%FontRendering%
 		StatusWidth := SubW-185
-		Gui, 1:add,text, xs center w85 C%U_SFC%, %TotalNotes% of %TotalNotes%
-		Gui, 1:add,text, x+5 center vStatusBarM w%StatusWidth% C%U_SFC%,M: 00/00/00
-		Gui, 1:add,text, x+5 right w75 C%U_SFC%,A: 00/00/00
-		Gui, 1:Font, s2
-		Gui, 1:add,text, xs
+		Gui, 5:add,text, xs center w85 C%U_SFC%, %TotalNotes% of %TotalNotes%
+		Gui, 5:add,text, x+5 center w%StatusWidth% C%U_SFC%,M: 00/00/00
+		Gui, 5:add,text, x+5 right w75 C%U_SFC%,A: 00/00/00
+		Gui, 5:Font, s2
+		Gui, 5:add,text, xs
 	}
-	
 	
 	LV_Add("", "Name", "Body", "20/20/20","Sample")
 	LV_Add("", "Name", "Body", "20/20/20","Sample")
@@ -972,6 +1045,9 @@ DummyGUI1:
 	LV_ModifyCol(3, "SortDesc")
 	LV_ModifyCol(3, "Center")
 	LV_ModifyCol(4, 0)
+	LV_ModifyCol(6, ModColW)
+	LV_ModifyCol(5, "Logical")
+	LV_ModifyCol(5, "Center")
 	CLV2 := New LV_Colors(HLV2)
 	CLV2.SelectionColors(rowSelectColor,rowSelectTextColor)
 	fakeY := round((A_ScreenHeight/3))
@@ -988,10 +1064,5 @@ SortNow:
 LV_ModifyCol(C_SortCol,C_SortDir)
 return
 }
-
-
-
-
-
 
 

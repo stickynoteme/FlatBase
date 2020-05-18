@@ -45,6 +45,7 @@ global sendCtrlC
 global SortBody
 global SortName
 global SortAdded
+global SortModded
 global NextSortAdded
 global NextSortBody
 global NextSortName
@@ -60,9 +61,11 @@ global PB_Mod
 global NamePercent
 global BodyPercent
 global AddedPercent
+global ModdedPercent
 global oNamePercent
 global oBodyPercent
-global oAddedPercent 
+global oAddedPercent
+global oModdedPercent
 global ShowStatusBar
 global StatusBarM
 global StatusBarA
@@ -73,6 +76,9 @@ global StatusBarCount
 global StatusBar
 global C_SortCol
 global C_SortDir
+global DeafultSort
+global DeafultSortDir
+global UserTimeFormat
 ;Pre-set globals
 global LibW
 global PreviewRows
@@ -172,16 +178,35 @@ IniRead, sendCtrlC, %iniPath%, General, sendCtrlC, 1
 IniRead, oNamePercent,%iniPath%, General,NamePercent,30
 IniRead, oBodyPercent,%iniPath%, General,BodyPercent,55
 IniRead, oAddedPercent,%iniPath%, General,AddedPercent,15
+IniRead, oModdedPercent,%iniPath%, General,ModdedPercent,0
+
 NamePercent = 0.%oNamePercent%
 BodyPercent = 0.%oBodyPercent%
 AddedPercent = 0.%oAddedPercent%
+ModdedPercent = 0.%oModdedPercent%
 
 IniRead, HideScrollbars,%iniPath%,General,HideScrollbars,1
 IniRead, backupsToKeep,%iniPath%,General,backupsToKeep,3
 
-IniRead, C_SortCol,%iniPath%,General,SortCol,3
-IniRead, C_SortDir,%iniPath%,General,SortDir,SortDesc
+IniRead, DeafultSort,%iniPath%,General,DeafultSort,4
+IniRead, DeafultSortDir,%iniPath%,General,DeafultSortDir,2
 
+StartSort = %DeafultSort%
+if (DeafultSortDir = 2) {
+	StartSort := DeafultSort*10
+	}
+if (StartSort = 1 or StartSort = 2 or StartSort = 3 or StartSort = 4) {
+	C_SortDir = Sort
+	}
+if (StartSort = 10 or StartSort = 20 or StartSort = 30 or StartSort = 40){
+	C_SortDir = SortDesc
+	}
+if (DeafultSort=4) {
+	DeafultSort=5
+	}
+C_SortCol = %DeafultSort%
+
+Iniread, UserTimeFormat,%iniPath%,General,UserTimeFormat,yy/MM/dd
 
 ;-------------------------------------------------
 ;Set Globals that need values from the ini
@@ -197,6 +222,7 @@ if (HideScrollbars = 1){
 global NameColW := Round(libWColAdjust*NamePercent)
 global BodyColW := Round(libWColAdjust*BodyPercent)
 global AddColW := Round(libWColAdjust*AddedPercent)
+global ModColW := Round(libWColAdjust*ModdedPercent)
 global NameColAndBodyCOlW := NameColW+BodyColW
 ;-------------------------------------------------
 ;Acitvate User Hotkeys if any & make INI for new files

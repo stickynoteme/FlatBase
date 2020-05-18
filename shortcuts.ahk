@@ -94,6 +94,7 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			GuiControl, +Redraw, QuickNoteName
 			ControlFocus, Edit2, FlatNote - QuickNote 
 			
+
 			if (MyFile !="")
 			{
 			MyNewFile := SubStr(MyFile, InStr(MyFile, "`n") + 1)

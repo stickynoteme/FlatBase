@@ -52,8 +52,9 @@ BuildGUI1(){
 	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%	
 	Gui, 1:Add, text, c%U_SFC% w%NameColW% center gSortName vSortName, Name
 	Gui, 1:Add, text, c%U_SFC% xp+%NameColW% yp+1 w%BodyColW% center gSortBody vSortBody, Body
-	Gui, 1:Add, text, yp+1 xp+%BodyColW% w75 center c%U_MSFC% gSortAdded vSortAdded, Added
-	Gui, 1:Add, ListView, -E0x200 -hdr NoSort NoSortHdr LV0x10000 -ReadOnly grid r%ResultRows% w%libWAdjust% x0 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi, Title|Body|Created|FileName
+	Gui, 1:Add, text, yp+1 xp+%BodyColW% w%AddColW% center c%U_MSFC% gSortAdded vSortAdded, Added
+	Gui, 1:Add, text, yp+1 xp+%AddColW% w%ModColW% center c%U_SFC% gSortModded vSortModded, Modified
+	Gui, 1:Add, ListView, -E0x200 -hdr NoSort NoSortHdr LV0x10000 -ReadOnly grid r%ResultRows% w%libWAdjust% x0 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi, Title|Body|Added|FileName|Modified
 
 	Gui, 1:add, Edit, vFake h0 x-1000 y-1000
 	Gui, 1:Add,text, center xs -E0x200  x0 r1 vTitleBar C%U_SFC% w%SubW% gTitleBarClick,
@@ -81,6 +82,7 @@ BuildGUI1(){
 	Gui, 1:SHOW, Hide w%SubW% 
 	WinGet, g1ID,, FlatNotes - Library
 	g1Open=0
+	gosub search
 	return
 }
 
@@ -132,11 +134,14 @@ MakeFileList(ReFreshMyNoteArray){
 		NoteIni = %detailsPath%%NoteIniName%
 		IniRead, NameField, %NoteIni%, INFO, Name
 		IniRead, AddedField, %NoteIni%, INFO, Add
+		FormatTime, UserTimeFormatA, %AddedField%, %UserTimeFormat%
 		IniRead, ModifiedField, %NoteIni%, INFO, Mod
+		FormatTime, UserTimeFormatM, %ModifiedField%,%UserTimeFormat%
+
 		if (ReFreshMyNoteArray = 1){
-			LV_Add("", NameField, NoteField, AddedField,A_LoopField)
+			LV_Add("", NameField, NoteField, UserTimeFormatA,A_LoopField,UserTimeFormatM)
 			}
-		MyNotesArray.Push({1:NameField,2:NoteField,3:AddedField,4:A_LoopField})
+		MyNotesArray.Push({1:NameField,2:NoteField,3:UserTimeFormatA,4:A_LoopField,5:UserTimeFormatM})
 	} ; File loop end
 	LV_ModifyCol(1, NameColW) ; 145
 	LV_ModifyCol(1, "Logical")
@@ -144,9 +149,28 @@ MakeFileList(ReFreshMyNoteArray){
 	LV_ModifyCol(2, "Logical")
 	LV_ModifyCol(3, AddColW)
 	LV_ModifyCol(3, "Logical")
-	LV_ModifyCol(3, "SortDesc")
 	LV_ModifyCol(3, "Center")
 	LV_ModifyCol(4, 0)
+	LV_ModifyCol(5, ModColW)
+	LV_ModifyCol(5, "Logical")
+	LV_ModifyCol(5, "Center")
+	
+	if (DeafultSort = 1)
+			LV_ModifyCol(1, "Sort")
+	if (DeafultSort = 10)
+			LV_ModifyCol(1, "SortDesc")
+	if (DeafultSort = 2)
+			LV_ModifyCol(2, "Sort")
+	if (DeafultSort = 20)
+			LV_ModifyCol(2, "SortDesc")
+	if (DeafultSort = 3)
+			LV_ModifyCol(3, "Sort")
+	if (DeafultSort = 30)
+			LV_ModifyCol(3, "SortDesc")
+	if (DeafultSort = 4)
+			LV_ModifyCol(5, "Sort")
+	if (DeafultSort = 40)
+			LV_ModifyCol(5, "SortDesc")
 	TotalNotes := MyNotesArray.MaxIndex()
 	return
 }
@@ -165,16 +189,16 @@ return
 }
 
 SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
-	FormatTime, CurrentTimeStamp, %A_Now%, yy/MM/dd
 	FileNameTxt =%FileSafeName%.txt
 	SaveFileName = %U_NotePath%%FileSafeName%.txt
 	
-	iniRead,CreatedDate,%detailsPath%%FileSafeName%.ini,INFO,Add,%CurrentTimeStamp%
+	iniRead,CreatedDate,%detailsPath%%FileSafeName%.ini,INFO,Add,%A_Now%
 	FileRecycle, %SaveFileName%
+	FormatTime, UserTimeFormatA, %CreatedDate%, %UserTimeFormat%
+	FormatTime, UserTimeFormatM, %A_Now%, %UserTimeFormat%
 	
 	if (Modified=0){
-		MyNotesArray.Push({1:QuickNoteName,2:QuickNoteBody,3:CreatedDate,4:FileNameTxt})
-		;ReFreshLV()
+		MyNotesArray.Push({1:QuickNoteName,2:QuickNoteBody,3:UserTimeFormatA,4:FileNameTxt,5:UserTimeFormatM})
 		GuiControl, 1:+Redraw, LV
 	}
 	if (Modified=1){
@@ -183,14 +207,13 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
 				MyNotesArray.RemoveAt(Each)
 			}
 		}
-		MyNotesArray.Push({1:QuickNoteName,2:QuickNoteBody,3:CreatedDate,4:FileNameTxt})
-		;ReFreshLV()
+		MyNotesArray.Push({1:QuickNoteName,2:QuickNoteBody,3:UserTimeFormatA,4:FileNameTxt,5:UserTimeFormatM})
 		GuiControl, 1:+Redraw, LV
 	}
 
-	iniWrite,%QuickNoteName%,%detailsPath%%FileSafeName%.ini,INFO,Name
-	iniWrite,%CurrentTimeStamp%,%detailsPath%%FileSafeName%.ini,INFO,Mod
 	iniWrite,%CreatedDate%,%detailsPath%%FileSafeName%.ini,INFO,Add
+	iniWrite,%QuickNoteName%,%detailsPath%%FileSafeName%.ini,INFO,Name
+	iniWrite,%A_Now%,%detailsPath%%FileSafeName%.ini,INFO,Mod
 	FileAppend , %QuickNoteBody%, %SaveFileName%, UTF-8
 return
 }
