@@ -52,9 +52,9 @@ BuildGUI1(){
 	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%	
 	Gui, 1:Add, text, c%U_SFC% w%NameColW% center gSortName vSortName, Name
 	Gui, 1:Add, text, c%U_SFC% xp+%NameColW% yp+1 w%BodyColW% center gSortBody vSortBody, Body
-	Gui, 1:Add, text, yp+1 xp+%BodyColW% w%AddColW% center c%U_MSFC% gSortAdded vSortAdded, Added
+	Gui, 1:Add, text, yp+1 xp+%BodyColW% w%AddColW% center c%U_SFC% gSortAdded vSortAdded, Added
 	Gui, 1:Add, text, yp+1 xp+%AddColW% w%ModColW% center c%U_SFC% gSortModded vSortModded, Modified
-	Gui, 1:Add, ListView, -E0x200 -hdr NoSort NoSortHdr LV0x10000 -ReadOnly grid r%ResultRows% w%libWAdjust% x0 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi, Title|Body|Added|FileName|Modified
+	Gui, 1:Add, ListView, -E0x200 -hdr NoSort NoSortHdr LV0x10000 -ReadOnly grid r%ResultRows% w%libWAdjust% x0 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi, Title|Body|Added|FileName|Modified|RawAdded|RawModded
 
 	Gui, 1:add, Edit, vFake h0 x-1000 y-1000
 	Gui, 1:Add,text, center xs -E0x200  x0 r1 vTitleBar C%U_SFC% w%SubW% gTitleBarClick,
@@ -78,6 +78,19 @@ BuildGUI1(){
 		Gui, 1:Font, s2
 		Gui, 1:add,text, xs
 	}
+
+	Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
+	if (DeafultSort=1)
+		GuiControl, Font, SortName
+	if (DeafultSort=2)
+		GuiControl, Font, SortBody
+	if (DeafultSort=6)
+		GuiControl, Font, SortAdded
+	if (DeafultSort=7)
+		GuiControl, Font, SortModded
+			
+
+			
 	
 	Gui, 1:SHOW, Hide w%SubW% 
 	WinGet, g1ID,, FlatNotes - Library
@@ -134,14 +147,14 @@ MakeFileList(ReFreshMyNoteArray){
 		NoteIni = %detailsPath%%NoteIniName%
 		IniRead, NameField, %NoteIni%, INFO, Name
 		IniRead, AddedField, %NoteIni%, INFO, Add
+		IniRead, ModdedField, %NoteIni%, INFO, Mod
 		FormatTime, UserTimeFormatA, %AddedField%, %UserTimeFormat%
-		IniRead, ModifiedField, %NoteIni%, INFO, Mod
-		FormatTime, UserTimeFormatM, %ModifiedField%,%UserTimeFormat%
+		FormatTime, UserTimeFormatM, %ModdedField%,%UserTimeFormat%
 
 		if (ReFreshMyNoteArray = 1){
-			LV_Add("", NameField, NoteField, UserTimeFormatA,A_LoopField,UserTimeFormatM)
+			LV_Add("", NameField, NoteField, UserTimeFormatA,A_LoopField,UserTimeFormatM,AddedField,ModdedField)
 			}
-		MyNotesArray.Push({1:NameField,2:NoteField,3:UserTimeFormatA,4:A_LoopField,5:UserTimeFormatM})
+		MyNotesArray.Push({1:NameField,2:NoteField,3:UserTimeFormatA,4:A_LoopField,5:UserTimeFormatM,6:AddedField,7:ModdedField})
 	} ; File loop end
 	LV_ModifyCol(1, NameColW) ; 145
 	LV_ModifyCol(1, "Logical")
@@ -154,6 +167,8 @@ MakeFileList(ReFreshMyNoteArray){
 	LV_ModifyCol(5, ModColW)
 	LV_ModifyCol(5, "Logical")
 	LV_ModifyCol(5, "Center")
+	LV_ModifyCol(6, 0)
+	LV_ModifyCol(7, 0)
 	
 	if (DeafultSort = 1)
 			LV_ModifyCol(1, "Sort")
@@ -180,7 +195,7 @@ GuiControl, 1:-Redraw, LV
 LV_Delete()
 For Each, Note In MyNotesArray
 {
-	LV_Add("", Note.1,Note.2,Note.3,Note.4)
+	LV_Add("", Note.1,Note.2,Note.3,Note.4,Note.5,Note.6,Note.7)
 }
 gosub SortNow
 TotalNotes := MyNotesArray.MaxIndex() 
@@ -198,7 +213,7 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
 	FormatTime, UserTimeFormatM, %A_Now%, %UserTimeFormat%
 	
 	if (Modified=0){
-		MyNotesArray.Push({1:QuickNoteName,2:QuickNoteBody,3:UserTimeFormatA,4:FileNameTxt,5:UserTimeFormatM})
+		MyNotesArray.Push({1:QuickNoteName,2:QuickNoteBody,3:UserTimeFormatA,4:FileNameTxt,5:UserTimeFormatM,6:CreatedDate,7:A_Now})
 		GuiControl, 1:+Redraw, LV
 	}
 	if (Modified=1){
@@ -207,7 +222,7 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
 				MyNotesArray.RemoveAt(Each)
 			}
 		}
-		MyNotesArray.Push({1:QuickNoteName,2:QuickNoteBody,3:UserTimeFormatA,4:FileNameTxt,5:UserTimeFormatM})
+		MyNotesArray.Push({1:QuickNoteName,2:QuickNoteBody,3:UserTimeFormatA,4:FileNameTxt,5:UserTimeFormatM,6:CreatedDate,7:A_Now})
 		GuiControl, 1:+Redraw, LV
 	}
 

@@ -76,6 +76,7 @@ global StatusBarCount
 global StatusBar
 global C_SortCol
 global C_SortDir
+global RawDeafultSort
 global DeafultSort
 global DeafultSortDir
 global UserTimeFormat
@@ -191,6 +192,9 @@ IniRead, backupsToKeep,%iniPath%,General,backupsToKeep,3
 IniRead, DeafultSort,%iniPath%,General,DeafultSort,4
 IniRead, DeafultSortDir,%iniPath%,General,DeafultSortDir,2
 
+;Sort value for select options
+RawDeafultSort := DeafultSort
+
 StartSort = %DeafultSort%
 if (DeafultSortDir = 2) {
 	StartSort := DeafultSort*10
@@ -201,9 +205,13 @@ if (StartSort = 1 or StartSort = 2 or StartSort = 3 or StartSort = 4) {
 if (StartSort = 10 or StartSort = 20 or StartSort = 30 or StartSort = 40){
 	C_SortDir = SortDesc
 	}
-if (DeafultSort=4) {
-	DeafultSort=5
+if (DeafultSort=3) {
+	DeafultSort=6
 	}
+if (DeafultSort=4) {
+	DeafultSort=7
+	}
+
 C_SortCol = %DeafultSort%
 
 Iniread, UserTimeFormat,%iniPath%,General,UserTimeFormat,yy/MM/dd
@@ -244,7 +252,7 @@ Progress, Off
 isStarting = 0
 
 WinShow, ahk_id %g1ID%
-;goto Options
+goto Options
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------

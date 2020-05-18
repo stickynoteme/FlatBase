@@ -139,11 +139,11 @@ Search:
 		  If (SearchTerm != "")
 		  {
 			If (InStr(Note.1, SearchTerm) != 0){
-			 LV_Add("", Note.1, Note.2,Note.3,Note.4)
+			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7)
 			   }
 			}
 			Else
-			  LV_Add("", Note.1,Note.2,Note.3,Note.4)
+			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7)
 		}
 	GuiControl, +Redraw, LV
 	return
@@ -154,17 +154,17 @@ Search:
 	   If (SearchTerm != "")
 	   {
 			If (InStr(Note.1, SearchTerm) != 0){
-			 LV_Add("", Note.1, Note.2,Note.3,Note.4)
+			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7)
 			}Else if (InStr(Note.2, SearchTerm) != 0)
-		   {LV_Add("", Note.1, Note.2,Note.3,Note.4)
+		   {LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7)
 		   }Else if (InStr(Note.3, SearchTerm) != 0)
-		   {LV_Add("", Note.1, Note.2,Note.3,Note.4)
+		   {LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7)
 		   }Else if (InStr(Note.4, SearchTerm) != 0)
-		   {LV_Add("", Note.1, Note.2,Note.3,Note.4)
+		   {LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7)
 		   }
 	   }
 	   Else
-		  LV_Add("", Note.1,Note.2,Note.3,Note.4)
+		  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7)
 	}
 Items := LV_GetCount()
 if (Items != 0) {
@@ -421,18 +421,18 @@ SortBody:
 SortAdded:
 {
 		if (NextSortAdded ="1") {
-			LV_ModifyCol(3, "SortDesc")
+			LV_ModifyCol(6, "SortDesc")
 			NextSortAdded = 0
 			NextSortName = 0
 			NextSortBody = 0
-			C_SortCol = 3
+			C_SortCol = 6
 			C_SortDir = SortDesc
 		}else {
-			LV_ModifyCol(3, "Sort")
+			LV_ModifyCol(6, "Sort")
 			NextSortAdded = 1
 			NextSortName = 0
 			NextSortBody = 0
-			C_SortCol = 3
+			C_SortCol = 6
 			C_SortDir = Sort
 			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
 			GuiControl, Font, SortAdded
@@ -445,18 +445,18 @@ SortAdded:
 SortModded:
 {
 		if (NextSortAdded ="1") {
-			LV_ModifyCol(5, "SortDesc")
+			LV_ModifyCol(7, "SortDesc")
 			NextSortAdded = 0
 			NextSortName = 0
 			NextSortBody = 0
-			C_SortCol = 5
+			C_SortCol = 7
 			C_SortDir = SortDesc
 		}else {
-			LV_ModifyCol(5, "Sort")
+			LV_ModifyCol(7, "Sort")
 			NextSortAdded = 1
 			NextSortName = 0
 			NextSortBody = 0
-			C_SortCol = 5
+			C_SortCol = 7
 			C_SortDir = Sort
 			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
 			GuiControl, Font, SortModded
@@ -506,8 +506,7 @@ For k, fonts in FontOptionsArray
 		Gui, 3:Add,text,xs section,Time format Default(yy/MM/dd) [yyyyMMMMddddhhHHmmsstt]
 		Gui, 3:Add,edit, w150 gSet_UserTimeFormat vSelect_UserTimeFormat,%UserTimeFormat%
 		
-		Gui, 3:add,DropDownList, xs section Choose%DeafultSort% AltSubmit vSelect_DeafultSort gSet_DeafultSort, Name|Body|Added|Modified
-		
+		Gui, 3:add,DropDownList, xs section Choose%RawDeafultSort% AltSubmit vSelect_DeafultSort gSet_DeafultSort, Name|Body|Added|Modified
 		Gui, 3:add,DropDownList, x+15 Choose%DeafultSortDir% AltSubmit vSelect_DeafultSortDir gSet_DeafultSortDir, Accending|Decending
 		;Hotkeys Tab
 		Gui, 3:Tab, Hotkeys
@@ -593,7 +592,7 @@ For k, fonts in FontOptionsArray
 		CurrentPreviewFontSize := PreviewFontSize*0.5
 		Gui, 3:add,DropDownList, x+10 Choose%CurrentPreviewFontSize% vPreviewFontSizeSelect gSetPreviewFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
 		
-		Gui, 3:Add,Text,xs,Column Width Percentage Name | Body | Added 
+		Gui, 3:Add,Text,xs,Column Width Percentage Name | Body | Added | Modified 
 		
 		Gui, Add, Edit, w50
 		Gui, 3:Add,UpDown, vNamePercentSelect gSetNamePercent Range0-100, %oNamePercent%
@@ -677,17 +676,20 @@ SaveAndReload:
 	
 	GuiControlGet, NamePercentSelect	
 	GuiControlGet, BodyPercentSelect	
-	GuiControlGet, AddedPercentSelect	
+	GuiControlGet, AddedPercentSelect
+	GuiControlGet, ModdedPercentSelect	
+	
 
-	is100 := NamePercentSelect+BodyPercentSelect+AddedPercentSelect
+	is100 := NamePercentSelect+BodyPercentSelect+AddedPercentSelect+ModdedPercentSelect
 	WinSet, AlwaysOnTop, Off, FlatNotes - Options
 	if (is100 >= 101){
-		msgbox Column width exceeds 100 please fix.
+		msgbox Column total width exceeds 100 please fix.
 		return
 	}
 	IniWrite, %NamePercentSelect%,%iniPath%,General, NamePercent		
 	IniWrite, %BodyPercentSelect%,%iniPath%,General, BodyPercent		
 	IniWrite, %AddedPercentSelect%,%iniPath%,General, AddedPercent
+	IniWrite, %ModdedPercentSelect%,%iniPath%,General, ModdedPercent
 	GuiControlGet,Select_UserTimeFormat
 	IniWrite, %Select_UserTimeFormat%,%iniPath%,General, UserTimeFormat
 	GuiControlGet,Select_DeafultSort
@@ -900,7 +902,8 @@ SetNamePercent:
 {
 	GuiControlGet, NamePercentSelect	
 	IniWrite, %NamePercentSelect%,%iniPath%,General, NamePercent		
-	IniRead, NamePercent,%iniPath%, General,NamePercent
+	IniRead, oNamePercent,%iniPath%, General,NamePercent
+	NamePercent = 0.%oNamePercent%
 	gosub DummyGUI1
 	return
 }
@@ -908,7 +911,8 @@ SetBodyPercent:
 {
 	GuiControlGet, BodyPercentSelect	
 	IniWrite, %BodyPercentSelect%,%iniPath%,General, BodyPercent		
-	IniRead, BodyPercent,%iniPath%, General,BodyPercent
+	IniRead, oBodyPercent,%iniPath%, General,BodyPercent
+	BodyPercent = 0.%oBodyPercent%
 	gosub DummyGUI1
 	return
 }
@@ -916,15 +920,17 @@ SetAddedPercent:
 {
 	GuiControlGet, AddedPercentSelect	
 	IniWrite, %AddedPercentSelect%,%iniPath%,General, AddedPercent		
-	IniRead, AddedPercent,%iniPath%, General,AddedPercent
+	IniRead, oAddedPercent,%iniPath%, General,AddedPercent
+	AddedPercent = 0.%oAddedPercent%
 	gosub DummyGUI1
 	return
 }
 SetModdedPercent:
 {
 	GuiControlGet, ModdedPercentSelect	
-	IniWrite, %ModdedPercentSelect%,%iniPath%,General, ModdedPercent		
-	IniRead, ModdedPercent,%iniPath%, General,ModdedPercent
+	IniWrite, %ModdedPercentSelect%,%iniPath%,General, ModdedPercent	
+	IniRead, oModdedPercent,%iniPath%, General,ModdedPercent
+	ModdedPercent = 0.%oModdedPercent%
 	gosub DummyGUI1
 	return
 }
