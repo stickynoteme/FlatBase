@@ -69,7 +69,6 @@ BuildGUI1(){
 	
 	;statusbar
 	if (ShowStatusBar=1) {
-
 		Gui, 1:Font, s8 Q%FontRendering%
 		StatusWidth := SubW-185
 		Gui, 1:add,text, xs center vStatusBarCount w85 C%U_SFC%, %TotalNotes% of %TotalNotes%
@@ -159,6 +158,7 @@ For Each, Note In MyNotesArray
 {
 	LV_Add("", Note.1,Note.2,Note.3,Note.4)
 }
+gosub SortNow
 TotalNotes := MyNotesArray.MaxIndex() 
 GuiControl, 1:+Redraw, LV
 return
@@ -174,7 +174,7 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
 	
 	if (Modified=0){
 		MyNotesArray.Push({1:QuickNoteName,2:QuickNoteBody,3:CreatedDate,4:FileNameTxt})
-		ReFreshLV()
+		;ReFreshLV()
 		GuiControl, 1:+Redraw, LV
 	}
 	if (Modified=1){
@@ -184,7 +184,7 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
 			}
 		}
 		MyNotesArray.Push({1:QuickNoteName,2:QuickNoteBody,3:CreatedDate,4:FileNameTxt})
-		ReFreshLV()
+		;ReFreshLV()
 		GuiControl, 1:+Redraw, LV
 	}
 

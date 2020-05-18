@@ -119,8 +119,8 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			SaveFile(RowText,FileSafeName,PreviewBox,1)
 			iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
 			FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
+			LV_Modify(LVSelectedROW,, RowText, NewBodyText)
 			ToolTip Saved 
-			LV_Modify(LVSelectedROW,,RowText,NewBodyText,OldAdd)
 			SetTimer, KillToolTip, -500
 			return
 		}else

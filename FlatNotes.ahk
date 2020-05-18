@@ -225,7 +225,7 @@ WinShow, ahk_id %g1ID%
 !w::
 {
 ;goto Options
-gosub SortNow
+ReFreshLV()
 return
 }
 vk14::

@@ -950,13 +950,13 @@ DummyGUI1:
 	
 		;statusbar
 	if (ShowStatusBar=1) {
-		Gui, 5:Font, s8
+		Gui, 1:Font, s8 Q%FontRendering%
 		StatusWidth := SubW-185
-		Gui, 5:add,text, xs center w85, 3 of 100
-		Gui, 5:add,text, x+5 center  w%StatusWidth%,M: 00/00/00
-		Gui, 5:add,text, x+5 right  w75,A: 00/00/00
-		Gui, 5:Font, s2
-		Gui, 5:add,text, xs
+		Gui, 1:add,text, xs center w85 C%U_SFC%, %TotalNotes% of %TotalNotes%
+		Gui, 1:add,text, x+5 center vStatusBarM w%StatusWidth% C%U_SFC%,M: 00/00/00
+		Gui, 1:add,text, x+5 right w75 C%U_SFC%,A: 00/00/00
+		Gui, 1:Font, s2
+		Gui, 1:add,text, xs
 	}
 	
 	
