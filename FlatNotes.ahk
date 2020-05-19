@@ -112,6 +112,7 @@ global isStarting
 global TotalNotes
 ;Var with starting values
 global istitle = yes
+global savetimerrunning = 0
 
 
 FileCreateDir, NoteDetails

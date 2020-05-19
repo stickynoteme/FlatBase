@@ -63,11 +63,14 @@ BuildGUI1(){
 	
 	;Allow User set prevent/edit font
 	Gui, 1:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
-	Gui, 1:Add,Edit, -E0x200 r%PreviewRows% w%LibW% yp+18 x0 C%U_MFC% vPreviewBox,
+	Gui, 1:Add,Edit, -E0x200 r%PreviewRows% w%LibW% yp+18 x0 C%U_MFC% gPreviewBox vPreviewBox,
 	
 	MakeFileList(1)
 	CLV := New LV_Colors(HLV)
 	CLV.SelectionColors(rowSelectColor,rowSelectTextColor)
+	
+	;CLV.AlternateRows(rowSelectColor,rowSelectTextColor)
+	
 	
 	;statusbar
 	if (ShowStatusBar=1) {
