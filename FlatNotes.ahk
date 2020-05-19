@@ -25,6 +25,7 @@ global FileList = ""
 global FileSafeClipBoard
 global FileSafeName
 global LV
+global LV@sel_col
 global MyNotesArray := {}
 global OldNoteData
 global QuickNoteBody
@@ -43,12 +44,14 @@ global iniPath
 global themePath
 global sendCtrlC
 global SortBody
+global SortStar
 global SortName
 global SortAdded
 global SortModded
 global NextSortAdded
 global NextSortBody
 global NextSortName
+global NextSortStar
 global rowSelectColor
 global rowSelectTextColor
 global QuickNoteWidth
@@ -58,10 +61,12 @@ global isfake
 global PB_Name
 global PB_Add
 global PB_Mod
+global StarPercent
 global NamePercent
 global BodyPercent
 global AddedPercent
 global ModdedPercent
+global oStarPercent
 global oNamePercent
 global oBodyPercent
 global oAddedPercent
@@ -80,6 +85,10 @@ global RawDeafultSort
 global DeafultSort
 global DeafultSortDir
 global UserTimeFormat
+global Star1
+global Star2
+global Star3
+global Star4
 ;Pre-set globals
 global LibW
 global PreviewRows
@@ -108,6 +117,7 @@ global istitle = yes
 FileCreateDir, NoteDetails
 detailsPath := A_WorkingDir "\NoteDetails\"
 iniPath = %A_WorkingDir%\settings.ini
+systemINI = %A_WorkingDir%\system.ini
 themePath = %A_WorkingDir%\Themes
 IniRead, U_NotePath, %iniPath%, General, MyNotePath,%A_WorkingDir%\MyNotes\
 
@@ -128,12 +138,24 @@ if InStr(FileExist(U_NotePath), "D") {
 		}
 global U_NotePath
 ;-------------------------------------------------
-;Write default theme ini if not found
+;Write settings.ini from system.ini
 ;-------------------------------------------------
 IniRead, isFristRun, %iniPath%, General, isFristRun,1
 if (isFristRun = "1") {
 	IniWrite, 0, %iniPath%, General, isFristRun
+	iniread, Star_1,%systemINI%,Start, Star1
+	IniWrite, %Star_1%, %iniPath%, General, Star1
+	iniread, Star_2,%systemINI%,Start,Star2
+	IniWrite, %Star_2%, %iniPath%, General, Star2
+	iniread, Star_3,%systemINI%,Start, Star3
+	IniWrite, %Star_3%, %iniPath%, General, Star3
+	iniread, Star_4,%systemINI%,Start,Star4
+	IniWrite, %Star_4%, %iniPath%, General, Star4
 }
+	IniRead, Star1, %iniPath%, General, Star1
+	IniRead, Star2, %iniPath%, General, Star2
+	IniRead, Star3, %iniPath%, General, Star3
+	IniRead, Star4, %iniPath%, General, Star4
 ;-------------------------------------------------
 ; Read from theme .ini 
 ;-------------------------------------------------
@@ -176,11 +198,23 @@ IniRead, LibW, %iniPath%, General, WindowWidth ,530
 IniRead, U_Capslock, %iniPath%, General, UseCapsLock , 1
 IniRead, sendCtrlC, %iniPath%, General, sendCtrlC, 1
 
+
+IniRead, oStarPercent,%iniPath%, General,StarPercent,05
 IniRead, oNamePercent,%iniPath%, General,NamePercent,30
 IniRead, oBodyPercent,%iniPath%, General,BodyPercent,55
 IniRead, oAddedPercent,%iniPath%, General,AddedPercent,15
 IniRead, oModdedPercent,%iniPath%, General,ModdedPercent,0
 
+if oStarPercent between 1 and 10
+	oStarPercent = 0%oStarPercent%
+if oNamePercent between 1 and 10
+	oNamePercent = 0%oNamePercent%
+if oBodyPercent between 1 and 10
+	oBodyPercent = 0%oBodyPercent%
+if oModdedPercent between 1 and 10
+	oModdedPercent = 0%oModdedPercent%
+
+StarPercent = 0.%oStarPercent%
 NamePercent = 0.%oNamePercent%
 BodyPercent = 0.%oBodyPercent%
 AddedPercent = 0.%oAddedPercent%
@@ -205,6 +239,12 @@ if (StartSort = 1 or StartSort = 2 or StartSort = 3 or StartSort = 4) {
 if (StartSort = 10 or StartSort = 20 or StartSort = 30 or StartSort = 40){
 	C_SortDir = SortDesc
 	}
+if (DeafultSort=1) {
+	DeafultSort=2
+	}
+if (DeafultSort=2) {
+	DeafultSort=3
+	}
 if (DeafultSort=3) {
 	DeafultSort=6
 	}
@@ -221,12 +261,13 @@ Iniread, UserTimeFormat,%iniPath%,General,UserTimeFormat,yy/MM/dd
 ;-------------------------------------------------
 global 	SubW := LibW
 global libWColAdjust :=round(LibW*.97)
-global libWAdjust := LibW
+global libWAdjust := LibW+3
 if (HideScrollbars = 1){
 	libWAdjust := LibW+10
 	SubW := LibW-10
 	}
 ;global ColAdjust := LibW-95
+global StarColW := Round(libWColAdjust*StarPercent)
 global NameColW := Round(libWColAdjust*NamePercent)
 global BodyColW := Round(libWColAdjust*BodyPercent)
 global AddColW := Round(libWColAdjust*AddedPercent)
@@ -252,7 +293,7 @@ Progress, Off
 isStarting = 0
 
 WinShow, ahk_id %g1ID%
-goto Options
+;goto Options
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------
@@ -302,8 +343,6 @@ return
 ;-!- Return after fucntions so lables don't get exacuted
 return
 #Include lables.ahk
-
-
-
+return
 
 

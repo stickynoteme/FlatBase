@@ -49,12 +49,13 @@ BuildGUI1(){
 
 	Gui, 1:Add, ListBox, vLB1 +0x100 h8 w%LibW% x0 y0 -E0x200 Disabled 
 	Gui, 1:Add, ListBox, vlB2 +0x100 h15 w%LibW% x0 ys0 -E0x200 Disabled
-	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%	
-	Gui, 1:Add, text, c%U_SFC% w%NameColW% center gSortName vSortName, Name
+	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%
+	Gui, 1:Add, text, x-3 c%U_SFC% w%StarColW% center gSortStar vSortStar, *
+	Gui, 1:Add, text, c%U_SFC% xp+%StarColW% w%NameColW% center gSortName vSortName, Name
 	Gui, 1:Add, text, c%U_SFC% xp+%NameColW% yp+1 w%BodyColW% center gSortBody vSortBody, Body
 	Gui, 1:Add, text, yp+1 xp+%BodyColW% w%AddColW% center c%U_SFC% gSortAdded vSortAdded, Added
 	Gui, 1:Add, text, yp+1 xp+%AddColW% w%ModColW% center c%U_SFC% gSortModded vSortModded, Modified
-	Gui, 1:Add, ListView, -E0x200 -hdr NoSort NoSortHdr LV0x10000 -ReadOnly grid r%ResultRows% w%libWAdjust% x0 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi, Title|Body|Added|FileName|Modified|RawAdded|RawModded
+	Gui, 1:Add, ListView, -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar
 
 	Gui, 1:add, Edit, vFake h0 x-1000 y-1000
 	Gui, 1:Add,text, center xs -E0x200  x0 r1 vTitleBar C%U_SFC% w%SubW% gTitleBarClick,
@@ -88,11 +89,17 @@ BuildGUI1(){
 		GuiControl, Font, SortAdded
 	if (DeafultSort=7)
 		GuiControl, Font, SortModded
-			
-
-			
 	
-	Gui, 1:SHOW, Hide w%SubW% 
+	
+	;These are needed to get the clicked COL
+	WM_LBUTTONDOWN = 0x0201
+	OnMessage( WM_LBUTTONDOWN, "HandleMessage" )
+
+	WM_RBUTTONDOWN = 0x0204
+	OnMessage( WM_RBUTTONDOWN, "HandleMessage" )
+
+	
+	Gui, 1:SHOW, Hide w%SubW%
 	WinGet, g1ID,, FlatNotes - Library
 	g1Open=0
 	gosub search
@@ -145,47 +152,62 @@ MakeFileList(ReFreshMyNoteArray){
 		NoteIniName := StrReplace(A_LoopField, ".txt", ".ini")
 		NoteBackupName := NoteBackupName := StrReplace(A_LoopField, ".txt", "")
 		NoteIni = %detailsPath%%NoteIniName%
+		IniRead, StarField, %NoteIni%, INFO, Star,S
 		IniRead, NameField, %NoteIni%, INFO, Name
 		IniRead, AddedField, %NoteIni%, INFO, Add
 		IniRead, ModdedField, %NoteIni%, INFO, Mod
 		FormatTime, UserTimeFormatA, %AddedField%, %UserTimeFormat%
 		FormatTime, UserTimeFormatM, %ModdedField%,%UserTimeFormat%
 
+		if (StarField=0)
+			StarFieldArray:= A_sapce
+		if (StarField=1)
+			StarFieldArray:=Star1
+		if (StarField=2)
+			StarFieldArray:=Star2
+		if (StarField=3)
+			StarFieldArray:=Star3
+		if (StarField=4)
+			StarFieldArray:=Star4
+
 		if (ReFreshMyNoteArray = 1){
-			LV_Add("", NameField, NoteField, UserTimeFormatA,A_LoopField,UserTimeFormatM,AddedField,ModdedField)
+			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField)
 			}
-		MyNotesArray.Push({1:NameField,2:NoteField,3:UserTimeFormatA,4:A_LoopField,5:UserTimeFormatM,6:AddedField,7:ModdedField})
+		MyNotesArray.Push({1:StarFieldArray,2:NameField,3:NoteField,4:UserTimeFormatA,5:UserTimeFormatM,6:AddedField,7:ModdedField,8:A_LoopField,9:StarField})
 	} ; File loop end
-	LV_ModifyCol(1, NameColW) ; 145
-	LV_ModifyCol(1, "Logical")
-	LV_ModifyCol(2, BodyColW) ; 275
+	LV_ModifyCol(1, StarColW) 
+	LV_ModifyCol(1, "Center")
+	LV_ModifyCol(2, NameColW)
 	LV_ModifyCol(2, "Logical")
-	LV_ModifyCol(3, AddColW)
+	LV_ModifyCol(3, BodyColW) ; 275
 	LV_ModifyCol(3, "Logical")
-	LV_ModifyCol(3, "Center")
-	LV_ModifyCol(4, 0)
+	LV_ModifyCol(4, AddColW)
+	LV_ModifyCol(4, "Center")
 	LV_ModifyCol(5, ModColW)
-	LV_ModifyCol(5, "Logical")
 	LV_ModifyCol(5, "Center")
 	LV_ModifyCol(6, 0)
+	LV_ModifyCol(6, "Logical")
 	LV_ModifyCol(7, 0)
+	LV_ModifyCol(7, "Logical")
+	LV_ModifyCol(8, 0)
+	LV_ModifyCol(9, 0)
 	
 	if (DeafultSort = 1)
-			LV_ModifyCol(1, "Sort")
-	if (DeafultSort = 10)
-			LV_ModifyCol(1, "SortDesc")
-	if (DeafultSort = 2)
 			LV_ModifyCol(2, "Sort")
-	if (DeafultSort = 20)
+	if (DeafultSort = 10)
 			LV_ModifyCol(2, "SortDesc")
-	if (DeafultSort = 3)
+	if (DeafultSort = 2)
 			LV_ModifyCol(3, "Sort")
-	if (DeafultSort = 30)
+	if (DeafultSort = 20)
 			LV_ModifyCol(3, "SortDesc")
+	if (DeafultSort = 3)
+			LV_ModifyCol(6, "Sort")
+	if (DeafultSort = 30)
+			LV_ModifyCol(6, "SortDesc")
 	if (DeafultSort = 4)
-			LV_ModifyCol(5, "Sort")
+			LV_ModifyCol(7, "Sort")
 	if (DeafultSort = 40)
-			LV_ModifyCol(5, "SortDesc")
+			LV_ModifyCol(7, "SortDesc")
 	TotalNotes := MyNotesArray.MaxIndex()
 	return
 }
@@ -195,7 +217,7 @@ GuiControl, 1:-Redraw, LV
 LV_Delete()
 For Each, Note In MyNotesArray
 {
-	LV_Add("", Note.1,Note.2,Note.3,Note.4,Note.5,Note.6,Note.7)
+	LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
 }
 gosub SortNow
 TotalNotes := MyNotesArray.MaxIndex() 
@@ -208,12 +230,26 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
 	SaveFileName = %U_NotePath%%FileSafeName%.txt
 	
 	iniRead,CreatedDate,%detailsPath%%FileSafeName%.ini,INFO,Add,%A_Now%
+	iniRead,NoteStar,%detailsPath%%FileSafeName%.ini,INFO,Star,
 	FileRecycle, %SaveFileName%
 	FormatTime, UserTimeFormatA, %CreatedDate%, %UserTimeFormat%
 	FormatTime, UserTimeFormatM, %A_Now%, %UserTimeFormat%
 	
+	IniRead, StarField, %NoteIni%, INFO, Star,S
+
+		if (StarField=0)
+			StarFieldArray:= A_sapce
+		if (StarField=1)
+			StarFieldArray:=Star1
+		if (StarField=2)
+			StarFieldArray:=Star2
+		if (StarField=3)
+			StarFieldArray:=Star3
+		if (StarField=4)
+			StarFieldArray:=Star4
+	
 	if (Modified=0){
-		MyNotesArray.Push({1:QuickNoteName,2:QuickNoteBody,3:UserTimeFormatA,4:FileNameTxt,5:UserTimeFormatM,6:CreatedDate,7:A_Now})
+		MyNotesArray.Push({1:StarFieldArray, 2:QuickNoteName,3:QuickNoteBody,4:UserTimeFormatA,5:UserTimeFormatM,6:CreatedDate,7:A_Now,8:FileNameTxt,9:NoteStar})
 		GuiControl, 1:+Redraw, LV
 	}
 	if (Modified=1){
@@ -222,13 +258,14 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
 				MyNotesArray.RemoveAt(Each)
 			}
 		}
-		MyNotesArray.Push({1:QuickNoteName,2:QuickNoteBody,3:UserTimeFormatA,4:FileNameTxt,5:UserTimeFormatM,6:CreatedDate,7:A_Now})
+		MyNotesArray.Push({1:StarFieldArray,2:QuickNoteName,3:QuickNoteBody,4:UserTimeFormatA,4:UserTimeFormatM,6:CreatedDate,7:A_Now,8:FileNameTxt,9:NoteStar})
 		GuiControl, 1:+Redraw, LV
 	}
 
 	iniWrite,%CreatedDate%,%detailsPath%%FileSafeName%.ini,INFO,Add
 	iniWrite,%QuickNoteName%,%detailsPath%%FileSafeName%.ini,INFO,Name
 	iniWrite,%A_Now%,%detailsPath%%FileSafeName%.ini,INFO,Mod
+	iniWrite,%NoteStar%,%detailsPath%%FileSafeName%.ini,INFO,Star
 	FileAppend , %QuickNoteBody%, %SaveFileName%, UTF-8
 return
 }
