@@ -282,7 +282,7 @@ Progress, Off
 isStarting = 0
 
 WinShow, ahk_id %g1ID%
-goto Options
+;goto Options
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------

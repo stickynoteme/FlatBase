@@ -82,8 +82,10 @@ BuildGUI1(){
 
 	Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
 	if (DeafultSort=1)
-		GuiControl, Font, SortName
+		GuiControl, Font, SortStar
 	if (DeafultSort=2)
+		GuiControl, Font, SortName
+	if (DeafultSort=3)
 		GuiControl, Font, SortBody
 	if (DeafultSort=6)
 		GuiControl, Font, SortAdded
@@ -217,7 +219,7 @@ GuiControl, 1:-Redraw, LV
 LV_Delete()
 For Each, Note In MyNotesArray
 {
-	LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+	 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
 }
 gosub SortNow
 TotalNotes := MyNotesArray.MaxIndex() 
@@ -235,7 +237,7 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
 	FormatTime, UserTimeFormatA, %CreatedDate%, %UserTimeFormat%
 	FormatTime, UserTimeFormatM, %A_Now%, %UserTimeFormat%
 	
-	IniRead, StarField, %NoteIni%, INFO, Star,S
+	IniRead, StarField, %NoteIni%, INFO, Star,0
 
 		if (StarField=0)
 			StarFieldArray:= A_sapce
@@ -248,25 +250,23 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
 		if (StarField=4)
 			StarFieldArray:=Star4
 	
-	if (Modified=0){
-		MyNotesArray.Push({1:StarFieldArray, 2:QuickNoteName,3:QuickNoteBody,4:UserTimeFormatA,5:UserTimeFormatM,6:CreatedDate,7:A_Now,8:FileNameTxt,9:NoteStar})
-		GuiControl, 1:+Redraw, LV
-	}
+
 	if (Modified=1){
 		for Each, Note in MyNotesArray{
-			If (Note.1 = QuickNoteName){
+			If (Note.2 = QuickNoteName){
 				MyNotesArray.RemoveAt(Each)
 			}
 		}
-		MyNotesArray.Push({1:StarFieldArray,2:QuickNoteName,3:QuickNoteBody,4:UserTimeFormatA,4:UserTimeFormatM,6:CreatedDate,7:A_Now,8:FileNameTxt,9:NoteStar})
-		GuiControl, 1:+Redraw, LV
-	}
+	}	
+	MyNotesArray.Push({1:StarFieldArray, 2:QuickNoteName,3:QuickNoteBody,4:UserTimeFormatA,5:UserTimeFormatM,6:CreatedDate,7:A_Now,8:FileNameTxt,9:NoteStar})
+	
 
 	iniWrite,%CreatedDate%,%detailsPath%%FileSafeName%.ini,INFO,Add
 	iniWrite,%QuickNoteName%,%detailsPath%%FileSafeName%.ini,INFO,Name
 	iniWrite,%A_Now%,%detailsPath%%FileSafeName%.ini,INFO,Mod
 	iniWrite,%NoteStar%,%detailsPath%%FileSafeName%.ini,INFO,Star
 	FileAppend , %QuickNoteBody%, %SaveFileName%, UTF-8
+;ReFreshLV()
 return
 }
 MakeAnyMissingINI(){
@@ -281,10 +281,10 @@ MakeAnyMissingINI(){
 		NoteIniName := StrReplace(A_LoopField, ".txt", ".ini")
 		IfNotExist, %detailsPath%%NoteIniName%
 				NoteName := StrReplace(A_LoopField, ".txt", "")
-				FormatTime, CurrentTimeStamp, %A_Now%, yy/MM/dd
 				iniWrite,%NoteName%,%detailsPath%%NoteName%.ini,INFO,Name
-				iniWrite,%CurrentTimeStamp%,%detailsPath%%NoteName%.ini,INFO,Mod
-				iniWrite,%CurrentTimeStamp%,%detailsPath%%NoteName%.ini,INFO,Add
+				iniWrite,%A_Now%,%detailsPath%%NoteName%.ini,INFO,Mod
+				iniWrite,%A_Now%,%detailsPath%%NoteName%.ini,INFO,Add
+				iniWrite,0,%detailsPath%%NoteName%.ini,INFO,Star
 	} 
 return
 }
