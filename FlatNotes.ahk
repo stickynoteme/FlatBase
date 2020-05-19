@@ -78,6 +78,7 @@ global Fake
 global SaveMod
 global TitelBar
 global StatusBarCount
+global LastRowSelected
 global StatusBar
 global C_SortCol
 global C_SortDir
@@ -339,6 +340,7 @@ return
 #Include Class_LV_Colors.ahk
 ;-!- Return after fucntions so lables don't get exacuted
 return
+#Include Build_Dummy_GUI.ahk
 #Include lables.ahk
 return
 
