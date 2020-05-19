@@ -231,9 +231,8 @@ return
 }
 
 SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
-	FileNameTxt =%FileSafeName%.txt
+	FileNameTxt := FileSafeName ".txt"
 	SaveFileName = %U_NotePath%%FileSafeName%.txt
-	
 	iniRead,CreatedDate,%detailsPath%%FileSafeName%.ini,INFO,Add,%A_Now%
 	iniRead,NoteStar,%detailsPath%%FileSafeName%.ini,INFO,Star,
 	FileRecycle, %SaveFileName%
@@ -307,20 +306,16 @@ RemoveINIsOfMissingTXT(){
 return
 }
 BackupNotes(){
-	FormatTime, CurrentTimeStamp, %A_Now%, yy-MM-dd
+	settimer, CheckBackupLaterTimer, 7200000
+	if (A_Now - LastBackupTime < 86400000) ;1day
+		return	
+	FormatTime, CurrentTimeStamp, %A_Now%, yy-MM-dd@tHH
 	7z_exe:="7za.exe"
 	z = 0
 	BackupFileList := ""  ; Initialize to be blank.
 	Loop, %A_WorkingDir%\Backups\*.*
 		BackupFileList .= A_LoopFileName "`n"
 	Sort, BackupFileList
-	TimeToBackup := CurrentTimeStamp ".7z"
-	Loop, parse, BackupFileList, `n
-	{
-		if (A_LoopField = TimeToBackup)
-			SetTimer, CheckBackupLater, 18000000
-			return
-	}
 	Sort, BackupFileList, R  
 	Loop, parse, BackupFileList, `n
 	{
@@ -330,7 +325,8 @@ BackupNotes(){
 		if (z>=backupsToKeep)
 		 FileRecycle %A_WorkingDir%\Backups\%A_LoopField%
 	}
-	FormatTime, CurrentTimeStamp, %A_Now%, yy-MM-dd
+	LastBackupTime := A_Now
+	iniwrite,%LastBackupTime%,%iniPath%,General,LastBackupTime
 	Run, %7z_exe% a -t7z "%A_WorkingDir%\Backups\%CurrentTimeStamp%.7z" "%detailsPath%" "%U_NotePath%",,Hide UseErrorLevel
 return
 }

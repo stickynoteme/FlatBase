@@ -89,6 +89,11 @@ global Star1
 global Star2
 global Star3
 global Star4
+global tOldFile
+global LastBackupTime
+global ListTitleToChange
+global NewTitle
+global NewTitleFileName
 ;Pre-set globals
 global LibW
 global PreviewRows
@@ -110,6 +115,7 @@ global g1Open
 global g1ID
 global isStarting
 global TotalNotes
+global unsaveddataEdit3
 ;Var with starting values
 global istitle = yes
 global savetimerrunning = 0
@@ -160,6 +166,7 @@ if (isFristRun = "1") {
 ;-------------------------------------------------
 ; Read from theme .ini 
 ;-------------------------------------------------
+IniRead,LastBackupTime,%iniPath%,General,LastBackupTime,10000000000
 IniRead, StartingTheme, %iniPath%, Theme, Name, Black
 StartingTheme = %A_WorkingDir%\Themes\%StartingTheme%.ini
 
