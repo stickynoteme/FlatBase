@@ -32,9 +32,7 @@ setHK(num,INI,GUI) {
 	 TrayTip, Label%num%,% !INI ? GUI " ON":!GUI ? INI " OFF":GUI " ON`n" INI " OFF"
 	 return
 }
-
 BuildGUI1(){
-	
 	if WinExist("FlatNotes - Library") {
 		Gui, 1:destroy
 		return
@@ -71,7 +69,6 @@ BuildGUI1(){
 	CLV := New LV_Colors(HLV)
 	CLV.SelectionColors(rowSelectColor,rowSelectTextColor)
 	
-	;CLV.AlternateRows(rowSelectColor,rowSelectTextColor)
 	
 	
 	;statusbar
@@ -105,14 +102,12 @@ BuildGUI1(){
 	WM_RBUTTONDOWN = 0x0204
 	OnMessage( WM_RBUTTONDOWN, "HandleMessage" )
 
-	
 	Gui, 1:SHOW, Hide w%SubW%
 	WinGet, g1ID,, FlatNotes - Library
 	g1Open=0
 	gosub search
 	return
 }
-
 BuildGUI2(){
 	QuickSubWidth := round(QuickNoteWidth*0.5)
 	FileSafeClipBoard := RegExReplace(clipboard, "\*|\?|\\|\||/|""|:|<|>"yyyy , Replacement := "_")
@@ -331,4 +326,45 @@ BackupNotes(){
 	iniwrite,%LastBackupTime%,%iniPath%,General,LastBackupTime
 	Run, %7z_exe% a -t7z "%A_WorkingDir%\Backups\%CurrentTimeStamp%.7z" "%detailsPath%" "%U_NotePath%",,Hide UseErrorLevel
 return
+}
+
+LV_Set_Column_Order( _Num_Of_Columns, _New_Column_Order, _lvID="1", Delim="," )
+{
+    local colOrder, pos
+    VarSetCapacity( colOrder, _Num_Of_Columns * 4, 0 )
+    
+    Loop, Parse, _New_Column_Order, %Delim%
+    {
+        pos := A_Index - 1
+        NumPut( A_LoopField - 1, colOrder, pos * 4, "UInt" )
+    }
+    
+    SendMessage, LVM_FIRST + LVM_SETCOLUMNORDERARRAY
+               , _Num_Of_Columns, &colOrder, SysListView32%_lvId%, A   ; LVM_SETCOLUMNORDERARRAY
+    
+    SendMessage, LVM_FIRST + LVM_REDRAWITEMS        
+               , 0, _Num_Of_Columns - 1, SysListView32%_lvId%, A   ; LVM_REDRAWITEMS
+    
+    VarSetCapacity( colOrder, 0 ) ; Clean up.
+}
+
+
+LV_Get_Column_Order( _Num_Of_Columns, _lvID="1", Delim="," )
+{
+    local colOrder, pos
+    Output := ""
+    VarSetCapacity( colOrder, _Num_Of_Columns * 4, 0 )
+    
+    SendMessage, LVM_FIRST + LVM_GETCOLUMNORDERARRAY
+               , _Num_Of_Columns, &colOrder, SysListView32%_lvID%, A   ; LVM_GETCOLUMNORDERARRAY
+
+    Loop, % _Num_Of_Columns
+    {
+        pos := A_Index - 1
+        Col := NumGet( colOrder, pos * 4, "UInt"  ) + 1 ; Array is zero-based so we add one.
+        Output .= Col . Delim
+    }
+    StringTrimRight, Output, Output, 1 ; Trim trailing delimiter.
+    VarSetCapacity( colOrder, 0 ) ; Clean up.
+    Return, Output
 }

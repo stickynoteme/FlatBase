@@ -186,7 +186,7 @@ IniRead, U_MFC, %StartingTheme%, Colors, MainFontColor , ffffff ;Result and prev
 IniRead, U_SFC, %StartingTheme%, Colors, SubFontColor , 000000 ; Details font
 IniRead, U_MSFC, %StartingTheme%, Colors, MainSortFontColor , 777700 ;Main Sort Font
 IniRead, U_FBCA, %StartingTheme%, Colors, SearchBoxFontColor , ffffff ;search box font
-IniRead, felectColor, %StartingTheme%, Colors, RowSelectColor , 0x444444 ;Row Select color
+IniRead, rowSelectColor, %StartingTheme%, Colors, RowSelectColor , 0x444444 ;Row Select color
 IniRead, rowSelectTextColor, %StartingTheme%, Colors, RowSelectTextColor , 0xffffff ;Row Select Text color
 
 ;-------------------------------------------------
@@ -301,19 +301,31 @@ Progress, 15, Backing up your notes
 BackupNotes()
 Progress, 20, Building note index
 BuildGUI1()
+LVM_FIRST               := 0x1000
+LVM_REDRAWITEMS         := 21
+LVM_SETCOLUMNORDERARRAY := 58
+LVM_GETCOLUMNORDERARRAY := 59
 Progress, 100, Done!
 WinHide, FlatNotes - Library
 Progress, Off
 isStarting = 0
-
 WinShow, ahk_id %g1ID%
+ColBase = ,6,7,8,9
+ColOrder = 1,2,3,4,5
+if (ColOrder != "1,2,3,4,5"){
+	LV_Set_Column_Order(9,ColOrder ColBase)
+	WinHide, ahk_id %g1ID%
+	WinShow, ahk_id %g1ID%
+}
+
+
 ;goto Options
+
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------
 !w::
 {
-ReFreshLV()
 return
 }
 vk14::
