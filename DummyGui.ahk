@@ -20,10 +20,11 @@ DummyGUI1:
 	;Allow User set prevent/edit font
 	Gui, 5:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
 
+	title_h := PreviewFontSize*1.7
 	Gui, 5:add, Edit,  h0 x-1000 y-1000
-	Gui, 5:Add,text, center xs -E0x200  x0 r1  C%U_SFC% w%SubW% gTitleBarClick,
+	Gui, 5:Add,edit, readonly center xs -E0x200  x0  C%U_SFC% w%SubW% h%title_h%, Name
 
-	Gui, 5:Add,Edit, -E0x200 r%PreviewRows% w%LibW% yp+18 x0 C%U_MFC% gPreviewBox ,
+	Gui, 5:Add,Edit, -E0x200 r%PreviewRows% w%LibW% yp+18 x0 C%U_MFC% gPreviewBox , Sample Text `nSample Text `nSample Text
 	
 	
 	LV_Add(,Star1, "Name", "Body", "20/20/20","Sample")
