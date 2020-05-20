@@ -121,6 +121,8 @@ global unsaveddataEdit3
 global istitle = yes
 global savetimerrunning = 0
 
+;tmp maybe
+
 
 FileCreateDir, NoteDetails
 detailsPath := A_WorkingDir "\NoteDetails\"
@@ -336,11 +338,12 @@ return
 ;Include external ahk  
 ;-------------------------------------------------
 #Include functions.ahk
+#Include StickyGui.ahk
 #Include shortcuts.ahk
 #Include Class_LV_Colors.ahk
 ;-!- Return after fucntions so lables don't get exacuted
 return
-#Include Build_Dummy_GUI.ahk
+#Include DummyGui.ahk
 #Include lables.ahk
 return
 
