@@ -196,7 +196,7 @@ IniRead, FontSize, %iniPath%, General, FontSize ,10
 IniRead, SearchFontFamily, %iniPath%, General, SearchFontFamily ,Verdana
 IniRead, SearchFontSize, %iniPath%, General, SearchFontSize ,10 
 
-IniRead, ResultFontFamily, %iniPath%, General, ResultFontFamily ,Verdana
+IniRead, ResultFontFamily, %iniPath%, General, ResultFontFamily ,Segoe Script
 IniRead, ResultFontSize, %iniPath%, General, ResultFontSize ,10
 
 IniRead, PreviewFontFamily, %iniPath%, General, PreviewFontFamily ,Verdana
@@ -212,8 +212,8 @@ IniRead, sendCtrlC, %iniPath%, General, sendCtrlC, 1
 
 IniRead, oStarPercent,%iniPath%, General,StarPercent,05
 IniRead, oNamePercent,%iniPath%, General,NamePercent,30
-IniRead, oBodyPercent,%iniPath%, General,BodyPercent,55
-IniRead, oAddedPercent,%iniPath%, General,AddedPercent,15
+IniRead, oBodyPercent,%iniPath%, General,BodyPercent,45
+IniRead, oAddedPercent,%iniPath%, General,AddedPercent,20
 IniRead, oModdedPercent,%iniPath%, General,ModdedPercent,0
 
 if oStarPercent between 1 and 10
