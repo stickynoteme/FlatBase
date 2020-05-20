@@ -206,13 +206,6 @@ UnDoom:
 	Doom = 0
 return
 }
-TitleBarClick:
-{
-	GuiControlGet, TitleBar
-	tooltip %TitleBar%
-	SetTimer, KillToolTip, -2000
-	return
-}
 HandleMessage( p_w, p_l, p_m, p_hw )
 {
 	if ( A_GuiControl = "LV" )

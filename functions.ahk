@@ -59,8 +59,7 @@ BuildGUI1(){
 	Gui, 1:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
 	;Gui, 1:Add,edit, readonly h6 -E0x200
 	title_h := PreviewFontSize*1.7
-	Gui, 1:add, Edit, vFake h0 x-1000 y-1000
-	Gui, 1:Add,edit, readonly center xs -E0x200  x0 vTitleBar C%U_SFC% w%SubW% gTitleBarClick h%title_h%,
+	Gui, 1:Add,edit, readonly center xs -E0x200  x0 vTitleBar C%U_SFC% w%SubW% h%title_h%,
 
 	
 	Gui, 1:Add,Edit, -E0x200 r%PreviewRows% w%LibW% x0 C%U_MFC% gPreviewBox vPreviewBox,

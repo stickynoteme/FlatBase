@@ -95,6 +95,7 @@ global LastBackupTime
 global ListTitleToChange
 global NewTitle
 global NewTitleFileName
+global TitleBar
 ;Pre-set globals
 global LibW
 global PreviewRows
