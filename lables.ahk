@@ -146,7 +146,7 @@ Search:
 			Else
 			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
 		}
-	GuiControl, +Redraw, LV
+	gosub UpdateStatusBar
 	return
 	}
 	
@@ -169,32 +169,36 @@ Search:
 	   Else
 		  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
 	}
-Items := LV_GetCount()
-if (Items != 0) {
-	LV_GetText(LastResultName, 1 , 2)
-	LV_GetText(LastFileName, 1 , 8)
-	LV_GetText(LastNoteAdded, 1 , 4)
-	LV_GetText(LastNoteModded, 1 , 5)
-	GuiControl,,TitleBar, %LastResultName%
-	FileRead, LastResultBody,%U_NotePath%%LastFileName%
-	LastNoteIni := StrReplace(LastFileName, ".txt",".ini") 
-
-	GuiControl,,PreviewBox, %LastResultBody%
-	GuiControl,, StatusbarM,M: %LastNoteModded%
-	GuiControl,, StatusbarA,A: %LastNoteAdded%
-	}else{
-		GuiControl,,TitleBar, 
-		GuiControl,,PreviewBox,
-		GuiControl,,StatusBarM,M: 00\00\00 
-		GuiControl,,StatusBarA,A: 00\00\00
-	}
-;ReFreshLV()
-;gosub SortNow
-GuiControl,,StatusBarCount, %Items% of %TotalNotes%
-GuiControl, +Redraw, LV
-Return
+	gosub UpdateStatusBar
+	Return
 }
+UpdateStatusBar:
+{
+	Items := LV_GetCount()
+	if (Items != 0) {
+		LV_GetText(LastResultName, 1 , 2)
+		LV_GetText(LastFileName, 1 , 8)
+		LV_GetText(LastNoteAdded, 1 , 4)
+		LV_GetText(LastNoteModded, 1 , 5)
+		GuiControl,,TitleBar, %LastResultName%
+		FileRead, LastResultBody,%U_NotePath%%LastFileName%
+		LastNoteIni := StrReplace(LastFileName, ".txt",".ini") 
 
+		GuiControl,,PreviewBox, %LastResultBody%
+		GuiControl,, StatusbarM,M: %LastNoteModded%
+		GuiControl,, StatusbarA,A: %LastNoteAdded%
+		}else{
+			GuiControl,,TitleBar, 
+			GuiControl,,PreviewBox,
+			GuiControl,,StatusBarM,M: 00\00\00 
+			GuiControl,,StatusBarA,A: 00\00\00
+		}
+	;ReFreshLV()
+	;gosub SortNow
+	GuiControl,,StatusBarCount, %Items% of %TotalNotes%
+	GuiControl, +Redraw, LV
+	return
+}
 KillToolTip:
 {
    ToolTip
