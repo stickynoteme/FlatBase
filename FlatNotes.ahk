@@ -106,6 +106,8 @@ global ResultFontFamily
 global ResultFontSize
 global PreviewFontFamily
 global PreviewFontSize
+global StickyFontFamily
+global StickyFontSize
 global SearchFontFamily
 global SearchFontSize
 global FontRendering
@@ -117,11 +119,14 @@ global g1ID
 global isStarting
 global TotalNotes
 global unsaveddataEdit3
+global StickyW ;250
+global StickyRows ;8
 ;Var with starting values
 global istitle = yes
 global savetimerrunning = 0
 
 ;tmp maybe
+
 
 
 FileCreateDir, NoteDetails
@@ -181,7 +186,7 @@ IniRead, U_MFC, %StartingTheme%, Colors, MainFontColor , ffffff ;Result and prev
 IniRead, U_SFC, %StartingTheme%, Colors, SubFontColor , 000000 ; Details font
 IniRead, U_MSFC, %StartingTheme%, Colors, MainSortFontColor , 777700 ;Main Sort Font
 IniRead, U_FBCA, %StartingTheme%, Colors, SearchBoxFontColor , ffffff ;search box font
-IniRead, rowSelectColor, %StartingTheme%, Colors, RowSelectColor , 0x444444 ;Row Select color
+IniRead, felectColor, %StartingTheme%, Colors, RowSelectColor , 0x444444 ;Row Select color
 IniRead, rowSelectTextColor, %StartingTheme%, Colors, RowSelectTextColor , 0xffffff ;Row Select Text color
 
 ;-------------------------------------------------
@@ -202,9 +207,15 @@ IniRead, ResultFontSize, %iniPath%, General, ResultFontSize ,10
 IniRead, PreviewFontFamily, %iniPath%, General, PreviewFontFamily ,Verdana
 IniRead, PreviewFontSize, %iniPath%, General, PreviewFontSize ,10
 
+IniRead, StickyFontFamily, %iniPath%, General, StickyFontFamily ,Segoe Script
+IniRead, StickyFontSize, %iniPath%, General, StickyFontSize ,10
+
 IniRead, PreviewRows, %iniPath%, General, PreviewRows ,8
 IniRead, ResultRows, %iniPath%, General, ResultRows ,8
 IniRead, QuickNoteRows, %iniPath%, General, QuickNoteRows ,7
+IniRead, StickyRows, %iniPath%, General, StickyRows ,8
+
+IniRead, StickyW, %iniPath%, General, StickyW ,250
 IniRead, LibW, %iniPath%, General, WindowWidth ,530
 IniRead, U_Capslock, %iniPath%, General, UseCapsLock , 1
 IniRead, sendCtrlC, %iniPath%, General, sendCtrlC, 1
@@ -259,6 +270,9 @@ Iniread, UserTimeFormat,%iniPath%,General,UserTimeFormat,yy/MM/dd
 ;-------------------------------------------------
 ;Set Globals that need values from the ini
 ;-------------------------------------------------
+global StickyTW := StickyW-60
+global StickyAdjustW = StickyW+20
+global StickyMaxH
 global 	SubW := LibW
 global libWColAdjust :=round(LibW*.97)
 global libWAdjust := LibW+3
@@ -299,7 +313,6 @@ WinShow, ahk_id %g1ID%
 ;-------------------------------------------------
 !w::
 {
-;goto Options
 ReFreshLV()
 return
 }
