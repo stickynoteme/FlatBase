@@ -159,6 +159,15 @@ global U_NotePath
 IniRead, isFristRun, %iniPath%, General, isFristRun,1
 if (isFristRun = "1") {
 	IniWrite, 0, %iniPath%, General, isFristRun
+	IniWrite, 5,%iniPath%, General,StarPercent
+	IniWrite, 30,%iniPath%, General,NamePercent
+	IniWrite, 45,%iniPath%, General,BodyPercent
+	IniWrite, 20,%iniPath%, General,AddedPercent
+	IniWrite, 0,%iniPath%, General,ModdedPercent
+	IniWrite, yy/MM/dd,%iniPath%, General,UserTimeFormat
+	IniWrite, 0, %iniPath%, General, isFristRun
+	IniWrite, 0, %iniPath%, General, isFristRun
+	IniWrite, 0, %iniPath%, General, isFristRun
 	iniread, Star_1,%systemINI%,Start, Star1
 	IniWrite, %Star_1%, %iniPath%, General, Star1
 	iniread, Star_2,%systemINI%,Start,Star2
@@ -202,13 +211,13 @@ IniRead, FontSize, %iniPath%, General, FontSize ,10
 IniRead, SearchFontFamily, %iniPath%, General, SearchFontFamily ,Verdana
 IniRead, SearchFontSize, %iniPath%, General, SearchFontSize ,10 
 
-IniRead, ResultFontFamily, %iniPath%, General, ResultFontFamily ,Segoe Script
+IniRead, ResultFontFamily, %iniPath%, General, ResultFontFamily ,Verdana
 IniRead, ResultFontSize, %iniPath%, General, ResultFontSize ,10
 
 IniRead, PreviewFontFamily, %iniPath%, General, PreviewFontFamily ,Verdana
 IniRead, PreviewFontSize, %iniPath%, General, PreviewFontSize ,10
 
-IniRead, StickyFontFamily, %iniPath%, General, StickyFontFamily ,Segoe Script
+IniRead, StickyFontFamily, %iniPath%, General, StickyFontFamily ,Verdana
 IniRead, StickyFontSize, %iniPath%, General, StickyFontSize ,10
 
 IniRead, PreviewRows, %iniPath%, General, PreviewRows ,8
@@ -222,19 +231,19 @@ IniRead, U_Capslock, %iniPath%, General, UseCapsLock , 1
 IniRead, sendCtrlC, %iniPath%, General, sendCtrlC, 1
 
 
-IniRead, oStarPercent,%iniPath%, General,StarPercent,05
+IniRead, oStarPercent,%iniPath%, General,StarPercent,5
 IniRead, oNamePercent,%iniPath%, General,NamePercent,30
 IniRead, oBodyPercent,%iniPath%, General,BodyPercent,45
 IniRead, oAddedPercent,%iniPath%, General,AddedPercent,20
 IniRead, oModdedPercent,%iniPath%, General,ModdedPercent,0
 
-if oStarPercent between 1 and 10
+if oStarPercent between 0 and 10
 	oStarPercent = 0%oStarPercent%
-if oNamePercent between 1 and 10
+if oNamePercent between 0 and 10
 	oNamePercent = 0%oNamePercent%
-if oBodyPercent between 1 and 10
+if oBodyPercent between 0 and 10
 	oBodyPercent = 0%oBodyPercent%
-if oModdedPercent between 1 and 10
+if oModdedPercent between 0 and 10
 	oModdedPercent = 0%oModdedPercent%
 
 StarPercent = 0.%oStarPercent%
