@@ -1364,3 +1364,9 @@ Hsticky:
 	WinMove, , , ,  , , %StickyMaxH%
 	return
 }
+Pinsticky:
+{
+	Gui +LastFound 
+	WinSet, AlwaysOnTop , Toggle
+	return
+}

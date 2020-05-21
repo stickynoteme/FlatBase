@@ -281,7 +281,7 @@ Iniread, UserTimeFormat,%iniPath%,General,UserTimeFormat,yy/MM/dd
 ;-------------------------------------------------
 ;Set Globals that need values from the ini
 ;-------------------------------------------------
-global StickyTW := StickyW-60
+global StickyTW := StickyW-80
 global StickyAdjustW = StickyW+20
 global StickyMaxH
 global 	SubW := LibW
