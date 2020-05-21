@@ -411,7 +411,7 @@ build_tEdit:
 }
 About:
 {
-Gui, 4:add,text,,FlatNotes Version 2.0.0 May 2020
+Gui, 4:add,text,,FlatNotes Version 2.5.1 May 2020
 Gui, 4:Add,Link,,<a href="https://github.com/chaosdrop/FlatNotes">GitHub Page</a>
 Gui, 4:add,button,g4GuiEscape,Close
 Gui, 4:Show

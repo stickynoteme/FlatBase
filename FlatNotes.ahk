@@ -311,12 +311,12 @@ Progress, 15, Backing up your notes
 BackupNotes()
 Progress, 20, Building note index
 BuildGUI1()
+gosub SortNow
 LVM_FIRST               := 0x1000
 LVM_REDRAWITEMS         := 21
 LVM_SETCOLUMNORDERARRAY := 58
 LVM_GETCOLUMNORDERARRAY := 59
 Progress, 100, Done!
-WinHide, FlatNotes - Library
 Progress, Off
 isStarting = 0
 WinShow, ahk_id %g1ID%
