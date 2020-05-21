@@ -170,6 +170,8 @@ MakeFileList(ReFreshMyNoteArray){
 			StarFieldArray:=Star3
 		if (StarField=4)
 			StarFieldArray:=Star4
+		if (StarField !=1 and StarField !=2 and StarField !=3 and StarField !=4)
+			StarFieldArray:=StarField
 
 		if (ReFreshMyNoteArray = 1){
 			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField)
@@ -236,7 +238,6 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
 	FormatTime, UserTimeFormatM, %A_Now%, %UserTimeFormat%
 	
 	IniRead, StarField, %NoteIni%, INFO, Star,0
-
 		if (StarField=0)
 			StarFieldArray:= A_sapce
 		if (StarField=1)
@@ -245,9 +246,10 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
 			StarFieldArray:=Star2
 		if (StarField=3)
 			StarFieldArray:=Star3
-		if (StarField=4)
+		if (StarField=4) 
 			StarFieldArray:=Star4
-	
+		if (StarField !=1 and StarField !=2 and StarField !=3 and StarField !=4)
+			StarFieldArray:=StarField
 
 	if (Modified=1){
 		for Each, Note in MyNotesArray{

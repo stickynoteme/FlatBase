@@ -93,7 +93,9 @@ global Star4
 global tOldFile
 global LastBackupTime
 global ListTitleToChange
+global ListStarToChange
 global NewTitle
+global NewStar
 global NewTitleFileName
 global TitleBar
 ;Pre-set globals

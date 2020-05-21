@@ -248,6 +248,10 @@ if (ListTitleToChange = 1){
 			LV_Modify(LVSelectedROW,,, NewTitle,,,,,,NewTitleFileName)
 			ListTitleToChange = 0
 		}
+if (ListStarToChange = 1){
+			LV_Modify(LVSelectedROW,,NewStar)
+			ListStarToChange = 0
+		}
 if (unsaveddataEdit3 = 1)
 	gosub Edit3SaveTimer
 if (A_GuiEvent = "I")
@@ -388,6 +392,12 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			gosub build_tEdit
 			return
 		}
+		if (LV@sel_col=1) {
+			MouseGetPos, xPos, yPos
+			xPos := xPos+25
+			gosub build_sEdit
+			return
+		}
 	}
 	if A_GuiEvent in LeftClick
 	{
@@ -407,6 +417,20 @@ build_tEdit:
 	gui, t:add,button, default gTitleSaveChange x-10000 y-10000
 	WinSet, Style,  -0xC00000,TMPedit000
 	GUI, t:Show, x%xPos% y%yPos%
+	return
+}
+build_sEdit:
+{
+	GUI, star:new, ,TMPedit001
+	Gui, star:Margin , 5, 5 
+	Gui, star:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
+	Gui, star:Color,%U_SBG%, %U_MBG%	
+
+	gui, star:add,text,w35 -E0x200 center c%U_SFC%,Star
+	Gui, star:add,edit,w35 -E0x200 c%U_FBCA% vsEdit
+	gui, star:add,button, default gStarSaveChange x-10000 y-10000
+	WinSet, Style,  -0xC00000,TMPedit001
+	GUI, star:Show, x%xPos% y%yPos%
 	return
 }
 About:
@@ -1224,6 +1248,11 @@ Label:
 		setHK(num, savedHK%num%, HK%num%)
 	return
 }
+StarGuiEscape:
+{
+	Gui, Star:Destroy
+	return
+}
 tGuiEscape:
 {
 	Gui, t:Destroy
@@ -1318,6 +1347,29 @@ TitleSaveChange:
 	ControlFocus , Edit1, FlatNotes - Library
 	return
 }
+
+StarSaveChange:
+{
+	GUI, star:Submit
+	NewStar = %sEdit%
+	TmpFileINI := RegExReplace(tOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
+	TmpFileSafeName := RegExReplace(tOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
+	FileRead, C_Body,%U_NotePath%%tOldFile%
+	Iniread, TmpName,%detailsPath%%TmpFileINI%, INFO,Name
+	IniWrite, %NewStar%, %detailsPath%%TmpFileINI%, INFO, Star
+	for Each, Note in MyNotesArray{
+			If (Note.8 = tOldFile){
+				MyNotesArray.RemoveAt(Each)
+			}
+		}
+	
+	;FileRecycle, %detailsPath%%C_ini%%tOldFile%
+	SaveFile(TmpName,TmpFileSafeName,C_Body,1)
+	ListStarToChange = 1
+	ControlFocus , Edit1, FlatNotes - Library
+	return
+}
+
 Edit3SaveTimer:
 {
 	global LVSelectedROW
