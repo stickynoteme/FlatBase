@@ -71,7 +71,7 @@ Label3:
 		send {Ctrl Down}{c}{Ctrl up}
 		zbody := clipboard 
 		istitle = yes
-		TmpFileSafeName := RegExReplace(ztitle, "\*|\?|\\|\||/|""|:|<|>" , Replacement := "_")
+		TmpFileSafeName := NameEncode(ztitle)
 		FileReadLine, CheckExists, %U_NotePath%%TmpFileSafeName%.txt, 1
 		SaveFile(ztitle,TmpFileSafeName,zbody,0)
 		;MakeFileList(1)
@@ -121,7 +121,7 @@ QuickSafeNameUpdate:
 	;Remove stray whitespace from front and back
 	;QuickNoteName := Ltrim(QuickNoteName," ")
 	;QuickNoteName := Rtrim(QuickNoteName," ")
-	NewFileSafeName := RegExReplace(QuickNoteName, "\*|\?|\\|\||/|""|:|<|>" , Replacement := "_")
+	NewFileSafeName := NameEncode(QuickNoteName)
 	GuiControl,, FileSafeName,%NewFileSafeName%
 	return
 }
@@ -182,7 +182,7 @@ UpdateStatusBar:
 		LV_GetText(LastNoteModded, 1 , 5)
 		GuiControl,,TitleBar, %LastResultName%
 		FileRead, LastResultBody,%U_NotePath%%LastFileName%
-		LastNoteIni := StrReplace(LastFileName, ".txt",".ini") 
+		LastNoteIni := RegExReplace(LastFileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 
 		GuiControl,,PreviewBox, %LastResultBody%
 		GuiControl,, StatusbarM,M: %LastNoteModded%
@@ -315,8 +315,8 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			LV_GetText(CurrentStar, A_EventInfo, 9)
 			LV_GetText(C_FileName, A_EventInfo, 8)
 			LV_GetText(C_Name, A_EventInfo, 2)
-			C_ini := StrReplace(C_FileName, ".txt" , ".ini")
-			C_SafeName := StrReplace(C_FileName, ".txt" , "")
+			C_ini := RegExReplace(C_FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
+			C_SafeName := RegExReplace(C_FileName, "\.txt(?:^|$|\r\n|\r|\n)")
 			fileread, C_Body, %U_NotePath%%C_FileName%
 			If (CurrentStar = "")
 				CurrentStar = 0
@@ -344,8 +344,8 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 		LV_GetText(CurrentStar, LastRowSelected, 9)
 		LV_GetText(C_FileName, LastRowSelected, 8)
 		LV_GetText(C_Name, LastRowSelected, 2)
-		C_ini := StrReplace(C_FileName, ".txt" , ".ini")
-		C_SafeName := StrReplace(C_FileName, ".txt" , "")
+		C_ini := RegExReplace(C_FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
+			C_SafeName := RegExReplace(C_FileName, "\.txt(?:^|$|\r\n|\r|\n)")
 		fileread, C_Body, %U_NotePath%%C_FileName%
 		If (CurrentStar = "")
 			CurrentStar = 0
@@ -1282,8 +1282,8 @@ TitleSaveChange:
 	GUI, t:Submit
 	global LVSelectedROW
 	NewTitle = %tEdit%
-	FileSafeName := RegExReplace(NewTitle, "\*|\?|\\|\||/|""|:|<|>" , Replacement := "_")
-	OldIniName := StrReplace(tOldFile,".txt",".ini")
+	FileSafeName :=NameEncode(NewTitle)
+	OldIniName := RegExReplace(tOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 	NewIniName = %FileSafeName%.ini
 	NewTitleFileName = %FileSafeName%.txt
 	FileRead, C_Body,%U_NotePath%%tOldFile%
@@ -1324,7 +1324,7 @@ Edit3SaveTimer:
 	if (LVSelectedROW="")
 		LVSelectedROW=1
 	LV_GetText(RowText, LVSelectedROW,2)
-	FileSafeName := RegExReplace(RowText, "\*|\?|\\|\||/|""|:|<|>" , Replacement := "_")
+	FileSafeName := NameEncode(RowText)
 	GuiControlGet, PreviewBox
 	SaveFile(RowText,FileSafeName,PreviewBox,1)
 	iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add

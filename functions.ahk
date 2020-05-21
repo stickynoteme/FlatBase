@@ -109,7 +109,7 @@ BuildGUI1(){
 }
 BuildGUI2(){
 	QuickSubWidth := round(QuickNoteWidth*0.5)
-	FileSafeClipBoard := RegExReplace(clipboard, "\*|\?|\\|\||/|""|:|<|>"yyyy , Replacement := "_")
+	FileSafeClipBoard := NameEncode(clipboard)
 	CheckForOldNote = %U_NotePath%%FileSafeClipBoard%.txt
 	FileRead, OldNoteData, %CheckForOldNote%
 	MouseGetPos, xPos, yPos
@@ -150,8 +150,8 @@ MakeFileList(ReFreshMyNoteArray){
 		OldNoteField = NoteField
 
 		FileReadLine, NoteField, %U_NotePath%%A_LoopField%, 1
-		NoteIniName := StrReplace(A_LoopField, ".txt", ".ini")
-		NoteBackupName := NoteBackupName := StrReplace(A_LoopField, ".txt", "")
+		NoteIniName := RegExReplace(A_LoopField, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
+		NoteBackupName := NoteBackupName := := RegExReplace(A_LoopField, "\.txt(?:^|$|\r\n|\r|\n)")
 		NoteIni = %detailsPath%%NoteIniName%
 		IniRead, StarField, %NoteIni%, INFO, Star,S
 		IniRead, NameField, %NoteIni%, INFO, Name
@@ -227,7 +227,7 @@ return
 }
 
 SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
-	FileNameTxt := FileSafeName ".txt"
+	FileNameTxt := RegExReplace(FileSafeName, "\.txt(?:^|$|\r\n|\r|\n)")
 	SaveFileName = %U_NotePath%%FileSafeName%.txt
 	iniRead,CreatedDate,%detailsPath%%FileSafeName%.ini,INFO,Add,%A_Now%
 	iniRead,NoteStar,%detailsPath%%FileSafeName%.ini,INFO,Star,
@@ -276,14 +276,19 @@ MakeAnyMissingINI(){
 	Loop Parse, FileList, `n
 	{
 		NoteIniName := ""
-		NoteIniName := StrReplace(A_LoopField, ".txt", ".ini")
-		IfNotExist, %detailsPath%%NoteIniName%
-				NoteName := StrReplace(A_LoopField, ".txt", "")
-				iniWrite,%NoteName%,%detailsPath%%NoteName%.ini,INFO,Name
+		DecodedNoteName := ""
+		NoteIniName := RegExReplace(A_LoopField, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
+		IfNotExist, %detailsPath%%NoteIniName% 
+		{
+				DecodedNoteName := RegExReplace(A_LoopField, "\.txt(?:^|$|\r\n|\r|\n)")
+				DecodedNoteName := NameDecode(DecodedNoteName)
+				NoteName := RegExReplace(A_LoopField, "\.txt(?:^|$|\r\n|\r|\n)")
+				
+				iniWrite,%DecodedNoteName%,%detailsPath%%NoteName%.ini,INFO,Name
 				iniWrite,%A_Now%,%detailsPath%%NoteName%.ini,INFO,Mod
 				iniWrite,%A_Now%,%detailsPath%%NoteName%.ini,INFO,Add
 				iniWrite,0,%detailsPath%%NoteName%.ini,INFO,Star
-	} 
+	}   } 
 return
 }
 RemoveINIsOfMissingTXT(){
@@ -295,7 +300,7 @@ RemoveINIsOfMissingTXT(){
 	Loop Parse, FileList, `n
 	{
 		NoteName := ""
-		NoteName := StrReplace(A_LoopField, ".ini", ".txt")
+		NoteName := RegExReplace(A_LoopField, "\.ini(?:^|$|\r\n|\r|\n)", Replacement := ".txt")
 		IfNotExist, %U_NotePath%%NoteName%
 			FileRecycle %detailsPath%%A_LoopField%
 	} 
@@ -366,4 +371,30 @@ LV_Get_Column_Order( _Num_Of_Columns, _lvID="1", Delim="," )
     StringTrimRight, Output, Output, 1 ; Trim trailing delimiter.
     VarSetCapacity( colOrder, 0 ) ; Clean up.
     Return, Output
+}
+
+NameEncode(Name){
+; RegExReplace(RowText, "\*|\?|\\|\||/|""|:|<|>"
+Name := strreplace(Name,"\","$1%")
+Name := strreplace(Name,"?","$2%")
+Name := strreplace(Name,"*","$3%")
+Name := strreplace(Name,"|","$4%")
+Name := strreplace(Name,"""","$5%")
+Name := strreplace(Name,":","$6%")
+Name := strreplace(Name,"<","$7%")
+Name := strreplace(Name,">","$8%")
+Name := strreplace(Name,"/","$9%")
+return Name
+}
+NameDecode(Name){
+Name := strreplace(Name,"$1%","\")
+Name := strreplace(Name,"$2%","?")
+Name := strreplace(Name,"$3%","*")
+Name := strreplace(Name,"$4%","|")
+Name := strreplace(Name,"$5%","""")
+Name := strreplace(Name,"$6%",":")
+Name := strreplace(Name,"$7%","<")
+Name := strreplace(Name,"$8%",">")
+Name := strreplace(Name,"$9%","/")
+return Name
 }
