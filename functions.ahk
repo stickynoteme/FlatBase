@@ -399,6 +399,16 @@ Name := strreplace(Name,"<","_g_")
 Name := strreplace(Name,">","_l_")
 Name := strreplace(Name,"/","_fs_")
 Name := strreplace(Name,".","_p_")
+Name := strreplace(Name,"1","one")
+Name := strreplace(Name,"2","two")
+Name := strreplace(Name,"3","three")
+Name := strreplace(Name,"4","four")
+Name := strreplace(Name,"5","five")
+Name := strreplace(Name,"6","six")
+Name := strreplace(Name,"7","seven")
+Name := strreplace(Name,"8","eight")
+Name := strreplace(Name,"9","nine")
+Name := strreplace(Name,"0","zero")
 return Name
 }
 NameDecode(Name){
