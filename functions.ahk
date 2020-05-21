@@ -227,7 +227,7 @@ return
 }
 
 SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
-	FileNameTxt := RegExReplace(FileSafeName, "\.txt(?:^|$|\r\n|\r|\n)")
+	FileNameTxt := FileSafeName ".txt"
 	SaveFileName = %U_NotePath%%FileSafeName%.txt
 	iniRead,CreatedDate,%detailsPath%%FileSafeName%.ini,INFO,Add,%A_Now%
 	iniRead,NoteStar,%detailsPath%%FileSafeName%.ini,INFO,Star,
@@ -375,15 +375,15 @@ LV_Get_Column_Order( _Num_Of_Columns, _lvID="1", Delim="," )
 
 NameEncode(Name){
 ; RegExReplace(RowText, "\*|\?|\\|\||/|""|:|<|>"
-Name := strreplace(Name,"\","$1%")
-Name := strreplace(Name,"?","$2%")
-Name := strreplace(Name,"*","$3%")
-Name := strreplace(Name,"|","$4%")
-Name := strreplace(Name,"""","$5%")
-Name := strreplace(Name,":","$6%")
-Name := strreplace(Name,"<","$7%")
-Name := strreplace(Name,">","$8%")
-Name := strreplace(Name,"/","$9%")
+Name := strreplace(Name,"\","$1bslash%")
+Name := strreplace(Name,"?","$2qm%")
+Name := strreplace(Name,"*","$3as%")
+Name := strreplace(Name,"|","$4pi%")
+Name := strreplace(Name,"""","$5dq%")
+Name := strreplace(Name,":","$6col%")
+Name := strreplace(Name,"<","$7less%")
+Name := strreplace(Name,">","$8great%")
+Name := strreplace(Name,"/","$9fslash%")
 return Name
 }
 NameEncodeSticky(Name){
@@ -401,14 +401,14 @@ Name := strreplace(Name,".","_p_")
 return Name
 }
 NameDecode(Name){
-Name := strreplace(Name,"$1%","\")
-Name := strreplace(Name,"$2%","?")
-Name := strreplace(Name,"$3%","*")
-Name := strreplace(Name,"$4%","|")
-Name := strreplace(Name,"$5%","""")
-Name := strreplace(Name,"$6%",":")
-Name := strreplace(Name,"$7%","<")
-Name := strreplace(Name,"$8%",">")
-Name := strreplace(Name,"$9%","/")
+Name := strreplace(Name,"$1bslash%","\")
+Name := strreplace(Name,"$2qm%","?")
+Name := strreplace(Name,"$3as%","*")
+Name := strreplace(Name,"$4pi%","|")
+Name := strreplace(Name,"$5dq%","""")
+Name := strreplace(Name,"$6col%",":")
+Name := strreplace(Name,"$7less%","<")
+Name := strreplace(Name,"$8great%",">")
+Name := strreplace(Name,"$9fslash%","/"	)
 return Name
 }
