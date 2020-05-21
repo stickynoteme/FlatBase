@@ -92,7 +92,7 @@ global Star1
 global Star2
 global Star3
 global Star4
-global StarList = "1|2|3|4|%|*|>|0"
+global UniqueStarList
 global tOldFile
 global LastBackupTime
 global ListTitleToChange
@@ -132,7 +132,8 @@ global istitle = yes
 global savetimerrunning = 0
 
 ;tmp maybe
-
+global ColBase = ,6,7,8,9
+global ColOrder = 1,2,3,4,5
 
 
 FileCreateDir, NoteDetails
@@ -207,6 +208,7 @@ IniRead, rowSelectTextColor, %StartingTheme%, Colors, RowSelectTextColor , 0xfff
 ;-------------------------------------------------
 ; Read and from settings.ini
 ;-------------------------------------------------
+Iniread, UniqueStarList,%iniPath%,General,UniqueStarList,1|2|3|4|5|6|7|8|9|0
 Iniread, ShowMainWindowOnStartUp,%iniPath%, General,ShowMainWindowOnStartUp,1
 IniRead, QuickNoteWidth,%iniPath%, General,QuickNoteWidth,500
 IniRead, ShowStatusBar,%iniPath%, General,ShowStatusBar,1
@@ -325,12 +327,10 @@ LVM_GETCOLUMNORDERARRAY := 59
 Progress, 100, Done!
 Progress, Off
 isStarting = 0
-if (ShowMainWindowOnStartUp = 1) {
+if (ShowMainWindowOnStartUp = 1 and ColOrder = "1,2,3,4,5") {
 	WinShow, ahk_id %g1ID%
 	g1Open=1
 }
-ColBase = ,6,7,8,9
-ColOrder = 1,2,3,4,5
 if (ColOrder != "1,2,3,4,5"){
 	LV_Set_Column_Order(9,ColOrder ColBase)
 	WinHide, ahk_id %g1ID%

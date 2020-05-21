@@ -468,12 +468,22 @@ build_sEdit:
 	Gui, star:Color,%U_SBG%, %U_MBG%	
 
 	gui, star:add,text,w35 -E0x200 center c%U_SFC%,Star
-	Gui, star:add,combobox,w35 -E0x200 c%U_FBCA% vsEdit,%StarList%
+	Gui, star:add,edit, c%U_FBCA% w35 -E0x200 vsEdit
+	gui, star:add,text, w35 -E0x200 center c%U_SFC% gStarSaveChange ,Apply
+	Gui, star:add,ListBox, c%U_FBCA% -E0x200 r10 w35 gStarSaveChange vStarSelectedBox, %UniqueStarList%
 	gui, star:add,button, default gStarSaveChange x-10000 y-10000
 	WinSet, Style,  -0xC00000,TMPedit001
 	GUI, star:Show, x%xPos% y%yPos%
 	sNeedsSubmit = 1
 	return
+}
+StarSelected:
+{
+z := "::" A_GuiEvent ":" errorlevel ":" A_EventInfo ":" LV@sel_col ":" GuiControlEvent
+tooltip % z
+;tooltip % x
+settimer,KillToolTip,-1000
+ return
 }
 About:
 {
@@ -698,191 +708,194 @@ FolderSelect:
 Options:
 {
 
-Fontlist := "fontlist.cfg"
-FileRead, FontFile, % Fontlist
-FontOptionsArray := []
-loop, parse, FontFile, `n
-	FontOptionsArray.push(A_LoopField)
-For k, fonts in FontOptionsArray
-	FontDropDownOptions .= fonts "|"
+	Fontlist := "fontlist.cfg"
+	FileRead, FontFile, % Fontlist
+	FontOptionsArray := []
+	loop, parse, FontFile, `n
+		FontOptionsArray.push(A_LoopField)
+	For k, fonts in FontOptionsArray
+		FontDropDownOptions .= fonts "|"
 
 
-		Gui, 3:New,,FlatNotes - Options
-		Gui, 3:Add, Tab3,, General|Hotkeys|Appearance|Window Size
-		Gui, 3:Tab, General
-		
-		Gui, 3:Add, CheckBox, section vSelect_ShowMainWindowOnStartUp gSet_ShowMainWindowOnStartUp, Show main window on startup?
-		GuiControl,,Select_ShowMainWindowOnStartUp,%ShowMainWindowOnStartUp%
-		
-		Gui, 3:Add,Text,section xs, Notes storage folder:
-		Gui, 3:Add,Edit, disabled r1 w300 vNotesStorageFolder, %U_NotePath%
-		Gui, 3:Add,Button, gFolderSelect, Select a folder.
-		
-		Gui, 3:Add,Text,xs section,How many daily backups to keep: (Default: 3)
-		Gui, 3:Add,Edit, yp-5 x+5 w25
-		Gui, 3:Add,UpDown,vbackupsToKeepSelect gSet_backupsToKeep range0-99, %backupsToKeep%
-		Gui, 3:Add,CheckBox, xs vShowStatusBarSelect gSetShowStatusBar, Show Library Window Statusbar?
-		GuiControl,,ShowStatusBarSelect,%ShowStatusBar%
+	Gui, 3:New,,FlatNotes - Options
+	Gui, 3:Add, Tab3,, General|Hotkeys|Appearance|Window Size
+	Gui, 3:Tab, General
+	
+	Gui, 3:Add, CheckBox, section vSelect_ShowMainWindowOnStartUp gSet_ShowMainWindowOnStartUp, Show main window on startup?
+	GuiControl,,Select_ShowMainWindowOnStartUp,%ShowMainWindowOnStartUp%
+	
+	Gui, 3:Add,Text,section xs, Notes storage folder:
+	Gui, 3:Add,Edit, disabled r1 w300 vNotesStorageFolder, %U_NotePath%
+	Gui, 3:Add,Button, gFolderSelect, Select a folder.
+	
+	Gui, 3:Add,Text,xs section,How many daily backups to keep: (Default: 3)
+	Gui, 3:Add,Edit, yp-5 x+5 w25
+	Gui, 3:Add,UpDown,vbackupsToKeepSelect gSet_backupsToKeep range0-99, %backupsToKeep%
+	Gui, 3:Add,CheckBox, xs vShowStatusBarSelect gSetShowStatusBar, Show Library Window Statusbar?
+	GuiControl,,ShowStatusBarSelect,%ShowStatusBar%
 
-		Gui, 3:Add,text,xs section,Time format Default(yy/MM/dd) [yyyyMMMMddddhhHHmmsstt]
-		Gui, 3:Add,edit, w150 gSet_UserTimeFormat vSelect_UserTimeFormat,%UserTimeFormat%
-		
-		Gui, 3:add,DropDownList, xs section Choose%RawDeafultSort% AltSubmit vSelect_DeafultSort gSet_DeafultSort, Satr|Name|Body|Added|Modified
-		Gui, 3:add,DropDownList, x+15 Choose%DeafultSortDir% AltSubmit vSelect_DeafultSortDir gSet_DeafultSortDir, Accending|Decending
-		
-		Gui, 3:add,text, xs section, Star 1 | Star 2 | Star 3 | Star 4 (Win+; brings up Emoji Keyboard)
-		Gui, 3:add,edit, xs center w30 gSet_Star1 vSelect_Star1,%Star1%
-		Gui, 3:add,edit, x+5 center w30 gSet_Star2 vSelect_Star2,%Star2%
-		Gui, 3:add,edit, x+5 center w30 gSet_Star3 vSelect_Star3,%Star3%
-		Gui, 3:add,edit, x+5 center w30 gSet_Star4 vSelect_Star4
-		,%Star4%
-		
-		;Hotkeys Tab
-		Gui, 3:Tab, Hotkeys
-		Gui, 3:Add,CheckBox, vSetCtrlC gCtrlCToggle, Send Ctrl+C when using the quick note hotkey.
-		Gui, 3:Add, CheckBox, vUseCapslock gUseCapslockToggle, Use Capslock for Library?
-		GuiControl,,UseCapslock,%U_Capslock%
-		GuiControl,,SetCtrlC,%sendCtrlC%
-		Gui, 3:Add,text, h1 Disabled 			
- 		
-		HotkeyNames := ["Show Library Window","Quick New Note","Rapid Save","Cancel Rapid Save"]
-		Loop,% 4 {
-			HotkeyNameTmp := HotkeyNames[A_Index]
-			Gui, 3:Add, Text, , Hotkey: %HotkeyNameTmp%
-			IniRead, savedHK%A_Index%, settings.ini, Hotkeys, %A_Index%, %A_Space%
-   
-			StringReplace, noMods, savedHK%A_Index%, ~                  
-			StringReplace, noMods, noMods, #,,UseErrorLevel              
-			Gui, 3:Add, Hotkey, section vHK%A_Index% gLabel, %noMods%           
-			Gui, 3:Add, CheckBox, x+5  vCB%A_Index% Checked%ErrorLevel%, Win
-			Gui, 3:Add,text, h0 xs0 Disabled
-		}                                                        
-		if (U_Capslock = 1)
-			GuiControl, Disable, msctls_hotkey321
+	Gui, 3:Add,text,xs section,Time format Default(yy/MM/dd) [yyyyMMMMddddhhHHmmsstt]
+	Gui, 3:Add,edit, w150 gSet_UserTimeFormat vSelect_UserTimeFormat,%UserTimeFormat%
+	
+	Gui, 3:add,DropDownList, xs section Choose%RawDeafultSort% AltSubmit vSelect_DeafultSort gSet_DeafultSort, Satr|Name|Body|Added|Modified
+	Gui, 3:add,DropDownList, x+15 Choose%DeafultSortDir% AltSubmit vSelect_DeafultSortDir gSet_DeafultSortDir, Accending|Decending
+	
+	Gui, 3:add,text, xs section, Star 1 | Star 2 | Star 3 | Star 4 (Win+; brings up Emoji Keyboard)
+	Gui, 3:add,edit, xs center w30 gSet_Star1 vSelect_Star1,%Star1%
+	Gui, 3:add,edit, x+5 center w30 gSet_Star2 vSelect_Star2,%Star2%
+	Gui, 3:add,edit, x+5 center w30 gSet_Star3 vSelect_Star3,%Star3%
+	Gui, 3:add,edit, x+5 center w30 gSet_Star4 vSelect_Star4
+	,%Star4%
+	
+	Gui, 3:add,text, xs section, Pipe "|" sperated list of quick unique stars. (Example: 1|a|2|b..etc)
+	Gui, 3:add,edit, xs section w300 vSelect_UniqueStarList gSet_UniqueStarList, %UniqueStarList% 
+	
+	;Hotkeys Tab
+	Gui, 3:Tab, Hotkeys
+	Gui, 3:Add,CheckBox, vSetCtrlC gCtrlCToggle, Send Ctrl+C when using the quick note hotkey.
+	Gui, 3:Add, CheckBox, vUseCapslock gUseCapslockToggle, Use Capslock for Library?
+	GuiControl,,UseCapslock,%U_Capslock%
+	GuiControl,,SetCtrlC,%sendCtrlC%
+	Gui, 3:Add,text, h1 Disabled 			
+	
+	HotkeyNames := ["Show Library Window","Quick New Note","Rapid Save","Cancel Rapid Save"]
+	Loop,% 4 {
+		HotkeyNameTmp := HotkeyNames[A_Index]
+		Gui, 3:Add, Text, , Hotkey: %HotkeyNameTmp%
+		IniRead, savedHK%A_Index%, settings.ini, Hotkeys, %A_Index%, %A_Space%
 
-		;Appearance Tab
-		Gui, 3:Tab, Appearance
-		Gui, 3:Add,Text,,Font Rendering: (5 = ClearType)
-		Gui, Add, Edit 
-		Gui, 3:Add,UpDown, vFontRenderingSelect gSetFontRendering Range0-5, %FontRendering%
-		
-		Gui, 3:Add, CheckBox, vHideScrollbarsSelect gSetHideScrollbars, Hide Scroolbars where possible.
-		GuiControl,,HideScrollbarsSelect,%HideScrollbars%
-		
-		
-		
-		Gui, 3:Add,Text,,Theme Selection:
-		Loop, Files, %themePath%\*.ini
-		{
-			themeFileList .= A_LoopFileName "|"
-			IniWrite, %A_index%,%themePath%\%A_LoopFileName%,Theme,UserSetting
-			themeList := StrReplace(themeFileList, ".ini" , "")
-		}
-		Gui, 3:Add,DropDownList, Choose%U_Theme% vColorChoice gColorPicked, %themeList%
-		
-		CurrentFont = 1
-		C_PreviewFont = 1
-		C_StickyFont = 1
-		C_ResultFont = 1
-		C_SearchFont = 1
-		for k, v in FontOptionsArray
-		{ 
-			if (v = FontFamily) 
-				CurrentFont := k
-		} 
-		for k, v in FontOptionsArray
-		{ 
-			if (v = PreviewFontFamily) 
-				C_PreviewFont := k
-		} 
-		for k, v in FontOptionsArray
-		{ 
-			if (v = ResultFontFamily) 
-				C_ResultFont := k
-		} 
-		for k, v in FontOptionsArray
-		{ 
-			if (v = SearchFontFamily) 
-				C_SearchFont := k
-		}
-		for k, v in FontOptionsArray
-		{ 
-			if (v = StickyFontFamily) 
-				C_StickyFont := k
-		} 
-		Gui, 3:Add,text,section, Quick Note Interface font settings:
-		Gui, 3:add,DropDownList, Choose%CurrentFont% w100 vFontFamilySelect gSetFontFamily, %FontDropDownOptions%
-		CurrentFontSize := FontSize*0.5
-		Gui, 3:add,DropDownList, x+10 Choose%CurrentFontSize% vFontSizeSelect gSetFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
-		Gui, 3:Add,text,xs section, Search Box font settings:
-		Gui, 3:add,DropDownList, Choose%C_SearchFont% w100 vSearchFontFamilySelect gSetSearchFontFamily,%FontDropDownOptions%
-		CurrenSearchFontSize := SearchFontSize*0.5
-		Gui, 3:add,DropDownList, x+10 Choose%CurrenSearchFontSize% vSearchFontSizeSelect gSetSearchFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
-		Gui, 3:Add,text,xs section, Result font settings:
-		Gui, 3:add,DropDownList, Choose%C_ResultFont% w100 vResultFontFamilySelect gSetResultFontFamily, %FontDropDownOptions%
-		CurrenResulttFontSize := ResultFontSize*0.5
-		Gui, 3:add,DropDownList, x+10 Choose%CurrenResulttFontSize% vResultFontSizeSelect gSetResultFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
-		Gui, 3:Add,text,xs section, Note font settings:
-		Gui, 3:add,DropDownList, Choose%C_PreviewFont% w100 vPreviewFontFamilySelect gSetPreviewFontFamily, %FontDropDownOptions%
-		CurrentPreviewFontSize := PreviewFontSize*0.5
-		Gui, 3:add,DropDownList, x+10 Choose%CurrentPreviewFontSize% vPreviewFontSizeSelect gSetPreviewFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
-		
-		Gui, 3:Add,text,xs section, Sticky Note font settings:
-		Gui, 3:add,DropDownList, Choose%C_StickyFont% w100 vStickyFontFamilySelect gSetStickyFontFamily, %FontDropDownOptions%
-		CurrentStickyFontSize := StickyFontSize*0.5
-		Gui, 3:add,DropDownList, x+10 Choose%CurrentStickyFontSize% vStickyFontSizeSelect gSetStickyFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
-		
-		Gui, 3:Add,Text,xs,Column Width Percentage Star | Name | Body | Added | Modified 
-		
-		Gui, Add, Edit, w50
-		Gui, 3:Add,UpDown, vStarPercentSelect gSet_StarPercent Range0-100, %oStarPercent%
-		Gui, Add, Edit, w50 x+5
-		Gui, 3:Add,UpDown, vNamePercentSelect gSet_NamePercent Range0-100, %oNamePercent%
-		Gui, Add, Edit, w50 x+5
-		Gui, 3:Add,UpDown,  vBodyPercentSelect gSet_BodyPercent Range0-100, %oBodyPercent%
-		Gui, Add, Edit, w50 x+5
-		Gui, 3:Add,UpDown,  vAddedPercentSelect gSet_AddedPercent Range0-100, %oAddedPercent%
-		Gui, Add, Edit, w50 x+5
-		Gui, 3:Add,UpDown,  vModdedPercentSelect gSet_ModdedPercent Range0-100, %oModdedPercent%
-		
-		;Window Size Options Tab
-		Gui, 3:Tab, Window Size
-		Gui, 3:Add,Text,section,Main Window Width: (Default: 530)
-		Gui, 3:Add,Edit   
-		Gui, 3:Add,UpDown,vMainWSelect gSetMainW range50-3000, %LibW%
-		
-		Gui, 3:Add,Text,xs,Result Rows: (Default: 8)
-		Gui, 3:Add,Edit   
-		Gui, 3:Add,UpDown,vResultRowsSelect gSetResultRows range1-99, %ResultRows%
-		
-		Gui, 3:Add,Text,xs,Note Preview/Edit Rows: (Default: 8)
-		Gui, 3:Add,Edit   
-		Gui, 3:Add,UpDown,vPreviewRowsSelect gSetPreviewRows range1-99, %PreviewRows%
-		
-		Gui, 3:Add,Text,xs,Quick Note Window Width: (Default: 500)
+		StringReplace, noMods, savedHK%A_Index%, ~                  
+		StringReplace, noMods, noMods, #,,UseErrorLevel              
+		Gui, 3:Add, Hotkey, section vHK%A_Index% gLabel, %noMods%           
+		Gui, 3:Add, CheckBox, x+5  vCB%A_Index% Checked%ErrorLevel%, Win
+		Gui, 3:Add,text, h0 xs0 Disabled
+	}                                                        
+	if (U_Capslock = 1)
+		GuiControl, Disable, msctls_hotkey321
 
-		Gui, 3:Add,Edit   
-		Gui, 3:Add,UpDown,vQuickWSelect gSetQuickW range50-3000, %QuickNoteWidth%
-		
-		Gui, 3:Add,Text,xs,Quick Note Rows: (Default: 7)
-		Gui, 3:Add,Edit   
-		Gui, 3:Add,UpDown,vQuickNoteRowsSelect gSetQuickNoteRows range1-99, %QuickNoteRows%
-		
-		Gui, 3:Add,Text,xs,Sticky Note Width: (Default: 250)
-		
-		Gui, 3:Add,Edit   
-		Gui, 3:Add,UpDown,vSelect_StickyW gSet_StickyW range50-3000, %StickyW%
-		
-		Gui, 3:Add,Text,xs,Sticky Note Rows: (Default: 8)
-		Gui, 3:Add,Edit   
-		Gui, 3:Add,UpDown,vSelect_StickyRows gSet_StickyRows range1-99, %StickyRows%
-		
-		Gui, 3:Tab 
-		Gui, 3:Add, Button, Default gSaveAndReload, Save and Reload
-		Gui, 3:SHOW 
-		WinSet, AlwaysOnTop, On, FlatNotes - Options
-		return
+	;Appearance Tab
+	Gui, 3:Tab, Appearance
+	Gui, 3:Add,Text,,Font Rendering: (5 = ClearType)
+	Gui, Add, Edit 
+	Gui, 3:Add,UpDown, vFontRenderingSelect gSetFontRendering Range0-5, %FontRendering%
+	
+	Gui, 3:Add, CheckBox, vHideScrollbarsSelect gSetHideScrollbars, Hide Scroolbars where possible.
+	GuiControl,,HideScrollbarsSelect,%HideScrollbars%
+	
+	
+	
+	Gui, 3:Add,Text,,Theme Selection:
+	Loop, Files, %themePath%\*.ini
+	{
+		themeFileList .= A_LoopFileName "|"
+		IniWrite, %A_index%,%themePath%\%A_LoopFileName%,Theme,UserSetting
+		themeList := StrReplace(themeFileList, ".ini" , "")
 	}
+	Gui, 3:Add,DropDownList, Choose%U_Theme% vColorChoice gColorPicked, %themeList%
+	
+	CurrentFont = 1
+	C_PreviewFont = 1
+	C_StickyFont = 1
+	C_ResultFont = 1
+	C_SearchFont = 1
+	for k, v in FontOptionsArray
+	{ 
+		if (v = FontFamily) 
+			CurrentFont := k
+	} 
+	for k, v in FontOptionsArray
+	{ 
+		if (v = PreviewFontFamily) 
+			C_PreviewFont := k
+	} 
+	for k, v in FontOptionsArray
+	{ 
+		if (v = ResultFontFamily) 
+			C_ResultFont := k
+	} 
+	for k, v in FontOptionsArray
+	{ 
+		if (v = SearchFontFamily) 
+			C_SearchFont := k
+	}
+	for k, v in FontOptionsArray
+	{ 
+		if (v = StickyFontFamily) 
+			C_StickyFont := k
+	} 
+	Gui, 3:Add,text,section, Quick Note Interface font settings:
+	Gui, 3:add,DropDownList, Choose%CurrentFont% w100 vFontFamilySelect gSetFontFamily, %FontDropDownOptions%
+	CurrentFontSize := FontSize*0.5
+	Gui, 3:add,DropDownList, x+10 Choose%CurrentFontSize% vFontSizeSelect gSetFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
+	Gui, 3:Add,text,xs section, Search Box font settings:
+	Gui, 3:add,DropDownList, Choose%C_SearchFont% w100 vSearchFontFamilySelect gSetSearchFontFamily,%FontDropDownOptions%
+	CurrenSearchFontSize := SearchFontSize*0.5
+	Gui, 3:add,DropDownList, x+10 Choose%CurrenSearchFontSize% vSearchFontSizeSelect gSetSearchFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
+	Gui, 3:Add,text,xs section, Result font settings:
+	Gui, 3:add,DropDownList, Choose%C_ResultFont% w100 vResultFontFamilySelect gSetResultFontFamily, %FontDropDownOptions%
+	CurrenResulttFontSize := ResultFontSize*0.5
+	Gui, 3:add,DropDownList, x+10 Choose%CurrenResulttFontSize% vResultFontSizeSelect gSetResultFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
+	Gui, 3:Add,text,xs section, Note font settings:
+	Gui, 3:add,DropDownList, Choose%C_PreviewFont% w100 vPreviewFontFamilySelect gSetPreviewFontFamily, %FontDropDownOptions%
+	CurrentPreviewFontSize := PreviewFontSize*0.5
+	Gui, 3:add,DropDownList, x+10 Choose%CurrentPreviewFontSize% vPreviewFontSizeSelect gSetPreviewFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
+	
+	Gui, 3:Add,text,xs section, Sticky Note font settings:
+	Gui, 3:add,DropDownList, Choose%C_StickyFont% w100 vStickyFontFamilySelect gSetStickyFontFamily, %FontDropDownOptions%
+	CurrentStickyFontSize := StickyFontSize*0.5
+	Gui, 3:add,DropDownList, x+10 Choose%CurrentStickyFontSize% vStickyFontSizeSelect gSetStickyFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
+	
+	Gui, 3:Add,Text,xs,Column Width Percentage Star | Name | Body | Added | Modified 
+	
+	Gui, Add, Edit, w50
+	Gui, 3:Add,UpDown, vStarPercentSelect gSet_StarPercent Range0-100, %oStarPercent%
+	Gui, Add, Edit, w50 x+5
+	Gui, 3:Add,UpDown, vNamePercentSelect gSet_NamePercent Range0-100, %oNamePercent%
+	Gui, Add, Edit, w50 x+5
+	Gui, 3:Add,UpDown,  vBodyPercentSelect gSet_BodyPercent Range0-100, %oBodyPercent%
+	Gui, Add, Edit, w50 x+5
+	Gui, 3:Add,UpDown,  vAddedPercentSelect gSet_AddedPercent Range0-100, %oAddedPercent%
+	Gui, Add, Edit, w50 x+5
+	Gui, 3:Add,UpDown,  vModdedPercentSelect gSet_ModdedPercent Range0-100, %oModdedPercent%
+	
+	;Window Size Options Tab
+	Gui, 3:Tab, Window Size
+	Gui, 3:Add,Text,section,Main Window Width: (Default: 530)
+	Gui, 3:Add,Edit   
+	Gui, 3:Add,UpDown,vMainWSelect gSetMainW range50-3000, %LibW%
+	
+	Gui, 3:Add,Text,xs,Result Rows: (Default: 8)
+	Gui, 3:Add,Edit   
+	Gui, 3:Add,UpDown,vResultRowsSelect gSetResultRows range1-99, %ResultRows%
+	
+	Gui, 3:Add,Text,xs,Note Preview/Edit Rows: (Default: 8)
+	Gui, 3:Add,Edit   
+	Gui, 3:Add,UpDown,vPreviewRowsSelect gSetPreviewRows range1-99, %PreviewRows%
+	
+	Gui, 3:Add,Text,xs,Quick Note Window Width: (Default: 500)
+
+	Gui, 3:Add,Edit   
+	Gui, 3:Add,UpDown,vQuickWSelect gSetQuickW range50-3000, %QuickNoteWidth%
+	
+	Gui, 3:Add,Text,xs,Quick Note Rows: (Default: 7)
+	Gui, 3:Add,Edit   
+	Gui, 3:Add,UpDown,vQuickNoteRowsSelect gSetQuickNoteRows range1-99, %QuickNoteRows%
+	
+	Gui, 3:Add,Text,xs,Sticky Note Width: (Default: 250)
+	
+	Gui, 3:Add,Edit   
+	Gui, 3:Add,UpDown,vSelect_StickyW gSet_StickyW range50-3000, %StickyW%
+	
+	Gui, 3:Add,Text,xs,Sticky Note Rows: (Default: 8)
+	Gui, 3:Add,Edit   
+	Gui, 3:Add,UpDown,vSelect_StickyRows gSet_StickyRows range1-99, %StickyRows%
+	
+	Gui, 3:Tab 
+	Gui, 3:Add, Button, Default gSaveAndReload, Save and Reload
+	Gui, 3:SHOW 
+	WinSet, AlwaysOnTop, On, FlatNotes - Options
+	return
+}
   
 SaveAndReload:
 { 
@@ -956,6 +969,8 @@ SaveAndReload:
 reload
 	GuiControlGet,Select_ShowMainWindowOnStartUp
 	IniWrite,%Select_ShowMainWindowOnStartUp%, %iniPath%, General, ShowMainWindowOnStartUp
+	GuiControlGet,Select_UniqueStarList
+	IniWrite, %Select_UniqueStarList%,%iniPath%,General, UniqueStarList
 }
 Set_Star1:
 {
@@ -980,6 +995,12 @@ Set_Star4:
 	GuiControlGet,Select_Star4
 	IniWrite, %Select_Star4%,%iniPath%,General, Star4
 	IniRead, Star4, %iniPath%, General, Star4
+}
+Set_UniqueStarList:
+{
+	GuiControlGet,Select_UniqueStarList
+	IniWrite, %Select_UniqueStarList%,%iniPath%,General, UniqueStarList
+	IniRead, UniqueStarList, %iniPath%, General, UniqueStarList
 }
 Set_DeafultSort:
 {
@@ -1397,7 +1418,8 @@ StarSaveChange:
 {
 	GUI, star:Submit
 	NewStar = %sEdit%
-	tooltip % NewStar
+	if (NewStar = "")
+		NewStar = %StarSelectedBox%
 	if (NewStar ="")
 		return
 	TmpFileINI := RegExReplace(tOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
