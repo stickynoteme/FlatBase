@@ -386,6 +386,20 @@ Name := strreplace(Name,">","$8%")
 Name := strreplace(Name,"/","$9%")
 return Name
 }
+NameEncodeSticky(Name){
+; RegExReplace(RowText, "\*|\?|\\|\||/|""|:|<|>"
+Name := strreplace(Name,"\","%1")
+Name := strreplace(Name,"?","_qm_")
+Name := strreplace(Name,"*","_a_")
+Name := strreplace(Name,"|","_pi_")
+Name := strreplace(Name,"""","_q_")
+Name := strreplace(Name,":","_d_")
+Name := strreplace(Name,"<","_g_")
+Name := strreplace(Name,">","_l_")
+Name := strreplace(Name,"/","_fs_")
+Name := strreplace(Name,".","_p_")
+return Name
+}
 NameDecode(Name){
 Name := strreplace(Name,"$1%","\")
 Name := strreplace(Name,"$2%","?")
