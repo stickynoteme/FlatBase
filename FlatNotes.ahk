@@ -202,6 +202,7 @@ IniRead, rowSelectTextColor, %StartingTheme%, Colors, RowSelectTextColor , 0xfff
 ;-------------------------------------------------
 ; Read and from settings.ini
 ;-------------------------------------------------
+Iniread, ShowMainWindowOnStartUp,%iniPath%, General,ShowMainWindowOnStartUp,1
 IniRead, QuickNoteWidth,%iniPath%, General,QuickNoteWidth,500
 IniRead, ShowStatusBar,%iniPath%, General,ShowStatusBar,1
 IniRead, FontRendering,%iniPath%, General,FontRendering,5
@@ -319,7 +320,10 @@ LVM_GETCOLUMNORDERARRAY := 59
 Progress, 100, Done!
 Progress, Off
 isStarting = 0
-WinShow, ahk_id %g1ID%
+if (ShowMainWindowOnStartUp = 1) {
+	WinShow, ahk_id %g1ID%
+	g1Open=1
+}
 ColBase = ,6,7,8,9
 ColOrder = 1,2,3,4,5
 if (ColOrder != "1,2,3,4,5"){

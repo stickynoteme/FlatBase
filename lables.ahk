@@ -644,7 +644,11 @@ For k, fonts in FontOptionsArray
 		Gui, 3:New,,FlatNotes - Options
 		Gui, 3:Add, Tab3,, General|Hotkeys|Appearance|Window Size
 		Gui, 3:Tab, General
-		Gui, 3:Add,Text,section, Notes storage folder:
+		
+		Gui, 3:Add, CheckBox, section vSelect_ShowMainWindowOnStartUp gSet_ShowMainWindowOnStartUp, Show main window on startup?
+		GuiControl,,Select_ShowMainWindowOnStartUp,%ShowMainWindowOnStartUp%
+		
+		Gui, 3:Add,Text,section xs, Notes storage folder:
 		Gui, 3:Add,Edit, disabled r1 w300 vNotesStorageFolder, %U_NotePath%
 		Gui, 3:Add,Button, gFolderSelect, Select a folder.
 		
@@ -884,6 +888,8 @@ SaveAndReload:
 	GuiControlGet, Select_StickyW	
 	IniWrite, %Select_StickyW%,%iniPath%,General, StickyW
 reload
+	GuiControlGet,Select_ShowMainWindowOnStartUp
+	IniWrite,%Select_ShowMainWindowOnStartUp%, %iniPath%, General, ShowMainWindowOnStartUp
 }
 Set_Star1:
 {
@@ -932,6 +938,17 @@ Set_backupsToKeep:
 	GuiControlGet,U_backupsToKeep,, backupsToKeepSelect	
 	IniWrite, %U_backupsToKeep%,%iniPath%,General, backupsToKeep
 	IniRead, backupsToKeep, %iniPath%, General, backupsToKeep
+}
+Set_ShowMainWindowOnStartUp:
+{
+	GuiControlGet,Select_ShowMainWindowOnStartUp
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ShowMainWindowOnStartUp%, %iniPath%, General, ShowMainWindowOnStartUp
+		IniRead,ShowMainWindowOnStartUp,%iniPath%,General,ShowMainWindowOnStartUp
+		
+	}
+return
 }
 SetHideScrollbars:
 {
