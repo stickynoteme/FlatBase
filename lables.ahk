@@ -403,7 +403,7 @@ build_tEdit:
 	Gui, t:Color,%U_SBG%, %U_MBG%	
 
 	gui, t:add,text,w100 -E0x200 center c%U_SFC%,New Name
-	Gui, t:add,edit,w100 -E0x200 c%U_SFC% vtEdit
+	Gui, t:add,edit,w100 -E0x200 c%U_FBCA% vtEdit
 	gui, t:add,button, default gTitleSaveChange x-10000 y-10000
 	WinSet, Style,  -0xC00000,TMPedit000
 	GUI, t:Show, x%xPos% y%yPos%
@@ -1287,6 +1287,10 @@ TitleSaveChange:
 	NewIniName = %FileSafeName%.ini
 	NewTitleFileName = %FileSafeName%.txt
 	FileRead, C_Body,%U_NotePath%%tOldFile%
+	if FileExist(U_NotePath NewTitleFileName){
+		MsgBox, A note with this name already exists.
+		return
+	}
 	if (LVSelectedROW=""){
 		msgbox Name Save Erro 1
 		return
