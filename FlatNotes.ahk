@@ -209,6 +209,8 @@ IniRead, rowSelectTextColor, %StartingTheme%, Colors, RowSelectTextColor , 0xfff
 ; Read and from settings.ini
 ;-------------------------------------------------
 Iniread, UniqueStarList,%iniPath%,General,UniqueStarList,1|2|3|4|5|6|7|8|9|0
+Iniread, USSLR,%iniPath%,General,USSLR,10
+
 Iniread, ShowMainWindowOnStartUp,%iniPath%, General,ShowMainWindowOnStartUp,1
 IniRead, QuickNoteWidth,%iniPath%, General,QuickNoteWidth,500
 IniRead, ShowStatusBar,%iniPath%, General,ShowStatusBar,1

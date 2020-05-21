@@ -470,7 +470,7 @@ build_sEdit:
 	gui, star:add,text,w35 -E0x200 center c%U_SFC%,Star
 	Gui, star:add,edit, c%U_FBCA% w35 -E0x200 vsEdit
 	gui, star:add,text, w35 -E0x200 center c%U_SFC% gStarSaveChange ,Apply
-	Gui, star:add,ListBox, c%U_FBCA% -E0x200 r10 w35 gStarSaveChange vStarSelectedBox, %UniqueStarList%
+	Gui, star:add,ListBox, c%U_FBCA% -E0x200 r%USSLR% w35 gStarSaveChange vStarSelectedBox, %UniqueStarList%
 	gui, star:add,button, default gStarSaveChange x-10000 y-10000
 	WinSet, Style,  -0xC00000,TMPedit001
 	GUI, star:Show, x%xPos% y%yPos%
@@ -890,6 +890,11 @@ Options:
 	Gui, 3:Add,Edit   
 	Gui, 3:Add,UpDown,vSelect_StickyRows gSet_StickyRows range1-99, %StickyRows%
 	
+	Gui, 3:Add,Text,xs,Unique Star List Rows: (Default: 10)
+	Gui, 3:Add,Edit   
+	Gui, 3:Add,UpDown,vSelect_USSLR gSet_USSLR range1-99, %USSLR%
+	
+	
 	Gui, 3:Tab 
 	Gui, 3:Add, Button, Default gSaveAndReload, Save and Reload
 	Gui, 3:SHOW 
@@ -971,6 +976,8 @@ reload
 	IniWrite,%Select_ShowMainWindowOnStartUp%, %iniPath%, General, ShowMainWindowOnStartUp
 	GuiControlGet,Select_UniqueStarList
 	IniWrite, %Select_UniqueStarList%,%iniPath%,General, UniqueStarList
+	GuiControlGet,Select_USSLR	
+	IniWrite, %Select_USSLR%,%iniPath%,General, USSLR	
 }
 Set_Star1:
 {
@@ -1107,6 +1114,12 @@ SetQuickW:
 	else
 		WinActivate, FlatNotes
 	return
+}
+Set_USSLR:
+{
+	GuiControlGet,Select_USSLR	
+	IniWrite, %Select_USSLR%,%iniPath%,General, USSLR	
+	IniRead, USSLR, %iniPath%, General, USSLR
 }
 Set_StickyRows:
 {
