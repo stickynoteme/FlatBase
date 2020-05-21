@@ -368,6 +368,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 				
 			LV_Modify(A_EventInfo ,,UpdateStar,,,,,,,,NextStar)
 			IniWrite, %NextStar%, %detailsPath%%C_ini%, INFO, Star
+			fileRead, C_Body, %U_NotePath%%C_FileName%
 			SaveFile(C_Name,C_SafeName,C_Body,1)	
 			LV@sel_col = "undoomCol1"
 		}
@@ -412,6 +413,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			
 		LV_Modify(LastRowSelected,,UpdateStar,,,,,,,,NextStar)
 		IniWrite, %NextStar%, %detailsPath%%C_ini%, INFO, Star
+		fileRead, C_Body, %U_NotePath%%C_FileName%
 		SaveFile(C_Name,C_SafeName,C_Body,1)	
 		return		
 	}
