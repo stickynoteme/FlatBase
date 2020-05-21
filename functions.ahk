@@ -160,19 +160,19 @@ MakeFileList(ReFreshMyNoteArray){
 		FormatTime, UserTimeFormatA, %AddedField%, %UserTimeFormat%
 		FormatTime, UserTimeFormatM, %ModdedField%,%UserTimeFormat%
 
-		if (StarField=0)
-			StarFieldArray:= A_sapce
-		if (StarField=1)
+		if (StarField=10001)
 			StarFieldArray:=Star1
-		if (StarField=2)
+		if (StarField=10002)
 			StarFieldArray:=Star2
-		if (StarField=3)
+		if (StarField=10003)
 			StarFieldArray:=Star3
-		if (StarField=4)
+		if (StarField=10004)
 			StarFieldArray:=Star4
-		if (StarField !=1 and StarField !=2 and StarField !=3 and StarField !=4)
+		if (StarField != A_space and StarField !=10001 and StarField !=10002 and StarField !=10003 and StarField !=10004)
 			StarFieldArray:=StarField
-
+		if (StarField=10000)
+			StarFieldArray:= A_sapce
+		
 		if (ReFreshMyNoteArray = 1){
 			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField)
 			}
@@ -232,25 +232,24 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
 	FileNameTxt := FileSafeName ".txt"
 	SaveFileName = %U_NotePath%%FileSafeName%.txt
 	iniRead,CreatedDate,%detailsPath%%FileSafeName%.ini,INFO,Add,%A_Now%
-	iniRead,NoteStar,%detailsPath%%FileSafeName%.ini,INFO,Star,
+	iniRead,NoteStar,%detailsPath%%FileSafeName%.ini,INFO,Star,10000
 	FileRecycle, %SaveFileName%
 	FormatTime, UserTimeFormatA, %CreatedDate%, %UserTimeFormat%
 	FormatTime, UserTimeFormatM, %A_Now%, %UserTimeFormat%
 	
-	IniRead, StarField, %NoteIni%, INFO, Star,0
-		if (StarField=0)
-			StarFieldArray:= A_sapce
-		if (StarField=1)
+		if (NoteStar=10001)
 			StarFieldArray:=Star1
-		if (StarField=2)
+		if (NoteStar=10002)
 			StarFieldArray:=Star2
-		if (StarField=3)
+		if (NoteStar=10003)
 			StarFieldArray:=Star3
-		if (StarField=4) 
+		if (NoteStar=10004) 
 			StarFieldArray:=Star4
-		if (StarField !=1 and StarField !=2 and StarField !=3 and StarField !=4)
-			StarFieldArray:=StarField
-
+		if (NoteStar !=10001 and NoteStar !=10002 and NoteStar !=10003 and NoteStar !=10004 and NoteStar !=A_Space)
+			StarFieldArray:=NoteStar
+		if (NoteStar=10000)
+			StarFieldArray:= A_sapce
+			
 	if (Modified=1){
 		for Each, Note in MyNotesArray{
 			If (Note.2 = QuickNoteName){
@@ -289,7 +288,7 @@ MakeAnyMissingINI(){
 				iniWrite,%DecodedNoteName%,%detailsPath%%NoteName%.ini,INFO,Name
 				iniWrite,%A_Now%,%detailsPath%%NoteName%.ini,INFO,Mod
 				iniWrite,%A_Now%,%detailsPath%%NoteName%.ini,INFO,Add
-				iniWrite,0,%detailsPath%%NoteName%.ini,INFO,Star
+				iniWrite,10000,%detailsPath%%NoteName%.ini,INFO,Star
 	}   } 
 return
 }

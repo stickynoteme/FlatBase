@@ -6,6 +6,8 @@ Label1:
 	if (g1Open=1) {
 		WinHide, FlatNotes - Library
 		g1Open=0
+		GUI, star:destroy
+		GUI, t:destroy
 		return
 	}
 	if (g1Open=0) {
@@ -240,16 +242,29 @@ HandleMessage( p_w, p_l, p_m, p_hw )
 NoteListView:
 {
 Critical
-;z := A_GuiEvent errorlevel A_EventInfo
+;z := "::" A_GuiEvent ":" errorlevel ":" A_EventInfo ":" LV@sel_col
 ;tooltip % z
 ;tooltip % x
 ;settimer,KillToolTip,-1000
+
+if (WinActive(FlatNote - Library)) {
+	if (tNeedsSubmit = 1) {
+		gosub TitleSaveChange
+		tNeedsSubmit = 0
+	}
+}
+if (WinActive(FlatNote - Library)) {
+	if (sNeedsSubmit = 1) {
+		gosub StarSaveChange
+		sNeedsSubmit = 0
+	}
+}
 if (ListTitleToChange = 1){
 			LV_Modify(LVSelectedROW,,, NewTitle,,,,,,NewTitleFileName)
 			ListTitleToChange = 0
 		}
 if (ListStarToChange = 1){
-			LV_Modify(LVSelectedROW,,NewStar)
+			LV_Modify(LVSelectedROW,,NewStar,,,,,,,,NewStar)
 			ListStarToChange = 0
 		}
 if (unsaveddataEdit3 = 1)
@@ -317,30 +332,44 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 	{
 		if (LV@sel_col=1) {
 			LV_GetText(CurrentStar, A_EventInfo, 9)
+			if (CurrentStar !=A_Space and CurrentStar !=10000 and CurrentStar !=10001 and CurrentStar !=10002 and CurrentStar !=10003 and CurrentStar !=10004){
+				MsgBox, 4,, Clear Unique Star? (press Yes or No)
+					IfMsgBox Yes 
+						CurrentStar = 10004
+					else{
+						LV@sel_col = "undoomCol1"
+						return
+					}						
+			}
 			LV_GetText(C_FileName, A_EventInfo, 8)
 			LV_GetText(C_Name, A_EventInfo, 2)
 			C_ini := RegExReplace(C_FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 			C_SafeName := RegExReplace(C_FileName, "\.txt(?:^|$|\r\n|\r|\n)")
-			fileread, C_Body, %U_NotePath%%C_FileName%
-			If (CurrentStar = "")
-				CurrentStar = 0
+			If CurrentStar not between 10000 and 10004
+				CurrentStar = 10000
+			if (NextStar = 10005)
+				NextStar = 10000
+			if (CurrentStar = 10005)
+				CurrentStar = 10000
 			NextStar := CurrentStar+1
-			if (CurrentStar=4)
-				NextStar=0
-			if (NextStar=0)
-				UpdateStar:=A_Space
-			if (NextStar=1)
+			if (CurrentStar=10004)
+				NextStar=10000
+			if (NextStar=10001)
 				UpdateStar:=Star1
-			if (NextStar=2)
+			if (NextStar=10002)
 				UpdateStar:=Star2
-			if (NextStar=3)
+			if (NextStar=10003)
 				UpdateStar:=Star3
-			if (NextStar=4)
+			if (NextStar=10004)
 				UpdateStar:=Star4
+			if (NextStar=10000)
+				UpdateStar:=A_Space
+			
 				
-			LV_Modify(A_EventInfo ,,UpdateStar,C_Name,,,,,,,NextStar)
+			LV_Modify(A_EventInfo ,,UpdateStar,,,,,,,,NextStar)
 			IniWrite, %NextStar%, %detailsPath%%C_ini%, INFO, Star
 			SaveFile(C_Name,C_SafeName,C_Body,1)	
+			LV@sel_col = "undoomCol1"
 		}
 	}
 	; change star on space
@@ -348,26 +377,40 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 		LV_GetText(CurrentStar, LastRowSelected, 9)
 		LV_GetText(C_FileName, LastRowSelected, 8)
 		LV_GetText(C_Name, LastRowSelected, 2)
-		C_ini := RegExReplace(C_FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
+
+		if (CurrentStar !=A_Space and CurrentStar !=10000 and CurrentStar !=10001 and CurrentStar !=10002 and CurrentStar !=10003 and CurrentStar !=10004){
+				MsgBox, 4,, Clear Unique Star? (press Yes or No)
+					IfMsgBox Yes 
+						CurrentStar = 10004
+					else{
+						LV@sel_col = "undoomCol1"
+						return
+					}	
+			}
+			C_ini := RegExReplace(C_FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 			C_SafeName := RegExReplace(C_FileName, "\.txt(?:^|$|\r\n|\r|\n)")
-		fileread, C_Body, %U_NotePath%%C_FileName%
-		If (CurrentStar = "")
-			CurrentStar = 0
-		NextStar := CurrentStar+1
-		if (CurrentStar=4)
-			NextStar=0
-		if (NextStar=0)
-			UpdateStar:=A_Space
-		if (NextStar=1)
-			UpdateStar:=Star1
-		if (NextStar=2)
-			UpdateStar:=Star2
-		if (NextStar=3)
-			UpdateStar:=Star3
-		if (NextStar=4)
-			UpdateStar:=Star4
+			If CurrentStar not between 10000 and 10004
+				CurrentStar = 10000
+			NextStar := CurrentStar+1
+			if (NextStar = 10005)
+				NextStar = 10000
+			if (CurrentStar = 10005)
+				CurrentStar = 10000
+			if (CurrentStar=10004)
+				NextStar=10000
+			if (NextStar=10001)
+				UpdateStar:=Star1
+			if (NextStar=10002)
+				UpdateStar:=Star2
+			if (NextStar=10003)
+				UpdateStar:=Star3
+			if (NextStar=10004)
+				UpdateStar:=Star4
+			if (NextStar=10000)
+				UpdateStar:=A_Space
 			
-		LV_Modify(LastRowSelected ,,UpdateStar,C_Name,,,,,,,NextStar)
+			
+		LV_Modify(LastRowSelected,,UpdateStar,,,,,,,,NextStar)
 		IniWrite, %NextStar%, %detailsPath%%C_ini%, INFO, Star
 		SaveFile(C_Name,C_SafeName,C_Body,1)	
 		return		
@@ -396,12 +439,9 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			MouseGetPos, xPos, yPos
 			xPos := xPos+25
 			gosub build_sEdit
+			LV@sel_col = "undoomCol1"
 			return
 		}
-	}
-	if A_GuiEvent in LeftClick
-	{
-
 	}
 return
 }
@@ -417,6 +457,7 @@ build_tEdit:
 	gui, t:add,button, default gTitleSaveChange x-10000 y-10000
 	WinSet, Style,  -0xC00000,TMPedit000
 	GUI, t:Show, x%xPos% y%yPos%
+	tNeedsSubmit = 1
 	return
 }
 build_sEdit:
@@ -427,10 +468,11 @@ build_sEdit:
 	Gui, star:Color,%U_SBG%, %U_MBG%	
 
 	gui, star:add,text,w35 -E0x200 center c%U_SFC%,Star
-	Gui, star:add,edit,w35 -E0x200 c%U_FBCA% vsEdit
+	Gui, star:add,combobox,w35 -E0x200 c%U_FBCA% vsEdit,%StarList%
 	gui, star:add,button, default gStarSaveChange x-10000 y-10000
 	WinSet, Style,  -0xC00000,TMPedit001
 	GUI, star:Show, x%xPos% y%yPos%
+	sNeedsSubmit = 1
 	return
 }
 About:
@@ -1311,6 +1353,8 @@ TitleSaveChange:
 	GUI, t:Submit
 	global LVSelectedROW
 	NewTitle = %tEdit%
+	if (NewTitle = "")
+		return
 	FileSafeName :=NameEncode(NewTitle)
 	OldIniName := RegExReplace(tOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 	NewIniName = %FileSafeName%.ini
@@ -1318,6 +1362,7 @@ TitleSaveChange:
 	FileRead, C_Body,%U_NotePath%%tOldFile%
 	if FileExist(U_NotePath NewTitleFileName){
 		MsgBox, A note with this name already exists.
+		NeedsSubmit = 0
 		return
 	}
 	if (LVSelectedROW=""){
@@ -1352,6 +1397,9 @@ StarSaveChange:
 {
 	GUI, star:Submit
 	NewStar = %sEdit%
+	tooltip % NewStar
+	if (NewStar ="")
+		return
 	TmpFileINI := RegExReplace(tOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 	TmpFileSafeName := RegExReplace(tOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
 	FileRead, C_Body,%U_NotePath%%tOldFile%

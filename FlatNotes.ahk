@@ -26,6 +26,8 @@ global FileSafeClipBoard
 global FileSafeName
 global LV
 global LV@sel_col
+global tNeedsSubmit
+global sNeedsSubmit
 global MyNotesArray := {}
 global OldNoteData
 global QuickNoteBody
@@ -90,6 +92,7 @@ global Star1
 global Star2
 global Star3
 global Star4
+global StarList = "1|2|3|4|%|*|>|0"
 global tOldFile
 global LastBackupTime
 global ListTitleToChange
@@ -353,6 +356,8 @@ if (U_Capslock = "0"){
 if (g1Open=1) {
 	WinHide, FlatNotes - Library
 	g1Open=0
+	GUI, star:destroy
+	GUI, t:destroy
 	return
 }
 if (g1Open=0) {
