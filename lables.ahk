@@ -63,6 +63,7 @@ Label3:
 			return
 		
 		istitle = no
+		ztitleEncoded := NameEncode(ztitle)
 		tooltip T: %ztitle%
 		settimer, KillToolTip, -500
 		return
@@ -71,13 +72,17 @@ Label3:
 		send {Ctrl Down}{c}{Ctrl up}
 		zbody .= clipboard 
 		istitle = yes
-		TmpFileSafeName := NameEncode(ztitle)
 		FileReadLine, CheckExists, %U_NotePath%%TmpFileSafeName%.txt, 1
-		SaveFile(ztitle,TmpFileSafeName,zbody,0)
-		;MakeFileList(1)
+		SaveFile(ztitle,ztitleEncoded,zbody,0)
 		gosub search
 		tooltip B: %zbody%
 		settimer, KillToolTip, -500
+		if (ShowStarOnRapidNoteSave != 1) {
+			MouseGetPos, xPos, yPos
+			xPos := xPos+25
+			RapidStar = 1
+			gosub build_sEdit
+		}
 	}
 	return
 }
@@ -266,13 +271,17 @@ if (WinActive(FlatNote - Library)) {
 	}
 }
 if (ListTitleToChange = 1){
-			LV_Modify(LVSelectedROW,,, NewTitle,,,,,,NewTitleFileName)
-			ListTitleToChange = 0
-		}
+		LV_Modify(LVSelectedROW,,, NewTitle,,,,,,NewTitleFileName)
+		ListTitleToChange = 0
+	}
 if (ListStarToChange = 1){
-			LV_Modify(LVSelectedROW,,NewStar,,,,,,,,NewStar)
-			ListStarToChange = 0
-		}
+		LV_Modify(LVSelectedROW,,NewStar,,,,,,,,NewStar)
+		ListStarToChange = 0
+	}
+if (ListNeedsRefresh = 1){
+		gosub search
+		ListNeedsRefresh = 0
+	}
 if (unsaveddataEdit3 = 1)
 	gosub Edit3SaveTimer
 if (A_GuiEvent = "I")
@@ -483,6 +492,40 @@ build_sEdit:
 	WinSet, Style,  -0xC00000,TMPedit001
 	GUI, star:Show, x%xPos% y%yPos%
 	sNeedsSubmit = 1
+	if (RapidStar = 1)
+		sNeedsSubmit = 0
+	return
+}
+StarSaveChange:
+{
+	GUI, star:Submit
+	NewStar = %sEdit%
+	if (NewStar = "")
+		NewStar = %StarSelectedBox%
+	if (NewStar ="")
+		return
+	if (RapidStar = 1)
+		tOldFile := ztitleEncoded ".txt"
+	TmpFileINI := RegExReplace(tOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
+	TmpFileSafeName := RegExReplace(tOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
+	FileRead, C_Body,%U_NotePath%%tOldFile%
+	Iniread, TmpName,%detailsPath%%TmpFileINI%, INFO,Name
+	IniWrite, %NewStar%, %detailsPath%%TmpFileINI%, INFO, Star
+	for Each, Note in MyNotesArray{
+		If (Note.8 = tOldFile){
+			MyNotesArray.RemoveAt(Each)
+		}
+	}
+	SaveFile(TmpName,TmpFileSafeName,C_Body,1)
+	ListStarToChange = 1
+	if (RapidStar = 1){
+		ListStarToChange = 0
+		ListNeedsRefresh = 1
+		ControlFocus , SysListView321, FlatNotes - Library
+	}
+	RapidStar = 0
+	ControlFocus , Edit1, FlatNotes - Library
+	gosub search
 	return
 }
 StarSelected:
@@ -520,6 +563,13 @@ CtrlCToggle:
 		IniWrite, 0, %iniPath%, General, sendCtrlC
 	return
 }
+Set_RapidStar:
+{
+	GuiControlGet, Select_RapidStar
+	IniWrite, %RapidStar%, %iniPath%, General, RapidStar
+	return
+}
+
 UseCapslockToggle:
 {
 	GuiControlGet, UseCapslock
@@ -726,7 +776,7 @@ Options:
 
 
 	Gui, 3:New,,FlatNotes - Options
-	Gui, 3:Add, Tab3,, General|Hotkeys|Appearance|Window Size
+	Gui, 3:Add, Tab3,, General|Hotkeys|Appearance|Window Size|Quick/Rapid Save
 	Gui, 3:Tab, General
 	
 	Gui, 3:Add, CheckBox, section vSelect_ShowMainWindowOnStartUp gSet_ShowMainWindowOnStartUp, Show main window on startup?
@@ -772,7 +822,7 @@ Options:
 	GuiControl,,SetCtrlC,%sendCtrlC%
 	Gui, 3:Add,text, h1 Disabled 			
 	
-	HotkeyNames := ["Show Library Window","Quick New Note","Rapid Save","Cancel Rapid Save","Rapid Note append"]
+	HotkeyNames := ["Show Library Window","Quick New Note","Rapid Note","Cancel Rapid Note","Rapid Note Append"]
 	Loop,% 5 {
 		HotkeyNameTmp := HotkeyNames[A_Index]
 		Gui, 3:Add, Text, , Hotkey: %HotkeyNameTmp%
@@ -908,6 +958,10 @@ Options:
 	Gui, 3:Add,Edit   
 	Gui, 3:Add,UpDown,vSelect_USSLR gSet_USSLR range1-99, %USSLR%
 	
+	;Quick/Rapid Save Tab
+	Gui, 3:Tab, Quick/Rapid Save
+	Gui, 3:Add,CheckBox, vSelect_RapidStar gSet_RapidStar, Prompt for star at end of Rapid note?
+	GuiControl,,Select_RapidStar,%RapidStar%
 	
 	Gui, 3:Tab 
 	Gui, 3:Add, Button, Default gSaveAndReload, Save and Reload
@@ -918,6 +972,8 @@ Options:
   
 SaveAndReload:
 { 
+	GuiControlGet, Select_RapidStar
+	IniWrite, %RapidStar%, %iniPath%, General, RapidStar
 	GuiControlGet, U_QuickNoteWidth,,QuickWSelect	
 	IniWrite, %U_QuickNoteWidth%,%iniPath%,General, QuickNoteWidth
 	GuiControlGet, U_MainNoteWidth,,MainWSelect	
@@ -1466,31 +1522,7 @@ TitleSaveChange:
 	return
 }
 
-StarSaveChange:
-{
-	GUI, star:Submit
-	NewStar = %sEdit%
-	if (NewStar = "")
-		NewStar = %StarSelectedBox%
-	if (NewStar ="")
-		return
-	TmpFileINI := RegExReplace(tOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
-	TmpFileSafeName := RegExReplace(tOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
-	FileRead, C_Body,%U_NotePath%%tOldFile%
-	Iniread, TmpName,%detailsPath%%TmpFileINI%, INFO,Name
-	IniWrite, %NewStar%, %detailsPath%%TmpFileINI%, INFO, Star
-	for Each, Note in MyNotesArray{
-			If (Note.8 = tOldFile){
-				MyNotesArray.RemoveAt(Each)
-			}
-		}
-	
-	;FileRecycle, %detailsPath%%C_ini%%tOldFile%
-	SaveFile(TmpName,TmpFileSafeName,C_Body,1)
-	ListStarToChange = 1
-	ControlFocus , Edit1, FlatNotes - Library
-	return
-}
+
 
 Edit3SaveTimer:
 {

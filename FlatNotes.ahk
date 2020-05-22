@@ -105,6 +105,8 @@ global TitleBar
 global UsedStars
 global QuickStar
 global SearchDates
+global ztitleEncoded
+global RapidStar
 ;Pre-set globals
 global LibW
 global PreviewRows
@@ -214,6 +216,8 @@ IniRead, rowSelectTextColor, %StartingTheme%, Colors, RowSelectTextColor , 0xfff
 ;-------------------------------------------------
 ; Read and from settings.ini
 ;-------------------------------------------------
+IniRead, RapidStar,%iniPath%,General,RapidStar,1
+
 Iniread, SearchWholeNote,%iniPath%,General,SearchWholeNote,1
 
 Iniread, UniqueStarList,%iniPath%,General,UniqueStarList,1|2|3|4|5|6|7|8|9|0
@@ -350,7 +354,7 @@ if (ColOrder != "1,2,3,4,5"){
 }
 
 
-;goto Options
+goto Options
 ;BuildGUI2()
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
@@ -383,6 +387,7 @@ if (g1Open=0) {
 	g1Open=1
 	ControlFocus,Edit1,FlatNotes - Library
 	sendinput {left}{right}
+	gosub search
 	gosub SortNow
 	return
 }
