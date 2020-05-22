@@ -108,7 +108,11 @@ BuildGUI1(){
 	return
 }
 BuildGUI2(){
+	QuickStarListRows := QuickNoteRows+2
 	QuickSubWidth := QuickNoteWidth-232
+	QuickNoteEditW := QuickNoteWidth-40
+	if (HideScrollbars = 1)
+		QuickNoteEditW := QuickNoteWidth-20
 	FileSafeClipBoard := NameEncode(clipboard)
 	CheckForOldNote = %U_NotePath%%FileSafeClipBoard%.txt
 	FileRead, OldNoteData, %CheckForOldNote%
@@ -133,8 +137,8 @@ BuildGUI2(){
 	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar2, %Star2%
 	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar3, %Star3% 
 	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar4, %Star4%
-	QuickNoteEditW := QuickNoteWidth-38
-	QuickStarListRows := QuickNoteRows+2
+	
+
 	Gui, 2:Add,Edit, disabled hidden x+1 r1 w0
 	
 	Gui, 2:Add,Edit, xs section y+2 x38 -E0x200 -WantReturn C%U_MFC% r%QuickNoteRows% w%QuickNoteEditW% vQuickNoteBody

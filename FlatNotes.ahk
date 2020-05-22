@@ -304,7 +304,7 @@ global libWColAdjust :=round(LibW*.97)
 global libWAdjust := LibW+3
 if (HideScrollbars = 1){
 	libWAdjust := LibW+10
-	SubW := LibW-10
+	SubW := LibW-20
 	}
 ;global ColAdjust := LibW-95
 global StarColW := Round(libWColAdjust*StarPercent)
@@ -347,7 +347,7 @@ if (ColOrder != "1,2,3,4,5"){
 
 
 ;goto Options
-
+;BuildGUI2()
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------
