@@ -185,6 +185,29 @@ Search:
 	gosub UpdateStatusBar
 	Return
 }
+StarFilter:
+{
+	if (unsaveddataEdit3 = 1)
+		gosub Edit3SaveTimer
+	global StarFilterSelected
+	GuiControlGet, StarFilterSelected
+	GuiControl, -Redraw, LV
+	LV_Delete()
+	For Each, Note In MyNotesArray
+	{
+	   If (StarFilterSelected != "")
+	   {
+			If (InStr(Note.1, SearchTerm) != 0)
+				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+	   }
+	   Else {
+		  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+		}
+	gosub SortNow
+	gosub UpdateStatusBar
+	}
+	Return
+}
 UpdateStatusBar:
 {
 	Items := LV_GetCount()
@@ -253,15 +276,15 @@ HandleMessage( p_w, p_l, p_m, p_hw )
 NoteListView:
 {
 Critical
-;z := "::" A_GuiEvent ":" errorlevel ":" A_EventInfo ":" LV@sel_col
+;z := "#" A_GuiEvent ":" errorlevel ":" A_EventInfo ":" LV@sel_col
 ;tooltip % z
 ;tooltip % x
-;settimer,KillToolTip,-1000
+settimer,KillToolTip,-1000
 
 if (WinActive(FlatNote - Library)) {
 	if (tNeedsSubmit = 1) {
-		gosub TitleSaveChange
 		tNeedsSubmit = 0
+		gosub TitleSaveChange
 	}
 }
 if (WinActive(FlatNote - Library)) {
@@ -273,10 +296,12 @@ if (WinActive(FlatNote - Library)) {
 if (ListTitleToChange = 1){
 		LV_Modify(LVSelectedROW,,, NewTitle,,,,,,NewTitleFileName)
 		ListTitleToChange = 0
+		TitleOldFile := ""
 	}
 if (ListStarToChange = 1){
 		LV_Modify(LVSelectedROW,,NewStar,,,,,,,,NewStar)
 		ListStarToChange = 0
+		StarOldFile := ""
 	}
 if (ListNeedsRefresh = 1){
 		gosub search
@@ -327,10 +352,15 @@ if (A_GuiEvent = "DoubleClick")
 	settimer,KillToolTip, -500
     return
 }
+if (A_GuiEvent = "I")
+{
+	
+}
 ;update the preview
 if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 {
-	global LVSelectedROW = A_EventInfo
+	LVSelectedROW := A_EventInfo
+	LV_GetText(tOldFile, LVSelectedROW,8)
     LV_GetText(RowText, A_EventInfo,8)
 	LV_GetText(C_Added, A_EventInfo,4)
     LV_GetText(C_Modded, A_EventInfo,5)
@@ -347,7 +377,8 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 	{
 		if (LV@sel_col=1) {
 			LV_GetText(CurrentStar, A_EventInfo, 9)
-			if (CurrentStar !=A_Space and CurrentStar !=10000 and CurrentStar !=10001 and CurrentStar !=10002 and CurrentStar !=10003 and CurrentStar !=10004){
+			if (CurrentStar !=A_Space and CurrentStar !=10000 and CurrentStar !=10001 and CurrentStar !=10002 and CurrentStar !=10003 and CurrentStar !=10004 and CurrentStar !=""){
+				clipboard := 
 				MsgBox, 4,, Clear Unique Star? (press Yes or No)
 					IfMsgBox Yes 
 						CurrentStar = 10004
@@ -445,7 +476,8 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 	}
 	if A_GuiEvent in RightClick
 	{
-		LV_GetText(tOldFile, LVSelectedROW,8)
+		LV_GetText(StarOldFile, LVSelectedROW,8)
+		LV_GetText(TitleOldFile, LVSelectedROW,8)
 		if (LV@sel_col=2) {
 			MouseGetPos, xPos, yPos
 			xPos := xPos+25
@@ -506,13 +538,20 @@ StarSaveChange:
 		return
 	if (RapidStar = 1)
 		tOldFile := ztitleEncoded ".txt"
-	TmpFileINI := RegExReplace(tOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
-	TmpFileSafeName := RegExReplace(tOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
-	FileRead, C_Body,%U_NotePath%%tOldFile%
+	TmpFileINI := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
+	TmpFileSafeName := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
+	Iniread, OldStar,%detailsPath%%TmpFileINI%, INFO,Star
+	if (NewStar = OldStar or OldStar = "ERROR"){
+		msgbox Can't change to the same star.
+		RapidStar = 0
+		ListStarToChange = 0
+		return
+	}
+	FileRead, C_Body,%U_NotePath%%StarOldFile%
 	Iniread, TmpName,%detailsPath%%TmpFileINI%, INFO,Name
 	IniWrite, %NewStar%, %detailsPath%%TmpFileINI%, INFO, Star
 	for Each, Note in MyNotesArray{
-		If (Note.8 = tOldFile){
+		If (Note.8 = StarOldFile){
 			MyNotesArray.RemoveAt(Each)
 		}
 	}
@@ -1481,36 +1520,52 @@ TitleSaveChange:
 {
 	GUI, t:Submit
 	global LVSelectedROW
+	tNeedsSubmit = 0
 	NewTitle = %tEdit%
-	if (NewTitle = "")
+	if (NewTitle = ""){
+		tNeedsSubmit = 0
+		ListTitleToChange = 0
+		TitleOldFile := ""
 		return
+	}
 	FileSafeName :=NameEncode(NewTitle)
-	OldIniName := RegExReplace(tOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
+	OldIniName := RegExReplace(TitleOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 	NewIniName = %FileSafeName%.ini
 	NewTitleFileName = %FileSafeName%.txt
-	FileRead, C_Body,%U_NotePath%%tOldFile%
+	FileRead, C_Body,%U_NotePath%%TitleOldFile%
 	if FileExist(U_NotePath NewTitleFileName){
 		MsgBox, A note with this name already exists.
-		NeedsSubmit = 0
+		tNeedsSubmit = 0
+		ListTitleToChange = 0
+		TitleOldFile := ""
 		return
 	}
 	if (LVSelectedROW=""){
 		msgbox Name Save Erro 1
+		tNeedsSubmit = 0
+		ListTitleToChange = 0
+		TitleOldFile := ""
 		return
 		}
 	if (NewIniName=""){
 		msgbox Name Save Error 2
+		tNeedsSubmit = 0
+		ListTitleToChange = 0
+		TitleOldFile := ""
 		return
 		}
 	if (OldIniName=""){
 		msgbox Name Save Error 3
+		tNeedsSubmit = 0
+		ListTitleToChange = 0
+		TitleOldFile := ""
 		return
 		}
 	FileMove, %detailsPath%%OldIniName%, %detailsPath%%NewIniName%
-	FileMove, %U_NotePath%%tOldFile%, %U_NotePath%%FileSafeName%.txt
+	FileMove, %U_NotePath%%TitleOldFile%, %U_NotePath%%FileSafeName%.txt
 	
 	for Each, Note in MyNotesArray{
-			If (Note.8 = tOldFile){
+			If (Note.8 = TitleOldFile){
 				MyNotesArray.RemoveAt(Each)
 			}
 		}
@@ -1519,6 +1574,7 @@ TitleSaveChange:
 	SaveFile(NewTitle,FileSafeName,C_Body,1)
 	ListTitleToChange = 1
 	ControlFocus , Edit1, FlatNotes - Library
+	TitleOldFile := ""
 	return
 }
 

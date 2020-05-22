@@ -107,6 +107,9 @@ global QuickStar
 global SearchDates
 global ztitleEncoded
 global RapidStar
+global LVSelectedROW
+global StarOldFile
+global TitleOldFile
 ;Pre-set globals
 global LibW
 global PreviewRows
@@ -354,7 +357,7 @@ if (ColOrder != "1,2,3,4,5"){
 }
 
 
-goto Options
+;goto Options
 ;BuildGUI2()
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
