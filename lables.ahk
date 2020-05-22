@@ -47,6 +47,7 @@ Label3:
 	if(istitle != "no") {
 		send {Ctrl Down}{c}{Ctrl up}
 		ztitle := clipboard
+		zbody := ""
 		;only first line for title to prevent fail
 		Loop, parse, clipboard, `n, `r
 			{
@@ -68,7 +69,7 @@ Label3:
 	}
 	if(istitle = "no") {
 		send {Ctrl Down}{c}{Ctrl up}
-		zbody := clipboard 
+		zbody .= clipboard 
 		istitle = yes
 		TmpFileSafeName := NameEncode(ztitle)
 		FileReadLine, CheckExists, %U_NotePath%%TmpFileSafeName%.txt, 1
@@ -80,15 +81,22 @@ Label3:
 	}
 	return
 }
-
-
-
 Label4:
 {
 	istitle = yes
 	tooltip cancled
 	settimer,KillToolTip,-1000
 	return 
+}
+Label5:
+{
+	if(istitle = "no") {
+		send {Ctrl Down}{c}{Ctrl up}
+		zbody .= clipboard " " 
+		tooltip B: %zbody%
+		settimer, KillToolTip, -1000
+	}
+	return
 }
 SaveButton:
 {
@@ -764,8 +772,8 @@ Options:
 	GuiControl,,SetCtrlC,%sendCtrlC%
 	Gui, 3:Add,text, h1 Disabled 			
 	
-	HotkeyNames := ["Show Library Window","Quick New Note","Rapid Save","Cancel Rapid Save"]
-	Loop,% 4 {
+	HotkeyNames := ["Show Library Window","Quick New Note","Rapid Save","Cancel Rapid Save","Rapid Note append"]
+	Loop,% 5 {
 		HotkeyNameTmp := HotkeyNames[A_Index]
 		Gui, 3:Add, Text, , Hotkey: %HotkeyNameTmp%
 		IniRead, savedHK%A_Index%, settings.ini, Hotkeys, %A_Index%, %A_Space%
