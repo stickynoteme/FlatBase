@@ -155,15 +155,13 @@ Search:
 	{
 	   If (SearchTerm != "")
 	   {
-			If (InStr(Note.1, SearchTerm) != 0){
+			If (InStr(Note.2, SearchTerm) != 0){
 			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-			}Else if (InStr(Note.2, SearchTerm) != 0)
+			}Else if (InStr(Note.3, SearchTerm) != 0)
 		   {LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-		   }Else if (InStr(Note.3, SearchTerm) != 0)
+		   }Else if (InStr(Note.4, SearchTerm) != 0 && SearchDates =1)
 		   {LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-		   }Else if (InStr(Note.4, SearchTerm) != 0)
-		   {LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-		   }Else if (InStr(Note.5, SearchTerm) != 0)
+		   }Else if (InStr(Note.5, SearchTerm) != 0 && SearchDates =1)
 		   {LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
 		   }
 	   }
@@ -725,6 +723,9 @@ Options:
 	Gui, 3:Add, CheckBox, section vSelect_ShowMainWindowOnStartUp gSet_ShowMainWindowOnStartUp, Show main window on startup?
 	GuiControl,,Select_ShowMainWindowOnStartUp,%ShowMainWindowOnStartUp%
 	
+	Gui, 3:Add, CheckBox, section vSelect_SearchDates gSet_SearchDates, Include added & modified dates in search?
+	GuiControl,,Select_SearchDates,%SearchDates%
+	
 	Gui, 3:Add,Text,section xs, Notes storage folder:
 	Gui, 3:Add,Edit, disabled r1 w300 vNotesStorageFolder, %U_NotePath%
 	Gui, 3:Add,Button, gFolderSelect, Select a folder.
@@ -979,6 +980,8 @@ reload
 	IniWrite, %Select_UniqueStarList%,%iniPath%,General, UniqueStarList
 	GuiControlGet,Select_USSLR	
 	IniWrite, %Select_USSLR%,%iniPath%,General, USSLR	
+	GuiControlGet,Select_SearchDates
+	IniWrite,%Select_SearchDates%, %iniPath%, General, SearchDates
 }
 Set_Star1:
 {
@@ -1041,6 +1044,17 @@ Set_ShowMainWindowOnStartUp:
 	if (A_GuiEvent == "Normal"){
 		IniWrite,%Select_ShowMainWindowOnStartUp%, %iniPath%, General, ShowMainWindowOnStartUp
 		IniRead,ShowMainWindowOnStartUp,%iniPath%,General,ShowMainWindowOnStartUp
+		
+	}
+return
+}
+Set_SearchDates:
+{
+	GuiControlGet,Select_SearchDates
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_SearchDates%, %iniPath%, General, SearchDates
+		IniRead,SearchDates,%iniPath%,General,SearchDates
 		
 	}
 return

@@ -104,6 +104,7 @@ global NewTitleFileName
 global TitleBar
 global UsedStars
 global QuickStar
+global SearchDates
 ;Pre-set globals
 global LibW
 global PreviewRows
@@ -213,6 +214,8 @@ IniRead, rowSelectTextColor, %StartingTheme%, Colors, RowSelectTextColor , 0xfff
 ;-------------------------------------------------
 Iniread, UniqueStarList,%iniPath%,General,UniqueStarList,1|2|3|4|5|6|7|8|9|0
 Iniread, USSLR,%iniPath%,General,USSLR,10
+
+Iniread, SearchDates,%iniPath%,General,SearchDates,0
 
 Iniread, ShowMainWindowOnStartUp,%iniPath%, General,ShowMainWindowOnStartUp,1
 IniRead, QuickNoteWidth,%iniPath%, General,QuickNoteWidth,350
