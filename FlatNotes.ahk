@@ -17,6 +17,7 @@ Menu, Tray, Add, About
 Menu, Tray, Add, Options
 Menu, Tray, Add, Exit
 Menu, Tray, Default, Library
+
 ;-------------------------------------------------
 ;Set up script global variables
 ;-------------------------------------------------
@@ -101,6 +102,8 @@ global NewTitle
 global NewStar
 global NewTitleFileName
 global TitleBar
+global UsedStars
+global QuickStar
 ;Pre-set globals
 global LibW
 global PreviewRows
@@ -212,7 +215,7 @@ Iniread, UniqueStarList,%iniPath%,General,UniqueStarList,1|2|3|4|5|6|7|8|9|0
 Iniread, USSLR,%iniPath%,General,USSLR,10
 
 Iniread, ShowMainWindowOnStartUp,%iniPath%, General,ShowMainWindowOnStartUp,1
-IniRead, QuickNoteWidth,%iniPath%, General,QuickNoteWidth,500
+IniRead, QuickNoteWidth,%iniPath%, General,QuickNoteWidth,350
 IniRead, ShowStatusBar,%iniPath%, General,ShowStatusBar,1
 IniRead, FontRendering,%iniPath%, General,FontRendering,5
 IniRead, FontFamily, %iniPath%, General, FontFamily ,Verdana

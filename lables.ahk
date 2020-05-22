@@ -33,15 +33,12 @@ BuildGUI2()
 
 GuiControl,, QuickNoteName,%clipboard%
 GuiControl,, FileSafeName,%FileSafeClipBoard%
-GuiControl, +Redraw, FileSafeName
-GuiControl, +Redraw, QuickNoteName
-ControlFocus, Edit2, FlatNote - QuickNote 
+ControlFocus, Edit4, FlatNote - QuickNote 
 if (OldNoteData !="")
 {
 	FilePath = %U_NotePath%%FileSafeClipBoard%.txt
 	FileRead, MyFile, %FilePath%
 	GuiControl,, QuickNoteBody,%MyNewFile%
-	GuiControl, +Redraw, QuickNoteBody
 }
 return
 }
@@ -101,11 +98,13 @@ SaveButton:
 	return
 	}
 	Gui, 2:Submit
+	Iniwrite, %Select_UStar%, %detailsPath%%FileSafeName%.ini,INFO,Star
 	SaveMod = 0
 	IfExist, %U_NotePath%%FileSafeName%.txt
 		SaveMod = 1
 	SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,SaveMod)
 	;horrible fix to LV to update
+
 	GuiControlGet,SearchTerm
 	GuiControl,1: , SearchTerm,
 	GuiControl,1: , SearchTerm,
@@ -874,7 +873,7 @@ Options:
 	Gui, 3:Add,Edit   
 	Gui, 3:Add,UpDown,vPreviewRowsSelect gSetPreviewRows range1-99, %PreviewRows%
 	
-	Gui, 3:Add,Text,xs,Quick Note Window Width: (Default: 500)
+	Gui, 3:Add,Text,xs,Quick Note Window Width: (Default: 350)
 
 	Gui, 3:Add,Edit   
 	Gui, 3:Add,UpDown,vQuickWSelect gSetQuickW range50-3000, %QuickNoteWidth%
@@ -1510,4 +1509,29 @@ Pinsticky:
 	Gui +LastFound 
 	WinSet, AlwaysOnTop , Toggle
 	return
+}
+AddStar1:
+{
+	GuiControl,, QuickStar, %Star1%
+	return
+}
+AddStar2:
+{ 
+	GuiControl,, QuickStar, %Star2%
+	return
+}
+AddStar3:
+{ 
+	GuiControl,, QuickStar, %Star3%
+	return
+}
+AddStar4:
+{ 
+	GuiControl,, QuickStar, %Star4%
+	return
+}
+AddStarU:
+{
+	GuiControlGet, Select_UStar
+	GuiControl,, QuickStar, %Select_UStar%
 }

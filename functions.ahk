@@ -108,7 +108,7 @@ BuildGUI1(){
 	return
 }
 BuildGUI2(){
-	QuickSubWidth := round(QuickNoteWidth*0.5)
+	QuickSubWidth := QuickNoteWidth-232
 	FileSafeClipBoard := NameEncode(clipboard)
 	CheckForOldNote = %U_NotePath%%FileSafeClipBoard%.txt
 	FileRead, OldNoteData, %CheckForOldNote%
@@ -127,10 +127,21 @@ BuildGUI2(){
 	Gui, 2:Margin , 0, 0 
 	Gui, 2:Font, s%FontSize% Q%FontRendering%, %FontFamily%, %U_SFC%	
 	Gui, 2:Color,%U_SBG%, %U_MBG%
-	Gui, 2:Add,Edit, C%U_MFC% w%QuickSubWidth% vQuickNoteName gQuickSafeNameUpdate -E0x200
-	Gui, 2:Add,Edit, -WantReturn C%U_MFC% r%QuickNoteRows% w%QuickNoteWidth% y+1 vQuickNoteBody -E0x200
-	Gui, 2:Add,Text, C%U_SFC% x%QuickSubWidth% y3 w%QuickSubWidth% vFileSafeName,
+	Gui, 2:Add,Edit, section C%U_MFC% w%QuickSubWidth% y+2 x38 vQuickNoteName gQuickSafeNameUpdate -E0x200
+	Gui, 2:Add,Edit, x+2 w35    C%U_MFC% -E0x200 center vQuickStar,
+	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar1, %Star1%
+	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar2, %Star2%
+	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar3, %Star3% 
+	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar4, %Star4%
+	QuickNoteEditW := QuickNoteWidth-38
+	QuickStarListRows := QuickNoteRows+2
+	Gui, 2:Add,Edit, disabled hidden x+1 r1 w0
+	
+	Gui, 2:Add,Edit, xs section y+2 x38 -E0x200 -WantReturn C%U_MFC% r%QuickNoteRows% w%QuickNoteEditW% vQuickNoteBody
+	Gui, 2:Add,listbox, center x0 y2 w35 C%U_MFC% r%QuickStarListRows% -Vscroll -E0x200 gAddStarU vSelect_UStar,%UniqueStarList%
+	
 	Gui, 2:Add, Button,x-1000 default gSaveButton y-1000, &Save
+	Gui, 2:Add,Text,x-1000 y-1000 vFileSafeName,	
 	Gui, 2:SHOW, w%QuickNoteWidth% %xPos% %yPos% 
 	return  
 }
@@ -176,8 +187,12 @@ MakeFileList(ReFreshMyNoteArray){
 		if (ReFreshMyNoteArray = 1){
 			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField)
 			}
+		
+		UsedStars .= StarFieldArray "|"
 		MyNotesArray.Push({1:StarFieldArray,2:NameField,3:NoteField,4:UserTimeFormatA,5:UserTimeFormatM,6:AddedField,7:ModdedField,8:A_LoopField,9:StarField})
 	} ; File loop end
+	UsedStars := RemoveDups(UsedStars,"|")
+	UsedStars := StrReplace(UsedStars,"||","|")
 	LV_ModifyCol(1, StarColW) 
 	LV_ModifyCol(1, "Center")
 	LV_ModifyCol(2, NameColW)
@@ -422,4 +437,10 @@ Name := strreplace(Name,"$7less%","<")
 Name := strreplace(Name,"$8great%",">")
 Name := strreplace(Name,"$9fslash%","/"	)
 return Name
+}
+RemoveDups( List="", delimiter="`n" ) {
+Loop, Parse, List, %delimiter%
+	List := (A_Index=1 ? A_LoopField : List . (InStr(delimiter List delimiter
+	, delimiter A_LoopField delimiter) ? "" : delimiter A_LoopField ) )
+return list
 }
