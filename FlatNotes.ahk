@@ -138,6 +138,8 @@ global savetimerrunning = 0
 ;tmp maybe
 global ColBase = ,6,7,8,9
 global ColOrder = 1,2,3,4,5
+global SearchWholeNote
+
 
 
 FileCreateDir, NoteDetails
@@ -212,6 +214,8 @@ IniRead, rowSelectTextColor, %StartingTheme%, Colors, RowSelectTextColor , 0xfff
 ;-------------------------------------------------
 ; Read and from settings.ini
 ;-------------------------------------------------
+Iniread, SearchWholeNote,%iniPath%,General,SearchWholeNote,1
+
 Iniread, UniqueStarList,%iniPath%,General,UniqueStarList,1|2|3|4|5|6|7|8|9|0
 Iniread, USSLR,%iniPath%,General,USSLR,10
 
@@ -379,6 +383,7 @@ if (g1Open=0) {
 	g1Open=1
 	ControlFocus,Edit1,FlatNotes - Library
 	sendinput {left}{right}
+	gosub SortNow
 	return
 }
 return

@@ -168,6 +168,7 @@ Search:
 	   Else
 		  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
 	}
+	gosub SortNow
 	gosub UpdateStatusBar
 	Return
 }
@@ -726,6 +727,9 @@ Options:
 	Gui, 3:Add, CheckBox, section vSelect_SearchDates gSet_SearchDates, Include added & modified dates in search?
 	GuiControl,,Select_SearchDates,%SearchDates%
 	
+	Gui, 3:Add, CheckBox, section vSelect_SearchWholeNote gSet_SearchWholeNote, Search whole note? (disable to search only the 1st line.)
+	GuiControl,,Select_SearchWholeNote,%SearchWholeNote%
+	
 	Gui, 3:Add,Text,section xs, Notes storage folder:
 	Gui, 3:Add,Edit, disabled r1 w300 vNotesStorageFolder, %U_NotePath%
 	Gui, 3:Add,Button, gFolderSelect, Select a folder.
@@ -982,6 +986,8 @@ reload
 	IniWrite, %Select_USSLR%,%iniPath%,General, USSLR	
 	GuiControlGet,Select_SearchDates
 	IniWrite,%Select_SearchDates%, %iniPath%, General, SearchDates
+	GuiControlGet,Select_SearchWholeNote
+	IniWrite,%Select_SearchWholeNote%, %iniPath%, General, SearchWholeNote
 }
 Set_Star1:
 {
@@ -1056,6 +1062,16 @@ Set_SearchDates:
 		IniWrite,%Select_SearchDates%, %iniPath%, General, SearchDates
 		IniRead,SearchDates,%iniPath%,General,SearchDates
 		
+	}
+return
+}
+Set_SearchWholeNote:
+{
+	GuiControlGet,Select_SearchWholeNote
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_SearchWholeNote%, %iniPath%, General, SearchWholeNote
+		IniRead,SearchWholeNote,%iniPath%,General,SearchWholeNote
 	}
 return
 }

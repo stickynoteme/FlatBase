@@ -149,7 +149,6 @@ BuildGUI2(){
 	Gui, 2:SHOW, w%QuickNoteWidth% %xPos% %yPos% 
 	return  
 }
-
 MakeFileList(ReFreshMyNoteArray){
 	FileList := ""
 	MyNotesArray := {}
@@ -163,8 +162,12 @@ MakeFileList(ReFreshMyNoteArray){
 	{
 		NoteField := ""
 		OldNoteField = NoteField
+		
+		if (SearchWholeNote = 0)
+			FileReadLine, NoteField, %U_NotePath%%A_LoopField%, 1
+		if (SearchWholeNote = 1)
+			FileRead, NoteField, %U_NotePath%%A_LoopField%
 
-		FileReadLine, NoteField, %U_NotePath%%A_LoopField%, 1
 		NoteIniName := RegExReplace(A_LoopField, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 		NoteBackupName := NoteBackupName := := RegExReplace(A_LoopField, "\.txt(?:^|$|\r\n|\r|\n)")
 		NoteIni = %detailsPath%%NoteIniName%
