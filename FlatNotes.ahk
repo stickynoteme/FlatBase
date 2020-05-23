@@ -33,7 +33,6 @@ global MyNotesArray := {}
 global OldNoteData
 global QuickNoteBody
 global QuickNoteName
-global AddStar
 global U_MBG
 global U_MFC
 global U_SBG

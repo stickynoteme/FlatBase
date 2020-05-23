@@ -311,12 +311,11 @@ if (WinActive(FlatNote - Library)) {
 		tNeedsSubmit = 0
 		gosub TitleSaveChange
 	}
-}
-if (WinActive(FlatNote - Library)) {
 	if (sNeedsSubmit = 1) {
 		sNeedsSubmit = 0
 		gosub StarSaveChange
 	}
+	gui, sb:destroy
 }
 if (ListTitleToChange = 1){
 		LV_Modify(LVSelectedROW,,, NewTitle,,,,,,NewTitleFileName)
@@ -536,10 +535,36 @@ build_tEdit:
 }
 AddStarBox:
 {
+	Loops := LV_GetCount()
+	AllStars := ""
+	if (searchterm ="") {
+		loop % loops {
+				LV_GetText(starz,A_index,1)
+				AllStars .= starz "|"
+		}
+		AllStars := RemoveDups(AllStars,"|")
+		sort AllStars, D|
+		UsedStars := StrReplace(AllStars,"||","|")
+	}
+	
+	
+	; var with all used stars = UsedStars
+	GUI, sb:new,-Caption +ToolWindow,StarPicker
+	Gui, sb:Margin , 5, 5 
+	Gui, sb:Font, s10 Q%FontRendering%, Verdana, %U_MFC%
+	Gui, sb:Color,%U_SBG%, %U_MBG%
+	
+	Gui, sb:add,ListBox, c%U_FBCA% -E0x200 r%USSLR% w35 gDo_AddStar vStarPickerEdit,%UsedStars%
+	
 	MouseGetPos, xPos, yPos
 	xPos := xPos+25
-	AddStar = 1
-	gosub build_sEdit
+	Gui, sb:show, x%xPos% y%yPos%
+	return
+}
+Do_AddStar:
+{
+	Gui sb:Submit
+	GuiControl,,%HSterm%,$*%StarPickerEdit%
 	return
 }
 
@@ -565,12 +590,6 @@ build_sEdit:
 StarSaveChange:
 {
 	GUI, star:Submit
-	if (AddStar = 1)
-		{
-			GuiControl,,%HSterm%,$*%sEdit%%StarSelectedBox%
-			AddStar = 0
-			return
-		}
 	sNeedsSubmit = 0
 	NewStar = %sEdit%
 	if (NewStar = "")
@@ -1498,6 +1517,11 @@ Label:
 	}
 	If (savedHK%num% || HK%num%)
 		setHK(num, savedHK%num%, HK%num%)
+	return
+}
+sbGuiEscape:
+{
+	Gui, sb:Destroy
 	return
 }
 StarGuiEscape:
