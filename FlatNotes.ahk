@@ -110,6 +110,7 @@ global RapidStar
 global LVSelectedROW
 global StarOldFile
 global TitleOldFile
+global ShowStarHelper
 ;Pre-set globals
 global LibW
 global PreviewRows
@@ -219,6 +220,8 @@ IniRead, rowSelectTextColor, %StartingTheme%, Colors, RowSelectTextColor , 0xfff
 ;-------------------------------------------------
 ; Read and from settings.ini
 ;-------------------------------------------------
+IniRead, ShowStarHelper,%iniPath%,General,ShowStarHelper,0
+
 IniRead, RapidStar,%iniPath%,General,RapidStar,1
 
 Iniread, SearchWholeNote,%iniPath%,General,SearchWholeNote,1
@@ -357,7 +360,7 @@ if (ColOrder != "1,2,3,4,5"){
 }
 
 
-;goto Options
+goto Options
 ;BuildGUI2()
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey

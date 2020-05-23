@@ -914,6 +914,9 @@ Options:
 	Gui, 3:add,text, xs section, Pipe "|" sperated list of quick unique stars. (Example: 1|a|2|b..etc)
 	Gui, 3:add,edit, xs section w300 vSelect_UniqueStarList gSet_UniqueStarList, %UniqueStarList% 
 	
+	Gui, 3:Add,CheckBox, xs vSelect_ShowStarHelper gSet_ShowStarHelper, Show star helper by search box?
+	GuiControl,,Select_ShowStarHelper,%ShowStarHelper%
+	
 	;Hotkeys Tab
 	Gui, 3:Tab, Hotkeys
 	Gui, 3:Add,CheckBox, vSetCtrlC gCtrlCToggle, Send Ctrl+C when using the quick note hotkey.
@@ -1072,6 +1075,8 @@ Options:
   
 SaveAndReload:
 { 
+	GuiControlGet,Select_ShowStarHelper
+	IniWrite,%Select_ShowStarHelper%, %iniPath%, General, ShowStarHelper
 	GuiControlGet, Select_RapidStar
 	IniWrite, %RapidStar%, %iniPath%, General, RapidStar
 	GuiControlGet, U_QuickNoteWidth,,QuickWSelect	
@@ -1258,6 +1263,16 @@ SetShowStatusBar:
 		IniWrite,%ShowStatusBarSelect%, %iniPath%, General, ShowStatusBar
 		IniRead,ShowStatusBar,%iniPath%,General,ShowStatusBar
 		
+	}
+return
+}
+Set_ShowStarHelper:
+{
+	GuiControlGet,Select_ShowStarHelper
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ShowStarHelper%, %iniPath%, General, ShowStarHelper
+		IniRead,ShowStarHelper,%iniPath%,General,ShowStarHelper
 	}
 return
 }

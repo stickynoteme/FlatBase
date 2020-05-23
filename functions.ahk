@@ -48,11 +48,15 @@ BuildGUI1(){
 	Gui, 1:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
 	Gui, 1:Color,%U_SBG%, %U_MBG%
 	; old x6
-	Gui, 1:Add,Edit, c%U_FBCA% w%LibW% y%FontSize% x27 y8 vSearchTerm gSearch -E0x200 HwndHSterm
-	;ListBox used as background color for search area padding
-
+	searchX = 6
+	if (ShowStarHelper = 1) {
+		searchX = 27
+	}
+	
+	Gui, 1:Add,Edit, c%U_FBCA% w%LibW% y%FontSize% x%searchX% y8 vSearchTerm gSearch -E0x200 HwndHSterm
 	Gui, 1:Add, ListBox, vLB1 +0x100 h8 w%LibW% x0 y0 -E0x200 Disabled 
 	Gui, 1:Add, ListBox, vlB2 +0x100 h15 w%LibW% x0 ys0 -E0x200 Disabled
+	;ListBox used as background color for search area padding
 	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%
 	Gui, 1:Add, text, x-3 c%U_SFC% w%StarColW% center gSortStar vSortStar, *
 	Gui, 1:Add, text, c%U_SFC% xp+%StarColW% w%NameColW% center gSortName vSortName, Name
@@ -107,8 +111,10 @@ BuildGUI1(){
 	WM_RBUTTONDOWN = 0x0204
 	OnMessage( WM_RBUTTONDOWN, "HandleMessage" )
 
+	if (ShowStarHelper = 1) {
+			Gui, 1:add, text, center w15 h15 x6 y8 -E0x200 c%U_FBCA% gAddStarBox, %star1%
+		}
 
-	Gui, 1:add, text, center w15 h15 x6 y8 -E0x200 c%U_FBCA% gAddStarBox, %star1%
 	Gui, 1:SHOW, Hide w%SubW%
 	WinGet, g1ID,, FlatNotes - Library
 	g1Open=0
