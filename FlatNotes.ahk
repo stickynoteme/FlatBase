@@ -114,6 +114,14 @@ global TitleOldFile
 global ShowStarHelper
 global CtrlEnter
 ;Pre-set globals
+global savedHK1
+global savedHK2
+global savedHK3
+global savedHK4
+global savedHK5
+global savedSK1
+global savedSK2
+global savedSK3
 global LibW
 global PreviewRows
 global ResultRows
@@ -222,6 +230,14 @@ IniRead, rowSelectTextColor, %StartingTheme%, Colors, RowSelectTextColor , 0xfff
 ;-------------------------------------------------
 ; Read and from settings.ini
 ;-------------------------------------------------
+IniRead, savedHK1, %iniPath%, Hotkeys, 1,#o
+IniRead, savedHK2, %iniPath%, Hotkeys, 2,#n
+IniRead, savedHK3, %iniPath%, Hotkeys, 3,#z
+IniRead, savedHK4, %iniPath%, Hotkeys, 4,#+z
+IniRead, savedHK5, %iniPath%, Hotkeys, 5,#a
+IniRead, savedSK1, %iniPath%, Shortcuts, 1,!s
+IniRead, savedSK2, %iniPath%, Shortcuts, 2,!r
+IniRead, savedSK3, %iniPath%, Shortcuts, 3,!e
 
 IniRead, CtrlEnter,%iniPath%,General,CtrlEnter,0
 IniRead, ShowStarHelper,%iniPath%,General,ShowStarHelper,0
@@ -365,7 +381,7 @@ if (ColOrder != "1,2,3,4,5"){
 
 ;-------------------------------------------------
 ;-------------------------------------------------
-;goto Options
+goto Options
 ;BuildGUI2()
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey

@@ -3,28 +3,6 @@
 ;------------------------------------------
 #IfWinActive, FlatNotes - Library
 {
-^l::
-!l::
-{
-ControlFocus, SysListView321, FlatNotes - Library
-return
-}
-^s::
-^f::
-!s::
-!f::
-{
-ControlFocus, Edit1, FlatNotes - Library
-return
-}
-^e::
-^p::
-!e::
-!p::
-{
-ControlFocus, Edit3, FlatNotes - Library
-return
-}
 Down::
 ControlGetFocus, OutputVar, FlatNotes - Library
 {

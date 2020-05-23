@@ -1,24 +1,4 @@
 SetUserHotKeys() {
-	IniRead, savedHK1, %iniPath%, Hotkeys, 1, #o
-	IniRead, savedHK2, %iniPath%, Hotkeys, 2, #n
-	IniRead, savedHK3, %iniPath%, Hotkeys, 3, #z
-	IniRead, savedHK4, %iniPath%, Hotkeys, 4, #+z
-	IniRead, savedHK5, %iniPath%, Hotkeys, 5, #a
-	if (savedHK1="")
-		savedHK1=#o
-		IniWrite,#o,%iniPath%,Hotkeys, 2
-	if (savedHK2="")
-		savedHK2=#n
-		IniWrite,#n,%iniPath%,Hotkeys, 2
-	if (savedHK3="")
-		savedHK3=#z
-		IniWrite,#z,%iniPath%,Hotkeys, 3
-	if (savedHK4="")
-		savedHK4=#+z
-		IniWrite,#+z,%iniPath%,Hotkeys, 4
-	if (savedHK5="")
-		savedHK4=#a
-		IniWrite,#a,%iniPath%,Hotkeys, 5
 	Hotkey,%savedHK1%, Label1
 	Hotkey,%savedHK2%, Label2
 	Hotkey,%savedHK3%, Label3
@@ -29,6 +9,14 @@ SetUserHotKeys() {
 		Hotkey,Enter, NewAndSaveHK
 	if (CtrlEnter = 1)
 		Hotkey,^Enter, NewAndSaveHK2
+		
+;-------------------------------------------------
+; Shortcuts
+;-------------------------------------------------
+	Hotkey,%savedSK1%, LabelS1
+	Hotkey,%savedSK2%, LabelS2
+	Hotkey,%savedSK3%, LabelS3
+
 return
 }
 
@@ -40,6 +28,16 @@ setHK(num,INI,GUI) {
 	 IniWrite,% GUI ? GUI:null, settings.ini, Hotkeys, %num%
 	 savedHK%num%  := HK%num%
 	 TrayTip, Label%num%,% !INI ? GUI " ON":!GUI ? INI " OFF":GUI " ON`n" INI " OFF"
+	 return
+}
+setSK(num,INI,GUI) {
+	 If INI
+	  Hotkey, %INI%, LabelS%num%, Off
+	 If GUI
+	  Hotkey, %GUI%, LabelS%num%, On
+	 IniWrite,% GUI ? GUI:null, settings.ini, Shortcuts, %num%
+	 savedHK%num%  := SK%num%
+	 TrayTip, LabelS%num%,% !INI ? GUI " ON":!GUI ? INI " OFF":GUI " ON`n" INI " OFF"
 	 return
 }
 BuildGUI1(){

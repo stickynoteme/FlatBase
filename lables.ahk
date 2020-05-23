@@ -104,6 +104,24 @@ Label5:
 	}
 	return
 }
+LabelS1:
+{
+	;Focus Search
+	ControlFocus, Edit1, FlatNotes - Library
+	return
+}
+LabelS2:
+{
+	;Focus Results 
+	ControlFocus, SysListView321, FlatNotes - Library
+	return
+}
+LabelS3:
+{
+	;Focus Edit
+	ControlFocus, Edit3, FlatNotes - Library
+	return
+}
 NewAndSaveHK:
 {
 ControlGetFocus, OutputVar, FlatNotes - Library
@@ -1067,25 +1085,25 @@ Options:
 	
 	Gui, 3:Add,CheckBox, xs vSelect_ShowStarHelper gSet_ShowStarHelper, Show star filter by search box?
 	GuiControl,,Select_ShowStarHelper,%ShowStarHelper%
-	
-	;Hotkeys Tab
+
+;-------------------------------------------------
+;Hotkeys Tab
+;-------------------------------------------------
 	Gui, 3:Tab, Hotkeys
 	Gui, 3:Add,CheckBox, vSetCtrlC gCtrlCToggle, Send Ctrl+C when using the quick note hotkey.
 	Gui, 3:Add, CheckBox, vUseCapslock gUseCapslockToggle, Use Capslock for Library?
 	GuiControl,,UseCapslock,%U_Capslock%
 	GuiControl,,SetCtrlC,%sendCtrlC%
-	Gui, 3:Add,text, h1 Disabled 			
+	Gui, 3:Add,text, section h1 Disabled 			
 	
 	HotkeyNames := ["Show Library Window","Quick New Note","Rapid Note","Cancel Rapid Note","Rapid Note Append"]
 	Loop,% 5 {
 		HotkeyNameTmp := HotkeyNames[A_Index]
 		Gui, 3:Add, Text, , Hotkey: %HotkeyNameTmp%
-		IniRead, savedHK%A_Index%, settings.ini, Hotkeys, %A_Index%, %A_Space%
-
 		StringReplace, noMods, savedHK%A_Index%, ~                  
 		StringReplace, noMods, noMods, #,,UseErrorLevel              
 		Gui, 3:Add, Hotkey, section vHK%A_Index% gLabel, %noMods%           
-		Gui, 3:Add, CheckBox, x+5  vCB%A_Index% Checked%ErrorLevel%, Win
+		Gui, 3:Add, CheckBox, x+6  vCB%A_Index% Checked%ErrorLevel%, Win
 		Gui, 3:Add,text, h0 xs0 Disabled
 	}                                                        
 	if (U_Capslock = 1)
@@ -1097,6 +1115,16 @@ Options:
 	Gui, 3:Add, CheckBox, section vSelect_CtrlEnter gSet_CtrlEnter, Use Ctrl+Enter instead of Enter?
 	GuiControl,,Select_CtrlEnter,%CtrlEnter%
 
+	ShortcutNames := ["Focus Search","Focus Results","Focus Edit/Preview"]
+	Loop,% 3 {
+		ShortCutNameTmp := ShortcutNames[A_Index]
+		Gui, 3:Add, Text, , %ShortCutNameTmp%:
+		StringReplace, noMods, savedSK%A_Index%, ~                  
+		StringReplace, noMods, noMods, #,,UseErrorLevel              
+		Gui, 3:Add, Hotkey, section vSK%A_Index% gLabelS, %noMods%           
+		Gui, 3:Add, CheckBox, x+6  vSCB%A_Index% Checked%ErrorLevel%, Win
+		Gui, 3:Add,text, h0 xs0 Disabled
+	}      
 ;-------------------------------------------------
 ;Appearance Tab
 ;-------------------------------------------------
@@ -1704,6 +1732,32 @@ Label:
 	}
 	If (savedHK%num% || HK%num%)
 		setHK(num, savedHK%num%, HK%num%)
+	return
+}
+LabelS:
+{
+	If %A_GuiControl% in +,^,!,+^,+!,^!,+^!   
+		return
+	num := SubStr(A_GuiControl,3)              
+	If (SK%num% != "") {                       
+		Gui, Submit, NoHide
+		If SCB%num%                                
+			SK%num% := "#" SK%num%
+		If !RegExMatch(SK%num%,"[#!\^\+]")       
+			SK%num% := "~" SK%num%                  
+		Loop,% #ctrls
+			If (SK%num% = savedSK%A_Index%) {       
+				dup := A_Index
+				Loop,6 {
+					GuiControl,% "Disable" b:=!b, SK%dup% 
+					Sleep,200
+				}
+				GuiControl,,SK%num%,% SK%num% :=""      
+				break
+			}
+	}
+	If (savedSK%num% || SK%num%)
+		setSK(num, savedSK%num%, SK%num%)
 	return
 }
 sbGuiEscape:
