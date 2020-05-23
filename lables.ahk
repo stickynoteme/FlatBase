@@ -163,49 +163,74 @@ Search:
 	gosub UpdateStatusBar
 	return
 	}
-	
+	If (InStr(SearchTerm, "$*") != 0) {
+		SearchTerm := StrReplace(SearchTerm, "$*" , "")
+		For Each, Note In MyNotesArray
+		{
+		  If (SearchTerm != "")
+		  {
+			If (InStr(Note.1, SearchTerm) != 0){
+			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+			   }
+			}
+			Else
+			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+		}
+	gosub UpdateStatusBar
+	return
+	}
+	If (InStr(SearchTerm, "||") != 0) {
+		SArray := StrSplit(SearchTerm , "||","||")
+		SearchTerm := StrReplace(SearchTerm, "||" , "")
+		For Each, Note In MyNotesArray
+		{
+			If (SearchTerm != "")
+			{
+				
+				If (InStr(Note.1, SArray.1) != 0 or InStr(Note.1, SArray.2) != 0){
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+				}Else if (InStr(Note.2, SArray.1) != 0 or InStr(Note.2, SArray.2) != 0){
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+				}Else if (InStr(Note.3, SArray.1) != 0 or InStr(Note.3, SArray.2) != 0){
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+				}Else if (InStr(Note.4, SArray.1) != 0 or InStr(Note.4, SArray.2) != 0  && SearchDates =1){
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+				}Else if (InStr(Note.5, SArray.1) != 0 or InStr(Note.5, SArray.2) != 0  && SearchDates =1){
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+				}
+				
+			}
+		Else
+			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+			
+		}
+	gosub UpdateStatusBar
+	return
+	}
+
 	For Each, Note In MyNotesArray
 	{
 	   If (SearchTerm != "")
 	   {
-			If (InStr(Note.2, SearchTerm) != 0){
-			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-			}Else if (InStr(Note.3, SearchTerm) != 0)
-		   {LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-		   }Else if (InStr(Note.4, SearchTerm) != 0 && SearchDates =1)
-		   {LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-		   }Else if (InStr(Note.5, SearchTerm) != 0 && SearchDates =1)
-		   {LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-		   }
-	   }
-	   Else
-		  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-	}
-	gosub SortNow
-	gosub UpdateStatusBar
-	Return
-}
-StarFilter:
-{
-	if (unsaveddataEdit3 = 1)
-		gosub Edit3SaveTimer
-	global StarFilterSelected
-	GuiControlGet, StarFilterSelected
-	GuiControl, -Redraw, LV
-	LV_Delete()
-	For Each, Note In MyNotesArray
-	{
-	   If (StarFilterSelected != "")
-	   {
-			If (InStr(Note.1, SearchTerm) != 0)
+			If (InStr(Note.2, SearchTerm) != 0)
+			{
 				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-	   }
-	   Else {
-		  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+			}Else if (InStr(Note.3, SearchTerm) != 0)
+			{
+				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+			}Else if (InStr(Note.4, SearchTerm) != 0 && SearchDates =1)
+			{
+				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+		   }Else if (InStr(Note.5, SearchTerm) != 0 && SearchDates =1)
+			{
+				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+			}
 		}
+		Else
+			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+	}
 	gosub SortNow
 	gosub UpdateStatusBar
-	}
 	Return
 }
 UpdateStatusBar:
@@ -289,8 +314,8 @@ if (WinActive(FlatNote - Library)) {
 }
 if (WinActive(FlatNote - Library)) {
 	if (sNeedsSubmit = 1) {
-		gosub StarSaveChange
 		sNeedsSubmit = 0
+		gosub StarSaveChange
 	}
 }
 if (ListTitleToChange = 1){
@@ -509,6 +534,15 @@ build_tEdit:
 	tNeedsSubmit = 1
 	return
 }
+AddStarBox:
+{
+	MouseGetPos, xPos, yPos
+	xPos := xPos+25
+	AddStar = 1
+	gosub build_sEdit
+	return
+}
+
 build_sEdit:
 {
 	GUI, star:new, ,TMPedit001
@@ -524,13 +558,20 @@ build_sEdit:
 	WinSet, Style,  -0xC00000,TMPedit001
 	GUI, star:Show, x%xPos% y%yPos%
 	sNeedsSubmit = 1
-	if (RapidStar = 1)
+	if (RapidStar = 1 or AddStar = 1)
 		sNeedsSubmit = 0
 	return
 }
 StarSaveChange:
 {
 	GUI, star:Submit
+	if (AddStar = 1)
+		{
+			GuiControl,,%HSterm%,$*%sEdit%%StarSelectedBox%
+			AddStar = 0
+			return
+		}
+	sNeedsSubmit = 0
 	NewStar = %sEdit%
 	if (NewStar = "")
 		NewStar = %StarSelectedBox%
@@ -565,6 +606,7 @@ StarSaveChange:
 	RapidStar = 0
 	ControlFocus , Edit1, FlatNotes - Library
 	gosub search
+	StarOldFile := ""
 	return
 }
 StarSelected:

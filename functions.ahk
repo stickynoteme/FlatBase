@@ -48,7 +48,7 @@ BuildGUI1(){
 	Gui, 1:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
 	Gui, 1:Color,%U_SBG%, %U_MBG%
 	; old x6
-	Gui, 1:Add,Edit, c%U_FBCA% w%LibW% y%FontSize% x41 y8 vSearchTerm gSearch -E0x200
+	Gui, 1:Add,Edit, c%U_FBCA% w%LibW% y%FontSize% x27 y8 vSearchTerm gSearch -E0x200 HwndHSterm
 	;ListBox used as background color for search area padding
 
 	Gui, 1:Add, ListBox, vLB1 +0x100 h8 w%LibW% x0 y0 -E0x200 Disabled 
@@ -108,7 +108,7 @@ BuildGUI1(){
 	OnMessage( WM_RBUTTONDOWN, "HandleMessage" )
 
 
-	Gui, 1:add, edit, w35 x6 y8 -E0x200 c%U_FBCA% vStarFilterSelected gStarFilter,
+	Gui, 1:add, text, center w15 h15 x6 y8 -E0x200 c%U_FBCA% gAddStarBox, %star1%
 	Gui, 1:SHOW, Hide w%SubW%
 	WinGet, g1ID,, FlatNotes - Library
 	g1Open=0
