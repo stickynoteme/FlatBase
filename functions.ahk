@@ -47,7 +47,7 @@ BuildGUI1(){
 	Gui, 1:Margin , 0, 0 
 	Gui, 1:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
 	Gui, 1:Color,%U_SBG%, %U_MBG%
-	; old x6
+
 	searchX = 6
 	if (ShowStarHelper = 1) {
 		searchX = 27
@@ -111,6 +111,7 @@ BuildGUI1(){
 	WM_RBUTTONDOWN = 0x0204
 	OnMessage( WM_RBUTTONDOWN, "HandleMessage" )
 
+	Gui, 1:Add,Edit, c%U_FBCA% w35 y-2000 x-2000 vSearchFilter -E0x200 HwndHSF,
 	if (ShowStarHelper = 1) {
 			Gui, 1:add, text, center w15 h15 x6 y8 -E0x200 c%U_FBCA% gAddStarBox, %star1%
 		}

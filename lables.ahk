@@ -80,7 +80,7 @@ Label3:
 		if (ShowStarOnRapidNoteSave != 1) {
 			MouseGetPos, xPos, yPos
 			xPos := xPos+25
-			RapidStar = 1
+			RapidStarNow = 1
 			gosub build_sEdit
 		}
 	}
@@ -231,6 +231,21 @@ Search:
 	}
 	gosub SortNow
 	gosub UpdateStatusBar
+
+	global SearchFilter
+	GuiControlGet, SearchFilter,, %HSF%
+	if (SearchFilter != "")
+	{
+		Mloops := LV_GetCount()
+		while (Mloops--)
+		{
+			LV_GetText(RowVar,Mloops+1,1)
+			if (RowVar != SearchFilter)
+				LV_Delete(Mloops+1)
+			if (Mloops = 0)
+				break
+	}
+	}
 	Return
 }
 UpdateStatusBar:
@@ -325,7 +340,6 @@ if (ListTitleToChange = 1){
 if (ListStarToChange = 1){
 		LV_Modify(LVSelectedROW,,NewStar,,,,,,,,NewStar)
 		ListStarToChange = 0
-		StarOldFile := ""
 	}
 if (ListNeedsRefresh = 1){
 		gosub search
@@ -384,6 +398,8 @@ if (A_GuiEvent = "I")
 if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 {
 	LVSelectedROW := A_EventInfo
+	LV_GetText(StarOldFile, LVSelectedROW,8)
+	LV_GetText(TitleOldFile, LVSelectedROW,8)
 	LV_GetText(tOldFile, LVSelectedROW,8)
     LV_GetText(RowText, A_EventInfo,8)
 	LV_GetText(C_Added, A_EventInfo,4)
@@ -399,6 +415,8 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 
 	if A_GuiEvent in Normal
 	{
+		LV_GetText(StarOldFile, LVSelectedROW,8)
+		LV_GetText(TitleOldFile, LVSelectedROW,8)
 		if (LV@sel_col=1) {
 			LV_GetText(CurrentStar, A_EventInfo, 9)
 			if (CurrentStar !=A_Space and CurrentStar !=10000 and CurrentStar !=10001 and CurrentStar !=10002 and CurrentStar !=10003 and CurrentStar !=10004 and CurrentStar !=""){
@@ -500,6 +518,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 	}
 	if A_GuiEvent in RightClick
 	{
+		LVSelectedROW := A_EventInfo
 		LV_GetText(StarOldFile, LVSelectedROW,8)
 		LV_GetText(TitleOldFile, LVSelectedROW,8)
 		if (LV@sel_col=2) {
@@ -537,15 +556,21 @@ AddStarBox:
 {
 	Loops := LV_GetCount()
 	AllStars := ""
-	if (searchterm ="") {
+	if (SearchFilter ="") {
 		loop % loops {
 				LV_GetText(starz,A_index,1)
 				AllStars .= starz "|"
 		}
+		AllStars := StrReplace(AllStars,Star1,"")
+		AllStars := StrReplace(AllStars,Star2,"")
+		AllStars := StrReplace(AllStars,Star3,"")
+		AllStars := StrReplace(AllStars,Star4,"")
 		AllStars := RemoveDups(AllStars,"|")
 		sort AllStars, D|
+		AllStars :=  Trim(AllStars,"|")
 		UsedStars := StrReplace(AllStars,"||","|")
 	}
+	
 	
 	
 	; var with all used stars = UsedStars
@@ -555,6 +580,7 @@ AddStarBox:
 	Gui, sb:Color,%U_SBG%, %U_MBG%
 	
 	Gui, sb:add,ListBox, c%U_FBCA% -E0x200 r%USSLR% w35 gDo_AddStar vStarPickerEdit,%UsedStars%
+	Gui, sb:add,ListBox, c%U_FBCA% -E0x200 r%USSLR% x+5 w35 gDo_AddStar vStarPickerEdit2,|%Star1%|%Star2%|%Star3%|%Star4%
 	
 	MouseGetPos, xPos, yPos
 	xPos := xPos+25
@@ -564,7 +590,12 @@ AddStarBox:
 Do_AddStar:
 {
 	Gui sb:Submit
-	GuiControl,,%HSterm%,$*%StarPickerEdit%
+	if (StarPickerEdit="")
+		StarPickerEdit:=StarPickerEdit2
+	GuiControl,,%HSF%,%StarPickerEdit%
+	GuiControlGet,Old_Sterm,,%HSterm%
+	GuiControl,,%HSterm%
+	GuiControl,,%HSterm%, %Old_Sterm%
 	return
 }
 
@@ -582,9 +613,8 @@ build_sEdit:
 	gui, star:add,button, default gStarSaveChange x-10000 y-10000
 	WinSet, Style,  -0xC00000,TMPedit001
 	GUI, star:Show, x%xPos% y%yPos%
-	sNeedsSubmit = 1
-	if (RapidStar = 1 or AddStar = 1)
-		sNeedsSubmit = 0
+	if (RapidStarNow = 0 and AddStar = 0)
+		sNeedsSubmit = 1
 	return
 }
 StarSaveChange:
@@ -592,18 +622,21 @@ StarSaveChange:
 	GUI, star:Submit
 	sNeedsSubmit = 0
 	NewStar = %sEdit%
+	;msgbox 	% RapidStar "|" TmpName "," TmpFileSafeName "," C_Body "," NewStar "," StarOldFile
 	if (NewStar = "")
 		NewStar = %StarSelectedBox%
 	if (NewStar ="")
 		return
-	if (RapidStar = 1)
-		tOldFile := ztitleEncoded ".txt"
+	if (RapidStarNow = 1)
+		StarOldFile := ztitleEncoded ".txt"
 	TmpFileINI := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 	TmpFileSafeName := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
 	Iniread, OldStar,%detailsPath%%TmpFileINI%, INFO,Star
+	TmpName := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
+	;xthis
+
 	if (NewStar = OldStar or OldStar = "ERROR"){
 		msgbox Can't change to the same star.
-		RapidStar = 0
 		ListStarToChange = 0
 		return
 	}
@@ -617,9 +650,10 @@ StarSaveChange:
 	}
 	SaveFile(TmpName,TmpFileSafeName,C_Body,1)
 	ListStarToChange = 1
-	if (RapidStar = 1){
+	if (RapidStarNow = 1){
 		ListStarToChange = 0
 		ListNeedsRefresh = 1
+		sNeedsSubmit = 0
 		ControlFocus , SysListView321, FlatNotes - Library
 	}
 	RapidStar = 0
@@ -914,7 +948,7 @@ Options:
 	Gui, 3:add,text, xs section, Pipe "|" sperated list of quick unique stars. (Example: 1|a|2|b..etc)
 	Gui, 3:add,edit, xs section w300 vSelect_UniqueStarList gSet_UniqueStarList, %UniqueStarList% 
 	
-	Gui, 3:Add,CheckBox, xs vSelect_ShowStarHelper gSet_ShowStarHelper, Show star helper by search box?
+	Gui, 3:Add,CheckBox, xs vSelect_ShowStarHelper gSet_ShowStarHelper, Show star filter by search box?
 	GuiControl,,Select_ShowStarHelper,%ShowStarHelper%
 	
 	;Hotkeys Tab
