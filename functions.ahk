@@ -24,6 +24,11 @@ SetUserHotKeys() {
 	Hotkey,%savedHK3%, Label3
 	Hotkey,%savedHK4%, Label4
 	Hotkey,%savedHK5%, Label5
+	
+	if (CtrlEnter = 0)
+		Hotkey,Enter, NewAndSaveHK
+	if (CtrlEnter = 1)
+		Hotkey,^Enter, NewAndSaveHK2
 return
 }
 

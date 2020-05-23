@@ -35,29 +35,6 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			Down::Down
 	return
 }
-Enter::
-{
-
-ControlGetFocus, OutputVar, FlatNotes - Library
-		if(OutputVar == "SysListView321"){
-			global LVSelectedROW
-			LV_GetText(RowText, LVSelectedROW,2)
-			if (RowText="Title")
-				return
-			TmpFileSafeName := NameEncode(RowText)
-			FilePath = %U_NotePath%%TmpFileSafeName%.txt
-			FileRead, MyFile, %FilePath%
-			NoteBody := SubStr(MyFile, InStr(MyFile, "`n") + 1)
-			clipboard = %NoteBody%
-			ToolTip Text: "%RowText%" Copied to clipboard
-			SetTimer, KillToolTip, -500
-			WinHide, FlatNotes - Library
-			g1Open=0
-			return
-			}else
-			Enter::Enter
-}
-
 ^+Enter::
 {
 
@@ -77,61 +54,6 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			^+Enter::^+Enter
 }
 
-^Enter::
-{
-ControlGetFocus, OutputVar, FlatNotes - Library
-		 If (OutputVar == "Edit1"){
-			GuiControlGet, SearchTerm
-			;Remove stray whitespace from front and back
-			;SearchTerm := Ltrim(SearchTerm," ")
-			;SearchTerm := Rtrim(SearchTerm," ")
-			FileSafeSearchTerm := NameEncode(SearchTerm)
-			CheckForOldNote = %U_NotePath%%FileSafeSearchTerm%.txt
-			FileRead, MyFile, %CheckForOldNote%
-			
-			BuildGUI2()
-			GuiControl,, QuickNoteName,%SearchTerm%
-			GuiControl,, FileSafeName,%FileSafeSearchTerm%
-			GuiControl, +Redraw, FileSafeName
-			GuiControl, +Redraw, QuickNoteName
-			ControlFocus, Edit2, FlatNote - QuickNote 
-			
-
-			if (MyFile !="")
-			{
-			MyNewFile := SubStr(MyFile, InStr(MyFile, "`n") + 1)
-			GuiControl,, QuickNoteBody,%MyNewFile%
-			GuiControl, +Redraw, QuickNoteBody
-			}
-			return
-			}
-		if(OutputVar == "SysListView321"){
-			global LVSelectedROW
-			LV_GetText(RowText, LVSelectedROW,2)
-			clipboard = %RowText%
-			ToolTip Text: "%RowText%" Copied to clipboard
-			SetTimer, KillToolTip, -500
-			gosub GuiEscape
-			return
-			}
-		if(OutputVar == "Edit3"){
-			global LVSelectedROW
-			if (LVSelectedROW="")
-				LVSelectedROW=1
-			LV_GetText(RowText, LVSelectedROW,2)
-			FileSafeName := NameEncode(RowText)
-			GuiControlGet, PreviewBox
-			SaveFile(RowText,FileSafeName,PreviewBox,1)
-			iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
-			FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
-			LV_Modify(LVSelectedROW,,, RowText, NewBodyText)
-			ToolTip Saved 
-			SetTimer, KillToolTip, -500
-			unsaveddataEdit3 = 0
-			return
-		}else
-			^Enter::^Enter
-}
 del::
 ControlGetFocus, OutputVar, FlatNotes - Library
 {

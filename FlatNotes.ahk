@@ -112,6 +112,7 @@ global LVSelectedROW
 global StarOldFile
 global TitleOldFile
 global ShowStarHelper
+global CtrlEnter
 ;Pre-set globals
 global LibW
 global PreviewRows
@@ -221,6 +222,8 @@ IniRead, rowSelectTextColor, %StartingTheme%, Colors, RowSelectTextColor , 0xfff
 ;-------------------------------------------------
 ; Read and from settings.ini
 ;-------------------------------------------------
+
+IniRead, CtrlEnter,%iniPath%,General,CtrlEnter,0
 IniRead, ShowStarHelper,%iniPath%,General,ShowStarHelper,0
 
 IniRead, RapidStar,%iniPath%,General,RapidStar,1
@@ -360,7 +363,8 @@ if (ColOrder != "1,2,3,4,5"){
 	WinShow, ahk_id %g1ID%
 }
 
-
+;-------------------------------------------------
+;-------------------------------------------------
 ;goto Options
 ;BuildGUI2()
 ;-------------------------------------------------

@@ -1,3 +1,4 @@
+
 Label1:
 {
 	if (U_Capslock = "1"){
@@ -103,6 +104,112 @@ Label5:
 	}
 	return
 }
+NewAndSaveHK:
+{
+ControlGetFocus, OutputVar, FlatNotes - Library
+if (OutputVar = "Edit1"){
+	GuiControlGet, SearchTerm
+	FileSafeSearchTerm := NameEncode(SearchTerm)
+	CheckForOldNote = %U_NotePath%%FileSafeSearchTerm%.txt
+	FileRead, MyFile, %CheckForOldNote%
+	
+	BuildGUI2()
+	GuiControl,, QuickNoteName,%SearchTerm%
+	GuiControl,, FileSafeName,%FileSafeSearchTerm%
+	GuiControl, +Redraw, FileSafeName
+	GuiControl, +Redraw, QuickNoteName
+	ControlFocus, Edit4, FlatNote - QuickNote 
+	
+
+	if (MyFile !="")
+	{
+	MyNewFile := SubStr(MyFile, InStr(MyFile, "`n") + 1)
+	GuiControl,, QuickNoteBody,%MyNewFile%
+	GuiControl, +Redraw, QuickNoteBody
+	}
+	return
+	}
+if(OutputVar == "SysListView321"){
+	global LVSelectedROW
+	LV_GetText(RowText, LVSelectedROW,2)
+	clipboard = %RowText%
+	ToolTip Text: "%RowText%" Copied to clipboard
+	SetTimer, KillToolTip, -500
+	gosub GuiEscape
+	return
+	}
+if(OutputVar == "Edit3"){
+	global LVSelectedROW
+	if (LVSelectedROW="")
+		LVSelectedROW=1
+	LV_GetText(RowText, LVSelectedROW,2)
+	FileSafeName := NameEncode(RowText)
+	GuiControlGet, PreviewBox
+	SaveFile(RowText,FileSafeName,PreviewBox,1)
+	iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
+	FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
+	LV_Modify(LVSelectedROW,,, RowText, NewBodyText)
+	ToolTip Saved 
+	SetTimer, KillToolTip, -500
+	unsaveddataEdit3 = 0
+}else{
+	Send {enter}
+}
+return
+}
+NewAndSaveHK2:
+{
+ControlGetFocus, OutputVar, FlatNotes - Library
+if (OutputVar = "Edit1"){
+	GuiControlGet, SearchTerm
+		FileSafeSearchTerm := NameEncode(SearchTerm)
+		CheckForOldNote = %U_NotePath%%FileSafeSearchTerm%.txt
+		FileRead, MyFile, %CheckForOldNote%
+		
+		BuildGUI2()
+		GuiControl,, QuickNoteName,%SearchTerm%
+		GuiControl,, FileSafeName,%FileSafeSearchTerm%
+		GuiControl, +Redraw, FileSafeName
+		GuiControl, +Redraw, QuickNoteName
+		ControlFocus, Edit4, FlatNote - QuickNote 
+		
+
+		if (MyFile !="")
+		{
+		MyNewFile := SubStr(MyFile, InStr(MyFile, "`n") + 1)
+		GuiControl,, QuickNoteBody,%MyNewFile%
+		GuiControl, +Redraw, QuickNoteBody
+		}
+		return
+		}
+	if(OutputVar == "SysListView321"){
+		global LVSelectedROW
+		LV_GetText(RowText, LVSelectedROW,2)
+		clipboard = %RowText%
+		ToolTip Text: "%RowText%" Copied to clipboard
+		SetTimer, KillToolTip, -500
+		gosub GuiEscape
+		return
+		}
+	if(OutputVar == "Edit3"){
+		global LVSelectedROW
+		if (LVSelectedROW="")
+			LVSelectedROW=1
+		LV_GetText(RowText, LVSelectedROW,2)
+		FileSafeName := NameEncode(RowText)
+		GuiControlGet, PreviewBox
+		SaveFile(RowText,FileSafeName,PreviewBox,1)
+		iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
+		FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
+		LV_Modify(LVSelectedROW,,, RowText, NewBodyText)
+		ToolTip Saved 
+		SetTimer, KillToolTip, -500
+		unsaveddataEdit3 = 0
+}else{
+	Send {ctrl down}{enter}{ctrl up}
+}
+return
+}
 SaveButton:
 {
 	GuiControlGet,FileSafeName,,FileSafeName
@@ -111,7 +218,16 @@ SaveButton:
 	return
 	}
 	Gui, 2:Submit
-	Iniwrite, %Select_UStar%, %detailsPath%%FileSafeName%.ini,INFO,Star
+	;convert used symbols to raw stars
+	if (QuickStar = Star1)
+		QuickStar = 10001
+	if (QuickStar = Star2)
+		QuickStar = 10002
+	if (QuickStar = Star3)
+		QuickStar = 10003
+	if (QuickStar = Star4)
+		QuickStar = 10004
+	Iniwrite, %QuickStar%, %detailsPath%%FileSafeName%.ini,INFO,Star
 	SaveMod = 0
 	IfExist, %U_NotePath%%FileSafeName%.txt
 		SaveMod = 1
@@ -603,13 +719,14 @@ build_sEdit:
 {
 	GUI, star:new, ,TMPedit001
 	Gui, star:Margin , 5, 5 
-	Gui, star:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
+	Gui, star:Font, s10 Q%FontRendering%, %ResultFontFamily%, %U_MFC%
 	Gui, star:Color,%U_SBG%, %U_MBG%	
 
-	gui, star:add,text,w35 -E0x200 center c%U_SFC%,Star
-	Gui, star:add,edit, c%U_FBCA% w35 -E0x200 vsEdit
-	gui, star:add,text, w35 -E0x200 center c%U_SFC% gStarSaveChange ,Apply
-	Gui, star:add,ListBox, c%U_FBCA% -E0x200 r%USSLR% w35 gStarSaveChange vStarSelectedBox, %UniqueStarList%
+	;gui, star:add,text, w35 -E0x200 center c%U_SFC%,Star
+	Gui, star:add,edit, x+1 y+6 c%U_FBCA% w35 -E0x200 vsEdit
+	gui, star:add,text, x+2 w35 yp+3 -E0x200 center c%U_SFC% gStarSaveChange ,Apply
+	Gui, star:add,ListBox, xs section c%U_FBCA% -E0x200 r%USSLR% w35 gStarSaveChange vStarSelectedBox, %UniqueStarList%
+	Gui, star:add,ListBox, c%U_FBCA% -E0x200 r%USSLR% x+5 w35 gStarSaveChange vStarSelectedBox2,|%Star1%|%Star2%|%Star3%|%Star4%
 	gui, star:add,button, default gStarSaveChange x-10000 y-10000
 	WinSet, Style,  -0xC00000,TMPedit001
 	GUI, star:Show, x%xPos% y%yPos%
@@ -625,8 +742,8 @@ StarSaveChange:
 	;msgbox 	% RapidStar "|" TmpName "," TmpFileSafeName "," C_Body "," NewStar "," StarOldFile
 	if (NewStar = "")
 		NewStar = %StarSelectedBox%
-	if (NewStar ="")
-		return
+	if (NewStar = "")
+		NewStar = %StarSelectedBox2%
 	if (RapidStarNow = 1)
 		StarOldFile := ztitleEncoded ".txt"
 	TmpFileINI := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
@@ -910,7 +1027,7 @@ Options:
 
 
 	Gui, 3:New,,FlatNotes - Options
-	Gui, 3:Add, Tab3,, General|Hotkeys|Appearance|Window Size|Quick/Rapid Save
+	Gui, 3:Add, Tab3,, General|Hotkeys|Shortcuts|Appearance|Window Size|Quick/Rapid Save
 	Gui, 3:Tab, General
 	
 	Gui, 3:Add, CheckBox, section vSelect_ShowMainWindowOnStartUp gSet_ShowMainWindowOnStartUp, Show main window on startup?
@@ -973,8 +1090,16 @@ Options:
 	}                                                        
 	if (U_Capslock = 1)
 		GuiControl, Disable, msctls_hotkey321
+;-------------------------------------------------
+;Shortcuts Tab
+;-------------------------------------------------
+	Gui, 3:Tab, Shortcuts
+	Gui, 3:Add, CheckBox, section vSelect_CtrlEnter gSet_CtrlEnter, Use Ctrl+Enter instead of Enter?
+	GuiControl,,Select_CtrlEnter,%CtrlEnter%
 
-	;Appearance Tab
+;-------------------------------------------------
+;Appearance Tab
+;-------------------------------------------------
 	Gui, 3:Tab, Appearance
 	Gui, 3:Add,Text,,Font Rendering: (5 = ClearType)
 	Gui, Add, Edit 
@@ -1109,6 +1234,8 @@ Options:
   
 SaveAndReload:
 { 
+	GuiControlGet,Select_CtrlEnter
+	IniWrite,%Select_CtrlEnter%, %iniPath%, General, CtrlEnter
 	GuiControlGet,Select_ShowStarHelper
 	IniWrite,%Select_ShowStarHelper%, %iniPath%, General, ShowStarHelper
 	GuiControlGet, Select_RapidStar
@@ -1253,6 +1380,17 @@ Set_ShowMainWindowOnStartUp:
 	if (A_GuiEvent == "Normal"){
 		IniWrite,%Select_ShowMainWindowOnStartUp%, %iniPath%, General, ShowMainWindowOnStartUp
 		IniRead,ShowMainWindowOnStartUp,%iniPath%,General,ShowMainWindowOnStartUp
+		
+	}
+return
+}
+Set_CtrlEnter:
+{
+	GuiControlGet,Select_CtrlEnter
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_CtrlEnter%, %iniPath%, General, CtrlEnter
+		IniRead,CtrlEnter,%iniPath%,General,CtrlEnter
 		
 	}
 return
@@ -1714,6 +1852,10 @@ Edit3SaveTimer:
 }
 PreviewBox:
 {
+	;if (A_GuiEvent = "K") {
+	tooltip %  A_EventInfo A_GuiEvent
+	settimer, KillToolTip,-1000
+	;}
 	unsaveddataEdit3 = 1
 if (savetimerrunning = 0) {
 	savetimerrunning = 1
