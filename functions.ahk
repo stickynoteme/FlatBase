@@ -356,8 +356,9 @@ RemoveINIsOfMissingTXT(){
 return
 }
 BackupNotes(){
+	msgbox % A_Now - LastBackupTime
 	settimer, CheckBackupLaterTimer, 7200000
-	if (A_Now - LastBackupTime < 86400000) ;1day
+	if (A_Now - LastBackupTime < 86400) ;1day in seconds
 		return	
 	FormatTime, CurrentTimeStamp, %A_Now%, yy-MM-dd@tHH
 	7z_exe:="7za.exe"

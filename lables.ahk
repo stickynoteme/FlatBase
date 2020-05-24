@@ -276,9 +276,6 @@ SaveButton:
 QuickSafeNameUpdate:
 {
 	GuiControlGet, QuickNoteName
-	;Remove stray whitespace from front and back
-	;QuickNoteName := Ltrim(QuickNoteName," ")
-	;QuickNoteName := Rtrim(QuickNoteName," ")
 	NewFileSafeName := NameEncode(QuickNoteName)
 	GuiControl,, FileSafeName,%NewFileSafeName%
 	return
@@ -304,6 +301,8 @@ Search:
 			Else
 			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
 		}
+	gosub SortNow
+	gosub SearchFilter
 	gosub UpdateStatusBar
 	return
 	}
@@ -320,6 +319,8 @@ Search:
 			Else
 			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
 		}
+	gosub SortNow
+	gosub SearchFilter
 	gosub UpdateStatusBar
 	return
 	}
@@ -348,10 +349,41 @@ Search:
 			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
 			
 		}
+	gosub SortNow
+	gosub SearchFilter
 	gosub UpdateStatusBar
 	return
 	}
-
+	If (InStr(SearchTerm, "&&") != 0) {
+		SArray := StrSplit(SearchTerm , "&&","&&")
+		SearchTerm := StrReplace(SearchTerm, "&&" , "")
+		For Each, Note In MyNotesArray
+		{
+			If (SearchTerm != "")
+			{
+				
+				If (InStr(Note.1, SArray.1) != 0 && InStr(Note.1, SArray.2) != 0){
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+				}Else if (InStr(Note.2, SArray.1) != 0 && InStr(Note.2, SArray.2) != 0){
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+				}Else if (InStr(Note.3, SArray.1) != 0 && InStr(Note.3, SArray.2) != 0){
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+				}Else if (InStr(Note.4, SArray.1) != 0 && InStr(Note.4, SArray.2) != 0  && SearchDates =1){
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+				}Else if (InStr(Note.5, SArray.1) != 0 && InStr(Note.5, SArray.2) != 0  && SearchDates =1){
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+				}
+				
+			}
+		Else
+			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+			
+		}
+	gosub SortNow
+	gosub SearchFilter
+	gosub UpdateStatusBar
+	return
+	}
 	For Each, Note In MyNotesArray
 	{
 	   If (SearchTerm != "")
@@ -374,8 +406,12 @@ Search:
 			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
 	}
 	gosub SortNow
+	gosub SearchFilter
 	gosub UpdateStatusBar
-
+	Return
+}
+SearchFilter:
+{
 	global SearchFilter
 	GuiControlGet, SearchFilter,, %HSF%
 	if (SearchFilter != "")
@@ -388,9 +424,9 @@ Search:
 				LV_Delete(Mloops+1)
 			if (Mloops = 0)
 				break
+		}	
 	}
-	}
-	Return
+	return
 }
 UpdateStatusBar:
 {
