@@ -743,11 +743,20 @@ if (SearchFilterState ="") {
 	OOKStars := RemoveDups(OOKStars,"|")
 	OOKArr := StrSplit(OOKStars,"|","|")
 	NewOOKStars := ""
-	for k, v in OOKArr
-		if (inStr(UniqueStarList, v) !=0)
-			OOKArr.RemoveAt(k)
-		else
-			NewOOKStars .= v "|"
+	if (UniqueStarList>0) {
+		for k, v in OOKArr
+			if (RegExMatch(UniqueStarList,"\b" v "\b") !=0)
+				Continue
+			else
+				NewOOKStars .= v "|"
+	}
+	if (UniqueStarList2>0) {
+		for k, v in OOKArr
+			if (RegExMatch(UniqueStarList2,"\b" v "\b") !=0)
+				Continue
+			else
+				NewOOKStars .= v "|"
+	}
 	sort NewOOKStars, D|
 	NewOOKStars :=  Trim(NewOOKStars,"|")
 	OOKStars := StrReplace(NewOOKStars,"||","|")
