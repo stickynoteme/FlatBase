@@ -759,7 +759,7 @@ StarFilterBox:
 {
 	gosub MakeOOKStarList
 	; var with all used stars = UsedStars
-	GUI, sb:new,-Caption +ToolWindow,StarPicker
+	GUI, sb:new,-Caption +ToolWindow +hWndHSEB2,StarPicker
 	Gui, sb:Margin , 5, 5 
 	Gui, sb:Font, s10 Q%FontRendering%, Verdana, %U_MFC%
 	Gui, sb:Color,%U_SBG%, %U_MBG%
@@ -777,6 +777,7 @@ StarFilterBox:
 	MouseGetPos, xPos, yPos
 	xPos := xPos+25
 	Gui, sb:show, x%xPos% y%yPos%
+	SetTimer, GuiTimerSB
 	return
 }
 Do_ApplyStarFilter:
@@ -798,11 +799,10 @@ Do_ApplyStarFilter:
 build_StarEditBox:
 {
 	gosub MakeOOKStarList
-	GUI, star:new, ,TMPedit001
+	GUI, star:new, +hWndHSEB ,TMPedit001
 	Gui, star:Margin , 5, 5 
 	Gui, star:Font, s10 Q%FontRendering%, %ResultFontFamily%, %U_MFC%
 	Gui, star:Color,%U_SBG%, %U_MBG%	
-
 	;gui, star:add,text, w35 -E0x200 center c%U_SFC%,Star
 	Gui, star:add,edit, x+1 y+6 c%U_FBCA% w35 -E0x200 vsEdit
 	gui, star:add,text, x+2 w35 yp+3 -E0x200 center c%U_SFC% gStarSaveChange ,Apply
@@ -813,10 +813,11 @@ build_StarEditBox:
 	if (OOKStars > 0)
 		Gui, star:add,ListBox, x+5 c%U_FBCA% -E0x200 r%USSLR% w35 gStarSaveChange vStarSelectedBox4, %OOKStars%
 	gui, star:add,button, default gStarSaveChange x-10000 y-10000
-	WinSet, Style,  -0xC00000,TMPedit001
+	WinSet, Style,  E0x08000000,TMPedit001
 	GUI, star:Show, x%xPos% y%yPos%
 	if (RapidStarNow = 0 and AddStar = 0)
 		sNeedsSubmit = 1
+	SetTimer, GuiTimerStar
 	return
 }
 StarSaveChange:
@@ -2072,4 +2073,23 @@ AddStarU:
 {
 	GuiControlGet, Select_UStar
 	GuiControl,, QuickStar, %Select_UStar%
+}
+
+GuiTimerStar:
+{
+	IfWinNotActive, TMPedit001
+	{	
+		Gui, Star:destroy
+		SetTimer, GuiTimerStar, Off
+	}
+	Return
+}
+GuiTimerSB:
+{
+	IfWinNotActive, StarPicker
+	{	
+		Gui, sb:destroy
+		SetTimer, GuiTimerSB, Off
+	}
+	Return
 }
