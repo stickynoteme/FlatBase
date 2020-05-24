@@ -337,7 +337,6 @@ Iniread, UserTimeFormat,%iniPath%,General,UserTimeFormat,yy/MM/dd
 ;Set Globals that need values from the ini
 ;-------------------------------------------------
 global StickyTW := StickyW-80
-global StickyAdjustW = StickyW+20
 global StickyMaxH
 SysGet, VSBW, 2 ;Width of Vscroll Bar
 global libWColAdjust :=LibW-(VSBW+1) ;Prevent H-scroll bar.
@@ -385,8 +384,8 @@ if (ColOrder != "1,2,3,4,5"){
 
 ;-------------------------------------------------
 ;-------------------------------------------------
-;goto Options
-BuildGUI2()
+goto Options
+;BuildGUI2()
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------

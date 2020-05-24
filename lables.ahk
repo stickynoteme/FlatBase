@@ -30,28 +30,28 @@ Label2:
 		send {Ctrl Down}{c}{Ctrl up}
 		clipboard := clipboard
 
-BuildGUI2()
-ControlFocus, Edit4, FlatNote - QuickNote
+	BuildGUI2()
+	ControlFocus, Edit4, FlatNote - QuickNote
 
-GuiControl,, QuickNoteName,%clipboard%
-CBinfo = %clipboard%
-FileSafeName := NameEncode(CBinfo)
-IfExist, %U_NotePath%%FileSafeName%.txt
-{
-	FileRead, MyFile, %U_NotePath%%FileSafeName%.txt
-	IniRead, OldStarData, %detailsPath%%FileSafeName%.ini,INFO,Star
-	if (OldStarData = 10001)
-		OldStarData = %Star1%
-	if (OldStarData = 10002)
-		OldStarData = %Star2%
-	if (OldStarData = 10003)
-		OldStarData = %Star3%
-	if (OldStarData = 10004)
-		OldStarData = %Star4%
-	GuiControl,, QuickNoteBody,%MyFile%
-	GuiControl,, QuickStar,%OldStarData%
-}
-return
+	GuiControl,, QuickNoteName,%clipboard%
+	CBinfo = %clipboard%
+	FileSafeName := NameEncode(CBinfo)
+	IfExist, %U_NotePath%%FileSafeName%.txt
+	{
+		FileRead, MyFile, %U_NotePath%%FileSafeName%.txt
+		IniRead, OldStarData, %detailsPath%%FileSafeName%.ini,INFO,Star
+		if (OldStarData = 10001)
+			OldStarData = %Star1%
+		if (OldStarData = 10002)
+			OldStarData = %Star2%
+		if (OldStarData = 10003)
+			OldStarData = %Star3%
+		if (OldStarData = 10004)
+			OldStarData = %Star4%
+		GuiControl,, QuickNoteBody,%MyFile%
+		GuiControl,, QuickStar,%OldStarData%
+	}
+	return
 }
 Label3:
 {
@@ -1019,6 +1019,7 @@ ColorPicked:
 		
 	}
 	gosub DummyGUI1
+	return
 }
 SortStar:
 	{
@@ -1074,92 +1075,92 @@ SortName:
 			GuiControl, Font, SortModded
 			GuiControl, Font, SortStar
 		}
-		return
+	return
 	}
 SortBody:
 {
-		if (NextSortBody ="1") {
-			LV_ModifyCol(3, "SortDesc")
-			NextSortBody = 0
-			NextSortName = 0
-			NextSortAdded = 0
-			NextSortStar = 0
-			C_SortCol = 3
-			C_SortDir = SortDesc
-		}else {
-			LV_ModifyCol(3, "Sort")
-			NextSortBody = 1
-			NextSortName = 0
-			NextSortAdded = 0
-			NextSortStar = 0
-			C_SortCol = 3
-			C_SortDir = Sort
-			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
-			GuiControl, Font, SortBody
-			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%
-			GuiControl, Font, SortName
-			GuiControl, Font, SortAdded
-			GuiControl, Font, SortModded
-			GuiControl, Font, SortStar
-		}
-		return
+	if (NextSortBody ="1") {
+		LV_ModifyCol(3, "SortDesc")
+		NextSortBody = 0
+		NextSortName = 0
+		NextSortAdded = 0
+		NextSortStar = 0
+		C_SortCol = 3
+		C_SortDir = SortDesc
+	}else {
+		LV_ModifyCol(3, "Sort")
+		NextSortBody = 1
+		NextSortName = 0
+		NextSortAdded = 0
+		NextSortStar = 0
+		C_SortCol = 3
+		C_SortDir = Sort
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortBody
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortName
+		GuiControl, Font, SortAdded
+		GuiControl, Font, SortModded
+		GuiControl, Font, SortStar
 	}
+	return
+}
 SortAdded:
 {
-		if (NextSortAdded ="1") {
-			LV_ModifyCol(6, "SortDesc")
-			NextSortAdded = 0
-			NextSortName = 0
-			NextSortBody = 0
-			NextSortStar = 0
-			C_SortCol = 6
-			C_SortDir = SortDesc
-		}else {
-			LV_ModifyCol(6, "Sort")
-			NextSortAdded = 1
-			NextSortName = 0
-			NextSortBody = 0
-			NextSortStar = 0
-			C_SortCol = 6
-			C_SortDir = Sort
-			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
-			GuiControl, Font, SortAdded
-			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%
-			GuiControl, Font, SortBody
-			GuiControl, Font, SortName
-			GuiControl, Font, SortModded
-			GuiControl, Font, SortStar
-		}
-		return
+	if (NextSortAdded ="1") {
+		LV_ModifyCol(6, "SortDesc")
+		NextSortAdded = 0
+		NextSortName = 0
+		NextSortBody = 0
+		NextSortStar = 0
+		C_SortCol = 6
+		C_SortDir = SortDesc
+	}else {
+		LV_ModifyCol(6, "Sort")
+		NextSortAdded = 1
+		NextSortName = 0
+		NextSortBody = 0
+		NextSortStar = 0
+		C_SortCol = 6
+		C_SortDir = Sort
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortAdded
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortBody
+		GuiControl, Font, SortName
+		GuiControl, Font, SortModded
+		GuiControl, Font, SortStar
 	}
+	return
+}
 SortModded:
 {
-		if (NextSortAdded ="1") {
-			LV_ModifyCol(7, "SortDesc")
-			NextSortAdded = 0
-			NextSortName = 0
-			NextSortStar = 0
-			NextSortBody = 0
-			C_SortCol = 7
-			C_SortDir = SortDesc
-		}else {
-			LV_ModifyCol(7, "Sort")
-			NextSortAdded = 1
-			NextSortName = 0
-			NextSortBody = 0
-			NextSortStar = 0
-			C_SortCol = 7
-			C_SortDir = Sort
-			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
-			GuiControl, Font, SortModded
-			Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%
-			GuiControl, Font, SortBody
-			GuiControl, Font, SortName
-			GuiControl, Font, SortAdded
-			GuiControl, Font, SortStar
-		}
-		return
+	if (NextSortAdded ="1") {
+		LV_ModifyCol(7, "SortDesc")
+		NextSortAdded = 0
+		NextSortName = 0
+		NextSortStar = 0
+		NextSortBody = 0
+		C_SortCol = 7
+		C_SortDir = SortDesc
+	}else {
+		LV_ModifyCol(7, "Sort")
+		NextSortAdded = 1
+		NextSortName = 0
+		NextSortBody = 0
+		NextSortStar = 0
+		C_SortCol = 7
+		C_SortDir = Sort
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortModded
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortBody
+		GuiControl, Font, SortName
+		GuiControl, Font, SortAdded
+		GuiControl, Font, SortStar
 	}
+	return
+}
 FolderSelect:
 {
 	WinSet, AlwaysOnTop, Off, FlatNotes - Options
@@ -1514,66 +1515,77 @@ reload
 	IniWrite,%Select_SearchDates%, %iniPath%, General, SearchDates
 	GuiControlGet,Select_SearchWholeNote
 	IniWrite,%Select_SearchWholeNote%, %iniPath%, General, SearchWholeNote
+	return
 }
 Set_Star1:
 {
 	GuiControlGet,Select_Star1
 	IniWrite, %Select_Star1%,%iniPath%,General, Star1
 	IniRead, Star1, %iniPath%, General, Star1
+	return
 }
 Set_Star2:
 {
 	GuiControlGet,Select_Star2
 	IniWrite, %Select_Star2%,%iniPath%,General, Star2
 	IniRead, Star2, %iniPath%, General, Star2
+	return
 }
 Set_Star3:
 {
 	GuiControlGet,Select_Star3
 	IniWrite, %Select_Star3%,%iniPath%,General, Star3
 	IniRead, Star3, %iniPath%, General, Star3
+	return
 }
 Set_Star4:
 {
 	GuiControlGet,Select_Star4
 	IniWrite, %Select_Star4%,%iniPath%,General, Star4
 	IniRead, Star4, %iniPath%, General, Star4
+	return
 }
 Set_UniqueStarList:
 {
 	GuiControlGet,Select_UniqueStarList
 	IniWrite, %Select_UniqueStarList%,%iniPath%,General, UniqueStarList
 	IniRead, UniqueStarList, %iniPath%, General, UniqueStarList
+	return
 }
 Set_UniqueStarList2:
 {
 	GuiControlGet,Select_UniqueStarList2
 	IniWrite, %Select_UniqueStarList2%,%iniPath%,General, UniqueStarList2
 	IniRead, UniqueStarList2, %iniPath%, General, UniqueStarList2
+	return
 }
 Set_DeafultSort:
 {
 	GuiControlGet,Select_DeafultSort
 	IniWrite, %Select_DeafultSort%,%iniPath%,General, DeafultSort
 	IniRead, DeafultSort, %iniPath%, General, DeafultSort
+	return
 }
 Set_DeafultSortDir:
 {
 	GuiControlGet,Select_DeafultSortDir
 	IniWrite, %Select_DeafultSortDir%,%iniPath%,General, DeafultSortDir
 	IniRead, DeafultSortDir, %iniPath%, General, DeafultSortDir
+	return
 }
 Set_UserTimeFormat:
 {
 	GuiControlGet,Select_UserTimeFormat
 	IniWrite, %Select_UserTimeFormat%,%iniPath%,General, UserTimeFormat
 	IniRead, UserTimeFormat, %iniPath%, General, UserTimeFormat
+	return
 }
 Set_backupsToKeep:
 {
 	GuiControlGet,U_backupsToKeep,, backupsToKeepSelect	
 	IniWrite, %U_backupsToKeep%,%iniPath%,General, backupsToKeep
 	IniRead, backupsToKeep, %iniPath%, General, backupsToKeep
+	return
 }
 Set_ShowMainWindowOnStartUp:
 {
@@ -1704,18 +1716,21 @@ Set_USSLR:
 	GuiControlGet,Select_USSLR	
 	IniWrite, %Select_USSLR%,%iniPath%,General, USSLR	
 	IniRead, USSLR, %iniPath%, General, USSLR
+	return
 }
 Set_StickyRows:
 {
 	GuiControlGet,Select_StickyRows	
 	IniWrite, %Select_StickyRows%,%iniPath%,General, StickyRows	
 	IniRead, StickyRows, %iniPath%, General, StickyRows
+	return
 }
 Set_StickyW:
 { 
 	GuiControlGet, Select_StickyW	
 	IniWrite, %Select_StickyW%,%iniPath%,General, StickyW	
 	IniRead, StickyW,%iniPath%, General,StickyW
+	return
 }
 SetMainW:
 {
@@ -1736,6 +1751,7 @@ SetFontRendering:
 	IniWrite, %U_FontRendering%,%iniPath%,General, FontRendering		
 	IniRead, FontRendering,%iniPath%, General,FontRendering
 	gosub DummyGUI1
+	return
 } 
 SetSearchFontFamily:
 {
@@ -2088,15 +2104,15 @@ return
 }
 uiMove:
 {
-PostMessage, 0xA1, 2,,, A 
-Return
+	PostMessage, 0xA1, 2,,, A 
+	Return
 }
 Xsticky:
 {
 	Gui +LastFound 
 	gui destroy
 	WinClose
- return
+	return
 }
 Usticky:
 {

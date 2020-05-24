@@ -14,7 +14,13 @@ Build_Stickynote_GUI(NoteName,NoteFile)
 	Gui, %NoteName%:add, text, center  gUsticky x+0 y0 h20 w20,-
 	Gui, %NoteName%:add, text, center  gHsticky x+0 y0 h20 w20,#
 	Gui, %NoteName%:add, text, center  gXsticky x+0 y0 h20 w20,X
-	Gui, %NoteName%:add, edit, -Tabstop readonly w%StickyAdjustW% r%StickyRows% -E0x200 x0 ,%StickyBody%
+	Gui, %NoteName%:add, edit, -Tabstop readonly hwndHStickyEdit w%StickyW% r%StickyRows% -E0x200 x0 ,%StickyBody%
+	
+
+	LVM_ShowScrollBar(HStickyEdit,1,False)
+	GuiControl,+Vscroll,%HStickyEdit%
+
+	
 	Gui, %NoteName%:show, w%StickyW%
 	WinGetPos,,,, StickyMaxH,Sticky-%NoteName%
 	return
