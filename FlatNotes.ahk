@@ -22,6 +22,7 @@ Menu, Tray, Default, Library
 ;Set up script global variables
 ;-------------------------------------------------
 global CheckForOldNote 
+global OldStarData
 global FileList = ""
 global FileSafeClipBoard
 global FileSafeName
@@ -381,7 +382,7 @@ if (ColOrder != "1,2,3,4,5"){
 
 ;-------------------------------------------------
 ;-------------------------------------------------
-goto Options
+;goto Options
 ;BuildGUI2()
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey

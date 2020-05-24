@@ -150,7 +150,7 @@ BuildGUI2(){
 	Gui, 2:Font, s%FontSize% Q%FontRendering%, %FontFamily%, %U_SFC%	
 	Gui, 2:Color,%U_SBG%, %U_MBG%
 	Gui, 2:Add,Edit, section C%U_MFC% w%QuickSubWidth% y+2 x38 vQuickNoteName gQuickSafeNameUpdate -E0x200
-	Gui, 2:Add,Edit, x+2 w35    C%U_MFC% -E0x200 center vQuickStar,
+	Gui, 2:Add,Edit, x+2 w35    C%U_MFC% -E0x200 center vQuickStar,%OldStarData%
 	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar1, %Star1%
 	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar2, %Star2%
 	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar3, %Star3% 
@@ -271,6 +271,14 @@ return
 SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
 	FileNameTxt := FileSafeName ".txt"
 	SaveFileName = %U_NotePath%%FileSafeName%.txt
+	if (SaveFileName =".txt") {
+		msgbox Name error #01
+		return
+		}
+	if (SaveFileName =".txt.txt") {
+		msgbox Name error #02
+		return
+		}
 	iniRead,CreatedDate,%detailsPath%%FileSafeName%.ini,INFO,Add,%A_Now%
 	iniRead,NoteStar,%detailsPath%%FileSafeName%.ini,INFO,Star,10000
 	FileRecycle, %SaveFileName%

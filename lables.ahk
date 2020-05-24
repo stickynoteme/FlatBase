@@ -31,15 +31,25 @@ Label2:
 		clipboard := clipboard
 
 BuildGUI2()
+ControlFocus, Edit4, FlatNote - QuickNote
 
 GuiControl,, QuickNoteName,%clipboard%
-GuiControl,, FileSafeName,%FileSafeClipBoard%
-ControlFocus, Edit4, FlatNote - QuickNote 
-if (OldNoteData !="")
+CBinfo = %clipboard%
+FileSafeName := NameEncode(CBinfo)
+IfExist, %U_NotePath%%FileSafeName%.txt
 {
-	FilePath = %U_NotePath%%FileSafeClipBoard%.txt
-	FileRead, MyFile, %FilePath%
-	GuiControl,, QuickNoteBody,%MyNewFile%
+	FileRead, MyFile, %U_NotePath%%FileSafeName%.txt
+	IniRead, OldStarData, %detailsPath%%FileSafeName%.ini,INFO,Star
+	if (OldStarData = 10001)
+		OldStarData = %Star1%
+	if (OldStarData = 10002)
+		OldStarData = %Star2%
+	if (OldStarData = 10003)
+		OldStarData = %Star3%
+	if (OldStarData = 10004)
+		OldStarData = %Star4%
+	GuiControl,, QuickNoteBody,%MyFile%
+	GuiControl,, QuickStar,%OldStarData%
 }
 return
 }
@@ -468,6 +478,7 @@ if (WinActive(FlatNote - Library)) {
 }
 if (ListTitleToChange = 1){
 		LV_Modify(LVSelectedROW,,, NewTitle,,,,,,NewTitleFileName)
+		GuiControl,,TitleBar,%NewTitle%
 		ListTitleToChange = 0
 		TitleOldFile := ""
 	}
@@ -666,6 +677,10 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			xPos := xPos+25
 			gosub build_sEdit
 			LV@sel_col = "undoomCol1"
+			return
+		}
+		if (LV@sel_col=3) {
+			Run, open %U_NotePath%%TitleOldFile%
 			return
 		}
 	}
@@ -1906,10 +1921,6 @@ Edit3SaveTimer:
 }
 PreviewBox:
 {
-	;if (A_GuiEvent = "K") {
-	tooltip %  A_EventInfo A_GuiEvent
-	settimer, KillToolTip,-1000
-	;}
 	unsaveddataEdit3 = 1
 if (savetimerrunning = 0) {
 	savetimerrunning = 1
