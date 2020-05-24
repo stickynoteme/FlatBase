@@ -92,7 +92,7 @@ Label3:
 			MouseGetPos, xPos, yPos
 			xPos := xPos+25
 			RapidStarNow = 1
-			gosub build_sEdit
+			gosub build_StarEditBox
 		}
 	}
 	return
@@ -675,7 +675,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 		if (LV@sel_col=1) {
 			MouseGetPos, xPos, yPos
 			xPos := xPos+25
-			gosub build_sEdit
+			gosub build_StarEditBox
 			LV@sel_col = "undoomCol1"
 			return
 		}
@@ -705,55 +705,99 @@ build_tEdit:
 	tNeedsSubmit = 1
 	return
 }
-AddStarBox:
+
+;Get a list of all used stores.
+/*
+MakeUsedStarList:
 {
-	Loops := LV_GetCount()
-	AllStars := ""
-	if (SearchFilter ="") {
-		loop % loops {
-				LV_GetText(starz,A_index,1)
-				AllStars .= starz "|"
-		}
-		AllStars := StrReplace(AllStars,Star1,"")
-		AllStars := StrReplace(AllStars,Star2,"")
-		AllStars := StrReplace(AllStars,Star3,"")
-		AllStars := StrReplace(AllStars,Star4,"")
-		AllStars := RemoveDups(AllStars,"|")
-		sort AllStars, D|
-		AllStars :=  Trim(AllStars,"|")
-		UsedStars := StrReplace(AllStars,"||","|")
+Loops := LV_GetCount()
+AllStars := ""
+if (SearchFilter ="") {
+	loop % loops {
+			LV_GetText(starz,A_index,1)
+			AllStars .= starz "|"
 	}
-	
-	
-	
+	AllStars := RemoveDups(AllStars,"|")
+	sort AllStars, D|
+	AllStars :=  Trim(AllStars,"|")
+	UsedStars := StrReplace(AllStars,"||","|")
+	}
+return
+}
+*/
+;Make a list of all used stars - all user set stars.
+MakeOOKStarList:
+{
+Loops := LV_GetCount()
+GuiControlGet,SearchFilterState,,%HSF%
+if (SearchFilterState ="") {
+	OOKStars := ""
+	loop % loops {
+			LV_GetText(starz,A_index,1)
+			OOKStars .= starz "|"
+	}
+	OOKStars := StrReplace(OOKStars,Star1,"")
+	OOKStars := StrReplace(OOKStars,Star2,"")
+	OOKStars := StrReplace(OOKStars,Star3,"")
+	OOKStars := StrReplace(OOKStars,Star4,"")
+	OOKStars := RemoveDups(OOKStars,"|")
+	OOKArr := StrSplit(OOKStars,"|","|")
+	NewOOKStars := ""
+	for k, v in OOKArr
+		if (inStr(UniqueStarList, v) !=0)
+			OOKArr.RemoveAt(k)
+		else
+			NewOOKStars .= v "|"
+	sort NewOOKStars, D|
+	NewOOKStars :=  Trim(NewOOKStars,"|")
+	OOKStars := StrReplace(NewOOKStars,"||","|")
+}
+return
+}
+
+StarFilterBox:
+{
+	gosub MakeOOKStarList
 	; var with all used stars = UsedStars
 	GUI, sb:new,-Caption +ToolWindow,StarPicker
 	Gui, sb:Margin , 5, 5 
 	Gui, sb:Font, s10 Q%FontRendering%, Verdana, %U_MFC%
 	Gui, sb:Color,%U_SBG%, %U_MBG%
 	
-	Gui, sb:add,ListBox, c%U_FBCA% -E0x200 r%USSLR% w35 gDo_AddStar vStarPickerEdit,%UsedStars%
-	Gui, sb:add,ListBox, c%U_FBCA% -E0x200 r%USSLR% x+5 w35 gDo_AddStar vStarPickerEdit2,|%Star1%|%Star2%|%Star3%|%Star4%
+	if (OOKStars > 0) {
+		Gui, sb:add,ListBox, c%U_FBCA% -E0x200 r%USSLR% w35 gDo_ApplyStarFilter vStarFilter,%OOKStars%
+		Gui, sb:add,ListBox, c%U_FBCA% -E0x200 r%USSLR% x+5 w35 gDo_ApplyStarFilter vStarFilter2,|%Star1%|%Star2%|%Star3%|%Star4%
+	}else
+		Gui, sb:add,ListBox, c%U_FBCA% -E0x200 r%USSLR% w35 gDo_ApplyStarFilter vStarFilter2,|%Star1%|%Star2%|%Star3%|%Star4%
+	if (UniqueStarList > 0)
+		Gui, sb:add,ListBox, x+5 c%U_FBCA% -E0x200 r%USSLR% w35 gDo_ApplyStarFilter vStarFilter3, %UniqueStarList%
+	if (UniqueStarList2 > 0)
+		Gui, sb:add,ListBox, x+5 c%U_FBCA% -E0x200 r%USSLR% w35 gDo_ApplyStarFilter vStarFilter4, %UniqueStarList2%
 	
 	MouseGetPos, xPos, yPos
 	xPos := xPos+25
 	Gui, sb:show, x%xPos% y%yPos%
 	return
 }
-Do_AddStar:
+Do_ApplyStarFilter:
 {
 	Gui sb:Submit
-	if (StarPickerEdit="")
-		StarPickerEdit:=StarPickerEdit2
-	GuiControl,,%HSF%,%StarPickerEdit%
+	if (StarFilter="")
+		StarFilter:=StarFilter2
+	if (StarFilter="")
+		StarFilter:=StarFilter3
+	if (StarFilter="")
+		StarFilter:=StarFilter4
+	GuiControl,,%HSF%,%StarFilter%
 	GuiControlGet,Old_Sterm,,%HSterm%
 	GuiControl,,%HSterm%
 	GuiControl,,%HSterm%, %Old_Sterm%
 	return
 }
 
-build_sEdit:
+build_StarEditBox:
 {
+	gosub MakeOOKStarList
 	GUI, star:new, ,TMPedit001
 	Gui, star:Margin , 5, 5 
 	Gui, star:Font, s10 Q%FontRendering%, %ResultFontFamily%, %U_MFC%
@@ -763,7 +807,11 @@ build_sEdit:
 	Gui, star:add,edit, x+1 y+6 c%U_FBCA% w35 -E0x200 vsEdit
 	gui, star:add,text, x+2 w35 yp+3 -E0x200 center c%U_SFC% gStarSaveChange ,Apply
 	Gui, star:add,ListBox, xs section c%U_FBCA% -E0x200 r%USSLR% w35 gStarSaveChange vStarSelectedBox, %UniqueStarList%
+	if (UniqueStarList2 > 0)
+		Gui, star:add,ListBox, x+5 c%U_FBCA% -E0x200 r%USSLR% w35 gStarSaveChange vStarSelectedBox3, %UniqueStarList2%
 	Gui, star:add,ListBox, c%U_FBCA% -E0x200 r%USSLR% x+5 w35 gStarSaveChange vStarSelectedBox2,|%Star1%|%Star2%|%Star3%|%Star4%
+	if (OOKStars > 0)
+		Gui, star:add,ListBox, x+5 c%U_FBCA% -E0x200 r%USSLR% w35 gStarSaveChange vStarSelectedBox4, %OOKStars%
 	gui, star:add,button, default gStarSaveChange x-10000 y-10000
 	WinSet, Style,  -0xC00000,TMPedit001
 	GUI, star:Show, x%xPos% y%yPos%
@@ -781,6 +829,10 @@ StarSaveChange:
 		NewStar = %StarSelectedBox%
 	if (NewStar = "")
 		NewStar = %StarSelectedBox2%
+	if (NewStar = "")
+		NewStar = %StarSelectedBox3%
+	if (NewStar = "")
+		NewStar = %StarSelectedBox4%
 	if (RapidStarNow = 1)
 		StarOldFile := ztitleEncoded ".txt"
 	TmpFileINI := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
@@ -1116,6 +1168,9 @@ Options:
 	Gui, 3:add,text, xs section, Pipe "|" sperated list of quick unique stars. (Example: 1|a|2|b..etc)
 	Gui, 3:add,edit, xs section w300 vSelect_UniqueStarList gSet_UniqueStarList, %UniqueStarList% 
 	
+	Gui, 3:add,text, xs section, Unique stars list #2
+	Gui, 3:add,edit, xs section w300 vSelect_UniqueStarList2 gSet_UniqueStarList2, %UniqueStarList2% 
+	
 	Gui, 3:Add,CheckBox, xs vSelect_ShowStarHelper gSet_ShowStarHelper, Show star filter by search box?
 	GuiControl,,Select_ShowStarHelper,%ShowStarHelper%
 
@@ -1300,6 +1355,10 @@ Options:
   
 SaveAndReload:
 { 	
+	GuiControlGet,Select_UniqueStarList
+	IniRead, UniqueStarList, %iniPath%, General, UniqueStarList
+	GuiControlGet,Select_UniqueStarList2
+	IniRead, UniqueStarList2, %iniPath%, General, UniqueStarList2
 	GuiControlGet,Select_ExternalEditor
 	IniWrite, %Select_ExternalEditor%, %iniPath%, General, ExternalEditor
 	GuiControlGet,Select_CtrlEnter
@@ -1416,6 +1475,12 @@ Set_UniqueStarList:
 	GuiControlGet,Select_UniqueStarList
 	IniWrite, %Select_UniqueStarList%,%iniPath%,General, UniqueStarList
 	IniRead, UniqueStarList, %iniPath%, General, UniqueStarList
+}
+Set_UniqueStarList2:
+{
+	GuiControlGet,Select_UniqueStarList2
+	IniWrite, %Select_UniqueStarList2%,%iniPath%,General, UniqueStarList2
+	IniRead, UniqueStarList2, %iniPath%, General, UniqueStarList2
 }
 Set_DeafultSort:
 {

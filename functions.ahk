@@ -116,7 +116,7 @@ BuildGUI1(){
 
 	Gui, 1:Add,Edit, c%U_FBCA% w35 y-2000 x-2000 vSearchFilter -E0x200 HwndHSF,
 	if (ShowStarHelper = 1) {
-			Gui, 1:add, text, center w15 h15 x6 y8 -E0x200 c%U_FBCA% gAddStarBox, %star1%
+			Gui, 1:add, text, center w15 h15 x6 y8 -E0x200 c%U_FBCA% gStarFilterBox, %star1%
 		}
 
 	Gui, 1:SHOW, Hide w%SubW%

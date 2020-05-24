@@ -96,6 +96,7 @@ global Star2
 global Star3
 global Star4
 global UniqueStarList
+global UniqueStarList2
 global tOldFile
 global LastBackupTime
 global ListTitleToChange
@@ -250,6 +251,7 @@ IniRead, RapidStar,%iniPath%,General,RapidStar,1
 Iniread, SearchWholeNote,%iniPath%,General,SearchWholeNote,1
 
 Iniread, UniqueStarList,%iniPath%,General,UniqueStarList,1|2|3|4|5|6|7|8|9|0
+Iniread, UniqueStarList2,%iniPath%,General,UniqueStarList2,%a_space%
 Iniread, USSLR,%iniPath%,General,USSLR,10
 
 Iniread, SearchDates,%iniPath%,General,SearchDates,0
