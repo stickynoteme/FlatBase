@@ -21,6 +21,7 @@ Menu, Tray, Default, Library
 ;-------------------------------------------------
 ;Set up script global variables
 ;-------------------------------------------------
+global NewExternalEditor
 global CheckForOldNote 
 global OldStarData
 global FileList = ""
@@ -240,6 +241,7 @@ IniRead, savedSK1, %iniPath%, Shortcuts, 1,!s
 IniRead, savedSK2, %iniPath%, Shortcuts, 2,!r
 IniRead, savedSK3, %iniPath%, Shortcuts, 3,!e
 
+IniRead, ExternalEditor, %iniPath%, General, ExternalEditor,NONE
 IniRead, CtrlEnter,%iniPath%,General,CtrlEnter,0
 IniRead, ShowStarHelper,%iniPath%,General,ShowStarHelper,0
 

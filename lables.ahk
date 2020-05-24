@@ -680,6 +680,10 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			return
 		}
 		if (LV@sel_col=3) {
+			if (InStr(ExternalEditor,".") != 0 ){
+				Run, %ExternalEditor% %U_NotePath%%TitleOldFile%
+				return
+			}	
 			Run, open %U_NotePath%%TitleOldFile%
 			return
 		}
@@ -1037,16 +1041,30 @@ SortModded:
 	}
 FolderSelect:
 {
-		WinSet, AlwaysOnTop, Off, FlatNotes - Options
-		FileSelectFolder, NewNotesFolder, , 123
-		if NewNotesFolder =
-			GuiControl,,NotesStorageFolder,%U_NotePath%
-		else
-			GuiControl,,NotesStorageFolder,%NewNotesFolder%\
+	WinSet, AlwaysOnTop, Off, FlatNotes - Options
+	FileSelectFolder, NewNotesFolder, , 123
+	if NewNotesFolder = "")
+		GuiControl,,NotesStorageFolder,%U_NotePath%
+	else {
+		GuiControl,,NotesStorageFolder,%NewNotesFolder%\
 		IniWrite, %NewNotesFolder%\, %iniPath%, General, MyNotePath
-		WinSet, AlwaysOnTop, On, FlatNotes - Options
-		return
 	}
+	WinSet, AlwaysOnTop, On, FlatNotes - Options
+	return
+}
+Set_ExternalEditor:
+{
+	WinSet, AlwaysOnTop, Off, FlatNotes - Options
+	FileSelectFile, NewExternalEditor, 3, , Select a program, Programs (*.exe; *.jar;)
+		if (NewExternalEditor = "")
+			GuiControl,,Select_ExternalEditor,%ExternalEditor%
+		else {
+			GuiControl,,Select_ExternalEditor,%NewExternalEditor%
+			IniWrite, %NewExternalEditor%, %iniPath%, General, ExternalEditor
+		}
+	WinSet, AlwaysOnTop, On, FlatNotes - Options
+	return
+}
 Options:
 {
 
@@ -1100,6 +1118,11 @@ Options:
 	
 	Gui, 3:Add,CheckBox, xs vSelect_ShowStarHelper gSet_ShowStarHelper, Show star filter by search box?
 	GuiControl,,Select_ShowStarHelper,%ShowStarHelper%
+
+	Gui, 3:Add,Text,section xs, External Editor: (leave blank for system default)
+	Gui, 3:Add,Edit, r1 w300 vSelect_ExternalEditor, %ExternalEditor%
+	Gui, 3:Add,Button, gSet_ExternalEditor, Select a program.
+
 
 ;-------------------------------------------------
 ;Hotkeys Tab
@@ -1276,7 +1299,9 @@ Options:
 }
   
 SaveAndReload:
-{ 
+{ 	
+	GuiControlGet,Select_ExternalEditor
+	IniWrite, %Select_ExternalEditor%, %iniPath%, General, ExternalEditor
 	GuiControlGet,Select_CtrlEnter
 	IniWrite,%Select_CtrlEnter%, %iniPath%, General, CtrlEnter
 	GuiControlGet,Select_ShowStarHelper
