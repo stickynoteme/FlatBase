@@ -810,17 +810,28 @@ StarFilterBox:
 	Gui, sb:Color,%U_SBG%, %U_MBG%
 	
 	if (OOKStars > 0) {
-		Gui, sb:add,ListBox, c%U_FBCA% -E0x200 r%USSLR% w35 gDo_ApplyStarFilter vStarFilter,%OOKStars%
-		Gui, sb:add,ListBox, c%U_FBCA% -E0x200 r%USSLR% x+5 w35 gDo_ApplyStarFilter vStarFilter2,|%Star1%|%Star2%|%Star3%|%Star4%
+		Gui, sb:add,ListBox, hwndHStarBox1 c%U_FBCA% -E0x200 r%USSLR% w35 gDo_ApplyStarFilter vStarFilter,%OOKStars%
+		Gui, sb:add,ListBox, hwndHStarBox2 c%U_FBCA% -E0x200 r%USSLR% x+5 w35 gDo_ApplyStarFilter vStarFilter2,|%Star1%|%Star2%|%Star3%|%Star4%
 	}else
-		Gui, sb:add,ListBox, c%U_FBCA% -E0x200 r%USSLR% w35 gDo_ApplyStarFilter vStarFilter2,|%Star1%|%Star2%|%Star3%|%Star4%
+		Gui, sb:add,ListBox, hwndHStarBox2 c%U_FBCA% -E0x200 r%USSLR% w35 gDo_ApplyStarFilter vStarFilter2,|%Star1%|%Star2%|%Star3%|%Star4%
 	if (UniqueStarList > 0)
-		Gui, sb:add,ListBox, x+5 c%U_FBCA% -E0x200 r%USSLR% w35 gDo_ApplyStarFilter vStarFilter3, %UniqueStarList%
+		Gui, sb:add,ListBox, hwndHStarBox3 x+5 c%U_FBCA% -E0x200 r%USSLR% w35 gDo_ApplyStarFilter vStarFilter3, %UniqueStarList%
 	if (UniqueStarList2 > 0)
-		Gui, sb:add,ListBox, x+5 c%U_FBCA% -E0x200 r%USSLR% w35 gDo_ApplyStarFilter vStarFilter4, %UniqueStarList2%
+		Gui, sb:add,ListBox, hwndHStarBox4 x+5 c%U_FBCA% -E0x200 r%USSLR% w35 gDo_ApplyStarFilter vStarFilter4, %UniqueStarList2%
 	
 	MouseGetPos, xPos, yPos
 	xPos := xPos+25
+	
+	if (HideScrollbars = 1) {
+		LVM_ShowScrollBar(HStarBox1,1,False)
+		GuiControl,+Vscroll,%HStarBox1%
+		LVM_ShowScrollBar(HStarBox2,1,False)
+		GuiControl,+Vscroll,%HStarBox2%
+		LVM_ShowScrollBar(HStarBox3,1,False)
+		GuiControl,+Vscroll,%HStarBox3%
+		LVM_ShowScrollBar(HStarBox4,1,False)
+		GuiControl,+Vscroll,%HStarBox4%
+	}
 	Gui, sb:show, x%xPos% y%yPos%
 	SetTimer, GuiTimerSB
 	return
@@ -851,14 +862,26 @@ build_StarEditBox:
 	;gui, star:add,text, w35 -E0x200 center c%U_SFC%,Star
 	Gui, star:add,edit, x+1 y+6 c%U_FBCA% w35 -E0x200 vsEdit
 	gui, star:add,text, x+2 w35 yp+3 -E0x200 center c%U_SFC% gStarSaveChange ,Apply
-	Gui, star:add,ListBox, xs section c%U_FBCA% -E0x200 r%USSLR% w35 gStarSaveChange vStarSelectedBox, %UniqueStarList%
+	Gui, star:add,ListBox, HwndHStarEditBox1 xs section c%U_FBCA% -E0x200 r%USSLR% w35 gStarSaveChange vStarSelectedBox, %UniqueStarList%
 	if (UniqueStarList2 > 0)
-		Gui, star:add,ListBox, x+5 c%U_FBCA% -E0x200 r%USSLR% w35 gStarSaveChange vStarSelectedBox3, %UniqueStarList2%
-	Gui, star:add,ListBox, c%U_FBCA% -E0x200 r%USSLR% x+5 w35 gStarSaveChange vStarSelectedBox2,|%Star1%|%Star2%|%Star3%|%Star4%
+		Gui, star:add,ListBox, HwndHStarEditBox2 x+5 c%U_FBCA% -E0x200 r%USSLR% w35 gStarSaveChange vStarSelectedBox3, %UniqueStarList2%
+	Gui, star:add,ListBox, HwndHStarEditBox3 c%U_FBCA% -E0x200 r%USSLR% x+5 w35 gStarSaveChange vStarSelectedBox2,|%Star1%|%Star2%|%Star3%|%Star4%
 	if (OOKStars > 0)
-		Gui, star:add,ListBox, x+5 c%U_FBCA% -E0x200 r%USSLR% w35 gStarSaveChange vStarSelectedBox4, %OOKStars%
+		Gui, star:add,ListBox, HwndHStarEditBox4 x+5 c%U_FBCA% -E0x200 r%USSLR% w35 gStarSaveChange vStarSelectedBox4, %OOKStars%
 	gui, star:add,button, default gStarSaveChange x-10000 y-10000
 	WinSet, Style,  E0x08000000,TMPedit001
+	
+	if (HideScrollbars = 1) {
+		LVM_ShowScrollBar(HStarEditBox1,1,False)
+		GuiControl,+Vscroll,%HStarEditBox1%
+		LVM_ShowScrollBar(HStarEditBox2,1,False)
+		GuiControl,+Vscroll,%HStarEditBox2%
+		LVM_ShowScrollBar(HStarEditBox3,1,False)
+		GuiControl,+Vscroll,%HStarEditBox3%
+		LVM_ShowScrollBar(HStarEditBox4,1,False)
+		GuiControl,+Vscroll,%HStarEditBox4%
+	}
+	
 	GUI, star:Show, x%xPos% y%yPos%
 	if (RapidStarNow = 0 and AddStar = 0)
 		sNeedsSubmit = 1
@@ -1698,8 +1721,7 @@ SetMainW:
 {
 	GuiControlGet, U_MainNoteWidth,,MainWSelect	
 	IniWrite, %U_MainNoteWidth%,%iniPath%,General, WindowWidth	
-	IniRead, LibW, %iniPath%, General, WindowWidth ,530
-	SubW := LibW-10	
+	IniRead, LibW, %iniPath%, General, WindowWidth ,530	
 	libWAdjust := LibW+10
 	ColAdjust := LibW-95
 	NameColW := Round(ColAdjust*0.4)
@@ -2118,8 +2140,20 @@ AddStarU:
 {
 	GuiControlGet, Select_UStar
 	GuiControl,, QuickStar, %Select_UStar%
+	return
 }
-
+AddStarU2:
+{
+	GuiControlGet, Select_UStar2
+	GuiControl,, QuickStar, %Select_UStar2%
+	return
+}
+AddStarU3:
+{
+	GuiControlGet, Select_UStar3
+	GuiControl,, QuickStar, %Select_UStar3%
+	return
+}
 GuiTimerStar:
 {
 	IfWinNotActive, TMPedit001

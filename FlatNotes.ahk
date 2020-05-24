@@ -95,6 +95,7 @@ global Star1
 global Star2
 global Star3
 global Star4
+global OOKStars
 global UniqueStarList
 global UniqueStarList2
 global tOldFile
@@ -338,13 +339,10 @@ Iniread, UserTimeFormat,%iniPath%,General,UserTimeFormat,yy/MM/dd
 global StickyTW := StickyW-80
 global StickyAdjustW = StickyW+20
 global StickyMaxH
-global 	SubW := LibW
-global libWColAdjust :=round(LibW*.97)
+SysGet, VSBW, 2 ;Width of Vscroll Bar
+global libWColAdjust :=LibW-(VSBW+1) ;Prevent H-scroll bar.
 global libWAdjust := LibW+3
-if (HideScrollbars = 1){
-	libWAdjust := LibW+10
-	SubW := LibW-20
-	}
+
 ;global ColAdjust := LibW-95
 global StarColW := Round(libWColAdjust*StarPercent)
 global NameColW := Round(libWColAdjust*NamePercent)
@@ -366,6 +364,7 @@ Progress, 15, Backing up your notes
 BackupNotes()
 Progress, 20, Building note index
 BuildGUI1()
+gosub MakeOOKStarList
 gosub SortNow
 LVM_FIRST               := 0x1000
 LVM_REDRAWITEMS         := 21
@@ -387,7 +386,7 @@ if (ColOrder != "1,2,3,4,5"){
 ;-------------------------------------------------
 ;-------------------------------------------------
 ;goto Options
-;BuildGUI2()
+BuildGUI2()
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------

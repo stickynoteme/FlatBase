@@ -66,16 +66,16 @@ BuildGUI1(){
 	Gui, 1:Add, text, c%U_SFC% xp+%NameColW% yp+1 w%BodyColW% center gSortBody vSortBody, Body
 	Gui, 1:Add, text, yp+1 xp+%BodyColW% w%AddColW% center c%U_SFC% gSortAdded vSortAdded, Added
 	Gui, 1:Add, text, yp+1 xp+%AddColW% w%ModColW% center c%U_SFC% gSortModded vSortModded, Modified
-	Gui, 1:Add, ListView, -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar
+	Gui, 1:Add, ListView,  -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar
 
 	;Allow User set prevent/edit font
 	Gui, 1:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
 	;Gui, 1:Add,edit, readonly h6 -E0x200
 	title_h := PreviewFontSize*1.7
-	Gui, 1:Add,edit, readonly center xs -E0x200  x0 vTitleBar C%U_SFC% w%SubW% h%title_h%,
+	Gui, 1:Add,edit, readonly center xs -E0x200  x0 vTitleBar C%U_SFC% w%LibW% h%title_h%,
 
 	
-	Gui, 1:Add,Edit, -E0x200 r%PreviewRows% w%LibW% x0 C%U_MFC% gPreviewBox vPreviewBox,
+	Gui, 1:Add,Edit, section hwndHPB -E0x200 r%PreviewRows% w%LibW% x0 C%U_MFC% gPreviewBox vPreviewBox,
 	
 	MakeFileList(1)
 	CLV := New LV_Colors(HLV)
@@ -86,10 +86,10 @@ BuildGUI1(){
 	;statusbar
 	if (ShowStatusBar=1) {
 		Gui, 1:Font, s8 Q%FontRendering%
-		StatusWidth := SubW-185
-		Gui, 1:add,text, xs center vStatusBarCount w85 C%U_SFC%, %TotalNotes% of %TotalNotes%
-		Gui, 1:add,text, x+5 center vStatusBarM w%StatusWidth% C%U_SFC%,M: 00/00/00
-		Gui, 1:add,text, x+5 right vStatusBarA w75 C%U_SFC%,A: 00/00/00
+		StatusWidth := LibW//3
+		Gui, 1:add,text, xs left vStatusBarCount w%StatusWidth% C%U_SFC%, %TotalNotes% of %TotalNotes%
+		Gui, 1:add,text, x+0 center vStatusBarM w%StatusWidth% C%U_SFC%,M: 00/00/00
+		Gui, 1:add,text, x+0 right vStatusBarA w%StatusWidth% C%U_SFC%,A: 00/00/00
 		Gui, 1:Font, s2
 		Gui, 1:add,text, xs
 	}
@@ -118,8 +118,15 @@ BuildGUI1(){
 	if (ShowStarHelper = 1) {
 			Gui, 1:add, text, center w15 h15 x6 y8 -E0x200 c%U_FBCA% gStarFilterBox, %star1%
 		}
+	
 
-	Gui, 1:SHOW, Hide w%SubW%
+	if (HideScrollbars = 1) {
+		LVM_ShowScrollBar(HLV,1,False)
+		LVM_ShowScrollBar(HPB,1,False)
+		GuiControl,+Vscroll,%HLV%
+		GuiControl,+Vscroll,%HPB%
+	}
+	Gui, 1:SHOW, Hide w%LibW%
 	WinGet, g1ID,, FlatNotes - Library
 	g1Open=0
 	gosub search
@@ -128,9 +135,15 @@ BuildGUI1(){
 BuildGUI2(){
 	QuickStarListRows := QuickNoteRows+2
 	QuickSubWidth := QuickNoteWidth-232
-	QuickNoteEditW := QuickNoteWidth-40
-	if (HideScrollbars = 1)
-		QuickNoteEditW := QuickNoteWidth-20
+	QuickNoteEditW := QuickNoteWidth-42
+	if (OOKStars > 0){
+		QNOKX := QuickNoteWidth-37
+		QuickSubWidth := QuickNoteWidth-267
+		QuickNoteEditW := QuickNoteWidth-80
+	}
+	QuickNoteXOffset := 40
+	if (UniqueStarList2>0)
+		QuickNoteXOffset := 80
 	FileSafeClipBoard := NameEncode(clipboard)
 	CheckForOldNote = %U_NotePath%%FileSafeClipBoard%.txt
 	FileRead, OldNoteData, %CheckForOldNote%
@@ -146,10 +159,10 @@ BuildGUI2(){
 		yPos = y%yPos%
 	}
 	Gui, 2:New,, FlatNote - QuickNote
-	Gui, 2:Margin , 0, 0 
+	Gui, 2:Margin , 2, 2 
 	Gui, 2:Font, s%FontSize% Q%FontRendering%, %FontFamily%, %U_SFC%	
 	Gui, 2:Color,%U_SBG%, %U_MBG%
-	Gui, 2:Add,Edit, section C%U_MFC% w%QuickSubWidth% y+2 x38 vQuickNoteName gQuickSafeNameUpdate -E0x200
+	Gui, 2:Add,Edit, section C%U_MFC% w%QuickSubWidth% y+2 x%QuickNoteXOffset% vQuickNoteName gQuickSafeNameUpdate -E0x200
 	Gui, 2:Add,Edit, x+2 w35    C%U_MFC% -E0x200 center vQuickStar,%OldStarData%
 	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar1, %Star1%
 	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar2, %Star2%
@@ -159,12 +172,29 @@ BuildGUI2(){
 
 	Gui, 2:Add,Edit, disabled hidden x+1 r1 w0
 	
-	Gui, 2:Add,Edit, xs section y+2 x38 -E0x200 -WantReturn C%U_MFC% r%QuickNoteRows% w%QuickNoteEditW% vQuickNoteBody
-	Gui, 2:Add,listbox, center x0 y2 w35 C%U_MFC% r%QuickStarListRows% -Vscroll -E0x200 gAddStarU vSelect_UStar,%UniqueStarList%
+
+	Gui, 2:Add,Edit, xs section y+2 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r%QuickNoteRows% w%QuickNoteEditW% vQuickNoteBody hwndHQNB
+	
+
+	Gui, 2:Add,listbox, center x2 y4 w35 hwndHQNUSL1 C%U_MFC% r%QuickStarListRows% -Vscroll -E0x200 gAddStarU vSelect_UStar,%UniqueStarList%
+	if (UniqueStarList2>0)
+		Gui, 2:Add,listbox, center x2 y4 w35 hwndHQNUSL2 C%U_MFC% r%QuickStarListRows% -Vscroll -E0x200 gAddStarU2 vSelect_UStar2 ,%UniqueStarList2%
+	if (OOKStars > 0)
+		Gui, 2:Add,listbox, center x%QNOKX% y4 w35 hwndHQNUSL3 C%U_MFC% r%QuickStarListRows% -Vscroll -E0x200 gAddStarU3 vSelect_UStar3 ,%OOKStars%
+	
+	
+	if (HideScrollbars = 1) {
+		LVM_ShowScrollBar(HQNB,1,False)
+		LVM_ShowScrollBar(HQNUSL1,1,False)
+		LVM_ShowScrollBar(HQNUSL2,1,False)
+		GuiControl,+Vscroll,%HQNB%
+		GuiControl,+Vscroll,%HQNUSL1%
+		GuiControl,+Vscroll,%HQNUSL2%
+	}
 	
 	Gui, 2:Add, Button,x-1000 default gSaveButton y-1000, &Save
 	Gui, 2:Add,Text,x-1000 y-1000 vFileSafeName,	
-	Gui, 2:SHOW, w%QuickNoteWidth% %xPos% %yPos% 
+	Gui, 2:SHOW, w%QuickNoteWidth% %xPos% %yPos% 	
 	return  
 }
 MakeFileList(ReFreshMyNoteArray){
@@ -356,7 +386,6 @@ RemoveINIsOfMissingTXT(){
 return
 }
 BackupNotes(){
-	msgbox % A_Now - LastBackupTime
 	settimer, CheckBackupLaterTimer, 7200000
 	if (A_Now - LastBackupTime < 86400) ;1day in seconds
 		return	
@@ -478,3 +507,30 @@ Loop, Parse, List, %delimiter%
 	, delimiter A_LoopField delimiter) ? "" : delimiter A_LoopField ) )
 return list
 }
+
+LVM_ShowScrollBar(hLV,wBar,p_Show=True)
+    {
+    Static Dummy6622
+
+          ;-- Scroll bar flags
+          ,SB_HORZ:=0
+            ;-- Shows or hides a window's standard horizontal scroll bars.
+
+          ,SB_VERT:=1
+            ;-- Shows or hides a window's standard vertical scroll bar.
+
+          ,SB_CTL:=2
+            ;-- Shows or hides a scroll bar control. The hLV parameter must be
+            ;   the handle to the scroll bar control.
+
+          ,SB_BOTH:=3
+            ;-- Shows or hides a window's standard horizontal and vertical
+            ;   scroll bars.
+
+    RC:=DllCall("ShowScrollBar"
+        ,(A_PtrSize=8) ? "Ptr":"UInt",hLV               ;-- hWnd
+        ,"UInt",wBar                                    ;-- wbar
+        ,"UInt",p_Show)                                 ;-- bShow
+
+    Return RC ? True:False
+    }
