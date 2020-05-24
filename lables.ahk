@@ -144,8 +144,6 @@ if (OutputVar = "Edit1"){
 	BuildGUI2()
 	GuiControl,, QuickNoteName,%SearchTerm%
 	GuiControl,, FileSafeName,%FileSafeSearchTerm%
-	GuiControl, +Redraw, FileSafeName
-	GuiControl, +Redraw, QuickNoteName
 	ControlFocus, Edit4, FlatNote - QuickNote 
 	
 
@@ -153,7 +151,6 @@ if (OutputVar = "Edit1"){
 	{
 	MyNewFile := SubStr(MyFile, InStr(MyFile, "`n") + 1)
 	GuiControl,, QuickNoteBody,%MyNewFile%
-	GuiControl, +Redraw, QuickNoteBody
 	}
 	return
 	}
@@ -197,8 +194,6 @@ if (OutputVar = "Edit1"){
 		BuildGUI2()
 		GuiControl,, QuickNoteName,%SearchTerm%
 		GuiControl,, FileSafeName,%FileSafeSearchTerm%
-		GuiControl, +Redraw, FileSafeName
-		GuiControl, +Redraw, QuickNoteName
 		ControlFocus, Edit4, FlatNote - QuickNote 
 		
 
@@ -206,7 +201,6 @@ if (OutputVar = "Edit1"){
 		{
 		MyNewFile := SubStr(MyFile, InStr(MyFile, "`n") + 1)
 		GuiControl,, QuickNoteBody,%MyNewFile%
-		GuiControl, +Redraw, QuickNoteBody
 		}
 		return
 		}
@@ -449,8 +443,6 @@ UpdateStatusBar:
 			GuiControl,,StatusBarM,M: 00\00\00 
 			GuiControl,,StatusBarA,A: 00\00\00
 		}
-	;ReFreshLV()
-	;gosub SortNow
 	GuiControl,,StatusBarCount, %Items% of %TotalNotes%
 	GuiControl, +Redraw, LV
 	return
@@ -947,7 +939,7 @@ settimer,KillToolTip,-1000
 }
 About:
 {
-Gui, 4:add,text,,FlatNotes Version 2.6.0 May 2020
+Gui, 4:add,text,,FlatNotes Version 2.7.0 May 2020
 Gui, 4:Add,Link,,<a href="https://github.com/chaosdrop/FlatNotes">GitHub Page</a>
 Gui, 4:add,button,g4GuiEscape,Close
 Gui, 4:Show
@@ -1741,7 +1733,6 @@ SetMainW:
 	ColAdjust := LibW-95
 	NameColW := Round(ColAdjust*0.4)
 	BodyColW := Round(ColAdjust*0.6)
-	NameColAndBodyCOlW := NameColW+BodyColW
 	gosub DummyGUI1
 	return 
 }

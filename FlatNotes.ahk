@@ -293,13 +293,13 @@ IniRead, oBodyPercent,%iniPath%, General,BodyPercent,45
 IniRead, oAddedPercent,%iniPath%, General,AddedPercent,20
 IniRead, oModdedPercent,%iniPath%, General,ModdedPercent,0
 
-if oStarPercent between 0 and 10
+if oStarPercent between 0 and 9
 	oStarPercent = 0%oStarPercent%
-if oNamePercent between 0 and 10
+if oNamePercent between 0 and 9
 	oNamePercent = 0%oNamePercent%
-if oBodyPercent between 0 and 10
+if oBodyPercent between 0 and 9
 	oBodyPercent = 0%oBodyPercent%
-if oModdedPercent between 0 and 10
+if oModdedPercent between 0 and 9
 	oModdedPercent = 0%oModdedPercent%
 
 StarPercent = 0.%oStarPercent%
@@ -339,8 +339,10 @@ Iniread, UserTimeFormat,%iniPath%,General,UserTimeFormat,yy/MM/dd
 global StickyTW := StickyW-80
 global StickyMaxH
 SysGet, VSBW, 2 ;Width of Vscroll Bar
-global libWColAdjust :=LibW-(VSBW+1) ;Prevent H-scroll bar.
+global libWColAdjust :=LibW ;-(VSBW+1) ;Prevent H-scroll bar.
 global libWAdjust := LibW+3
+if (HideScrollbars = 1)
+	libWAdjust := LibW+3+VSBW
 
 ;global ColAdjust := LibW-95
 global StarColW := Round(libWColAdjust*StarPercent)
@@ -348,7 +350,6 @@ global NameColW := Round(libWColAdjust*NamePercent)
 global BodyColW := Round(libWColAdjust*BodyPercent)
 global AddColW := Round(libWColAdjust*AddedPercent)
 global ModColW := Round(libWColAdjust*ModdedPercent)
-global NameColAndBodyCOlW := NameColW+BodyColW
 ;-------------------------------------------------
 ;Acitvate User Hotkeys if any & make INI for new files
 ;-------------------------------------------------
@@ -384,7 +385,7 @@ if (ColOrder != "1,2,3,4,5"){
 
 ;-------------------------------------------------
 ;-------------------------------------------------
-goto Options
+;goto Options
 ;BuildGUI2()
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
