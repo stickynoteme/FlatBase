@@ -61,11 +61,12 @@ BuildGUI1(){
 	Gui, 1:Add, ListBox, vlB2 +0x100 h15 w%LibW% x0 ys0 -E0x200 Disabled
 	;ListBox used as background color for search area padding
 	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%
-	Gui, 1:Add, text, x-3 c%U_SFC% w%StarColW% center gSortStar vSortStar, *
+	Gui, 1:Add, text, x-3 c%U_SFC% w%StarColW% center gSortStar vSortStar, %Star1%
 	Gui, 1:Add, text, c%U_SFC% xp+%StarColW% w%NameColW% center gSortName vSortName, Name
 	Gui, 1:Add, text, c%U_SFC% xp+%NameColW% yp+1 w%BodyColW% center gSortBody vSortBody, Body
 	Gui, 1:Add, text, yp+1 xp+%BodyColW% w%AddColW% center c%U_SFC% gSortAdded vSortAdded, Added
 	Gui, 1:Add, text, yp+1 xp+%AddColW% w%ModColW% center c%U_SFC% gSortModded vSortModded, Modified
+	
 	Gui, 1:Add, ListView, -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar
 
 	;Allow User set prevent/edit font
@@ -114,9 +115,12 @@ BuildGUI1(){
 	WM_RBUTTONDOWN = 0x0204
 	OnMessage( WM_RBUTTONDOWN, "HandleMessage" )
 
-	Gui, 1:Add,Edit, c%U_FBCA% w35 y-2000 x-2000 vSearchFilter -E0x200 HwndHSF,
+	Gui, 1:Add,Edit, w35 y-2000 x-2000 vSearchFilter HwndHSF,
 	if (ShowStarHelper = 1) {
-			Gui, 1:add, text, center w15 h15 x6 y8 -E0x200 c%U_FBCA% gStarFilterBox, %star1%
+			Gui, 1:Font, s8 Q%FontRendering%, Segoe UI Emoji
+, %U_MFC%
+
+			Gui, 1:add, text, center backgroundTrans w15 h15 x2 y8 -E0x200 c%U_FBCA% gStarFilterBox, %star1%
 		}
 	
 
@@ -388,7 +392,7 @@ BackupNotes(){
 	if (A_Now - LastBackupTime < 86400) ;1day in seconds
 		return	
 	FormatTime, CurrentTimeStamp, %A_Now%, yy-MM-dd@tHH
-	7z_exe:="7za.exe"
+	7z_exe:="sys\7za.exe"
 	z = 0
 	BackupFileList := ""  ; Initialize to be blank.
 	Loop, %A_WorkingDir%\Backups\*.*
@@ -532,3 +536,4 @@ LVM_ShowScrollBar(hLV,wBar,p_Show=True)
 
     Return RC ? True:False
     }
+	

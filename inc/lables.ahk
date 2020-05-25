@@ -771,16 +771,10 @@ if (SearchFilterState ="") {
 	OOKStars := RemoveDups(OOKStars,"|")
 	OOKArr := StrSplit(OOKStars,"|","|")
 	NewOOKStars := ""
-	if (UniqueStarList>0) {
+	AllMyStarsList := UniqueStarList "|" UniqueStarList2
+	if (AllMyStarsList != "|") {
 		for k, v in OOKArr
-			if (RegExMatch(UniqueStarList,"\b" v "\b") !=0)
-				Continue
-			else
-				NewOOKStars .= v "|"
-	}
-	if (UniqueStarList2>0) {
-		for k, v in OOKArr
-			if (RegExMatch(UniqueStarList2,"\b" v "\b") !=0)
+			if (InStr(AllMyStarsList,v) !=0)
 				Continue
 			else
 				NewOOKStars .= v "|"
@@ -841,6 +835,10 @@ Do_ApplyStarFilter:
 	GuiControlGet,Old_Sterm,,%HSterm%
 	GuiControl,,%HSterm%
 	GuiControl,,%HSterm%, %Old_Sterm%
+	StarFilter := ""
+	StarFilter2 := ""
+	StarFilter3 := ""
+	StarFilter4 := ""
 	return
 }
 
@@ -990,7 +988,7 @@ ColorPicked:
 {
 	if (A_GuiEvent == "Normal"){	
 		GuiControlGet, ColorPicked,,ColorChoice
-		pathToTheme = %A_WorkingDir%\Themes\%ColorPicked%.ini
+		pathToTheme = %A_WorkingDir%\sys\Themes\%ColorPicked%.ini
 		
 		IniRead, U_MBG, %pathToTheme%, Colors, MainBackgroundColor
 		IniRead, U_SBG, %pathToTheme%, Colors, SubBackgroundColor
@@ -1182,7 +1180,7 @@ Set_ExternalEditor:
 Options:
 {
 
-	Fontlist := "fontlist.cfg"
+	Fontlist := "sys\fontlist.cfg"
 	FileRead, FontFile, % Fontlist
 	FontOptionsArray := []
 	loop, parse, FontFile, `n

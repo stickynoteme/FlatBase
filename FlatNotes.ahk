@@ -4,7 +4,6 @@
 #SingleInstance Force
 FileEncoding ,UTF-8
 CoordMode, mouse, Screen
-SetBatchLines, -1
 DetectHiddenWindows, On
 
 ;-------------------------------------------------
@@ -165,8 +164,8 @@ global SearchWholeNote
 FileCreateDir, NoteDetails
 detailsPath := A_WorkingDir "\NoteDetails\"
 iniPath = %A_WorkingDir%\settings.ini
-systemINI = %A_WorkingDir%\system.ini
-themePath = %A_WorkingDir%\Themes
+systemINI = %A_WorkingDir%\sys\system.ini
+themePath = %A_WorkingDir%\sys\Themes
 IniRead, U_NotePath, %iniPath%, General, MyNotePath,%A_WorkingDir%\MyNotes\
 
 if InStr(FileExist(U_NotePath), "D") {
@@ -218,7 +217,7 @@ if (isFristRun = "1") {
 ;-------------------------------------------------
 IniRead,LastBackupTime,%iniPath%,General,LastBackupTime,10000000000
 IniRead, StartingTheme, %iniPath%, Theme, Name, Black
-StartingTheme = %A_WorkingDir%\Themes\%StartingTheme%.ini
+StartingTheme = %A_WorkingDir%\sys\Themes\%StartingTheme%.ini
 
 
 IniRead, U_Theme, %StartingTheme%, Theme, UserSetting , Black
@@ -432,14 +431,14 @@ return
 ;-------------------------------------------------
 ;Include external ahk  
 ;-------------------------------------------------
-#Include functions.ahk
-#Include StickyGui.ahk
-#Include shortcuts.ahk
-#Include Class_LV_Colors.ahk
+#Include inc\functions.ahk
+#Include inc\StickyGui.ahk
+#Include inc\shortcuts.ahk
+#Include inc\Class_LV_Colors.ahk
 ;-!- Return after fucntions so lables don't get exacuted
 return
-#Include DummyGui.ahk
-#Include lables.ahk
+#Include inc\DummyGui.ahk
+#Include inc\lables.ahk
 return
 
 
