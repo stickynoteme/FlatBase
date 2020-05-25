@@ -12,6 +12,7 @@ DetectHiddenWindows, On
 Menu, Tray, NoStandard
 Menu, Tray, Add 
 Menu, Tray, Add, Library
+Menu, Tray, Add, Note Template Maker,NoteTemplateMaker
 Menu, Tray, Add, About
 Menu, Tray, Add, Options
 Menu, Tray, Add, Exit
@@ -20,6 +21,25 @@ Menu, Tray, Default, Library
 ;-------------------------------------------------
 ;Set up script global variables
 ;-------------------------------------------------
+;hwnd
+global HSterm ; Lib Searchbox 
+global HQNB ; QuickNoteBox
+global HLV ;Lib listview
+global HPB ;
+global HSF ;
+global HQNUSL1
+global HQNUSl2
+global HQNUSl3
+global HSEB
+global HSFB2
+global HstarBox1
+global HstarBox2
+global HstarBox3
+global HstarBox4
+global HTSLB ;Template Selection List Box
+global HTSGUI ;Template Select GUI
+
+global NewTemplateRows
 global NewExternalEditor
 global CheckForOldNote 
 global OldStarData
@@ -116,6 +136,7 @@ global StarOldFile
 global TitleOldFile
 global ShowStarHelper
 global CtrlEnter
+global templatePath
 ;Pre-set globals
 global savedHK1
 global savedHK2
@@ -166,6 +187,7 @@ detailsPath := A_WorkingDir "\NoteDetails\"
 iniPath = %A_WorkingDir%\settings.ini
 systemINI = %A_WorkingDir%\sys\system.ini
 themePath = %A_WorkingDir%\sys\Themes
+templatePath = %A_WorkingDir%\NoteTemplates\
 IniRead, U_NotePath, %iniPath%, General, MyNotePath,%A_WorkingDir%\MyNotes\
 
 if InStr(FileExist(U_NotePath), "D") {
@@ -242,6 +264,7 @@ IniRead, savedSK1, %iniPath%, Shortcuts, 1,!s
 IniRead, savedSK2, %iniPath%, Shortcuts, 2,!r
 IniRead, savedSK3, %iniPath%, Shortcuts, 3,!e
 
+IniRead, NewTemplateRows,%iniPath%, General, NewTemplateRows, 8
 IniRead, ExternalEditor, %iniPath%, General, ExternalEditor,NONE
 IniRead, CtrlEnter,%iniPath%,General,CtrlEnter,0
 IniRead, ShowStarHelper,%iniPath%,General,ShowStarHelper,0

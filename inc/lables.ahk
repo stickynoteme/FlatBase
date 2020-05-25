@@ -25,10 +25,9 @@ Label1:
 }
 Label2:
 {
-	IniRead,sendCtrlC,%iniPath%,General,sendCtrlC, 1
 	if (sendCtrlC="1")
 		send {Ctrl Down}{c}{Ctrl up}
-		clipboard := clipboard
+	clipboard := clipboard
 
 	BuildGUI2()
 	ControlFocus, Edit4, FlatNote - QuickNote
@@ -68,10 +67,13 @@ Label3:
 			}
 		;trim space and tab
 		ztitle := Trim(1ztitle," 	")
-		IfExist, %U_NotePath%%ztitle%.txt 
-			msgbox A note with this title already exsits.
 		IfExist, %U_NotePath%%ztitle%.txt
+		{
+			OnMessage(0x44, "OnMsgBox")
+			MsgBox 0x40, Exits, A note with this name already exits.
+			OnMessage(0x44, "")
 			return
+		}
 		
 		istitle = no
 		ztitleEncoded := NameEncode(ztitle)
@@ -1938,39 +1940,74 @@ LabelS:
 		setSK(num, savedSK%num%, SK%num%)
 	return
 }
+ntmGuiClose:
+{
+	Gui, ntm:Destroy
+	return
+}
+ntGuiEscape:
+ntGuiClose:
+{
+	Gui, nt:Destroy
+	return
+}
 sbGuiEscape:
+sbGuiClose:
 {
 	Gui, sb:Destroy
 	return
 }
 StarGuiEscape:
+StarGuiClose:
 {
 	Gui, Star:Destroy
 	return
 }
+tsGuiClose:
+tsGuiEscape:
+{
+	Gui, ts:Destroy
+	return
+}
+tGuiClose:
 tGuiEscape:
 {
 	Gui, t:Destroy
 	return
 }
 6GuiEscape:
+6GuiClose:
 {
 	Gui, 6:Destroy
 	return
 }
 4GuiEscape:
+4GuiClose:
 {
 	Gui, 4:Destroy
 	return
 }
 3GuiEscape:
+3GuiClose:
 {
 	Gui, 3:Destroy
 	reload
 	return
 }
 2GuiEscape:
+2GuiClose:
 {
+	GuiControlGet,working_QuickNote,,%HQNB%
+	if (working_QuickNote != "") {
+		OnMessage(0x44, "OnMsgBox")
+		MsgBox 0x40034, Close?, - Note data will be lost -`nCuntinue to close?
+		OnMessage(0x44, "")
+		IfMsgBox Yes, {
+			Gui, 2:Destroy
+		} Else IfMsgBox No, {
+			return
+		}
+	}
 	Gui, 2:Destroy 
 	return
 }
@@ -2176,4 +2213,175 @@ GuiTimerSB:
 		SetTimer, GuiTimerSB, Off
 	}
 	Return
+}
+NoteTemplateSelectUI:
+{
+	MouseGetPos, xPos, yPos
+	xPos /= 1.15
+	yPos /= 1.15
+	TemplateFileList := ""
+	Loop, Files, %templatePath%*.txt 
+		TemplateFileList .= A_LoopFileName "|"
+	gui, ts:new, +hwndHTSGUI ,Template Select - FlatNotes
+	Gui, ts:Margin, 3,3
+	Gui, ts:Font, s10, Courier New,
+	Gui, ts:Color,%U_SBG%, %U_MBG%
+	Gui, ts:Add, Listbox, -E0x200 hwndHTSLB c%U_MFC% r10 w200 gNoteTemplateUI vSelected_NoteTemplate,%TemplateFileList%
+	if (HideScrollbars = 1) {
+		LVM_ShowScrollBar(HTSLB,1,False)
+		GuiControl,+Vscroll,%HTSLB%
+	}
+	Gui, ts:add, edit, c%U_MFC% center r1 -E0x200 x178 w25 vTRowsOver gTRowsOver, %NewTemplateRows%
+	Gui, ts:add, text, c%U_SFC% center x0 w148 yp+5 gNoteTemplateMaker,  [ Make New ]
+	Gui, ts:show, x%xPos% y%yPos%
+return
+}
+TRowsOver:
+{
+	GuiControlGet,TRowsOver
+	IniWrite, %TRowsOver%,%iniPath%, General, NewTemplateRows
+	Iniread, NewTemplateRows,%iniPath%, General, NewTemplateRows
+	return
+}
+NoteTemplateUI:
+{
+	GuiControlGet,Selected_NoteTemplate
+	if (Selected_NoteTemplate = "")
+		return
+	Gui, ts:submit
+	Gui, ts:destroy
+	MouseGetPos, xPos, yPos
+	xPos /= 1.15
+	yPos /= 1.15
+	WindowW := ""
+	FileRead, TemplateTMP, %templatePath%%Selected_NoteTemplate%
+	TemplateTMP := trim(TemplateTMP,"`n")
+	TemplateTMP := trim(TemplateTMP,"`r")
+	NewTemplateArr := SubStr(TemplateTMP, InStr(TemplateTMP, "`n") + 1)
+	TemplateArr := StrSplit(NewTemplateArr, "`n","`n")
+	FileReadLine ListBoxWs, %templatePath%%Selected_NoteTemplate%, 1
+	ListBoxWArr := StrSplit(ListBoxWs, "|","|")
+	for k, v in TemplateArr {
+		wTMP%k%:= ListBoxWarr[A_Index]
+		wwTMP := wTMP%k%
+		WindowW += wwTMP+3
+	}
+	Gui, nt:Margin, 3,3
+	Gui, nt:Font, s10, Courier New,
+	Gui, nt:Color,%U_SBG%, %U_MBG%
+	Gui, nt:add, text, c%U_SFC% center w%WindowW% -E0x200 gntInsert, Insert
+	Gui, nt:add, text, c%U_SFC%section xs center h0 w0 hidden
+	for k, v in TemplateArr {
+		wTMP%k%:= ListBoxWarr[A_Index]
+		wwTMP := wTMP%k%
+		Gui, nt:add, listbox, % " -E0x200 c" U_MFC " x+3 w" wwTMP " vNTLB" k " r10", %v%
+	}
+	Gui, nt:add, text, c%U_SFC% center xs section w%WindowW% -E0x200 gntInsert, Insert
+	Gui, nt:show, x%xPos% y%yPos%
+	return
+}
+ntInsert:
+{
+Gui, nt:Submit
+for k, v in TemplateArr {
+    if (StrLen(NTLB%k%) > 0) {
+		NTLB%k% := trim(NTLB%k%)
+		NTLB%k% := trim(NTLB%k%,"`n")
+		NTLB%k% := trim(NTLB%k%,"`r")
+        NTBody .= NTLB%k% " "
+	}
+}
+Gui, nt:Destroy
+GuiControlGet,Old_QuickNote,,%HQNB%
+if (Old_QuickNote != "")
+	NL = `n
+GuiControl,,%HQNB%,%Old_QuickNote%%NL%%NTBody%
+for k, v in TemplateArr {
+	NTLB%k% := ""
+	wTMP%k% := ""
+}
+NL := ""
+NTBody := ""
+WindowW := ""
+TemplateArr := []
+ListBoxWArr := []
+NewTemplateArr :=[]
+return
+}
+NoteTemplateMaker:
+{
+	Gui, ntm:Margin, 3,3
+	Gui, ntm:Font, s10, Courier New,
+	Gui, ntm:Color,%U_SBG%, %U_MBG%
+	Gui, ntm:add, text, c%U_SFC% section y+3 w50, Name:
+	Gui, ntm:add, Edit, c%U_MFC% x+3 w300 r1 -E0x200 vTemplateFileName,
+	Gui, ntm:add, text, c%U_SFC% x+3 w50, .txt
+	Gui, ntm:add, text, section xs center h0 w0 hidden
+	Gui, ntm:add, text, c%U_SFC% center w400, Width of each list: (50|70|100)
+	Gui, ntm:add, text, c%U_SFC% center w200 gAutoWidth, [ Auto Width ]
+	Gui, ntm:add, text, c%U_SFC% center w200 x+3 gntSAVE, [ Save ]
+	Gui, ntm:add, Edit, c%U_MFC% section xs w400 r1 -E0x200 vListBoxWidthRow,
+
+	Gui, ntm:add, text, c%U_SFC%section xs center w400, List below here: (Red|Blue|Green) 
+	Loop %NewTemplateRows% {
+		Gui, ntm:add, text, c%U_SFC% section xs w30, %a_index%:
+		Gui, ntm:add, Edit, c%U_MFC% x+3 w370 r1 -E0x200  vTMLB%a_index%,
+	}
+	Gui, ntm:show
+	return 
+}
+
+AutoWidth:
+{
+BigSizeList :=""
+ Loop %NewTemplateRows% {
+	GuiControlGet,TMLB%a_index%
+	TmpArr := strsplit(TMLB%a_index%,"|","|")
+	num++
+	for k, v in TmpArr
+		SizeList%num% .= StrLen(v) ","
+	Sort SizeList%num%, N R D,
+	RegExMatch(SizeList%num%, "\d+" , Match)
+	SizeList%num% := Match * 9
+	BigSizeList .= SizeList%num% "|"
+ }
+ BigSizeList := trim(BigSizeList,"|")
+ GuiControl,,ListBoxWidthRow, %BigSizeList%
+ ;MsgBox % SizeList1 "|" SizeList2
+return
+}
+
+
+ntSAVE:
+{
+	GuiControlGet,TemplateFileName
+		if (TemplateFileName = ""){
+			msgbox Name can't be blank.
+			return
+		}
+		IfExist, %templatePath%%TemplateFileName%.txt
+		{
+			MsgBox Template with this name already exits.
+			return
+		}
+	GuiControlGet,ListBoxWidthRow
+	TemplateFileText := ListBoxWidthRow "`n"
+	Loop %NewTemplateRows% {
+		GuiControlGet,TMLB%a_index%
+		if (TMLB%a_index% > 0)
+			TemplateFileText .= TMLB%a_index% "`n"
+	}
+	FileAppend,%TemplateFileText%,%templatePath%%TemplateFileName%.txt, UTF-8
+		IfExist, %templatePath%%TemplateFileName%.txt
+		{
+			Gui, ntm:destroy
+			if (WinExist("Template Select - FlatNotes")) {
+				gui, ts:destroy
+				gosub NoteTemplateSelectUI
+				}
+			return
+		}else {
+			msgbox Soemthing went wrong...
+		}
+	return
 }

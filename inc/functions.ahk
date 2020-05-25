@@ -193,7 +193,9 @@ BuildGUI2(){
 		GuiControl,+Vscroll,%HQNUSL1%
 		GuiControl,+Vscroll,%HQNUSL2%
 	}
-	
+	TemplateFiles = 1
+	if (TemplateFiles > 0)
+		gui, 2:Add, text, xs section center c%U_SFC% x%QuickNoteXOffset% w%QuickNoteEditW%  gNoteTemplateSelectUI, [ Template ] 
 	Gui, 2:Add, Button,x-1000 default gSaveButton y-1000, &Save
 	Gui, 2:Add,Text,x-1000 y-1000 vFileSafeName,	
 	Gui, 2:SHOW, w%QuickNoteWidth% %xPos% %yPos% 	
@@ -536,4 +538,13 @@ LVM_ShowScrollBar(hLV,wBar,p_Show=True)
 
     Return RC ? True:False
     }
-	
+OnMsgBox() {
+	MouseGetPos, xPos, yPos
+	xPos /= 1.5
+	yPos /= 1.15
+	DetectHiddenWindows, On
+    Process, Exist
+    If (WinExist("ahk_class #32770 ahk_pid " . ErrorLevel)) {
+        WinMove %xPos%, %yPos%
+    }
+}
