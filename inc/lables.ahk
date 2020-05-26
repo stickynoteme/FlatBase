@@ -2263,6 +2263,7 @@ TRowsOver:
 }
 NoteTemplateUI:
 {
+	
 	LV_GetText(Selected_NoteTemplate,A_EventInfo)
 	;z := "#" A_GuiEvent ":" errorlevel ":" A_EventInfo ":" LV@sel_col ":" ;Selected_NoteTemplate
 	;tooltip % z
@@ -2271,9 +2272,15 @@ NoteTemplateUI:
 
 	if A_GuiEvent in RightClick
 	{
+		if WinExist("Template Maker - FlatNotes"){
+		msgbox Sorry only one template can be open at a time.
+		gui,ts:destroy
+		return
+		}
 		FileRead,TemplateToEdit,%templatePath%%Selected_NoteTemplate%
 		TemplateEditName := RegExReplace(Selected_NoteTemplate, "\.txt(?:^|$|\r\n|\r|\n)")
 		TTEArr := StrSplit(TemplateToEdit,"`n","`n")
+		Gui, ntm:new,hwndHNTM ,Template Maker - FlatNotes
 		Gui, ntm:Margin, 3,3
 		Gui, ntm:Font, s10, Courier New,
 		Gui, ntm:Color,%U_SBG%, %U_MBG%
@@ -2311,6 +2318,7 @@ NoteTemplateUI:
 		{
 		if (Selected_NoteTemplate = "")
 			return
+		Gui, nt:destroy
 		Gui, ts:submit
 		Gui, ts:destroy
 		MouseGetPos, xPos, yPos
@@ -2337,7 +2345,11 @@ NoteTemplateUI:
 		for k, v in TemplateArr {
 			wTMP%k%:= ListBoxWarr[A_Index]
 			wwTMP := wTMP%k%
-			Gui, nt:add, listbox, % " -E0x200 c" U_MFC " x+3 w" wwTMP " vNTLB" k " r10", %v%
+			if (wwTMP = ""){
+				msgbox Width Row is missing a value.`n`nTry opening this template in the editor by right clicking it and using [Auto Width].
+				return
+			}
+			Gui, nt:add, listbox, % "Multi -E0x200 c" U_MFC " x+3 w" wwTMP " vNTLB" k " r10", %v%
 		}
 		Gui, nt:add, text, c%U_SFC% center xs section w%WindowW% -E0x200 gntInsert, Insert
 		Gui, nt:show, x%xPos% y%yPos%
@@ -2375,6 +2387,7 @@ return
 }
 NoteTemplateMaker:
 {
+	gui, ntm:new,hwndHNTM ,Template Maker - FlatNotes
 	Gui, ntm:Margin, 3,3
 	Gui, ntm:Font, s10, Courier New,
 	Gui, ntm:Color,%U_SBG%, %U_MBG%
