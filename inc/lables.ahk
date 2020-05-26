@@ -975,7 +975,7 @@ settimer,KillToolTip,-1000
 }
 About:
 {
-Gui, 4:add,text,,FlatNotes Version 3.0.0b1 May 2020
+Gui, 4:add,text,,FlatNotes Version 3.0.0 June 2020
 Gui, 4:Add,Link,,<a href="https://github.com/chaosdrop/FlatNotes">GitHub Page</a>
 Gui, 4:add,button,g4GuiEscape,Close
 Gui, 4:Show
@@ -2300,7 +2300,7 @@ NoteTemplateSelectUI:
 	LV_ModifyCol(1, "Logical")
 	LV_ModifyCol(1, "Sort")
 	
-	Gui, ts:add, edit, c%U_MFC% center r1 -E0x200 x197 w25 vTRowsOver gTRowsOver, %NewTemplateRows%
+	Gui, ts:add, edit, c%U_MFC% center hwndHTRowsOver r1 -E0x200 x197 w25 vTRowsOver gTRowsOver, %NewTemplateRows%
 	Gui, ts:add, text, c%U_SFC% center x0 w148 yp+5 gNoteTemplateMaker,  [ Make New ]
 	
 	CLV := New LV_Colors(HTSLB)
@@ -2312,10 +2312,17 @@ return
 TRowsOver:
 {
 	GuiControlGet,TRowsOver
+	if (TRowsOver>30)
+		TRowsOver = 30
 	IniWrite, %TRowsOver%,%iniPath%, General, NewTemplateRows
 	Iniread, NewTemplateRows,%iniPath%, General, NewTemplateRows
 	return
 }
+NTMoveUP:
+{
+	
+}
+
 NoteTemplateUI:
 {
 	
@@ -2354,16 +2361,21 @@ NoteTemplateUI:
 		for, k,v  in TTEArr {
 			RowDetails := TTEArr[A_Index]
 			Gui, ntm:add, text, c%U_SFC% section xs w30, %a_index%:
-			Gui, ntm:add, Edit, c%U_MFC% x+3 w370 r1 -E0x200  vTMLB%a_index%,%RowDetails%
+			;370 
+			Gui, ntm:add, Edit, c%U_MFC% x+3 w350 r1 -E0x200  vTMLB%a_index%,%RowDetails%
+			Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMup%a_index%,%TemplateAboveSymbol%
+			Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMdown%a_index%,%TemplateBelowSymbol%
 		}
 		BlankRows := TTEArr.MaxIndex()
-		GuiControlGet,TRowsOver
+		GuiControlGet,TRowsOver,, %HTRowsOver%
 		CheckRows := TRowsOver - BlankRows
 		if (CheckRows>0)
 			Loop %CheckRows% {
 				BlankRows++
 				Gui, ntm:add, text, c%U_SFC% section xs w30, %BlankRows%:
-				Gui, ntm:add, Edit, c%U_MFC% x+3 w370 r1 -E0x200  vTMLB%BlankRows%,
+				Gui, ntm:add, Edit, c%U_MFC% x+3 w350 r1 -E0x200  vTMLB%BlankRows%,
+				Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMup%BlankRows%,%TemplateAboveSymbol%
+				Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMdown%BlankRows%,%TemplateBelowSymbol%
 			}
 		Gui, ntm:show
 		return
@@ -2504,6 +2516,8 @@ NoteTemplateMaker:
 	Loop %NewTemplateRows% {
 		Gui, ntm:add, text, c%U_SFC% section xs w30, %a_index%:
 		Gui, ntm:add, Edit, c%U_MFC% x+3 w370 r1 -E0x200  vTMLB%a_index%,
+		Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMup%a_index%,%TemplateAboveSymbol%
+		Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMdown%a_index%,%TemplateBelowSymbol%
 	}
 	Gui, ntm:show
 	return 

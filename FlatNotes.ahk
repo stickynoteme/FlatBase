@@ -38,7 +38,9 @@ global HstarBox3
 global HstarBox4
 global HTSLB ;Template Selection List Box
 global HTSGUI ;Template Select GUI
+global HTRowsOver ; Total Rows edit box for Template maker
 
+global TRowsOver
 global OpenInQuickNote
 global NewTemplateRows
 global NewExternalEditor
@@ -239,6 +241,8 @@ if (isFristRun = "1") {
 	IniRead, Star2, %iniPath%, General, Star2
 	IniRead, Star3, %iniPath%, General, Star3
 	IniRead, Star4, %iniPath%, General, Star4
+	iniread, TemplateAboveSymbol,%systemINI%,SYS,TemplateAboveSymbol,+
+	iniread, TemplateBelowSymbol,%systemINI%,SYS,TemplateBelowSymbol,-
 ;-------------------------------------------------
 ; Read from theme .ini 
 ;-------------------------------------------------
@@ -272,6 +276,8 @@ IniRead, savedSK3, %iniPath%, Shortcuts, 3,!e
 
 
 IniRead, NewTemplateRows,%iniPath%, General, NewTemplateRows, 8
+if (NewTemplateRows>30)
+	NewTemplateRows = 30
 IniRead, ExternalEditor, %iniPath%, General, ExternalEditor,NONE
 IniRead, OpenInQuickNote, %iniPath%, General, OpenInQuickNote,1
 IniRead, CtrlEnter,%iniPath%,General,CtrlEnter,0
@@ -471,6 +477,7 @@ return
 return
 #Include inc\DummyGui.ahk
 #Include inc\lables.ahk
+#Include inc\tmLables.ahk
 return
 
 
