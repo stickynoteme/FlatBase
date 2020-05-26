@@ -360,6 +360,7 @@ Iniread, UserTimeFormat,%iniPath%,General,UserTimeFormat,yy/MM/dd
 ;-------------------------------------------------
 global StickyTW := StickyW-80
 global StickyMaxH
+global VSBW
 SysGet, VSBW, 2 ;Width of Vscroll Bar
 global libWColAdjust :=LibW ;-(VSBW+1) ;Prevent H-scroll bar.
 global libWAdjust := LibW+3

@@ -27,13 +27,14 @@ Label2:
 {
 	if (sendCtrlC="1")
 		send {Ctrl Down}{c}{Ctrl up}
-	clipboard := clipboard
+	MyClip := clipboard
+	MyClip := trim(MyClip)
 
 	BuildGUI2()
 	ControlFocus, Edit4, FlatNote - QuickNote
 
-	GuiControl,, QuickNoteName,%clipboard%
-	CBinfo = %clipboard%
+	GuiControl,, QuickNoteName,%MyClip%
+	CBinfo = %MyClip%
 	FileSafeName := NameEncode(CBinfo)
 	IfExist, %U_NotePath%%FileSafeName%.txt
 	{
@@ -57,6 +58,7 @@ Label3:
 	if(istitle != "no") {
 		send {Ctrl Down}{c}{Ctrl up}
 		ztitle := clipboard
+		
 		zbody := ""
 		;only first line for title to prevent fail
 		Loop, parse, clipboard, `n, `r
@@ -66,7 +68,7 @@ Label3:
 					break
 			}
 		;trim space and tab
-		ztitle := Trim(1ztitle," 	")
+		ztitle := Trim(1ztitle)
 		IfExist, %U_NotePath%%ztitle%.txt
 		{
 			OnMessage(0x44, "OnMsgBox")
@@ -236,11 +238,14 @@ return
 }
 SaveButton:
 {
-	GuiControlGet,FileSafeName,,FileSafeName
+	GuiControlGet,FileSafeName
 	if (QuickNoteName == ""){
 		MsgBox Note Name Can Not Be Empty
 	return
 	}
+	QuickNoteName := trim(QuickNoteName)
+	FileSafeName := trim(FileSafeName)
+	
 	Gui, 2:Submit
 	;convert used symbols to raw stars
 	if (QuickStar = Star1)
@@ -493,7 +498,7 @@ Critical
 ;z := "#" A_GuiEvent ":" errorlevel ":" A_EventInfo ":" LV@sel_col
 ;tooltip % z
 ;tooltip % x
-settimer,KillToolTip,-1000
+;settimer,KillToolTip,-1000
 
 if (WinActive(FlatNote - Library)) {
 	if (tNeedsSubmit = 1) {
@@ -2226,14 +2231,27 @@ NoteTemplateSelectUI:
 	Gui, ts:Margin, 3,3
 	Gui, ts:Font, s10, Courier New,
 	Gui, ts:Color,%U_SBG%, %U_MBG%
-	Gui, ts:Add, Listbox, -E0x200 hwndHTSLB c%U_MFC% r10 w200 gNoteTemplateUI vSelected_NoteTemplate,%TemplateFileList%
+	TemplateLBW := 227+VSBW
+	Gui, ts:Add, ListView, hwndHTSLB r10 x+-6 w%TemplateLBW% gNoteTemplateUI vSelected_NoteTemplate -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid C%U_MFC% +altsubmit -Multi Report, Name
 	if (HideScrollbars = 1) {
 		LVM_ShowScrollBar(HTSLB,1,False)
 		GuiControl,+Vscroll,%HTSLB%
 	}
-	Gui, ts:add, edit, c%U_MFC% center r1 -E0x200 x178 w25 vTRowsOver gTRowsOver, %NewTemplateRows%
+	TemplateFileList := Trim(TemplateFileList,"|")
+	TemplateFileListLVArr := strsplit(TemplateFileList, "|","|")
+	for k,v in TemplateFileListLVArr
+		LV_Add("",v)
+	LV_ModifyCol(1, 227)
+	LV_ModifyCol(1, "Logical")
+	LV_ModifyCol(1, "Sort")
+	
+	Gui, ts:add, edit, c%U_MFC% center r1 -E0x200 x197 w25 vTRowsOver gTRowsOver, %NewTemplateRows%
 	Gui, ts:add, text, c%U_SFC% center x0 w148 yp+5 gNoteTemplateMaker,  [ Make New ]
-	Gui, ts:show, x%xPos% y%yPos%
+	
+	CLV := New LV_Colors(HTSLB)
+	CLV.SelectionColors(rowSelectColor,rowSelectTextColor)
+
+	Gui, ts:show, x%xPos% y%yPos% w225
 return
 }
 TRowsOver:
@@ -2245,39 +2263,86 @@ TRowsOver:
 }
 NoteTemplateUI:
 {
-	GuiControlGet,Selected_NoteTemplate
-	if (Selected_NoteTemplate = "")
+	LV_GetText(Selected_NoteTemplate,A_EventInfo)
+	;z := "#" A_GuiEvent ":" errorlevel ":" A_EventInfo ":" LV@sel_col ":" ;Selected_NoteTemplate
+	;tooltip % z
+	;settimer,KillToolTip,-1000
+	;return
+
+	if A_GuiEvent in RightClick
+	{
+		FileRead,TemplateToEdit,%templatePath%%Selected_NoteTemplate%
+		TemplateEditName := RegExReplace(Selected_NoteTemplate, "\.txt(?:^|$|\r\n|\r|\n)")
+		TTEArr := StrSplit(TemplateToEdit,"`n","`n")
+		Gui, ntm:Margin, 3,3
+		Gui, ntm:Font, s10, Courier New,
+		Gui, ntm:Color,%U_SBG%, %U_MBG%
+		Gui, ntm:add, text, c%U_SFC% section y+3 w50, Name:
+		Gui, ntm:add, Edit, center c%U_MFC% x+3 w300 r1 -E0x200 vTemplateFileName,%TemplateEditName%
+		Gui, ntm:add, text, c%U_SFC% x+3 w50, .txt
+		Gui, ntm:add, text, section xs center h0 w0 hidden
+		Gui, ntm:add, text, c%U_SFC% center w400, Width of each list: (50|70|100)
+		Gui, ntm:add, text, c%U_SFC% center w200 gAutoWidth, [ Auto Width ]
+		Gui, ntm:add, text, c%U_SFC% center w200 x+3 gntSAVE, [ Save ]
+		TTEArrW := TTEArr[1]
+		Gui, ntm:add, Edit, center c%U_MFC% section xs w400 r1 -E0x200 vListBoxWidthRow,%TTEArrW%
+		TTEArr.RemoveAt(1)
+		
+		Gui, ntm:add, text, c%U_SFC%section xs center w400, List below here: (Red|Blue|Green) 
+		for, k,v  in TTEArr {
+			RowDetails := TTEArr[A_Index]
+			Gui, ntm:add, text, c%U_SFC% section xs w30, %a_index%:
+			Gui, ntm:add, Edit, c%U_MFC% x+3 w370 r1 -E0x200  vTMLB%a_index%,%RowDetails%
+		}
+		BlankRows := TTEArr.MaxIndex()
+		GuiControlGet,TRowsOver
+		CheckRows := TRowsOver - BlankRows
+		if (CheckRows>0)
+			Loop %CheckRows% {
+				BlankRows++
+				Gui, ntm:add, text, c%U_SFC% section xs w30, %BlankRows%:
+				Gui, ntm:add, Edit, c%U_MFC% x+3 w370 r1 -E0x200  vTMLB%BlankRows%,
+			}
+		Gui, ntm:show
 		return
-	Gui, ts:submit
-	Gui, ts:destroy
-	MouseGetPos, xPos, yPos
-	xPos /= 1.15
-	yPos /= 1.15
-	WindowW := ""
-	FileRead, TemplateTMP, %templatePath%%Selected_NoteTemplate%
-	TemplateTMP := trim(TemplateTMP,"`n")
-	TemplateTMP := trim(TemplateTMP,"`r")
-	NewTemplateArr := SubStr(TemplateTMP, InStr(TemplateTMP, "`n") + 1)
-	TemplateArr := StrSplit(NewTemplateArr, "`n","`n")
-	FileReadLine ListBoxWs, %templatePath%%Selected_NoteTemplate%, 1
-	ListBoxWArr := StrSplit(ListBoxWs, "|","|")
-	for k, v in TemplateArr {
-		wTMP%k%:= ListBoxWarr[A_Index]
-		wwTMP := wTMP%k%
-		WindowW += wwTMP+3
 	}
-	Gui, nt:Margin, 3,3
-	Gui, nt:Font, s10, Courier New,
-	Gui, nt:Color,%U_SBG%, %U_MBG%
-	Gui, nt:add, text, c%U_SFC% center w%WindowW% -E0x200 gntInsert, Insert
-	Gui, nt:add, text, c%U_SFC%section xs center h0 w0 hidden
-	for k, v in TemplateArr {
-		wTMP%k%:= ListBoxWarr[A_Index]
-		wwTMP := wTMP%k%
-		Gui, nt:add, listbox, % " -E0x200 c" U_MFC " x+3 w" wwTMP " vNTLB" k " r10", %v%
+	
+	if A_GuiEvent in Normal
+		{
+		if (Selected_NoteTemplate = "")
+			return
+		Gui, ts:submit
+		Gui, ts:destroy
+		MouseGetPos, xPos, yPos
+		xPos /= 1.15
+		yPos /= 1.15
+		WindowW := ""
+		FileRead, TemplateTMP, %templatePath%%Selected_NoteTemplate%
+		TemplateTMP := trim(TemplateTMP,"`n")
+		TemplateTMP := trim(TemplateTMP,"`r")
+		NewTemplateArr := SubStr(TemplateTMP, InStr(TemplateTMP, "`n") + 1)
+		TemplateArr := StrSplit(NewTemplateArr, "`n","`n")
+		FileReadLine ListBoxWs, %templatePath%%Selected_NoteTemplate%, 1
+		ListBoxWArr := StrSplit(ListBoxWs, "|","|")
+		for k, v in TemplateArr {
+			wTMP%k%:= ListBoxWarr[A_Index]
+			wwTMP := wTMP%k%
+			WindowW += wwTMP+3
+		}
+		Gui, nt:Margin, 3,3
+		Gui, nt:Font, s10, Courier New,
+		Gui, nt:Color,%U_SBG%, %U_MBG%
+		Gui, nt:add, text, c%U_SFC% center w%WindowW% -E0x200 gntInsert, Insert
+		Gui, nt:add, text, c%U_SFC%section xs center h0 w0 hidden
+		for k, v in TemplateArr {
+			wTMP%k%:= ListBoxWarr[A_Index]
+			wwTMP := wTMP%k%
+			Gui, nt:add, listbox, % " -E0x200 c" U_MFC " x+3 w" wwTMP " vNTLB" k " r10", %v%
+		}
+		Gui, nt:add, text, c%U_SFC% center xs section w%WindowW% -E0x200 gntInsert, Insert
+		Gui, nt:show, x%xPos% y%yPos%
+		return
 	}
-	Gui, nt:add, text, c%U_SFC% center xs section w%WindowW% -E0x200 gntInsert, Insert
-	Gui, nt:show, x%xPos% y%yPos%
 	return
 }
 ntInsert:
@@ -2361,8 +2426,14 @@ ntSAVE:
 		}
 		IfExist, %templatePath%%TemplateFileName%.txt
 		{
-			MsgBox Template with this name already exits.
-			return
+			OnMessage(0x44, "OnMsgBox")
+			MsgBox 0x24, Overwrite?, Overwrite existing template?
+			OnMessage(0x44, "")
+			IfMsgBox Yes, {
+				
+			} Else IfMsgBox No, {
+				return
+			}
 		}
 	GuiControlGet,ListBoxWidthRow
 	TemplateFileText := ListBoxWidthRow "`n"
@@ -2371,6 +2442,7 @@ ntSAVE:
 		if (TMLB%a_index% > 0)
 			TemplateFileText .= TMLB%a_index% "`n"
 	}
+	FileRecycle,%templatePath%%TemplateFileName%.txt
 	FileAppend,%TemplateFileText%,%templatePath%%TemplateFileName%.txt, UTF-8
 		IfExist, %templatePath%%TemplateFileName%.txt
 		{

@@ -491,6 +491,7 @@ Name := strreplace(Name,"7","seven")
 Name := strreplace(Name,"8","eight")
 Name := strreplace(Name,"9","nine")
 Name := strreplace(Name,"0","zero")
+Name := strreplace(Name," ","_")
 return Name
 }
 NameDecode(Name){

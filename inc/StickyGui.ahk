@@ -9,12 +9,12 @@ Build_Stickynote_GUI(NoteName,NoteFile)
 	Gui, %NoteName%:Color,%U_SBG%, %U_MBG%
 	Gui, %NoteName%:add, text, center  gPinsticky x+0 y0 h20 w20,=
 
-	Gui, %NoteName%:add, text, center  GuiMove x20 y0 h20 w%StickyTW%,%oNoteName%
+	Gui, %NoteName%:add, text, center c%U_SFC% GuiMove x20 y0 h20 w%StickyTW%,%oNoteName%
 	Gui, %NoteName%:Font, s%StickyFontSize% Q%FontRendering%, %StickyFontFamily%, %U_MFC%
 	Gui, %NoteName%:add, text, center  gUsticky x+0 y0 h20 w20,-
 	Gui, %NoteName%:add, text, center  gHsticky x+0 y0 h20 w20,#
 	Gui, %NoteName%:add, text, center  gXsticky x+0 y0 h20 w20,X
-	Gui, %NoteName%:add, edit, -Tabstop readonly hwndHStickyEdit w%StickyW% r%StickyRows% -E0x200 x0 ,%StickyBody%
+	Gui, %NoteName%:add, edit, -Tabstop readonly c%U_SFC% hwndHStickyEdit w%StickyW% r%StickyRows% -E0x200 x0 ,%StickyBody%
 	
 
 	LVM_ShowScrollBar(HStickyEdit,1,False)
