@@ -699,6 +699,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 	if A_GuiEvent in RightClick
 	{
 		LVSelectedROW := A_EventInfo
+		LV_GetText(NoteNameToEdit, LVSelectedROW,2)
 		LV_GetText(StarOldFile, LVSelectedROW,8)
 		LV_GetText(TitleOldFile, LVSelectedROW,8)
 		if (LV@sel_col=2) {
@@ -715,6 +716,33 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			return
 		}
 		if (LV@sel_col=3) {
+			OpenInQuickNote = 1
+			if (OpenInQuickNote = "1"){
+				MyClip := NoteNameToEdit
+
+				BuildGUI2()
+				ControlFocus, Edit4, FlatNote - QuickNote
+
+				GuiControl,, QuickNoteName,%MyClip%
+				CBinfo = %MyClip%
+				FileSafeName := NameEncode(CBinfo)
+				IfExist, %U_NotePath%%FileSafeName%.txt
+				{
+					FileRead, MyFile, %U_NotePath%%FileSafeName%.txt
+					IniRead, OldStarData, %detailsPath%%FileSafeName%.ini,INFO,Star
+					if (OldStarData = 10001)
+						OldStarData = %Star1%
+					if (OldStarData = 10002)
+						OldStarData = %Star2%
+					if (OldStarData = 10003)
+						OldStarData = %Star3%
+					if (OldStarData = 10004)
+						OldStarData = %Star4%
+					GuiControl,, QuickNoteBody,%MyFile%
+					GuiControl,, QuickStar,%OldStarData%
+				}
+				return
+			}				
 			if (InStr(ExternalEditor,".") != 0 ){
 				Run, %ExternalEditor% %U_NotePath%%TitleOldFile%
 				return
@@ -2003,7 +2031,9 @@ tGuiEscape:
 2GuiClose:
 {
 	GuiControlGet,working_QuickNote,,%HQNB%
-	if (working_QuickNote != "") {
+	GuiControlGet,working_QuickNoteSafeName,,%HQNFSN%
+	FileRead, CheckForOldNote, %U_NotePath%%working_QuickNoteSafeName%.txt
+	if (working_QuickNote != "" && working_QuickNote != CheckForOldNote) {
 		OnMessage(0x44, "OnMsgBox")
 		MsgBox 0x40034, Close?, - Note data will be lost -`nCuntinue to close?
 		OnMessage(0x44, "")

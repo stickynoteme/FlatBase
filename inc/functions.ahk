@@ -197,7 +197,7 @@ BuildGUI2(){
 	if (TemplateFiles > 0)
 		gui, 2:Add, text, xs section center c%U_SFC% x%QuickNoteXOffset% w%QuickNoteEditW%  gNoteTemplateSelectUI, [ Template ] 
 	Gui, 2:Add, Button,x-1000 default gSaveButton y-1000, &Save
-	Gui, 2:Add,Text,x-1000 y-1000 vFileSafeName,	
+	Gui, 2:Add,Text,x-1000 y-1000 vFileSafeName hwndHQNFSN,	
 	Gui, 2:SHOW, w%QuickNoteWidth% %xPos% %yPos% 	
 	return  
 }
