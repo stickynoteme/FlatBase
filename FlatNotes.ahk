@@ -144,6 +144,7 @@ global savedHK2
 global savedHK3
 global savedHK4
 global savedHK5
+global savedHK6
 global savedSK1
 global savedSK2
 global savedSK3
@@ -175,6 +176,7 @@ global StickyRows ;8
 ;Var with starting values
 global istitle = yes
 global savetimerrunning = 0
+global RapidNTAppend = 0
 
 ;tmp maybe
 global ColBase = ,6,7,8,9
@@ -230,6 +232,8 @@ if (isFristRun = "1") {
 	IniWrite, %Star_3%, %iniPath%, General, Star3
 	iniread, Star_4,%systemINI%,Start,Star4
 	IniWrite, %Star_4%, %iniPath%, General, Star4
+	IniWrite, 1, %iniPath%, General, OpenInQuickNote
+	IniRead, OpenInQuickNote, %iniPath%, General, OpenInQuickNote,1
 }
 	IniRead, Star1, %iniPath%, General, Star1
 	IniRead, Star2, %iniPath%, General, Star2
@@ -261,6 +265,7 @@ IniRead, savedHK2, %iniPath%, Hotkeys, 2,#n
 IniRead, savedHK3, %iniPath%, Hotkeys, 3,#z
 IniRead, savedHK4, %iniPath%, Hotkeys, 4,#+z
 IniRead, savedHK5, %iniPath%, Hotkeys, 5,#a
+IniRead, savedHK6, %iniPath%, Hotkeys, 6,+#a
 IniRead, savedSK1, %iniPath%, Shortcuts, 1,!s
 IniRead, savedSK2, %iniPath%, Shortcuts, 2,!r
 IniRead, savedSK3, %iniPath%, Shortcuts, 3,!e

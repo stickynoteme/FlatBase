@@ -4,6 +4,7 @@ SetUserHotKeys() {
 	Hotkey,%savedHK3%, Label3
 	Hotkey,%savedHK4%, Label4
 	Hotkey,%savedHK5%, Label5
+	Hotkey,%savedHK6%, Label6
 	
 	if (CtrlEnter = 0)
 		Hotkey,Enter, NewAndSaveHK
@@ -74,7 +75,6 @@ BuildGUI1(){
 	;Gui, 1:Add,edit, readonly h6 -E0x200
 	title_h := PreviewFontSize*1.7
 	Gui, 1:Add,edit, readonly center xs -E0x200  x0 vTitleBar C%U_SFC% w%LibW% h%title_h%,
-
 	
 	Gui, 1:Add,Edit, section hwndHPB -E0x200 r%PreviewRows% w%LibW% x0 C%U_MFC% gPreviewBox vPreviewBox,
 	
@@ -87,8 +87,8 @@ BuildGUI1(){
 	;statusbar
 	if (ShowStatusBar=1) {
 		Gui, 1:Font, s8 Q%FontRendering%
-		StatusWidth := LibW//3
-		Gui, 1:add,text, xs left vStatusBarCount w%StatusWidth% C%U_SFC%, %TotalNotes% of %TotalNotes%
+		StatusWidth := LibW//3-30
+		Gui, 1:add,text, left vStatusBarCount w%StatusWidth% C%U_SFC%, %TotalNotes% of %TotalNotes%
 		Gui, 1:add,text, x+0 center vStatusBarM w%StatusWidth% C%U_SFC%,M: 00/00/00
 		Gui, 1:add,text, x+0 right vStatusBarA w%StatusWidth% C%U_SFC%,A: 00/00/00
 		Gui, 1:Font, s2
@@ -164,8 +164,8 @@ BuildGUI2(){
 	Gui, 2:Margin , 2, 2 
 	Gui, 2:Font, s%FontSize% Q%FontRendering%, %FontFamily%, %U_SFC%	
 	Gui, 2:Color,%U_SBG%, %U_MBG%
-	Gui, 2:Add,Edit, section C%U_MFC% w%QuickSubWidth% y+2 x%QuickNoteXOffset% vQuickNoteName gQuickSafeNameUpdate -E0x200
-	Gui, 2:Add,Edit, x+2 w35    C%U_MFC% -E0x200 center vQuickStar,%OldStarData%
+	Gui, 2:Add,Edit, section C%U_MFC% w%QuickSubWidth% r1 y+2 x%QuickNoteXOffset% vQuickNoteName gQuickSafeNameUpdate -E0x200
+	Gui, 2:Add,Edit, x+2 w35 r1 C%U_MFC% -E0x200 center vQuickStar,%OldStarData%
 	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar1, %Star1%
 	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar2, %Star2%
 	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar3, %Star3% 
@@ -193,9 +193,10 @@ BuildGUI2(){
 		GuiControl,+Vscroll,%HQNUSL1%
 		GuiControl,+Vscroll,%HQNUSL2%
 	}
-	TemplateFiles = 1
-	if (TemplateFiles > 0)
-		gui, 2:Add, text, xs section center c%U_SFC% x%QuickNoteXOffset% w%QuickNoteEditW%  gNoteTemplateSelectUI, [ Template ] 
+	QNTextButtonW := round(QuickNoteEditW*0.5)
+	QNTextButtonSaveX := QuickNoteXOffset+QNTextButtonW
+	gui, 2:Add, text, xs section center c%U_SFC% x%QuickNoteXOffset% w%QNTextButtonW%  gNoteTemplateSelectUI, [ Template ] 
+	gui, 2:Add, text, x+1 center c%U_SFC% x%QNTextButtonSaveX% w%QNTextButtonW%  gSaveButton, [ Save ] 
 	Gui, 2:Add, Button,x-1000 default gSaveButton y-1000, &Save
 	Gui, 2:Add,Text,x-1000 y-1000 vFileSafeName hwndHQNFSN,	
 	Gui, 2:SHOW, w%QuickNoteWidth% %xPos% %yPos% 	

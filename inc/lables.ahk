@@ -118,6 +118,12 @@ Label5:
 	}
 	return
 }
+Label6: ;Append Template to Rapid Note
+{
+	RapidNTAppend = 1
+	gosub NoteTemplateSelectUI
+	return
+}
 LabelS1:
 {
 	;Focus Search
@@ -263,12 +269,9 @@ SaveButton:
 	SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,SaveMod)
 	;horrible fix to LV to update
 
-	GuiControlGet,SearchTerm
+	GuiControlGet,OldST,,%HSterm%
 	GuiControl,1: , SearchTerm,
-	GuiControl,1: , SearchTerm,
-	if WinActive("FlatNotes - Library"){
-		send {space}{backspace} ;update results
-	}
+	GuiControl,1: , SearchTerm,%OldST%
 	tooltip Saved
 	settimer, KillToolTip, -500
 	return
@@ -972,7 +975,7 @@ settimer,KillToolTip,-1000
 }
 About:
 {
-Gui, 4:add,text,,FlatNotes Version 2.7.0 May 2020
+Gui, 4:add,text,,FlatNotes Version 3.0.0b1 May 2020
 Gui, 4:Add,Link,,<a href="https://github.com/chaosdrop/FlatNotes">GitHub Page</a>
 Gui, 4:add,button,g4GuiEscape,Close
 Gui, 4:Show
@@ -1287,8 +1290,8 @@ Options:
 	GuiControl,,SetCtrlC,%sendCtrlC%
 	Gui, 3:Add,text, section h1 Disabled 			
 	
-	HotkeyNames := ["Show Library Window","Quick New Note","Rapid Note","Cancel Rapid Note","Rapid Note Append"]
-	Loop,% 5 {
+	HotkeyNames := ["Show Library Window","Quick New Note","Rapid Note","Cancel Rapid Note","Rapid Note Append","Append Template to Rapid Note"]
+	Loop,% 6 {
 		HotkeyNameTmp := HotkeyNames[A_Index]
 		Gui, 3:Add, Text, , Hotkey: %HotkeyNameTmp%
 		StringReplace, noMods, savedHK%A_Index%, ~                  
@@ -2002,6 +2005,7 @@ ntGuiEscape:
 ntGuiClose:
 {
 	Gui, nt:Destroy
+	RapidNTAppend = 0
 	return
 }
 sbGuiEscape:
@@ -2020,6 +2024,7 @@ tsGuiClose:
 tsGuiEscape:
 {
 	Gui, ts:Destroy
+	RapidNTAppend = 0
 	return
 }
 tGuiClose:
@@ -2390,7 +2395,7 @@ NoteTemplateUI:
 		Gui, nt:Margin, 3,3
 		Gui, nt:Font, s10, Courier New,
 		Gui, nt:Color,%U_SBG%, %U_MBG%
-		Gui, nt:add, text, c%U_SFC% center w%WindowW% -E0x200 gntInsert, Insert
+		Gui, nt:add, text, c%U_SFC% center w%WindowW% -E0x200 gntInsert, [ Insert At Top ]
 		Gui, nt:add, text, c%U_SFC%section xs center h0 w0 hidden
 		for k, v in TemplateArr {
 			wTMP%k%:= ListBoxWarr[A_Index]
@@ -2401,7 +2406,7 @@ NoteTemplateUI:
 			}
 			Gui, nt:add, listbox, % "Multi -E0x200 c" U_MFC " x+3 w" wwTMP " vNTLB" k " r10", %v%
 		}
-		Gui, nt:add, text, c%U_SFC% center xs section w%WindowW% -E0x200 gntInsert, Insert
+		Gui, nt:add, text, c%U_SFC% center xs section w%WindowW% -E0x200 gntInsertB, [ Insert At Bottom ]
 		Gui, nt:show, x%xPos% y%yPos%
 		return
 	}
@@ -2409,31 +2414,76 @@ NoteTemplateUI:
 }
 ntInsert:
 {
-Gui, nt:Submit
-for k, v in TemplateArr {
-    if (StrLen(NTLB%k%) > 0) {
-		NTLB%k% := trim(NTLB%k%)
-		NTLB%k% := trim(NTLB%k%,"`n")
-		NTLB%k% := trim(NTLB%k%,"`r")
-        NTBody .= NTLB%k% " "
+	Gui, nt:Submit
+	for k, v in TemplateArr {
+		if (StrLen(NTLB%k%) > 0) {
+			NTLB%k% := trim(NTLB%k%)
+			NTLB%k% := trim(NTLB%k%,"`n")
+			NTLB%k% := trim(NTLB%k%,"`r")
+			NTBody .= NTLB%k% " "
+		}
 	}
+	Gui, nt:Destroy
+	if (RapidNTAppend = 1) {
+		NL = `n
+		zbody = %NTBody%%NL%%zbody%
+		zbody := trim(zbody,"`n")
+		RapidNTAppend = 0
+	}
+	if (RapidNTAppend = 0 or RapidNTAppend = "") {
+		GuiControlGet,Old_QuickNote,,%HQNB%
+		if (StrLen(zbody) > 0)
+			NL = `n
+		GuiControl,,%HQNB%,%NTBody%%NL%%Old_QuickNote%
+	}
+	for k, v in TemplateArr {
+		NTLB%k% := ""
+		wTMP%k% := ""
+	}
+	NL := ""
+	NTBody := ""
+	WindowW := ""
+	TemplateArr := []
+	ListBoxWArr := []
+	NewTemplateArr :=[]
+	return
 }
-Gui, nt:Destroy
-GuiControlGet,Old_QuickNote,,%HQNB%
-if (Old_QuickNote != "")
-	NL = `n
-GuiControl,,%HQNB%,%Old_QuickNote%%NL%%NTBody%
-for k, v in TemplateArr {
-	NTLB%k% := ""
-	wTMP%k% := ""
-}
-NL := ""
-NTBody := ""
-WindowW := ""
-TemplateArr := []
-ListBoxWArr := []
-NewTemplateArr :=[]
-return
+ntInsertB:
+{
+	Gui, nt:Submit
+	for k, v in TemplateArr {
+		if (StrLen(NTLB%k%) > 0) {
+			NTLB%k% := trim(NTLB%k%)
+			NTLB%k% := trim(NTLB%k%,"`n")
+			NTLB%k% := trim(NTLB%k%,"`r")
+			NTBody .= NTLB%k% " "
+		}
+	}
+	Gui, nt:Destroy
+	if (RapidNTAppend = 1) {
+		NL = `n
+		zbody = %zbody%%NL%%NTBody%
+		zbody := trim(zbody,"`n")
+		RapidNTAppend = 0
+	}
+	if (RapidNTAppend = 0 or RapidNTAppend = "") {
+		GuiControlGet,Old_QuickNote,,%HQNB%
+		Old_QuickNote := RTrim(Old_QuickNote,"`n")
+		if (Old_QuickNote != "")
+			NL = `n
+		GuiControl,,%HQNB%,%Old_QuickNote%%NL%%NTBody%
+	}
+	for k, v in TemplateArr {
+		NTLB%k% := ""
+		wTMP%k% := ""
+	}
+	NL := ""
+	NTBody := ""
+	WindowW := ""
+	TemplateArr := []
+	ListBoxWArr := []
+	NewTemplateArr :=[]
+	return
 }
 NoteTemplateMaker:
 {
