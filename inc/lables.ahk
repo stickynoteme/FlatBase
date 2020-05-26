@@ -716,7 +716,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			return
 		}
 		if (LV@sel_col=3) {
-			OpenInQuickNote = 1
+			
 			if (OpenInQuickNote = "1"){
 				MyClip := NoteNameToEdit
 
@@ -1269,6 +1269,9 @@ Options:
 	Gui, 3:Add,CheckBox, xs vSelect_ShowStarHelper gSet_ShowStarHelper, Show star filter by search box?
 	GuiControl,,Select_ShowStarHelper,%ShowStarHelper%
 
+	Gui, 3:Add,CheckBox, xs vSelect_OpenInQuickNote gSet_OpenInQuickNote, Use Quick Notes to edit on right click?
+	GuiControl,,Select_OpenInQuickNote,%OpenInQuickNote%
+
 	Gui, 3:Add,Text,section xs, External Editor: (leave blank for system default)
 	Gui, 3:Add,Edit, r1 w300 vSelect_ExternalEditor, %ExternalEditor%
 	Gui, 3:Add,Button, gSet_ExternalEditor, Select a program.
@@ -1294,8 +1297,6 @@ Options:
 		Gui, 3:Add, CheckBox, x+6  vCB%A_Index% Checked%ErrorLevel%, Win
 		Gui, 3:Add,text, h0 xs0 Disabled
 	}                                                        
-	if (U_Capslock = 1)
-		GuiControl, Disable, msctls_hotkey321
 ;-------------------------------------------------
 ;Shortcuts Tab
 ;-------------------------------------------------
@@ -1443,6 +1444,12 @@ Options:
 	
 	Gui, 3:Tab 
 	Gui, 3:Add, Button, Default gSaveAndReload, Save and Reload
+	
+	
+	if (U_Capslock = 1)
+		GuiControl, Disable, msctls_hotkey321
+	if (OpenInQuickNote = 1)
+		GuiControl, Disable, Select_ExternalEditor
 	Gui, 3:SHOW 
 	WinSet, AlwaysOnTop, On, FlatNotes - Options
 	return
@@ -1684,6 +1691,19 @@ Set_ShowStarHelper:
 	if (A_GuiEvent == "Normal"){
 		IniWrite,%Select_ShowStarHelper%, %iniPath%, General, ShowStarHelper
 		IniRead,ShowStarHelper,%iniPath%,General,ShowStarHelper
+	}
+return
+}
+Set_OpenInQuickNote:
+{
+	GuiControlGet,Select_OpenInQuickNote
+	if (OpenInQuickNote = 0)
+		GuiControl, Disable, Select_ExternalEditor
+	if (OpenInQuickNote = 1)
+		GuiControl, Enable, Select_ExternalEditor
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_OpenInQuickNote%, %iniPath%, General, OpenInQuickNote
+		IniRead,OpenInQuickNote,%iniPath%,General,OpenInQuickNote
 	}
 return
 }

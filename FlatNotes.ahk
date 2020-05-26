@@ -39,6 +39,7 @@ global HstarBox4
 global HTSLB ;Template Selection List Box
 global HTSGUI ;Template Select GUI
 
+global OpenInQuickNote
 global NewTemplateRows
 global NewExternalEditor
 global CheckForOldNote 
@@ -264,8 +265,10 @@ IniRead, savedSK1, %iniPath%, Shortcuts, 1,!s
 IniRead, savedSK2, %iniPath%, Shortcuts, 2,!r
 IniRead, savedSK3, %iniPath%, Shortcuts, 3,!e
 
+
 IniRead, NewTemplateRows,%iniPath%, General, NewTemplateRows, 8
 IniRead, ExternalEditor, %iniPath%, General, ExternalEditor,NONE
+IniRead, OpenInQuickNote, %iniPath%, General, OpenInQuickNote,1
 IniRead, CtrlEnter,%iniPath%,General,CtrlEnter,0
 IniRead, ShowStarHelper,%iniPath%,General,ShowStarHelper,0
 
