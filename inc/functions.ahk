@@ -68,15 +68,19 @@ BuildGUI1(){
 	Gui, 1:Add, text, yp+1 xp+%BodyColW% w%AddColW% center c%U_SFC% gSortAdded vSortAdded, Added
 	Gui, 1:Add, text, yp+1 xp+%AddColW% w%ModColW% center c%U_SFC% gSortModded vSortModded, Modified
 	
-	Gui, 1:Add, ListView, -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar
+	Gui, 1:Add, ListView,section -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar
 
 	;Allow User set prevent/edit font
 	Gui, 1:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
 	;Gui, 1:Add,edit, readonly h6 -E0x200
 	title_h := PreviewFontSize*1.7
-	Gui, 1:Add,edit, readonly center xs -E0x200  x0 vTitleBar C%U_SFC% w%LibW% h%title_h%,
+	TitleWAdjust := round(LibW*0.9)
+	Gui, 1:Add,text, center xs c%U_SFC% -E0x200 w25 h%title_h% gLibTemplateAdd, %TemplateSymbol%
+	Gui, 1:Add,edit, readonly center x+35 -E0x200 vTitleBar C%U_SFC% w%TitleWAdjust% h%title_h% backgroundTrans,
 	
-	Gui, 1:Add,Edit, section hwndHPB -E0x200 r%PreviewRows% w%LibW% x0 C%U_MFC% gPreviewBox vPreviewBox,
+	
+	
+	Gui, 1:Add,Edit, section x1 hwndHPB -E0x200 r%PreviewRows% w%LibW% C%U_MFC% gPreviewBox vPreviewBox,
 	
 	MakeFileList(1)
 	CLV := New LV_Colors(HLV)
@@ -87,7 +91,7 @@ BuildGUI1(){
 	;statusbar
 	if (ShowStatusBar=1) {
 		Gui, 1:Font, s8 Q%FontRendering%
-		StatusWidth := LibW//3-30
+		StatusWidth := LibW//3
 		Gui, 1:add,text, left vStatusBarCount w%StatusWidth% C%U_SFC%, %TotalNotes% of %TotalNotes%
 		Gui, 1:add,text, x+0 center vStatusBarM w%StatusWidth% C%U_SFC%,M: 00/00/00
 		Gui, 1:add,text, x+0 right vStatusBarA w%StatusWidth% C%U_SFC%,A: 00/00/00
@@ -134,18 +138,11 @@ BuildGUI1(){
 	gosub search
 	return
 }
+
 BuildGUI2(){
-	QuickStarListRows := QuickNoteRows+2
-	QuickSubWidth := QuickNoteWidth-232
-	QuickNoteEditW := QuickNoteWidth-42
-	if (OOKStars > 0){
-		QNOKX := QuickNoteWidth-37
-		QuickSubWidth := QuickNoteWidth-267
-		QuickNoteEditW := QuickNoteWidth-80
-	}
-	QuickNoteXOffset := 40
-	if (UniqueStarList2>0)
-		QuickNoteXOffset := 80
+	QuickSubWidth := QuickNoteWidth-70
+	QuickNoteEditW := QuickNoteWidth-5
+	QuickNoteXOffset := 3
 	FileSafeClipBoard := NameEncode(clipboard)
 	CheckForOldNote = %U_NotePath%%FileSafeClipBoard%.txt
 	FileRead, OldNoteData, %CheckForOldNote%
@@ -160,38 +157,35 @@ BuildGUI2(){
 		xPos = x%xPos%
 		yPos = y%yPos%
 	}
-	Gui, 2:New,, FlatNote - QuickNote
+	OD_LB  := "+0x0050" 
+	Gui, 2:New,-Caption, FlatNote - QuickNote
 	Gui, 2:Margin , 2, 2 
-	Gui, 2:Font, s%FontSize% Q%FontRendering%, %FontFamily%, %U_SFC%	
+	Gui, 2:Font, s10 Q%FontRendering%, Verdana, %U_SFC%	
 	Gui, 2:Color,%U_SBG%, %U_MBG%
-	Gui, 2:Add,Edit, section C%U_MFC% w%QuickSubWidth% r1 y+2 x%QuickNoteXOffset% vQuickNoteName gQuickSafeNameUpdate -E0x200
-	Gui, 2:Add,Edit, x+2 w35 r1 C%U_MFC% -E0x200 center vQuickStar,%OldStarData%
-	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar1, %Star1%
-	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar2, %Star2%
-	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar3, %Star3% 
-	Gui, 2:Add,text, x+2 w35 r1 C%U_SFC% -E0x200 center gAddStar4, %Star4%
+	QNtW := QuickNoteWidth - 50
+	QNxX := QuickNoteWidth - 25
+	Gui, 2:add,listbox, center hwndQNLBG r1 x0 y-10 r2 %OD_LB% disabled w%QuickNoteWidth% -E0x200,%a_space%|%a_space%
+	Gui, 2:Add,Text, y2 c%U_SFC% x2 h25 w25 center backgroundTrans hwndQNpinBar gPinsticky, =
+	Gui, 2:Add,Text, y2 c%U_SFC% x%QNxX% h25 w25 center backgroundTrans g2GuiClose hwndQNxBar, X
+	Gui, 2:add,Text, center c%U_SFC% GuiMove x2 y2 h25 hwndQNTitleBar w%QNtW% backgroundTrans, - Quick Note -
+	Gui, 2:Font, s%FontSize% Q%FontRendering%, %FontFamily%, %U_SFC%	
 	
+	gui, 2:add,listbox, w%QuickSubWidth% r1 y+-3 x2 -E0x200 disabled
+	Gui, 2:Add,Edit, C%U_MFC% w%QuickSubWidth% r1 yp+5 xp+0 vQuickNoteName gQuickSafeNameUpdate -E0x200 hwndHQNNE
+	
+	gui, 2:add,listbox, w35 r1 x+2  yp-5 -E0x200 disabled
+	Gui, 2:Add,Edit, xp+0 yp+5 w35 r1 C%U_MFC% -E0x200 center hwndHQNQS vQuickStar,
 
+	Gui, 2:Font, s%FontSize%, Segoe UI Emoji
+	GUI, 2:Add,text, x+2 w25 r1 C%U_SFC% center gStarQN, %Star1%
+	Gui, 2:Font, s%FontSize% Q%FontRendering%, %FontFamily%, %U_SFC%	
 	Gui, 2:Add,Edit, disabled hidden x+1 r1 w0
 	
-
 	Gui, 2:Add,Edit, xs section y+2 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r%QuickNoteRows% w%QuickNoteEditW% vQuickNoteBody hwndHQNB
-	
-
-	Gui, 2:Add,listbox, center x2 y4 w35 hwndHQNUSL1 C%U_MFC% r%QuickStarListRows% -Vscroll -E0x200 gAddStarU vSelect_UStar,%UniqueStarList%
-	if (UniqueStarList2>0)
-		Gui, 2:Add,listbox, center x2 y4 w35 hwndHQNUSL2 C%U_MFC% r%QuickStarListRows% -Vscroll -E0x200 gAddStarU2 vSelect_UStar2 ,%UniqueStarList2%
-	if (OOKStars > 0)
-		Gui, 2:Add,listbox, center x%QNOKX% y4 w35 hwndHQNUSL3 C%U_MFC% r%QuickStarListRows% -Vscroll -E0x200 gAddStarU3 vSelect_UStar3 ,%OOKStars%
-	
 	
 	if (HideScrollbars = 1) {
 		LVM_ShowScrollBar(HQNB,1,False)
-		LVM_ShowScrollBar(HQNUSL1,1,False)
-		LVM_ShowScrollBar(HQNUSL2,1,False)
 		GuiControl,+Vscroll,%HQNB%
-		GuiControl,+Vscroll,%HQNUSL1%
-		GuiControl,+Vscroll,%HQNUSL2%
 	}
 	QNTextButtonW := round(QuickNoteEditW*0.5)
 	QNTextButtonSaveX := QuickNoteXOffset+QNTextButtonW
@@ -199,7 +193,11 @@ BuildGUI2(){
 	gui, 2:Add, text, x+1 center c%U_SFC% x%QNTextButtonSaveX% w%QNTextButtonW%  gSaveButton, [ Save ] 
 	Gui, 2:Add, Button,x-1000 default gSaveButton y-1000, &Save
 	Gui, 2:Add,Text,x-1000 y-1000 vFileSafeName hwndHQNFSN,	
-	Gui, 2:SHOW, w%QuickNoteWidth% %xPos% %yPos% 	
+	Gui, 2:SHOW, w%QuickNoteWidth% %xPos% %yPos% 
+	;OD_Colors.Attach(QNLBG, {1: {T: 0xFFFFFF, B: 0x800080}, 2: {T: 0xFFFFFF, B: 0x800080}})
+	GuiControl, MoveDraw, %QNTitleBar%
+	GuiControl, MoveDraw, %QNxBar%
+	GuiControl, MoveDraw, %QNpinBar%
 	return  
 }
 MakeFileList(ReFreshMyNoteArray){
@@ -287,6 +285,7 @@ MakeFileList(ReFreshMyNoteArray){
 	if (DeafultSort = 40)
 			LV_ModifyCol(7, "SortDesc")
 	TotalNotes := MyNotesArray.MaxIndex()
+	gosub MakeOOKStarList
 	return
 }
 

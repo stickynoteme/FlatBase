@@ -40,7 +40,7 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 		 SaveRowNumber = %LVSelectedROW%
 		 LV_GetText(FileName, LVSelectedROW,8)
 		 iniFileName = RegExReplace(FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
-		 MsgBox , 52, Delete - Note , Delete: %FileName%
+		 MsgBox , 0x40030, Delete - Note , Delete: %FileName%
 		 IfMsgBox, No
 			Return 
 		 IfMsgBox, Yes

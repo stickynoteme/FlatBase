@@ -15,6 +15,7 @@ Label1:
 		MouseGetPos, xPos, yPos	
 		xPos /= 1.5
 		yPos /= 1.5
+		GuiControl,,%HSterm%, 
 		WinMove, ahk_id %g1ID%, , %xPos%, %yPos%
 		WinShow, ahk_id %g1ID%
 		WinRestore, ahk_id %g1ID%
@@ -2218,42 +2219,53 @@ Pinsticky:
 	WinSet, AlwaysOnTop , Toggle
 	return
 }
-AddStar1:
+StarQN:
 {
-	GuiControl,, QuickStar, %Star1%
+	GUI, sb:new,-Caption +ToolWindow +hWndHSEB2,StarPicker
+	Gui, sb:Margin , 5, 5 
+	Gui, sb:Font, s10 Q%FontRendering%, Verdana, %U_MFC%
+	Gui, sb:Color,%U_SBG%, %U_MBG%
+	if (StrLen(OOKStars) > 0) {
+		Gui, sb:add,ListBox, hwndHStarBox1QN c%U_FBCA% -E0x200 r%USSLR% w35 gDo_ApplyStarQN vStarQN,%OOKStars%
+		Gui, sb:add,ListBox, hwndHStarBox2QN c%U_FBCA% -E0x200 r%USSLR% x+5 w35 gDo_ApplyStarQN vStar2QN,|%Star1%|%Star2%|%Star3%|%Star4%
+	}else
+		Gui, sb:add,ListBox, hwndHStarBox2QN c%U_FBCA% -E0x200 r%USSLR% w35 gDo_ApplyStarQN vStar2QN,|%Star1%|%Star2%|%Star3%|%Star4%
+	if (UniqueStarList > 0)
+		Gui, sb:add,ListBox, hwndHStarBox3QN x+5 c%U_FBCA% -E0x200 r%USSLR% w35 gDo_ApplyStarQN vStar3QN, %UniqueStarList%
+	if (UniqueStarList2 > 0)
+		Gui, sb:add,ListBox, hwndHStarBox4QN x+5 c%U_FBCA% -E0x200 r%USSLR% w35 gDo_ApplyStarQN vStar4QN, %UniqueStarList2%
+	
+	MouseGetPos, xPos, yPos
+	xPos := xPos-50
+	
+	if (HideScrollbars = 1) {
+		LVM_ShowScrollBar(HStarBox1QN,1,False)
+		GuiControl,+Vscroll,%HStarBox1QN%
+		LVM_ShowScrollBar(HStarBox2QN,1,False)
+		GuiControl,+Vscroll,%HStarBox2QN%
+		LVM_ShowScrollBar(HStarBox3QN,1,False)
+		GuiControl,+Vscroll,%HStarBox3QN%
+		LVM_ShowScrollBar(HStarBox4QN,1,False)
+		GuiControl,+Vscroll,%HStarBox4QN%
+	}
+	Gui, sb:show, x%xPos% y%yPos%
+	SetTimer, GuiTimerSB
 	return
 }
-AddStar2:
-{ 
-	GuiControl,, QuickStar, %Star2%
-	return
-}
-AddStar3:
-{ 
-	GuiControl,, QuickStar, %Star3%
-	return
-}
-AddStar4:
-{ 
-	GuiControl,, QuickStar, %Star4%
-	return
-}
-AddStarU:
+Do_ApplyStarQN:
 {
-	GuiControlGet, Select_UStar
-	GuiControl,, QuickStar, %Select_UStar%
-	return
-}
-AddStarU2:
-{
-	GuiControlGet, Select_UStar2
-	GuiControl,, QuickStar, %Select_UStar2%
-	return
-}
-AddStarU3:
-{
-	GuiControlGet, Select_UStar3
-	GuiControl,, QuickStar, %Select_UStar3%
+	Gui sb:Submit
+	if (StarQN="")
+		StarQN:=Star2QN
+	if (StarQN="")
+		StarQN:=Star3QN
+	if (StarQN="")
+		StarQN:=Star4QN
+	GuiControl,,%HQNQS%,%StarQN%
+	StarQN := ""
+	StarQN2 := ""
+	StarQN3 := ""
+	StarQN4 := ""
 	return
 }
 GuiTimerStar:
@@ -2273,6 +2285,12 @@ GuiTimerSB:
 		SetTimer, GuiTimerSB, Off
 	}
 	Return
+}
+LibTemplateAdd:
+{
+	LibWindow = 1
+	gosub NoteTemplateSelectUI
+	return
 }
 NoteTemplateSelectUI:
 {
@@ -2307,6 +2325,8 @@ NoteTemplateSelectUI:
 	CLV.SelectionColors(rowSelectColor,rowSelectTextColor)
 
 	Gui, ts:show, x%xPos% y%yPos% w225
+	Gui +LastFound 
+	WinSet, AlwaysOnTop , Toggle
 return
 }
 TRowsOver:
@@ -2317,10 +2337,6 @@ TRowsOver:
 	IniWrite, %TRowsOver%,%iniPath%, General, NewTemplateRows
 	Iniread, NewTemplateRows,%iniPath%, General, NewTemplateRows
 	return
-}
-NTMoveUP:
-{
-	
 }
 
 NoteTemplateUI:
@@ -2416,9 +2432,10 @@ NoteTemplateUI:
 				msgbox Width Row is missing a value.`n`nTry opening this template in the editor by right clicking it and using [Auto Width].
 				return
 			}
-			Gui, nt:add, listbox, % "Multi -E0x200 c" U_MFC " x+3 w" wwTMP " vNTLB" k " r10", %v%
+			Gui, nt:add, edit, % "section -E0x200 c" U_MFC " x+3 y35 w" wwTMP " vNTeB" k " r1", 
+			Gui, nt:add, listbox, % "Multi -E0x200 c" U_MFC " w" wwTMP " vNTLB" k " r10", %v%
 		}
-		Gui, nt:add, text, c%U_SFC% center xs section w%WindowW% -E0x200 gntInsertB, [ Insert At Bottom ]
+		Gui, nt:add, text, c%U_SFC% center y+3 x3 section w%WindowW% -E0x200 gntInsertB, [ Insert At Bottom ]
 		Gui, nt:show, x%xPos% y%yPos%
 		return
 	}
@@ -2428,25 +2445,40 @@ ntInsert:
 {
 	Gui, nt:Submit
 	for k, v in TemplateArr {
-		if (StrLen(NTLB%k%) > 0) {
-			NTLB%k% := trim(NTLB%k%)
-			NTLB%k% := trim(NTLB%k%,"`n")
-			NTLB%k% := trim(NTLB%k%,"`r")
-			NTBody .= NTLB%k% " "
+		AddSpace :=
+		AddSapce2 :=
+		if (StrLen(NTeB%k%) > 0){
+			AddSapce2 := A_SPACE
 		}
+		if (StrLen(NTLB%k%) > 0){
+			AddSpace := A_SPACE
+			AddSapce2 := 
+		}
+		NTLB%k% := trim(NTLB%k%)
+		NTLB%k% := trim(NTLB%k%,"`n")
+		NTLB%k% := trim(NTLB%k%,"`r")
+		NTBody .= NTeB%k% AddSapce2 NTLB%k% AddSpace
 	}
 	Gui, nt:Destroy
+	NL = `n
 	if (RapidNTAppend = 1) {
-		NL = `n
 		zbody = %NTBody%%NL%%zbody%
 		zbody := trim(zbody,"`n")
 		RapidNTAppend = 0
 	}
 	if (RapidNTAppend = 0 or RapidNTAppend = "") {
 		GuiControlGet,Old_QuickNote,,%HQNB%
-		if (StrLen(zbody) > 0)
+		if (StrLen(Old_QuickNote) > 0)
 			NL = `n
 		GuiControl,,%HQNB%,%NTBody%%NL%%Old_QuickNote%
+	}
+	if (LibWindow = 1) {
+		GuiControlGet,Old_PreviewNote,,%HPB%
+		if (StrLen(Old_PreviewNote) > 0)
+			NL = `n
+		GuiControl,,%HPB%,%NTBody%%NL%%Old_PreviewNote%
+		LibWindow = 0
+		gosub PreviewBox
 	}
 	for k, v in TemplateArr {
 		NTLB%k% := ""
@@ -2464,16 +2496,23 @@ ntInsertB:
 {
 	Gui, nt:Submit
 	for k, v in TemplateArr {
-		if (StrLen(NTLB%k%) > 0) {
-			NTLB%k% := trim(NTLB%k%)
-			NTLB%k% := trim(NTLB%k%,"`n")
-			NTLB%k% := trim(NTLB%k%,"`r")
-			NTBody .= NTLB%k% " "
+		AddSpace :=
+		AddSapce2 :=
+		if (StrLen(NTeB%k%) > 0){
+			AddSapce2 := A_SPACE
 		}
+		if (StrLen(NTLB%k%) > 0) {
+			AddSpace := A_SPACE
+			AddSapce2 :=
+		}
+		NTLB%k% := trim(NTLB%k%)
+		NTLB%k% := trim(NTLB%k%,"`n")
+		NTLB%k% := trim(NTLB%k%,"`r")
+		NTBody .= NTeB%k% AddSapce2 NTLB%k% AddSpace
 	}
 	Gui, nt:Destroy
+	NL = `n
 	if (RapidNTAppend = 1) {
-		NL = `n
 		zbody = %zbody%%NL%%NTBody%
 		zbody := trim(zbody,"`n")
 		RapidNTAppend = 0
@@ -2481,9 +2520,23 @@ ntInsertB:
 	if (RapidNTAppend = 0 or RapidNTAppend = "") {
 		GuiControlGet,Old_QuickNote,,%HQNB%
 		Old_QuickNote := RTrim(Old_QuickNote,"`n")
-		if (Old_QuickNote != "")
+		if (Strlen(Old_QuickNote)>0)
 			NL = `n
-		GuiControl,,%HQNB%,%Old_QuickNote%%NL%%NTBody%
+		Results = %Old_QuickNote%%NL%%NTBody%
+		Results := Trim(Results,"`n")
+		GuiControl,,%HQNB%,%Results%
+	}
+	if (LibWindow = 1) {
+		GuiControlGet,Old_PreviewNote,,%HPB%
+		Old_PreviewNote :=RTrim(Old_PreviewNote,"`n")
+		if (StrLen(Old_PreviewNote) > 0) {
+			NL = `n
+			}
+		Results = %Old_PreviewNote%%NL%%NTBody%
+		Results := Trim(Results,"`n")
+		GuiControl,,%HPB%,%Results%
+		LibWindow = 0
+		gosub PreviewBox
 	}
 	for k, v in TemplateArr {
 		NTLB%k% := ""
@@ -2554,7 +2607,7 @@ ntSAVE:
 		IfExist, %templatePath%%TemplateFileName%.txt
 		{
 			OnMessage(0x44, "OnMsgBox")
-			MsgBox 0x24, Overwrite?, Overwrite existing template?
+			MsgBox 0x40040, ,, Overwrite?, Overwrite existing template?
 			OnMessage(0x44, "")
 			IfMsgBox Yes, {
 				
@@ -2566,6 +2619,7 @@ ntSAVE:
 	TemplateFileText := ListBoxWidthRow "`n"
 	Loop %NewTemplateRows% {
 		GuiControlGet,TMLB%a_index%
+		
 		if (TMLB%a_index% > 0)
 			TemplateFileText .= TMLB%a_index% "`n"
 	}
@@ -2580,7 +2634,7 @@ ntSAVE:
 				}
 			return
 		}else {
-			msgbox Soemthing went wrong...
+			msgbox 0x40040, ,Soemthing went wrong...
 		}
 	return
 }

@@ -18,6 +18,7 @@ Menu, Tray, Add, Options
 Menu, Tray, Add, Exit
 Menu, Tray, Default, Library
 
+
 ;-------------------------------------------------
 ;Set up script global variables
 ;-------------------------------------------------
@@ -181,6 +182,7 @@ global savetimerrunning = 0
 global RapidNTAppend = 0
 
 ;tmp maybe
+global TemplateSymbol
 global ColBase = ,6,7,8,9
 global ColOrder = 1,2,3,4,5
 global SearchWholeNote
@@ -243,6 +245,7 @@ if (isFristRun = "1") {
 	IniRead, Star4, %iniPath%, General, Star4
 	iniread, TemplateAboveSymbol,%systemINI%,SYS,TemplateAboveSymbol,+
 	iniread, TemplateBelowSymbol,%systemINI%,SYS,TemplateBelowSymbol,-
+	iniread, TemplateSymbol,%systemINI%,SYS,TemplateSymbol,+
 ;-------------------------------------------------
 ; Read from theme .ini 
 ;-------------------------------------------------
@@ -448,6 +451,7 @@ if (g1Open=0) {
 	MouseGetPos, xPos, yPos	
 	xPos /= 1.5
 	yPos /= 1.5
+	GuiControl,,%HSterm%, 
 	WinMove, ahk_id %g1ID%, , %xPos%, %yPos%
 	WinShow, ahk_id %g1ID%
 	WinRestore, ahk_id %g1ID%
