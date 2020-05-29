@@ -2059,9 +2059,10 @@ tGuiEscape:
 	GuiControlGet,working_QuickNote,,%HQNB%
 	GuiControlGet,working_QuickNoteSafeName,,%HQNFSN%
 	FileRead, CheckForOldNote, %U_NotePath%%working_QuickNoteSafeName%.txt
+	working_QuickNote := strreplace(working_QuickNote,"`n","`r`n")
 	if (working_QuickNote != "" && working_QuickNote != CheckForOldNote) {
 		OnMessage(0x44, "OnMsgBox")
-		MsgBox 0x40034, Close?, - Note data will be lost -`nCuntinue to close?
+		MsgBox 0x40024, Close?, - Note data will be lost -`nCuntinue to close?
 		OnMessage(0x44, "")
 		IfMsgBox Yes, {
 			Gui, 2:Destroy

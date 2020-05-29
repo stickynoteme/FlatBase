@@ -301,11 +301,13 @@ TotalNotes := MyNotesArray.MaxIndex()
 GuiControl, 1:+Redraw, LV
 return
 }
-
+ 
 SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
+	FileSafeName := trim(FileSafeName)
+	QuickNoteName := trim(QuickNoteName)
 	FileNameTxt := FileSafeName ".txt"
 	SaveFileName = %U_NotePath%%FileSafeName%.txt
-	if (SaveFileName =".txt") {
+	if (SaveFileName =".txt" or Strlen(SaveFileName)<1) {
 		msgbox Name error #01
 		return
 		}

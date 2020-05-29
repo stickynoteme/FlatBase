@@ -39,14 +39,14 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 		 global LVSelectedROW
 		 SaveRowNumber = %LVSelectedROW%
 		 LV_GetText(FileName, LVSelectedROW,8)
-		 iniFileName = RegExReplace(FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
-		 MsgBox , 0x40030, Delete - Note , Delete: %FileName%
+		 iniFileName := RegExReplace(FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
+		 MsgBox , 0x40024, Delete - Note , Delete: %FileName%
 		 IfMsgBox, No
 			Return 
 		 IfMsgBox, Yes
 			FileRecycle %U_NotePath%%FileName%
 			FileRecycle %detailsPath%%iniFileName%
-
+			
 			for Each, Note in MyNotesArray{
 					If (Note.8 = FileName){
 						MyNotesArray.RemoveAt(Each)
