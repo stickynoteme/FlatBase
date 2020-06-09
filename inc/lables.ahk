@@ -2075,8 +2075,8 @@ tGuiEscape:
 }
 GuiEscape:
 {
-	;WinHide, ahk_id %g1ID%
-	;g1Open=0
+	WinHide, ahk_id %g1ID%
+	g1Open=0
 	return
 }
 GuiClose:

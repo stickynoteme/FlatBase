@@ -180,6 +180,9 @@ global StickyRows ;8
 global istitle = yes
 global savetimerrunning = 0
 global RapidNTAppend = 0
+global TitleBarFontSize = 10
+if (A_ScreenDPI > 120)
+	TitleBarFontSize = 8
 
 ;tmp maybe
 global TemplateSymbol

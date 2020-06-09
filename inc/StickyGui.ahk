@@ -5,7 +5,7 @@ Build_Stickynote_GUI(NoteName,NoteFile)
 	FileRead, StickyBody, %U_NotePath%%NoteFile%
 	Gui, %NoteName%:new,-Caption +ToolWindow,Sticky-%NoteName%
 	Gui, %NoteName%:Margin , 0, 0 
-	Gui, %NoteName%:Font, s10 Q%FontRendering%, Verdana, %U_MFC%
+	Gui, %NoteName%:Font, s%TitleBarFontSize% Q%FontRendering%, Verdana, %U_MFC%
 	Gui, %NoteName%:Color,%U_SBG%, %U_MBG%
 	Gui, %NoteName%:add, text, center  gPinsticky x+0 y0 h20 w20,=
 

@@ -160,7 +160,7 @@ BuildGUI2(){
 	OD_LB  := "+0x0050" 
 	Gui, 2:New,-Caption, FlatNote - QuickNote
 	Gui, 2:Margin , 2, 2 
-	Gui, 2:Font, s10 Q%FontRendering%, Verdana, %U_SFC%	
+	Gui, 2:Font, s%TitleBarFontSize% Q%FontRendering%, Verdana, %U_SFC%	
 	Gui, 2:Color,%U_SBG%, %U_MBG%
 	QNtW := QuickNoteWidth - 50
 	QNxX := QuickNoteWidth - 25
