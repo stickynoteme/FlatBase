@@ -454,7 +454,7 @@ UpdateStatusBar:
 			GuiControl,,StatusBarM,M: 00\00\00 
 			GuiControl,,StatusBarA,A: 00\00\00
 		}
-	GuiControl,,StatusBarCount, %Items% of %TotalNotes%
+	GuiControl,,StatusBarCount, %Items%
 	GuiControl, +Redraw, LV
 	return
 }
