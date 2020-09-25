@@ -58,10 +58,10 @@ Label2:
 }
 Label3:
 {
+	MyOldClip := clipboard
 	if(istitle != "no") {
 		send {Ctrl Down}{c}{Ctrl up}
 		ztitle := clipboard
-		
 		zbody := ""
 		;only first line for title to prevent fail
 		Loop, parse, clipboard, `n, `r
@@ -77,6 +77,7 @@ Label3:
 			OnMessage(0x44, "OnMsgBox")
 			MsgBox 0x40, Exits, A note with this name already exits.
 			OnMessage(0x44, "")
+			clipboard := MyOldClip
 			return
 		}
 		
@@ -84,6 +85,7 @@ Label3:
 		ztitleEncoded := NameEncode(ztitle)
 		tooltip T: %ztitle%
 		settimer, KillToolTip, -500
+		clipboard := MyOldClip
 		return
 	}
 	if(istitle = "no") {
@@ -102,6 +104,7 @@ Label3:
 			gosub build_StarEditBox
 		}
 	}
+	clipboard := MyOldClip
 	return
 }
 Label4:
@@ -113,12 +116,14 @@ Label4:
 }
 Label5:
 {
+	MyOldClip := clipboard
 	if(istitle = "no") {
 		send {Ctrl Down}{c}{Ctrl up}
 		zbody .= clipboard " " 
 		tooltip B: %zbody%
 		settimer, KillToolTip, -1000
 	}
+	clipboard := MyOldClip
 	return
 }
 Label6: ;Append Template to Rapid Note
