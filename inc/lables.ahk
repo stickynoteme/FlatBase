@@ -26,9 +26,11 @@ Label1:
 }
 Label2:
 {
+	MyOldClip := clipboard
 	if (sendCtrlC="1")
 		send {Ctrl Down}{c}{Ctrl up}
 	MyClip := clipboard
+	clipboard := MyOldClip
 	MyClip := trim(MyClip)
 
 	BuildGUI2()
