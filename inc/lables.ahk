@@ -2331,8 +2331,8 @@ NoteTemplateSelectUI:
 	
 	CLV := New LV_Colors(HTSLB)
 	CLV.SelectionColors(rowSelectColor,rowSelectTextColor)
-
 	Gui, ts:show, x%xPos% y%yPos% w225
+	Gui, ts:add, button, default x-1000 h0 gNoteTemplateEnterButton, OK
 	Gui +LastFound 
 	WinSet, AlwaysOnTop , Toggle
 return
@@ -2349,7 +2349,11 @@ TRowsOver:
 
 NoteTemplateUI:
 {
-	
+
+	if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
+	{
+		TemplateLVSelectedROW := A_EventInfo
+	}
 	LV_GetText(Selected_NoteTemplate,A_EventInfo)
 	;z := "#" A_GuiEvent ":" errorlevel ":" A_EventInfo ":" LV@sel_col ":" ;Selected_NoteTemplate
 	;tooltip % z
@@ -2402,6 +2406,50 @@ NoteTemplateUI:
 				Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMdown%BlankRows%,%TemplateBelowSymbol%
 			}
 		Gui, ntm:show
+		return
+	}
+	if (A_GuiEvent = "K" and A_EventInfo = "32")
+		{
+		LV_GetText(Selected_NoteTemplate,TemplateLVSelectedROW)
+		;msgbox % Selected_NoteTemplate "  &  " TemplateLVSelectedROW
+		if (Selected_NoteTemplate = "")
+			return
+		Gui, nt:destroy
+		Gui, ts:submit
+		Gui, ts:destroy
+		MouseGetPos, xPos, yPos
+		xPos /= 1.15
+		yPos /= 1.15
+		WindowW := ""
+		FileRead, TemplateTMP, %templatePath%%Selected_NoteTemplate%
+		TemplateTMP := trim(TemplateTMP,"`n")
+		TemplateTMP := trim(TemplateTMP,"`r")
+		NewTemplateArr := SubStr(TemplateTMP, InStr(TemplateTMP, "`n") + 1)
+		TemplateArr := StrSplit(NewTemplateArr, "`n","`n")
+		FileReadLine ListBoxWs, %templatePath%%Selected_NoteTemplate%, 1
+		ListBoxWArr := StrSplit(ListBoxWs, "|","|")
+		for k, v in TemplateArr {
+			wTMP%k%:= ListBoxWarr[A_Index]
+			wwTMP := wTMP%k%
+			WindowW += wwTMP+3
+		}
+		Gui, nt:Margin, 3,3
+		Gui, nt:Font, s10, Courier New,
+		Gui, nt:Color,%U_SBG%, %U_MBG%
+		Gui, nt:add, text, c%U_SFC% center w%WindowW% -E0x200 gntInsert, [ Insert At Top ]
+		Gui, nt:add, text, c%U_SFC%section xs center h0 w0 hidden
+		for k, v in TemplateArr {
+			wTMP%k%:= ListBoxWarr[A_Index]
+			wwTMP := wTMP%k%
+			if (wwTMP = ""){
+				msgbox Width Row is missing a value.`n`nTry opening this template in the editor by right clicking it and using [Auto Width].
+				return
+			}
+			Gui, nt:add, edit, % "section -E0x200 c" U_MFC " x+3 y35 w" wwTMP " vNTeB" k " r1", 
+			Gui, nt:add, listbox, % "Multi -E0x200 c" U_MFC " w" wwTMP " vNTLB" k " r10", %v%
+		}
+		Gui, nt:add, text, c%U_SFC% center y+3 x3 section w%WindowW% -E0x200 gntInsertB, [ Insert At Bottom ]
+		Gui, nt:show, x%xPos% y%yPos%
 		return
 	}
 	
@@ -2500,6 +2548,52 @@ ntInsert:
 	NewTemplateArr :=[]
 	return
 }
+NoteTemplateEnterButton:
+{
+		LV_GetText(Selected_NoteTemplate,TemplateLVSelectedROW)
+		;msgbox % Selected_NoteTemplate "  &  " TemplateLVSelectedROW
+		if (Selected_NoteTemplate = "")
+			return
+		Gui, nt:destroy
+		Gui, ts:submit
+		Gui, ts:destroy
+		MouseGetPos, xPos, yPos
+		xPos /= 1.15
+		yPos /= 1.15
+		WindowW := ""
+		FileRead, TemplateTMP, %templatePath%%Selected_NoteTemplate%
+		TemplateTMP := trim(TemplateTMP,"`n")
+		TemplateTMP := trim(TemplateTMP,"`r")
+		NewTemplateArr := SubStr(TemplateTMP, InStr(TemplateTMP, "`n") + 1)
+		TemplateArr := StrSplit(NewTemplateArr, "`n","`n")
+		FileReadLine ListBoxWs, %templatePath%%Selected_NoteTemplate%, 1
+		ListBoxWArr := StrSplit(ListBoxWs, "|","|")
+		for k, v in TemplateArr {
+			wTMP%k%:= ListBoxWarr[A_Index]
+			wwTMP := wTMP%k%
+			WindowW += wwTMP+3
+		}
+		Gui, nt:Margin, 3,3
+		Gui, nt:Font, s10, Courier New,
+		Gui, nt:Color,%U_SBG%, %U_MBG%
+		Gui, nt:add, text, c%U_SFC% center w%WindowW% -E0x200 gntInsert, [ Insert At Top ]
+		Gui, nt:add, text, c%U_SFC%section xs center h0 w0 hidden
+		for k, v in TemplateArr {
+			wTMP%k%:= ListBoxWarr[A_Index]
+			wwTMP := wTMP%k%
+			if (wwTMP = ""){
+				msgbox Width Row is missing a value.`n`nTry opening this template in the editor by right clicking it and using [Auto Width].
+				return
+			}
+			Gui, nt:add, edit, % "section -E0x200 c" U_MFC " x+3 y35 w" wwTMP " vNTeB" k " r1", 
+			Gui, nt:add, listbox, % "Multi -E0x200 c" U_MFC " w" wwTMP " vNTLB" k " r10", %v%
+		}
+		Gui, nt:add, text, c%U_SFC% center y+3 x3 section w%WindowW% -E0x200 gntInsertB, [ Insert At Bottom ]
+		Gui, nt:show, x%xPos% y%yPos%
+		return
+}
+
+
 ntInsertB:
 {
 	Gui, nt:Submit

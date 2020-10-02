@@ -118,6 +118,8 @@ global Star1
 global Star2
 global Star3
 global Star4
+global Selected_NoteTemplate
+global TemplateLVSelectedROW
 global OOKStars
 global UniqueStarList
 global UniqueStarList2
