@@ -422,10 +422,18 @@ if (ShowMainWindowOnStartUp = 1 and ColOrder = "1,2,3,4,5") {
 	WinShow, ahk_id %g1ID%
 	g1Open=1
 }
-if (ColOrder != "1,2,3,4,5"){
+if (ShowMainWindowOnStartUp = 0 and ColOrder = "1,2,3,4,5") {
+	WinHide, ahk_id %g1ID%
+}
+if (ShowMainWindowOnStartUp = 1 and ColOrder != "1,2,3,4,5"){
 	LV_Set_Column_Order(9,ColOrder ColBase)
 	WinHide, ahk_id %g1ID%
 	WinShow, ahk_id %g1ID%
+	g1Open=1
+}
+if (ShowMainWindowOnStartUp = 0 and ColOrder != "1,2,3,4,5"){
+	LV_Set_Column_Order(9,ColOrder ColBase)
+	WinHide, ahk_id %g1ID%
 }
 
 ;-------------------------------------------------
