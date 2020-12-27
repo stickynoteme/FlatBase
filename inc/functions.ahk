@@ -58,8 +58,8 @@ BuildGUI1(){
 	}
 	
 	Gui, 1:Add,Edit, c%U_FBCA% w%LibW% y%FontSize% x%searchX% y8 vSearchTerm gSearch -E0x200 HwndHSterm
-	Gui, 1:Add, ListBox, vLB1 +0x100 h8 w%LibW% x0 y0 -E0x200 Disabled 
-	Gui, 1:Add, ListBox, vlB2 +0x100 h15 w%LibW% x0 ys0 -E0x200 Disabled
+	Gui, 1:Add, ListBox, vLB1 +0x100 h8 w%LibW% x0 y0 -E0x200 Disabled -Tabstop
+	Gui, 1:Add, ListBox, vlB2 +0x100 h15 w%LibW% x0 ys0 -E0x200 Disabled -Tabstop
 	;ListBox used as background color for search area padding
 	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%
 	Gui, 1:Add, text, x-3 c%U_SFC% w%StarColW% center gSortStar vSortStar, %Star1%
@@ -76,7 +76,7 @@ BuildGUI1(){
 	title_h := PreviewFontSize*1.7
 	TitleWAdjust := round(LibW*0.9)
 	Gui, 1:Add,text, center xs c%U_SFC% -E0x200 w25 h%title_h% gLibTemplateAdd, %TemplateSymbol%
-	Gui, 1:Add,edit, readonly center x+35 -E0x200 vTitleBar C%U_SFC% w%TitleWAdjust% h%title_h% backgroundTrans,
+	Gui, 1:Add,edit, readonly center x+35 -E0x200 vTitleBar C%U_SFC% w%TitleWAdjust% h%title_h% backgroundTrans -Tabstop,
 	
 	
 	
@@ -119,7 +119,7 @@ BuildGUI1(){
 	WM_RBUTTONDOWN = 0x0204
 	OnMessage( WM_RBUTTONDOWN, "HandleMessage" )
 
-	Gui, 1:Add,Edit, w35 y-2000 x-2000 vSearchFilter HwndHSF,
+	Gui, 1:Add,Edit, w35 y-2000 x-2000 vSearchFilter HwndHSF -Tabstop,
 	if (ShowStarHelper = 1) {
 			Gui, 1:Font, s8 Q%FontRendering%, Segoe UI Emoji
 , %U_MFC%
