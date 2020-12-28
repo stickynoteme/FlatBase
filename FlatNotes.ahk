@@ -153,6 +153,7 @@ global savedHK6
 global savedSK1
 global savedSK2
 global savedSK3
+global savedSK4
 global LibW
 global PreviewRows
 global ResultRows
@@ -281,6 +282,7 @@ IniRead, savedHK6, %iniPath%, Hotkeys, 6,+#a
 IniRead, savedSK1, %iniPath%, Shortcuts, 1,!s
 IniRead, savedSK2, %iniPath%, Shortcuts, 2,!r
 IniRead, savedSK3, %iniPath%, Shortcuts, 3,!e
+IniRead, savedSK4, %iniPath%, Shortcuts, 4,!t
 
 
 IniRead, NewTemplateRows,%iniPath%, General, NewTemplateRows, 8

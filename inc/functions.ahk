@@ -17,6 +17,7 @@ SetUserHotKeys() {
 	Hotkey,%savedSK1%, LabelS1
 	Hotkey,%savedSK2%, LabelS2
 	Hotkey,%savedSK3%, LabelS3
+	Hotkey,%savedSK4%, LabelS4
 
 return
 }

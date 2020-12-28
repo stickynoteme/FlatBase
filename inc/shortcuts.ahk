@@ -1,3 +1,15 @@
+;---------------------
+;Other shortcut keys
+;---------------------
+#IfWinActive, FlatNotes - Note From Template
+{
+!enter::
+	gosub ntInsertB
+	return
++enter::
+	gosub ntInsert
+	return
+}
 ;------------------------------------------
 ;Main window shortcut keys below this point
 ;------------------------------------------

@@ -150,6 +150,11 @@ LabelS3:
 	ControlFocus, Edit3, FlatNotes - Library
 	return
 }
+LabelS4:
+{
+	gosub LibTemplateAdd
+	return
+}
 NewAndSaveHK:
 {
 ControlGetFocus, OutputVar, FlatNotes - Library
@@ -1315,8 +1320,8 @@ Options:
 	Gui, 3:Add, CheckBox, section vSelect_CtrlEnter gSet_CtrlEnter, Use Ctrl+Enter instead of Enter?
 	GuiControl,,Select_CtrlEnter,%CtrlEnter%
 
-	ShortcutNames := ["Focus Search","Focus Results","Focus Edit/Preview"]
-	Loop,% 3 {
+	ShortcutNames := ["Focus Search","Focus Results","Focus Edit/Preview","Add Note From Tempalte"]
+	Loop,% 4 {
 		ShortCutNameTmp := ShortcutNames[A_Index]
 		Gui, 3:Add, Text, , %ShortCutNameTmp%:
 		StringReplace, noMods, savedSK%A_Index%, ~                  
@@ -2433,6 +2438,7 @@ NoteTemplateUI:
 			wwTMP := wTMP%k%
 			WindowW += wwTMP+3
 		}
+		Gui, nt:New,, FlatNotes - Note From Template
 		Gui, nt:Margin, 3,3
 		Gui, nt:Font, s10, Courier New,
 		Gui, nt:Color,%U_SBG%, %U_MBG%
@@ -2476,6 +2482,8 @@ NoteTemplateUI:
 			wwTMP := wTMP%k%
 			WindowW += wwTMP+3
 		}
+		;this is the + interface in the main GUI...
+		Gui, nt:New,, FlatNotes - Note From Template
 		Gui, nt:Margin, 3,3
 		Gui, nt:Font, s10, Courier New,
 		Gui, nt:Color,%U_SBG%, %U_MBG%
@@ -2492,6 +2500,7 @@ NoteTemplateUI:
 			Gui, nt:add, listbox, % "Multi -E0x200 c" U_MFC " w" wwTMP " vNTLB" k " r10", %v%
 		}
 		Gui, nt:add, text, c%U_SFC% center y+3 x3 section w%WindowW% -E0x200 gntInsertB, [ Insert At Bottom ]
+		TT.Add("Static1","Shift+Enter")
 		Gui, nt:show, x%xPos% y%yPos%
 		return
 	}
@@ -2573,6 +2582,7 @@ NoteTemplateEnterButton:
 			wwTMP := wTMP%k%
 			WindowW += wwTMP+3
 		}
+		Gui, nt:New,, FlatNotes - Note From Template
 		Gui, nt:Margin, 3,3
 		Gui, nt:Font, s10, Courier New,
 		Gui, nt:Color,%U_SBG%, %U_MBG%
