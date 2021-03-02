@@ -382,6 +382,8 @@ Iniread, UserTimeFormat,%iniPath%,General,UserTimeFormat,yy/MM/dd
 ;-------------------------------------------------
 ;Set Globals that need values from the ini
 ;-------------------------------------------------
+global HelpIconx := LibW-15
+global SearchW := LibW-50
 global StickyTW := StickyW-80
 global StickyMaxH
 global VSBW

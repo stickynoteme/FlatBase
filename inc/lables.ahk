@@ -2217,7 +2217,7 @@ Xsticky:
 Usticky:
 {
 	Gui +LastFound 
-	WinMove, , , ,  , , 22
+	WinMove, , , ,  , , 26
 	return
 }
 Hsticky:
@@ -2750,3 +2750,7 @@ ntSAVE:
 		}
 	return
 }
+
+HelpWindow:
+msgbox % "Help window coming soon..."
+return

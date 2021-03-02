@@ -58,7 +58,7 @@ BuildGUI1(){
 		searchX = 27
 	}
 	
-	Gui, 1:Add,Edit, c%U_FBCA% w%LibW% y%FontSize% x%searchX% y8 vSearchTerm gSearch -E0x200 HwndHSterm
+	Gui, 1:Add,Edit, c%U_FBCA% w%SearchW% y%FontSize% x%searchX% y8 vSearchTerm gSearch -E0x200 HwndHSterm
 	Gui, 1:Add, ListBox, vLB1 +0x100 h8 w%LibW% x0 y0 -E0x200 Disabled -Tabstop
 	Gui, 1:Add, ListBox, vlB2 +0x100 h15 w%LibW% x0 ys0 -E0x200 Disabled -Tabstop
 	;ListBox used as background color for search area padding
@@ -128,6 +128,9 @@ BuildGUI1(){
 			Gui, 1:add, text, center backgroundTrans w15 h15 x2 y8 -E0x200 c%U_FBCA% gStarFilterBox, %star1%
 		}
 	
+	Gui, 1:add, text, center backgroundTrans w15 h15 x%HelpIconx% y8 -E0x200 c%U_FBCA% gHelpWindow, [?]
+		
+	
 
 	if (HideScrollbars = 1) {
 		LVM_ShowScrollBar(HPB,1,False)
@@ -161,14 +164,14 @@ BuildGUI2(){
 	OD_LB  := "+0x0050" 
 	Gui, 2:New,-Caption, FlatNote - QuickNote
 	Gui, 2:Margin , 2, 2 
-	Gui, 2:Font, s%TitleBarFontSize% Q%FontRendering%, Verdana, %U_SFC%	
+	Gui, 2:Font, s%TitleBarFontSize% Q%FontRendering%, Verdana, %U_MFC%	
 	Gui, 2:Color,%U_SBG%, %U_MBG%
 	QNtW := QuickNoteWidth - 50
 	QNxX := QuickNoteWidth - 25
-	Gui, 2:add,listbox, center hwndQNLBG r1 x0 y-10 r2 %OD_LB% disabled w%QuickNoteWidth% -E0x200,%a_space%|%a_space%
-	Gui, 2:Add,Text, y2 c%U_SFC% x2 h25 w25 center backgroundTrans hwndQNpinBar gPinsticky, =
-	Gui, 2:Add,Text, y2 c%U_SFC% x%QNxX% h25 w25 center backgroundTrans g2GuiClose hwndQNxBar, X
-	Gui, 2:add,Text, center c%U_SFC% GuiMove x2 y2 h25 hwndQNTitleBar w%QNtW% backgroundTrans, - Quick Note -
+	Gui, 2:add,listbox, center hwndQNLBG r2 x0 y-5%OD_LB% disabled w%QuickNoteWidth% -E0x200,%a_space%|%a_space%
+	Gui, 2:Add,Text, y3 c%U_MFC% x2 h25 w25 center backgroundTrans hwndQNpinBar gPinsticky, =
+	Gui, 2:Add,Text, y3 c%U_MFC% x%QNxX% h25 w25 center backgroundTrans g2GuiClose hwndQNxBar, X
+	Gui, 2:add,Text, center c%U_SFC% GuiMove x2 y3 h25 hwndQNTitleBar w%QNtW% backgroundTrans, - Quick Note -
 	Gui, 2:Font, s%FontSize% Q%FontRendering%, %FontFamily%, %U_SFC%	
 	
 	gui, 2:add,listbox, w%QuickSubWidth% r1 y+-3 x2 -E0x200 disabled
