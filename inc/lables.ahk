@@ -178,10 +178,18 @@ if (OutputVar = "Edit1"){
 	return
 	}
 if(OutputVar == "SysListView321"){
+	/* OLD copy Name text by default
 	global LVSelectedROW
 	LV_GetText(RowText, LVSelectedROW,2)
 	clipboard = %RowText%
 	ToolTip Text: "%RowText%" Copied to clipboard
+	*/
+		LV_GetText(FileTmp, LVSelectedROW, 8)
+		LV_GetText(ToolTipText, LVSelectedROW, 3)
+		fileread,CopyText,%U_NotePath%%FileTmp%
+		clipboard := CopyText
+		Tooltip % ToolTipText "... Copied"
+	
 	SetTimer, KillToolTip, -500
 	gosub GuiEscape
 	return
@@ -229,9 +237,18 @@ if (OutputVar = "Edit1"){
 		}
 	if(OutputVar == "SysListView321"){
 		global LVSelectedROW
+		
+		/* OLD Copy Name row
 		LV_GetText(RowText, LVSelectedROW,2)
 		clipboard = %RowText%
 		ToolTip Text: "%RowText%" Copied to clipboard
+		*/
+		LV_GetText(FileTmp, LVSelectedROW, 8)
+		LV_GetText(ToolTipText, LVSelectedROW, 3)
+		fileread,CopyText,%U_NotePath%%FileTmp%
+		clipboard := CopyText
+		Tooltip % ToolTipText "... Copied"
+		
 		SetTimer, KillToolTip, -500
 		gosub GuiEscape
 		return
