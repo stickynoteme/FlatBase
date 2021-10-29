@@ -2769,5 +2769,5 @@ ntSAVE:
 }
 
 HelpWindow:
-msgbox % "Help window coming soon..."
+msgbox % "Hotkey legend`n+ = Shift, ^ = Ctrl, ! = Alt, # = Win`n`nOpen Library (if Capslock not used): " savedHK1 "`nQuick New Note: " savedHK2 "`nCancel Rapid Note: " savedHK3 "`nRapid Note Append: " savedHK4 "`nAppend Template to Rapid Note: " savedHK5
 return
