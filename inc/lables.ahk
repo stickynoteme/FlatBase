@@ -2769,5 +2769,5 @@ ntSAVE:
 }
 
 HelpWindow:
-msgbox % "Hotkey legend`n+ = Shift, ^ = Ctrl, ! = Alt, # = Win`n`nOpen Library (if Capslock not used): " savedHK1 "`nQuick New Note: " savedHK2 "`nCancel Rapid Note: " savedHK3 "`nRapid Note Append: " savedHK4 "`nAppend Template to Rapid Note: " savedHK5
+msgbox % "Hotkey legend`n+ = Shift, ^ = Ctrl, ! = Alt, # = Win`n`nOpen Library (if Capslock not used): " savedHK1 "`nQuick New Note: " savedHK2 "`nCancel Rapid Note: " savedHK3 "`nRapid Note Append: " savedHK4 "`nAppend Template to Rapid Note: " savedHK5 "`n`nMain Window Keyboard Shortcuts:`nFocus Search: "savedSK1 "`nFocus Results: " savedSK2 "`nFocus Edit/Preview: " savedSK3 "`nAdd Note From Template: " savedSK4
 return
