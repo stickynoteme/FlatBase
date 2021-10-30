@@ -2769,5 +2769,5 @@ ntSAVE:
 }
 
 HelpWindow:
-msgbox % "Hotkey legend`n+ = Shift, ^ = Ctrl, ! = Alt, # = Win`n`nOpen Library (if Capslock not used): " savedHK1 "`nQuick New Note: " savedHK2 "`nCancel Rapid Note: " savedHK3 "`nRapid Note Append: " savedHK4 "`nAppend Template to Rapid Note: " savedHK5 "`n`nMain Window Keyboard Shortcuts:`nFocus Search: "savedSK1 "`nFocus Results: " savedSK2 "`nFocus Edit/Preview: " savedSK3 "`nAdd Note From Template: " savedSK4
+msgbox % "[Legend: + = Shift, ^ = Ctrl, ! = Alt, # = Win]`n`nGLOBAL HOTKEYS:`nOpen Library (if Capslock not used): " savedHK1 "`nQuick Note: " savedHK2 "`nRapid Note: " savedHK3 "`nCancel Rapid Note: " savedHK4 "`nAppend to Rapid Note: " savedHK5 "`nAppend Template to Rapid Note" savedHK6 "`n`nMAIN WINDOW SHORTCUTS:`nFocus Search: "savedSK1 "`nFocus Results: " savedSK2 "`nFocus Edit/Preview: " savedSK3 "`nAdd Note From Template: " savedSK4 "`n`nINFO:`nQuick Note:`nSelect text and press the Quick Note hotkey to bring that text up as the body of a new blank note.`n`nRapid Note:`nUse the Rapid Note hotkey to quick add notes. Press the Rapid Note Hotkey once to copy the title, then again to copy the body or use the append hotkey to add any number of selected texts to the body of the note. When you are done use the Rapid Note hotekey to finish the note and select a star."
 return
