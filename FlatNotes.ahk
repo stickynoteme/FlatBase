@@ -203,6 +203,13 @@ themePath = %A_WorkingDir%\sys\Themes
 templatePath = %A_WorkingDir%\NoteTemplates\
 IniRead, U_NotePath, %iniPath%, General, MyNotePath,%A_WorkingDir%\MyNotes\
 
+;set tray icon
+if A_IsCompiled
+	Menu, Tray, Icon, %A_ScriptFullPath%, -159
+else 
+	Menu, Tray, Icon, %A_WorkingDir%\- Assets\FlatNotes.ico
+
+; check for note path, then reset to default and warn user if the path can't be found.
 if InStr(FileExist(U_NotePath), "D") {
 	if (U_NotePath = "") {
 	U_NotePath = %A_WorkingDir%\MyNotes\
