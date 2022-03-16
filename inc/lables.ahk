@@ -93,7 +93,7 @@ Label3:
 		zbody .= clipboard 
 		istitle = yes
 		FileReadLine, CheckExists, %U_NotePath%%TmpFileSafeName%.txt, 1
-		SaveFile(ztitle,ztitleEncoded,zbody,0,"tag-tmp","cat-tmp")
+		SaveFile(ztitle,ztitleEncoded,zbody,0,"tag-tmp","cat-tmp","p-tmp")
 		gosub search
 		tooltip B: %zbody%
 		settimer, KillToolTip, -500
@@ -201,7 +201,7 @@ if(OutputVar == "Edit3"){
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
 	GuiControlGet, PreviewBox
-	SaveFile(RowText,FileSafeName,PreviewBox,1,"tag-tmp","cat-tmp")
+	SaveFile(RowText,FileSafeName,PreviewBox,1,"tag-tmp","cat-tmp","p-tmp")
 	iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
 	FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
 	LV_Modify(LVSelectedROW,,, RowText, NewBodyText)
@@ -260,7 +260,7 @@ if (OutputVar = "Edit1"){
 		LV_GetText(RowText, LVSelectedROW,2)
 		FileSafeName := NameEncode(RowText)
 		GuiControlGet, PreviewBox
-		SaveFile(RowText,FileSafeName,PreviewBox,1,"tag-tmp","cat-tmp")
+		SaveFile(RowText,FileSafeName,PreviewBox,1,"tag-tmp","cat-tmp","p-tmp")
 		iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
 		FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
 		LV_Modify(LVSelectedROW,,, RowText, NewBodyText)
@@ -296,7 +296,7 @@ SaveButton:
 	SaveMod = 0
 	IfExist, %U_NotePath%%FileSafeName%.txt
 		SaveMod = 1
-	SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,SaveMod,QuickNoteTags,QuickNoteCat)
+	SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,SaveMod,QuickNoteTags,QuickNoteCat,QuickNoteParent)
 	;horrible fix to LV to update
 
 	GuiControlGet,OldST,,%HSterm%
@@ -329,11 +329,11 @@ Search:
 		  If (SearchTerm != "")
 		  {
 			If (InStr(Note.2, SearchTerm) != 0){
-			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 			   }
 			}
 			Else
-			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 		}
 	gosub SortNow
 	gosub SearchFilter
@@ -348,11 +348,11 @@ Search:
 		  If (SearchTerm != "")
 		  {
 			If (InStr(Note.1, SearchTerm) != 0){
-			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 			   }
 			}
 			Else
-			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 		}
 	gosub SortNow
 	gosub SearchFilter
@@ -369,22 +369,22 @@ Search:
 			{
 				
 				If (InStr(Note.1, SArray.1) != 0 or InStr(Note.1, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 				}Else if (InStr(Note.2, SArray.1) != 0 or InStr(Note.2, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 				}Else if (InStr(Note.3, SArray.1) != 0 or InStr(Note.3, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 				}Else if (InStr(Note.4, SArray.1) != 0 or InStr(Note.4, SArray.2) != 0  && SearchDates =1){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 				}Else if (InStr(Note.5, SArray.1) != 0 or InStr(Note.5, SArray.2) != 0  && SearchDates =1){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 				}Else if (InStr(Note.10, SArray.1) != 0 or InStr(Note.10, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 				}
 				
 			}
 		Else
-			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 			
 		}
 	gosub SortNow
@@ -402,23 +402,23 @@ Search:
 			{
 				
 				If (InStr(Note.1, SArray.1) != 0 && InStr(Note.1, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 				}Else if (InStr(Note.2, SArray.1) != 0 && InStr(Note.2, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 				}Else if (InStr(Note.3, SArray.1) != 0 && InStr(Note.3, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 				}Else if (InStr(Note.4, SArray.1) != 0 && InStr(Note.4, SArray.2) != 0  && SearchDates =1){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 				}Else if (InStr(Note.5, SArray.1) != 0 && InStr(Note.5, SArray.2) != 0  && SearchDates =1){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 				}Else if (InStr(Note.10, SArray.1) != 0 && InStr(Note.10, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 				
 				}
 				
 			}
 		Else
-			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 			
 		}
 	gosub SortNow
@@ -433,23 +433,23 @@ Search:
 	   {
 			If (InStr(Note.2, SearchTerm) != 0)
 			{
-				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 			}Else if (InStr(Note.3, SearchTerm) != 0)
 			{
-				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 			}Else if (InStr(Note.4, SearchTerm) != 0 && SearchDates =1)
 			{
-				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 		   }Else if (InStr(Note.5, SearchTerm) != 0 && SearchDates =1)
 			{
-				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 			}Else if (InStr(Note.10, SearchTerm) != 0)
 			{
-				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 			}
 		}
 		Else
-			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
 	}
 	gosub SortNow
 	gosub SearchFilter
@@ -501,6 +501,7 @@ UpdateStatusBar:
 		LV_GetText(LastNoteAdded, 1 , 4)
 		LV_GetText(LastNoteModded, 1 , 5)
 		LV_GetText(LastNoteTags, 1 , 10)
+		LV_GetText(LastNoteParent, 1 , 12)
 		;LV_GetText(LastNoteCat, 1 , 11)
 		GuiControl,,TitleBar, %LastResultName%
 		FileRead, LastResultBody,%U_NotePath%%LastFileName%
@@ -508,6 +509,7 @@ UpdateStatusBar:
 
 		GuiControl,,PreviewBox, %LastResultBody%
 		GuiControl,,TagBox, %LastNoteTags%
+		GuiControl,,NoteParent, %LastNoteParent%
 		;GuiControl, ChooseString, CatBox, %LastNoteCat%
 		GuiControl,, StatusbarM,M: %LastNoteModded%
 		GuiControl,, StatusbarA,A: %LastNoteAdded%
@@ -516,6 +518,7 @@ UpdateStatusBar:
 			GuiControl,,PreviewBox,
 			GuiControl,,TagBox,
 			;GuiControl, ChooseString, CatBox,
+			GuiControl,,NoteParent,
 			GuiControl,,StatusBarM,M: 00\00\00 
 			GuiControl,,StatusBarA,A: 00\00\00
 		}
@@ -655,16 +658,18 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
     LV_GetText(C_Modded, A_EventInfo,5)
 	LV_GetText(C_Name, A_EventInfo,2)
 	LV_GetText(C_Tags, A_EventInfo,10)
+	LV_GetText(C_Parent, A_EventInfo,12)
 	;LV_GetText(C_Cat, A_EventInfo,11)
     FileRead, NoteFile, %U_NotePath%%RowText%
 	GuiControl,, PreviewBox, %NoteFile%
 	GuiControl,, TagBox, %C_Tags%
+	GuiControl,, NoteParent, %C_Parent%
 	;GuiControl, ChooseString, CatBox, %C_Cat%
 	GuiControl,, TitleBar, %C_Name%
 	GuiControl,, StatusbarM,M: %C_Modded%
 	GuiControl,, StatusbarA,A: %C_Added%
 }
-;1Star|2Title|3Body|4Added|5Modified|6RawAdded|7RawModded|8FileName|9RawStar|10Tags|11Cat
+;1Star|2Title|3Body|4Added|5Modified|6RawAdded|7RawModded|8FileName|9RawStar|10Tags|11Cat|12Parent
 
 	if A_GuiEvent in Normal
 	{
@@ -710,7 +715,8 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			LV_Modify(A_EventInfo ,,UpdateStar,,,,,,,,NextStar)
 			IniWrite, %NextStar%, %detailsPath%%C_ini%, INFO, Star
 			fileRead, C_Body, %U_NotePath%%C_FileName%
-			SaveFile(C_Name,C_SafeName,C_Body,1,"tag-tmp","cat-tmp")	
+			SaveFile(C_Name,C_SafeName,C_Body,1,"
+			-tmp","cat-tmp","p-tmp")	
 			LV@sel_col = "undoomCol1"
 		}
 	}
@@ -755,7 +761,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 		LV_Modify(LastRowSelected,,UpdateStar,,,,,,,,NextStar)
 		IniWrite, %NextStar%, %detailsPath%%C_ini%, INFO, Star
 		fileRead, C_Body, %U_NotePath%%C_FileName%
-		SaveFile(C_Name,C_SafeName,C_Body,1,"tag-tmp","cat-tmp")	
+		SaveFile(C_Name,C_SafeName,C_Body,1,"tag-tmp","cat-tmp","p-tmp")	
 		return		
 	}
 	if (A_GuiEvent = "K") {
@@ -813,10 +819,12 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 						OldStarData = %Star4%
 					IniRead, OldTagsData, %detailsPath%%FileSafeName%.ini,INFO,Tags
 					IniRead, OldCatData, %detailsPath%%FileSafeName%.ini,INFO,Cat
+					IniRead, OldParentData, %detailsPath%%FileSafeName%.ini,INFO,Parent
 					GuiControl,, QuickNoteBody,%MyFile%
 					GuiControl,, QuickStar,%OldStarData%
 					GuiControl,, QuickNoteTags,%OldTagsData%
 					GuiControl, ChooseString, QuickNoteCat, %OldCatData%
+					GuiControl,, QuickNoteParent,%OldParentData%
 				}
 				return
 			}				
@@ -1025,7 +1033,7 @@ StarSaveChange:
 			MyNotesArray.RemoveAt(Each)
 		}
 	}
-	SaveFile(TmpName,TmpFileSafeName,C_Body,1,"tag-tmp","cat-tmp")
+	SaveFile(TmpName,TmpFileSafeName,C_Body,1,"tag-tmp","cat-tmp","p-tmp")
 	ListStarToChange = 1
 	if (RapidStarNow = 1){
 		ListStarToChange = 0
@@ -1468,7 +1476,7 @@ Options:
 	CurrentStickyFontSize := StickyFontSize*0.5
 	Gui, 3:add,DropDownList, x+10 Choose%CurrentStickyFontSize% vStickyFontSizeSelect gSetStickyFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
 	
-	Gui, 3:Add,Text,xs,Column Width Percentage Star | Name | Body | Added | Modified | Tags | Cat |
+	Gui, 3:Add,Text,xs,Column Width Percentage Star | Name | Body | Added | Modified | Tags | Cat | Parent |
 	
 	Gui, Add, Edit, w50
 	Gui, 3:Add,UpDown, vStarPercentSelect gSet_StarPercent Range0-100, %oStarPercent%
@@ -1484,6 +1492,8 @@ Options:
 	Gui, 3:Add,UpDown,  vTagsPercentSelect gSet_TagsPercent Range0-100, %oTagsPercent%
 	Gui, Add, Edit, w50 x+5
 	Gui, 3:Add,UpDown,  vCatPercentSelect gSet_CatPercent Range0-100, %oCatPercent%
+	Gui, Add, Edit, w50 x+5
+	Gui, 3:Add,UpDown,  vParentPercentSelect gSet_ParentPercent Range0-100, %oParentPercent%
 	
 	;Window Size Options Tab
 	Gui, 3:Tab, Window Size
@@ -1601,10 +1611,12 @@ SaveAndReload:
 	GuiControlGet, ModdedPercentSelect
 	GuiControlGet, TagsPercentSelect
 	GuiControlGet, CatPercentSelect	
+	GuiControlGet, ParentPercentSelect
+
 	
 		
 
-	is100 := StarPercentSelect+NamePercentSelect+BodyPercentSelect+AddedPercentSelect+ModdedPercentSelect+TagsPercentSelect+CatPercentSelect
+	is100 := StarPercentSelect+NamePercentSelect+BodyPercentSelect+AddedPercentSelect+ModdedPercentSelect+TagsPercentSelect+CatPercentSelect+ParentPercentSelect
 	WinSet, AlwaysOnTop, Off, FlatNotes - Options
 	if (is100 >= 110){
 		msgbox Column total width above 110 please fix.
@@ -1617,6 +1629,8 @@ SaveAndReload:
 	IniWrite, %ModdedPercentSelect%,%iniPath%,General, ModdedPercent
 	IniWrite, %TagsPercentSelect%,%iniPath%,General, TagsPercent
 	IniWrite, %CatPercentSelect%,%iniPath%,General, CatPercent
+	IniWrite, %ParentPercentSelect%,%iniPath%,General, ParentPercent
+
 	GuiControlGet,Select_UserTimeFormat
 	IniWrite, %Select_UserTimeFormat%,%iniPath%,General, UserTimeFormat
 	GuiControlGet,Select_DeafultSort
@@ -1976,6 +1990,8 @@ SetFontFamily:
 	GuiControl,,QuickNoteBody, Sample Text
 	GuiControl,,QuickNoteTags, Sample Text
 	GuiControl,,QuickNoteCat, Sample Text
+	GuiControl,,QuickNoteParent, Sample Text
+
 	return
 }
 SetFontSize:
@@ -1995,6 +2011,8 @@ SetFontSize:
 	GuiControl,,QuickNoteBody, Sample Text
 	GuiControl,,QuickNoteTags, Sample Text
 	GuiControl,,QuickNoteCat, Sample Text
+	GuiControl,,QuickNoteParent, Sample Text
+
 	return
 }
 Set_StarPercent:
@@ -2060,7 +2078,15 @@ Set_CatPercent:
 	gosub DummyGUI1
 	return
 }
-
+Set_ParentPercent:
+{
+	GuiControlGet, ParentPercentSelect	
+	IniWrite, %ParentPercentSelect%,%iniPath%,General, ParentPercent	
+	IniRead, oParentPercent,%iniPath%, General,ParentPercent
+	ParentPercent = 0.%oParentPercent%
+	gosub DummyGUI1
+	return
+}
 Label:
 {
 	If %A_GuiControl% in +,^,!,+^,+!,^!,+^!    ;If the hotkey contains only modifiers, return to wait for a key.
@@ -2271,7 +2297,7 @@ TitleSaveChange:
 		}
 	
 	;FileRecycle, %detailsPath%%C_ini%%tOldFile%
-	SaveFile(NewTitle,FileSafeName,C_Body,1,"TAG-TMP","CAT-TMP")
+	SaveFile(NewTitle,FileSafeName,C_Body,1,"TAG-TMP","CAT-TMP","P-TMP")
 	ListTitleToChange = 1
 	ControlFocus , Edit1, FlatNotes - Library
 	TitleOldFile := ""
@@ -2288,7 +2314,7 @@ Edit3SaveTimer:
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
 	GuiControlGet, PreviewBox
-	SaveFile(RowText,FileSafeName,PreviewBox,1,"tag-tmp","cat-tmp")
+	SaveFile(RowText,FileSafeName,PreviewBox,1,"tag-tmp","cat-tmp","p-tmp")
 	iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
 	FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
 	LV_Modify(LVSelectedROW,,, RowText, NewBodyText)

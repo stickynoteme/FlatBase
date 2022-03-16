@@ -67,6 +67,7 @@ global MyNotesArray := {}
 global OldNoteData
 global QuickNoteBody
 global QuickNoteTags
+global QuickNoteParent
 global QuickNoteCat
 global QuickNoteName
 global U_MBG
@@ -89,6 +90,7 @@ global SortAdded
 global SortModded
 global SortTags
 global SortCat
+global SortParent
 global NextSortAdded
 global NextSortBody
 global NextSortName
@@ -108,6 +110,7 @@ global BodyPercent
 global AddedPercent
 global ModdedPercent
 global TagsPercent
+global ParentPercent
 global CatPercent
 global oStarPercent
 global oNamePercent
@@ -116,6 +119,7 @@ global oAddedPercent
 global oModdedPercent
 global oTagsPercent
 global oCatPercent
+global oParentPercent
 global ShowStatusBar
 global StatusBarM
 global StatusBarA
@@ -256,6 +260,8 @@ if (isFristRun = "1") {
 	IniWrite, 0,%iniPath%, General,ModdedPercent
 	IniWrite, 0,%iniPath%, General,TagsPercent
 	IniWrite, 0,%iniPath%, General,CatPercent
+	IniWrite, 0,%iniPath%, General,ParentPercent
+
 	IniWrite, yy/MM/dd,%iniPath%, General,UserTimeFormat
 	IniWrite, 0, %iniPath%, General, isFristRun
 	IniWrite, 0, %iniPath%, General, isFristRun
@@ -368,6 +374,7 @@ IniRead, oAddedPercent,%iniPath%, General,AddedPercent,20
 IniRead, oModdedPercent,%iniPath%, General,ModdedPercent,0
 IniRead, oTagsPercent,%iniPath%, General,TagsPercent,0
 IniRead, oCatPercent,%iniPath%, General,CatPercent,0
+IniRead, oParentPercent,%iniPath%, General,ParentPercent,0
 
 if oStarPercent between 0 and 9
 	oStarPercent = 0%oStarPercent%
@@ -381,6 +388,8 @@ if oTagsPercent between 0 and 9
 	oTagsPercent = 0%oTagsPercent%
 if oCatPercent between 0 and 9
 	oCatPercent = 0%oCatPercent%
+if oParentPercent between 0 and 9
+	oParentPercent = 0%oParentPercent%
 
 StarPercent = 0.%oStarPercent%
 NamePercent = 0.%oNamePercent%
@@ -389,6 +398,7 @@ AddedPercent = 0.%oAddedPercent%
 ModdedPercent = 0.%oModdedPercent%
 TagsPercent = 0.%oTagsPercent%
 CatPercent = 0.%oCatPercent%
+ParentPercent = 0.%oParentPercent%
 
 
 IniRead, HideScrollbars,%iniPath%,General,HideScrollbars,1
@@ -440,6 +450,8 @@ global AddColW := Round(libWColAdjust*AddedPercent)
 global ModColW := Round(libWColAdjust*ModdedPercent)
 global TagColW := Round(libWColAdjust*TagsPercent)
 global CatColW := Round(libWColAdjust*CatPercent)
+global ParentColW := Round(libWColAdjust*ParentPercent)
+
 ;-------------------------------------------------
 ;Acitvate User Hotkeys if any & make INI for new files
 ;-------------------------------------------------
