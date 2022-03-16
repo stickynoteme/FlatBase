@@ -63,6 +63,7 @@ BuildGUI1(){
 	Gui, 1:Add, ListBox, vLB1 +0x100 h8 w%LibW% x0 y0 -E0x200 Disabled -Tabstop
 	Gui, 1:Add, ListBox, vlB2 +0x100 h15 w%LibW% x0 ys0 -E0x200 Disabled -Tabstop
 	;ListBox used as background color for search area padding
+	Gui, 1:Add, DropDownList, x%CatX% y6 -E0x200 r5 w%CatW% vCatFilter gSearch HwndHCF, %CatBoxContents%
 	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%
 	Gui, 1:Add, text, x-3 c%U_SFC% w%StarColW% center gSortStar vSortStar, %Star1%
 	Gui, 1:Add, text, c%U_SFC% xp+%StarColW% w%NameColW% center gSortName vSortName, Name
@@ -138,6 +139,7 @@ BuildGUI1(){
 
 	Gui, 1:Add,Edit, w35 y-2000 x-2000 vSearchFilter HwndHSF -Tabstop,
 	;Gui, 1:Add,Edit, w35 y-2200 x-2200 vCatFilter HwndHCF -Tabstop,
+	
 	if (ShowStarHelper = 1) {
 			Gui, 1:Font, s8 Q%FontRendering%, Segoe UI Emoji
 , %U_MFC%
@@ -147,7 +149,7 @@ BuildGUI1(){
 	
 	Gui, 1:add, text, center backgroundTrans w15 h15 x%HelpIconx% y6 -E0x200 c%U_FBCA% gHelpWindow, [?]
 	
-	Gui, 1:Add, DropDownList, x%CatX% y6 -E0x200 r5 w%CatW% vCatFilter gSearch HwndHCF, %CatBoxContents%
+	
 		
 	
 

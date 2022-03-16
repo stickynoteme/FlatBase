@@ -19,7 +19,7 @@ Down::
 ControlGetFocus, OutputVar, FlatNotes - Library
 {
 	 If (OutputVar == "Edit1"){
-		sendinput {tab}
+		sendinput {tab}{tab}
 		return
 		}else
 			Down::Down
