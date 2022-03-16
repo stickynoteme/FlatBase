@@ -1,2 +1,8 @@
 
 inc/lables.ahk~
+.tools
+NoteDetails/*
+MyNotes/*
+NoteTemplates/*
+Backups/*
+settings.ini
