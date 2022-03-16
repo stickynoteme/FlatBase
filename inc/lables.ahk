@@ -2456,6 +2456,10 @@ NoteTemplateUI:
 			WindowW += wwTMP+3
 		}
 		Gui, nt:New,, FlatNotes - Note From Template
+		
+		if (WindowW < 175)
+			WindowW = 175
+		
 		Gui, nt:Margin, 3,3
 		Gui, nt:Font, s10, Courier New,
 		Gui, nt:Color,%U_SBG%, %U_MBG%
@@ -2501,6 +2505,10 @@ NoteTemplateUI:
 		}
 		;this is the + interface in the main GUI...
 		Gui, nt:New,, FlatNotes - Note From Template
+		
+		if (WindowW < 175)
+			WindowW = 175
+		
 		Gui, nt:Margin, 3,3
 		Gui, nt:Font, s10, Courier New,
 		Gui, nt:Color,%U_SBG%, %U_MBG%
@@ -2600,6 +2608,10 @@ NoteTemplateEnterButton:
 			WindowW += wwTMP+3
 		}
 		Gui, nt:New,, FlatNotes - Note From Template
+		
+		if (WindowW < 175)
+			WindowW = 175 
+			
 		Gui, nt:Margin, 3,3
 		Gui, nt:Font, s10, Courier New,
 		Gui, nt:Color,%U_SBG%, %U_MBG%
@@ -2763,7 +2775,8 @@ ntSAVE:
 				}
 			return
 		}else {
-			msgbox 0x40040, ,Soemthing went wrong...
+			msgbox 0x40040, ,Something went wrong... this is normally cuased by a missing template folder it has been remade please try again. If you see this message again you might be missing details in the template.
+			FileCreateDir, NoteTemplates
 		}
 	return
 }

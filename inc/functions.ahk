@@ -187,6 +187,8 @@ BuildGUI2(){
 	
 	Gui, 2:Add,Edit, xs section y+2 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r%QuickNoteRows% w%QuickNoteEditW% vQuickNoteBody hwndHQNB
 	
+	Gui, 2:Add,Edit, xs section y+2 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r1 w%QuickNoteEditW% vQuickNoteTags hwndHQNT
+	
 	if (HideScrollbars = 1) {
 		LVM_ShowScrollBar(HQNB,1,False)
 		GuiControl,+Vscroll,%HQNB%

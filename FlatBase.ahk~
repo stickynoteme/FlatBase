@@ -57,7 +57,6 @@ global sNeedsSubmit
 global MyNotesArray := {}
 global OldNoteData
 global QuickNoteBody
-global QuickNoteTags
 global QuickNoteName
 global U_MBG
 global U_MFC
@@ -405,6 +404,8 @@ if (HideScrollbars = 1)
 global StarColW := Round(libWColAdjust*StarPercent)
 global NameColW := Round(libWColAdjust*NamePercent)
 global BodyColW := Round(libWColAdjust*BodyPercent)
+global TagsColW := Round(libWColAdjust*TagsPercent)
+global ParentColW := Round(libWColAdjust*ParentPercent)
 global AddColW := Round(libWColAdjust*AddedPercent)
 global ModColW := Round(libWColAdjust*ModdedPercent)
 ;-------------------------------------------------
