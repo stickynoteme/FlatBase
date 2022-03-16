@@ -65,12 +65,6 @@ BuildGUI1(){
 	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%
 	Gui, 1:Add, text, x-3 c%U_SFC% w%StarColW% center gSortStar vSortStar, %Star1%
 	Gui, 1:Add, text, c%U_SFC% xp+%StarColW% w%NameColW% center gSortName vSortName, Name
-	
-	;add tags and parent field
-	Gui, 1:Add, text, c%U_SFC% xp+%NameColW% yp+1 w%TagsColW% center gSortTags vSortTags, Tags
-	Gui, 1:Add, text, c%U_SFC% xp+%TagsColW% yp+1 w%ParentColW% center gSortParent vSortParent, Parent
-	
-	
 	Gui, 1:Add, text, c%U_SFC% xp+%NameColW% yp+1 w%BodyColW% center gSortBody vSortBody, Body
 	Gui, 1:Add, text, yp+1 xp+%BodyColW% w%AddColW% center c%U_SFC% gSortAdded vSortAdded, Added
 	Gui, 1:Add, text, yp+1 xp+%AddColW% w%ModColW% center c%U_SFC% gSortModded vSortModded, Modified
@@ -193,6 +187,8 @@ BuildGUI2(){
 	
 	Gui, 2:Add,Edit, xs section y+2 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r%QuickNoteRows% w%QuickNoteEditW% vQuickNoteBody hwndHQNB
 	
+	Gui, 2:Add,Edit, xs section y+2 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r1 w%QuickNoteEditW% vQuickNoteTags hwndHQNT
+	
 	if (HideScrollbars = 1) {
 		LVM_ShowScrollBar(HQNB,1,False)
 		GuiControl,+Vscroll,%HQNB%
@@ -238,6 +234,7 @@ MakeFileList(ReFreshMyNoteArray){
 		IniRead, ModdedField, %NoteIni%, INFO, Mod
 		FormatTime, UserTimeFormatA, %AddedField%, %UserTimeFormat%
 		FormatTime, UserTimeFormatM, %ModdedField%,%UserTimeFormat%
+		IniRead, TagsField, %NoteIni%, INFO, Tags
 
 		if (StarField=10001)
 			StarFieldArray:=Star1
@@ -277,10 +274,6 @@ MakeFileList(ReFreshMyNoteArray){
 	LV_ModifyCol(7, "Logical")
 	LV_ModifyCol(8, 0)
 	LV_ModifyCol(9, 0)
-	LV_ModifyCol(10, TagsColW) 
-	LV_ModifyCol(10, "Logical")
-	LV_ModifyCol(11, ParentColW)
-	LV_ModifyCol(11, "Logical")
 	
 	if (DeafultSort = 1)
 			LV_ModifyCol(2, "Sort")
@@ -316,7 +309,7 @@ GuiControl, 1:+Redraw, LV
 return
 }
  
-SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
+SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags) {
 	FileSafeName := trim(FileSafeName)
 	QuickNoteName := trim(QuickNoteName)
 	FileNameTxt := FileSafeName ".txt"
@@ -355,13 +348,14 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
 			}
 		}
 	}	
-	MyNotesArray.Push({1:StarFieldArray, 2:QuickNoteName,3:QuickNoteBody,4:UserTimeFormatA,5:UserTimeFormatM,6:CreatedDate,7:A_Now,8:FileNameTxt,9:NoteStar})
+	MyNotesArray.Push({1:StarFieldArray, 2:QuickNoteName,3:QuickNoteBody,4:UserTimeFormatA,5:UserTimeFormatM,6:CreatedDate,7:A_Now,8:FileNameTxt,9:NoteStar,10:QuickNoteTags})
 	
 
 	iniWrite,%CreatedDate%,%detailsPath%%FileSafeName%.ini,INFO,Add
 	iniWrite,%QuickNoteName%,%detailsPath%%FileSafeName%.ini,INFO,Name
 	iniWrite,%A_Now%,%detailsPath%%FileSafeName%.ini,INFO,Mod
 	iniWrite,%NoteStar%,%detailsPath%%FileSafeName%.ini,INFO,Star
+	iniWrite,%QuickNoteTags%,%detailsPath%%FileSafeName%.ini,INFO,Tags
 	FileAppend , %QuickNoteBody%, %SaveFileName%, UTF-8
 ;ReFreshLV()
 return

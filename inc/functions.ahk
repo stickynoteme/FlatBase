@@ -234,6 +234,7 @@ MakeFileList(ReFreshMyNoteArray){
 		IniRead, ModdedField, %NoteIni%, INFO, Mod
 		FormatTime, UserTimeFormatA, %AddedField%, %UserTimeFormat%
 		FormatTime, UserTimeFormatM, %ModdedField%,%UserTimeFormat%
+		IniRead, TagsField, %NoteIni%, INFO, Tags
 
 		if (StarField=10001)
 			StarFieldArray:=Star1
@@ -253,7 +254,7 @@ MakeFileList(ReFreshMyNoteArray){
 			}
 		
 		UsedStars .= StarFieldArray "|"
-		MyNotesArray.Push({1:StarFieldArray,2:NameField,3:NoteField,4:UserTimeFormatA,5:UserTimeFormatM,6:AddedField,7:ModdedField,8:A_LoopField,9:StarField})
+		MyNotesArray.Push({1:StarFieldArray,2:NameField,3:NoteField,4:UserTimeFormatA,5:UserTimeFormatM,6:AddedField,7:ModdedField,8:A_LoopField,9:StarField,10:TagsField})
 	} ; File loop end
 	UsedStars := RemoveDups(UsedStars,"|")
 	UsedStars := StrReplace(UsedStars,"||","|")
@@ -300,7 +301,7 @@ GuiControl, 1:-Redraw, LV
 LV_Delete()
 For Each, Note In MyNotesArray
 {
-	 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+	 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 }
 gosub SortNow
 TotalNotes := MyNotesArray.MaxIndex() 
@@ -308,7 +309,7 @@ GuiControl, 1:+Redraw, LV
 return
 }
  
-SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
+SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags) {
 	FileSafeName := trim(FileSafeName)
 	QuickNoteName := trim(QuickNoteName)
 	FileNameTxt := FileSafeName ".txt"
@@ -347,13 +348,14 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified) {
 			}
 		}
 	}	
-	MyNotesArray.Push({1:StarFieldArray, 2:QuickNoteName,3:QuickNoteBody,4:UserTimeFormatA,5:UserTimeFormatM,6:CreatedDate,7:A_Now,8:FileNameTxt,9:NoteStar})
+	MyNotesArray.Push({1:StarFieldArray, 2:QuickNoteName,3:QuickNoteBody,4:UserTimeFormatA,5:UserTimeFormatM,6:CreatedDate,7:A_Now,8:FileNameTxt,9:NoteStar,10:QuickNoteTags})
 	
 
 	iniWrite,%CreatedDate%,%detailsPath%%FileSafeName%.ini,INFO,Add
 	iniWrite,%QuickNoteName%,%detailsPath%%FileSafeName%.ini,INFO,Name
 	iniWrite,%A_Now%,%detailsPath%%FileSafeName%.ini,INFO,Mod
 	iniWrite,%NoteStar%,%detailsPath%%FileSafeName%.ini,INFO,Star
+	iniWrite,%QuickNoteTags%,%detailsPath%%FileSafeName%.ini,INFO,Tags
 	FileAppend , %QuickNoteBody%, %SaveFileName%, UTF-8
 ;ReFreshLV()
 return

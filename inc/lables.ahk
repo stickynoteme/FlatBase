@@ -93,7 +93,7 @@ Label3:
 		zbody .= clipboard 
 		istitle = yes
 		FileReadLine, CheckExists, %U_NotePath%%TmpFileSafeName%.txt, 1
-		SaveFile(ztitle,ztitleEncoded,zbody,0)
+		SaveFile(ztitle,ztitleEncoded,zbody,0,"")
 		gosub search
 		tooltip B: %zbody%
 		settimer, KillToolTip, -500
@@ -201,7 +201,7 @@ if(OutputVar == "Edit3"){
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
 	GuiControlGet, PreviewBox
-	SaveFile(RowText,FileSafeName,PreviewBox,1)
+	SaveFile(RowText,FileSafeName,PreviewBox,1,"")
 	iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
 	FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
 	LV_Modify(LVSelectedROW,,, RowText, NewBodyText)
@@ -260,7 +260,7 @@ if (OutputVar = "Edit1"){
 		LV_GetText(RowText, LVSelectedROW,2)
 		FileSafeName := NameEncode(RowText)
 		GuiControlGet, PreviewBox
-		SaveFile(RowText,FileSafeName,PreviewBox,1)
+		SaveFile(RowText,FileSafeName,PreviewBox,1,"")
 		iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
 		FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
 		LV_Modify(LVSelectedROW,,, RowText, NewBodyText)
@@ -296,7 +296,7 @@ SaveButton:
 	SaveMod = 0
 	IfExist, %U_NotePath%%FileSafeName%.txt
 		SaveMod = 1
-	SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,SaveMod)
+	SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,SaveMod,QuickNoteTags)
 	;horrible fix to LV to update
 
 	GuiControlGet,OldST,,%HSterm%
@@ -329,11 +329,11 @@ Search:
 		  If (SearchTerm != "")
 		  {
 			If (InStr(Note.2, SearchTerm) != 0){
-			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 			   }
 			}
 			Else
-			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 		}
 	gosub SortNow
 	gosub SearchFilter
@@ -347,11 +347,11 @@ Search:
 		  If (SearchTerm != "")
 		  {
 			If (InStr(Note.1, SearchTerm) != 0){
-			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 			   }
 			}
 			Else
-			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 		}
 	gosub SortNow
 	gosub SearchFilter
@@ -367,20 +367,20 @@ Search:
 			{
 				
 				If (InStr(Note.1, SArray.1) != 0 or InStr(Note.1, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 				}Else if (InStr(Note.2, SArray.1) != 0 or InStr(Note.2, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 				}Else if (InStr(Note.3, SArray.1) != 0 or InStr(Note.3, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 				}Else if (InStr(Note.4, SArray.1) != 0 or InStr(Note.4, SArray.2) != 0  && SearchDates =1){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 				}Else if (InStr(Note.5, SArray.1) != 0 or InStr(Note.5, SArray.2) != 0  && SearchDates =1){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 				}
 				
 			}
 		Else
-			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 			
 		}
 	gosub SortNow
@@ -397,20 +397,20 @@ Search:
 			{
 				
 				If (InStr(Note.1, SArray.1) != 0 && InStr(Note.1, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 				}Else if (InStr(Note.2, SArray.1) != 0 && InStr(Note.2, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 				}Else if (InStr(Note.3, SArray.1) != 0 && InStr(Note.3, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 				}Else if (InStr(Note.4, SArray.1) != 0 && InStr(Note.4, SArray.2) != 0  && SearchDates =1){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 				}Else if (InStr(Note.5, SArray.1) != 0 && InStr(Note.5, SArray.2) != 0  && SearchDates =1){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 				}
 				
 			}
 		Else
-			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 			
 		}
 	gosub SortNow
@@ -424,20 +424,20 @@ Search:
 	   {
 			If (InStr(Note.2, SearchTerm) != 0)
 			{
-				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 			}Else if (InStr(Note.3, SearchTerm) != 0)
 			{
-				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 			}Else if (InStr(Note.4, SearchTerm) != 0 && SearchDates =1)
 			{
-				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 		   }Else if (InStr(Note.5, SearchTerm) != 0 && SearchDates =1)
 			{
-				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 			}
 		}
 		Else
-			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 	}
 	gosub SortNow
 	gosub SearchFilter
@@ -670,7 +670,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			LV_Modify(A_EventInfo ,,UpdateStar,,,,,,,,NextStar)
 			IniWrite, %NextStar%, %detailsPath%%C_ini%, INFO, Star
 			fileRead, C_Body, %U_NotePath%%C_FileName%
-			SaveFile(C_Name,C_SafeName,C_Body,1)	
+			SaveFile(C_Name,C_SafeName,C_Body,1,"")	
 			LV@sel_col = "undoomCol1"
 		}
 	}
@@ -715,7 +715,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 		LV_Modify(LastRowSelected,,UpdateStar,,,,,,,,NextStar)
 		IniWrite, %NextStar%, %detailsPath%%C_ini%, INFO, Star
 		fileRead, C_Body, %U_NotePath%%C_FileName%
-		SaveFile(C_Name,C_SafeName,C_Body,1)	
+		SaveFile(C_Name,C_SafeName,C_Body,1,"")	
 		return		
 	}
 	if (A_GuiEvent = "K") {
@@ -771,8 +771,10 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 						OldStarData = %Star3%
 					if (OldStarData = 10004)
 						OldStarData = %Star4%
+					IniRead, OldTagsData, %detailsPath%%FileSafeName%.ini,INFO,Tags
 					GuiControl,, QuickNoteBody,%MyFile%
 					GuiControl,, QuickStar,%OldStarData%
+					GuiControl,, QuickNoteTags,%OldTagsData%
 				}
 				return
 			}				
@@ -981,7 +983,7 @@ StarSaveChange:
 			MyNotesArray.RemoveAt(Each)
 		}
 	}
-	SaveFile(TmpName,TmpFileSafeName,C_Body,1)
+	SaveFile(TmpName,TmpFileSafeName,C_Body,1,"")
 	ListStarToChange = 1
 	if (RapidStarNow = 1){
 		ListStarToChange = 0
@@ -1909,6 +1911,7 @@ SetFontFamily:
 		WinActivate, FlatNotes
 	GuiControl,,QuickNoteName, Sample Text
 	GuiControl,,QuickNoteBody, Sample Text
+	GuiControl,,QuickNoteTags, Sample Text
 	return
 }
 SetFontSize:
@@ -1926,6 +1929,7 @@ SetFontSize:
 		WinActivate, FlatNotes
 	GuiControl,,QuickNoteName, Sample Text
 	GuiControl,,QuickNoteBody, Sample Text
+	GuiControl,,QuickNoteTags, Sample Text
 	return
 }
 Set_StarPercent:
@@ -2184,7 +2188,7 @@ TitleSaveChange:
 		}
 	
 	;FileRecycle, %detailsPath%%C_ini%%tOldFile%
-	SaveFile(NewTitle,FileSafeName,C_Body,1)
+	SaveFile(NewTitle,FileSafeName,C_Body,1,"")
 	ListTitleToChange = 1
 	ControlFocus , Edit1, FlatNotes - Library
 	TitleOldFile := ""
@@ -2201,7 +2205,7 @@ Edit3SaveTimer:
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
 	GuiControlGet, PreviewBox
-	SaveFile(RowText,FileSafeName,PreviewBox,1)
+	SaveFile(RowText,FileSafeName,PreviewBox,1,"")
 	iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
 	FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
 	LV_Modify(LVSelectedROW,,, RowText, NewBodyText)
@@ -2782,5 +2786,5 @@ ntSAVE:
 }
 
 HelpWindow:
-msgbox % "[Legend: + = Shift, ^ = Ctrl, ! = Alt, # = Win]`n`nGLOBAL HOTKEYS:`nOpen Library (if Capslock not used): " savedHK1 "`nQuick Note: " savedHK2 "`nRapid Note: " savedHK3 "`nCancel Rapid Note: " savedHK4 "`nAppend to Rapid Note: " savedHK5 "`nAppend Template to Rapid Note" savedHK6 "`n`nMAIN WINDOW SHORTCUTS:`nFocus Search: "savedSK1 "`nFocus Results: " savedSK2 "`nFocus Edit/Preview: " savedSK3 "`nAdd Note From Template: " savedSK4 "`n`nINFO:`nQuick Note:`nSelect text and press the Quick Note hotkey to bring that text up as the body of a new blank note.`n`nRapid Note:`nUse the Rapid Note hotkey to quick add notes. Press the Rapid Note Hotkey once to copy the title, then again to copy the body or use the append hotkey to add any number of selected texts to the body of the note. When you are done use the Rapid Note hotekey to finish the note and select a star."
+msgbox % "Advanced search: `n$$term = Search title only.`ntermA||termB = find a or b.`nTermA&&TermB = find a and b`nNote: for || and && terms most be in the same field. eg. You can't search for terms in title and body, they most both be in that title or body.`n`n[Legend: + = Shift, ^ = Ctrl, ! = Alt, # = Win]`n`nGLOBAL HOTKEYS:`nOpen Library (if Capslock not used): " savedHK1 "`nQuick Note: " savedHK2 "`nRapid Note: " savedHK3 "`nCancel Rapid Note: " savedHK4 "`nAppend to Rapid Note: " savedHK5 "`nAppend Template to Rapid Note" savedHK6 "`n`nMAIN WINDOW SHORTCUTS:`nFocus Search: "savedSK1 "`nFocus Results: " savedSK2 "`nFocus Edit/Preview: " savedSK3 "`nAdd Note From Template: " savedSK4 "`n`nINFO:`nQuick Note:`nSelect text and press the Quick Note hotkey to bring that text up as the body of a new blank note.`n`nRapid Note:`nUse the Rapid Note hotkey to quick add notes. Press the Rapid Note Hotkey once to copy the title, then again to copy the body or use the append hotkey to add any number of selected texts to the body of the note. When you are done use the Rapid Note hotekey to finish the note and select a star."
 return
