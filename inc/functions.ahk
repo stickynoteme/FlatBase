@@ -66,22 +66,31 @@ BuildGUI1(){
 	Gui, 1:Add, text, x-3 c%U_SFC% w%StarColW% center gSortStar vSortStar, %Star1%
 	Gui, 1:Add, text, c%U_SFC% xp+%StarColW% w%NameColW% center gSortName vSortName, Name
 	Gui, 1:Add, text, c%U_SFC% xp+%NameColW% yp+1 w%BodyColW% center gSortBody vSortBody, Body
-	Gui, 1:Add, text, yp+1 xp+%BodyColW% w%AddColW% center c%U_SFC% gSortAdded vSortAdded, Added
-	Gui, 1:Add, text, yp+1 xp+%AddColW% w%ModColW% center c%U_SFC% gSortModded vSortModded, Modified
+	Gui, 1:Add, text, yp0 xp+%BodyColW% w%AddColW% center c%U_SFC% gSortAdded vSortAdded, Added
+	Gui, 1:Add, text, yp0 xp+%AddColW% w%ModColW% center c%U_SFC% gSortModded vSortModded, Modified
+	Gui, 1:Add, text, yp0 xp+%ModColW% w%TagColW% center c%U_SFC% vSortTags, Tags
 	
-	Gui, 1:Add, ListView,section -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar
+	Gui, 1:Add, ListView,section -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar|Tags
 
 	;Allow User set prevent/edit font
 	Gui, 1:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
 	;Gui, 1:Add,edit, readonly h6 -E0x200
-	title_h := PreviewFontSize*1.7
+	title_h := PreviewFontSize*1.6
 	TitleWAdjust := round(LibW*0.9)
 	Gui, 1:Add,text, center xs c%U_SFC% -E0x200 w25 h%title_h% gLibTemplateAdd, %TemplateSymbol%
 	Gui, 1:Add,edit, readonly center x+35 -E0x200 vTitleBar C%U_SFC% w%TitleWAdjust% h%title_h% backgroundTrans -Tabstop,
 	
 	
 	
-	Gui, 1:Add,Edit, section x1 hwndHPB -E0x200 r%PreviewRows% w%LibW% C%U_MFC% gPreviewBox vPreviewBox,
+	Gui, 1:Add,Edit, section x0 hwndHPB -E0x200 r%PreviewRows% w%LibW% C%U_MFC% gPreviewBox vPreviewBox,
+	
+	HalfLibW := Libw *0.5
+	
+		Gui, 1:Add, ListBox, +0x100 r1 w%HalfLibW% x0 y+1 -E0x200 Disabled -Tabstop
+	
+	Gui, 1:Add,Edit, section x0 yp+5 -E0x200 hwndHPT  r1 w%HalfLibW% C%U_MFC% vTagBox center,
+	
+	Gui, 1:Add, DropDownList,xp%HalfLibW% yp0 -E0x200 r5 w%HalfLibW% vCatBox, Black|White|Red|Green|Blue
 	
 	MakeFileList(1)
 	CLV := New LV_Colors(HLV)
@@ -93,7 +102,7 @@ BuildGUI1(){
 	if (ShowStatusBar=1) {
 		Gui, 1:Font, s8 Q%FontRendering%
 		StatusWidth := LibW//3
-		Gui, 1:add,text, left vStatusBarCount w%StatusWidth% C%U_SFC%, %TotalNotes% of %TotalNotes%
+		Gui, 1:add,text, x0 left vStatusBarCount w%StatusWidth% C%U_SFC%, %TotalNotes% of %TotalNotes%
 		Gui, 1:add,text, x+0 center vStatusBarM w%StatusWidth% C%U_SFC%,M: 00/00/00
 		Gui, 1:add,text, x+0 right vStatusBarA w%StatusWidth% C%U_SFC%,A: 00/00/00
 		Gui, 1:Font, s2
@@ -181,13 +190,20 @@ BuildGUI2(){
 	Gui, 2:Add,Edit, xp+0 yp+5 w35 r1 C%U_MFC% -E0x200 center hwndHQNQS vQuickStar,
 
 	Gui, 2:Font, s%FontSize%, Segoe UI Emoji
-	GUI, 2:Add,text, x+2 w25 r1 C%U_SFC% center gStarQN, %Star1%
+	GUI, 2:Add,text, x+2 yp0 w25 r1 C%U_SFC% center gStarQN, %Star1%
 	Gui, 2:Font, s%FontSize% Q%FontRendering%, %FontFamily%, %U_SFC%	
 	Gui, 2:Add,Edit, disabled hidden x+1 r1 w0
 	
 	Gui, 2:Add,Edit, xs section y+2 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r%QuickNoteRows% w%QuickNoteEditW% vQuickNoteBody hwndHQNB
 	
-	Gui, 2:Add,Edit, xs section y+2 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r1 w%QuickNoteEditW% vQuickNoteTags hwndHQNT
+	HalfQuickNoteEditW := QuickNoteEditW * 0.5
+		
+	Gui, 2:Add, ListBox, y+2 +0x100 h15 w%HalfQuickNoteEditW%  -E0x200 Disabled -Tabstop
+		
+		
+	Gui, 2:Add,Edit,  yp+5 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r1 w%HalfQuickNoteEditW% vQuickNoteTags hwndHQNT
+	
+	Gui, 2:Add, DropDownList,xp%HalfQuickNoteEditW% yp0 -E0x200 r5 w%HalfQuickNoteEditW% vQuickNoteCat, Black|White|Red|Green|Blue
 	
 	if (HideScrollbars = 1) {
 		LVM_ShowScrollBar(HQNB,1,False)
@@ -232,9 +248,9 @@ MakeFileList(ReFreshMyNoteArray){
 		IniRead, NameField, %NoteIni%, INFO, Name
 		IniRead, AddedField, %NoteIni%, INFO, Add
 		IniRead, ModdedField, %NoteIni%, INFO, Mod
+		IniRead, TagsField, %NoteIni%, INFO, Tags
 		FormatTime, UserTimeFormatA, %AddedField%, %UserTimeFormat%
 		FormatTime, UserTimeFormatM, %ModdedField%,%UserTimeFormat%
-		IniRead, TagsField, %NoteIni%, INFO, Tags
 
 		if (StarField=10001)
 			StarFieldArray:=Star1
@@ -250,7 +266,7 @@ MakeFileList(ReFreshMyNoteArray){
 			StarFieldArray:= A_sapce
 		
 		if (ReFreshMyNoteArray = 1){
-			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField)
+			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField,TagsField)
 			}
 		
 		UsedStars .= StarFieldArray "|"
@@ -274,6 +290,8 @@ MakeFileList(ReFreshMyNoteArray){
 	LV_ModifyCol(7, "Logical")
 	LV_ModifyCol(8, 0)
 	LV_ModifyCol(9, 0)
+	LV_ModifyCol(10, TagColW)
+	LV_ModifyCol(10, "Logical")
 	
 	if (DeafultSort = 1)
 			LV_ModifyCol(2, "Sort")

@@ -478,16 +478,19 @@ UpdateStatusBar:
 		LV_GetText(LastFileName, 1 , 8)
 		LV_GetText(LastNoteAdded, 1 , 4)
 		LV_GetText(LastNoteModded, 1 , 5)
+		LV_GetText(LastNoteTags, 1 , 10)
 		GuiControl,,TitleBar, %LastResultName%
 		FileRead, LastResultBody,%U_NotePath%%LastFileName%
 		LastNoteIni := RegExReplace(LastFileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 
 		GuiControl,,PreviewBox, %LastResultBody%
+		GuiControl,,TagBox, %LastNoteTags%
 		GuiControl,, StatusbarM,M: %LastNoteModded%
 		GuiControl,, StatusbarA,A: %LastNoteAdded%
 		}else{
 			GuiControl,,TitleBar, 
 			GuiControl,,PreviewBox,
+			GuiControl,,TagBox,
 			GuiControl,,StatusBarM,M: 00\00\00 
 			GuiControl,,StatusBarA,A: 00\00\00
 		}
@@ -626,13 +629,15 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 	LV_GetText(C_Added, A_EventInfo,4)
     LV_GetText(C_Modded, A_EventInfo,5)
 	LV_GetText(C_Name, A_EventInfo,2)
+	LV_GetText(C_Tags, A_EventInfo,10)
     FileRead, NoteFile, %U_NotePath%%RowText%
 	GuiControl,, PreviewBox, %NoteFile%
+	GuiControl,, Tagbox, %C_Tags%
 	GuiControl,, TitleBar, %C_Name%
 	GuiControl,, StatusbarM,M: %C_Modded%
 	GuiControl,, StatusbarA,A: %C_Added%
 }
-;1Star|2Title|3Body|4Added|5Modified|6RawAdded|7RawModded|8FileName|9RawStar
+;1Star|2Title|3Body|4Added|5Modified|6RawAdded|7RawModded|8FileName|9RawStar|10Tags4444
 
 	if A_GuiEvent in Normal
 	{
@@ -1431,7 +1436,7 @@ Options:
 	CurrentStickyFontSize := StickyFontSize*0.5
 	Gui, 3:add,DropDownList, x+10 Choose%CurrentStickyFontSize% vStickyFontSizeSelect gSetStickyFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
 	
-	Gui, 3:Add,Text,xs,Column Width Percentage Star | Name | Body | Added | Modified 
+	Gui, 3:Add,Text,xs,Column Width Percentage Star | Name | Body | Added | Modified | Tags |
 	
 	Gui, Add, Edit, w50
 	Gui, 3:Add,UpDown, vStarPercentSelect gSet_StarPercent Range0-100, %oStarPercent%
@@ -1443,6 +1448,8 @@ Options:
 	Gui, 3:Add,UpDown,  vAddedPercentSelect gSet_AddedPercent Range0-100, %oAddedPercent%
 	Gui, Add, Edit, w50 x+5
 	Gui, 3:Add,UpDown,  vModdedPercentSelect gSet_ModdedPercent Range0-100, %oModdedPercent%
+	Gui, Add, Edit, w50 x+5
+	Gui, 3:Add,UpDown,  vTagsPercentSelect gSet_TagsPercent Range0-100, %oTagsPercent%
 	
 	;Window Size Options Tab
 	Gui, 3:Tab, Window Size
@@ -1555,10 +1562,11 @@ SaveAndReload:
 	GuiControlGet, NamePercentSelect	
 	GuiControlGet, BodyPercentSelect	
 	GuiControlGet, AddedPercentSelect
-	GuiControlGet, ModdedPercentSelect	
+	GuiControlGet, ModdedPercentSelect
+	GuiControlGet, TagsPercentSelect	
 		
 
-	is100 := StarPercentSelect+NamePercentSelect+BodyPercentSelect+AddedPercentSelect+ModdedPercentSelect
+	is100 := StarPercentSelect+NamePercentSelect+BodyPercentSelect+AddedPercentSelect+ModdedPercentSelect+TagsPercentSelect
 	WinSet, AlwaysOnTop, Off, FlatNotes - Options
 	if (is100 >= 110){
 		msgbox Column total width above 110 please fix.
@@ -1569,6 +1577,7 @@ SaveAndReload:
 	IniWrite, %BodyPercentSelect%,%iniPath%,General, BodyPercent		
 	IniWrite, %AddedPercentSelect%,%iniPath%,General, AddedPercent
 	IniWrite, %ModdedPercentSelect%,%iniPath%,General, ModdedPercent
+	IniWrite, %TagsPercentSelect%,%iniPath%,General, TagsPercent
 	GuiControlGet,Select_UserTimeFormat
 	IniWrite, %Select_UserTimeFormat%,%iniPath%,General, UserTimeFormat
 	GuiControlGet,Select_DeafultSort
@@ -1982,6 +1991,15 @@ Set_ModdedPercent:
 	IniWrite, %ModdedPercentSelect%,%iniPath%,General, ModdedPercent	
 	IniRead, oModdedPercent,%iniPath%, General,ModdedPercent
 	ModdedPercent = 0.%oModdedPercent%
+	gosub DummyGUI1
+	return
+}
+Set_TagsPercent:
+{
+	GuiControlGet, TagsPercentSelect	
+	IniWrite, %TagsPercentSelect%,%iniPath%,General, TagsPercent	
+	IniRead, oTagsPercent,%iniPath%, General,TagsPercent
+	TagsPercent = 0.%oTagsPercent%
 	gosub DummyGUI1
 	return
 }
