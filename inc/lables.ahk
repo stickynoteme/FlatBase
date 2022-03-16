@@ -38,6 +38,9 @@ Label2:
 
 	GuiControl,, QuickNoteName,%MyClip%
 	CBinfo = %MyClip%
+	GuiControl, ChooseString, QuickNoteCat, %LastCatFilter%
+	
+	
 	FileSafeName := NameEncode(CBinfo)
 	IfExist, %U_NotePath%%FileSafeName%.txt
 	{
@@ -166,6 +169,7 @@ if (OutputVar = "Edit1"){
 	
 	BuildGUI2()
 	GuiControl,, QuickNoteName,%SearchTerm%
+	GuiControl, ChooseString, QuickNoteCat, %LastCatFilter%
 	GuiControl,, FileSafeName,%FileSafeSearchTerm%
 	ControlFocus, Edit4, FlatNote - QuickNote 
 	
@@ -224,6 +228,7 @@ if (OutputVar = "Edit1"){
 		
 		BuildGUI2()
 		GuiControl,, QuickNoteName,%SearchTerm%
+		GuiControl, ChooseString, QuickNoteCat, %LastCatFilter%
 		GuiControl,, FileSafeName,%FileSafeSearchTerm%
 		ControlFocus, Edit4, FlatNote - QuickNote 
 		
@@ -478,6 +483,8 @@ SearchFilter:
 CatFilter:
 {
 	GuiControlGet, CatFilter,, %HCF%
+	GuiControlGet, LastCatFilter,, %HCF%
+	
 	if (CatFilter != "")
 	{
 		Mloops := LV_GetCount()
@@ -800,11 +807,12 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 				MyClip := NoteNameToEdit
 
 				BuildGUI2()
+				
 				ControlFocus, Edit4, FlatNote - QuickNote
 
 				GuiControl,, QuickNoteName,%MyClip%
-				CBinfo = %MyClip%
-				FileSafeName := NameEncode(CBinfo)
+				GuiControl, ChooseString, QuickNoteCat, %LastCatFilter%
+				e := NameEncode(CBinfo)
 				IfExist, %U_NotePath%%FileSafeName%.txt
 				{
 					FileRead, MyFile, %U_NotePath%%FileSafeName%.txt

@@ -46,6 +46,7 @@ global HTRowsOver ; Total Rows edit box for Template maker
 global TagBox
 global CatBox
 global CatFilter
+global LastCatFilter
 
 global CatBoxContents
 global NoteParent
