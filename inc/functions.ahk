@@ -56,6 +56,7 @@ BuildGUI1(){
 	searchX = 6
 	if (ShowStarHelper = 1) {
 		searchX = 27
+		CatX := CatX + 27
 	}
 	
 	Gui, 1:Add,Edit, c%U_FBCA% w%SearchW% y%FontSize% x%searchX% y8 vSearchTerm gSearch -E0x200 HwndHSterm
@@ -86,13 +87,16 @@ BuildGUI1(){
 	Gui, 1:Add,Edit, section x0 hwndHPB -E0x200 r%PreviewRows% w%LibW% C%U_MFC% gPreviewBox vPreviewBox,
 	
 	TagLibW := Libw *0.8
-	CatLibW := Libw *0.2
+	ParentLibW := Libw *0.2 - 2
+	ParenetLibX := TagLibW + 1
 	
-		Gui, 1:Add, ListBox, +0x100 r1 w%TagLibW% x0 y+1 -E0x200 Disabled -Tabstop
+	; these two listboxes act as centering backgrounds for the tags and parent edits.
+	Gui, 1:Add, ListBox, +0x100 r1 w%TagLibW% x0 y+1 -E0x200 Disabled -Tabstop
+	Gui, 1:Add, ListBox, +0x100 r1 w%ParentLibW% xp%ParenetLibX% -E0x200 Disabled -Tabstop
 	
-	Gui, 1:Add,Edit, section x0 yp+5 -E0x200 hwndHPT  r1 w%TagLibW% C%U_MFC% vTagBox center,
+	Gui, 1:Add,Edit, section x0 yp+6 -E0x200 hwndHPT  r1 w%TagLibW% C%U_MFC% vTagBox center,
 	
-	Gui, 1:Add, DropDownList,xp%TagLibW% yp0 -E0x200 r5 w%CatLibW% vCatFilter gSearch HwndHCF, %CatBoxContents%
+	Gui, 1:Add, Edit,xp%ParenetLibX%  -E0x200 r1 center C%U_MFC% w%ParentLibW% vNoteParent HwndHNP,
 	
 	MakeFileList(1)
 	CLV := New LV_Colors(HLV)
@@ -140,7 +144,9 @@ BuildGUI1(){
 			Gui, 1:add, text, center backgroundTrans w15 h15 x2 y8 -E0x200 c%U_FBCA% gStarFilterBox, %star1%
 		}
 	
-	Gui, 1:add, text, center backgroundTrans w15 h15 x%HelpIconx% y8 -E0x200 c%U_FBCA% gHelpWindow, [?]
+	Gui, 1:add, text, center backgroundTrans w15 h15 x%HelpIconx% y6 -E0x200 c%U_FBCA% gHelpWindow, [?]
+	
+	Gui, 1:Add, DropDownList, x%CatX% y6 -E0x200 r5 w%CatW% vCatFilter gSearch HwndHCF, %CatBoxContents%
 		
 	
 

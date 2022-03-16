@@ -29,6 +29,7 @@ global HLV ;Lib listview
 global HPB ;
 global HSF ; SearchFilter edit ID
 global HCF ; CatFilter edit ID
+global HNP ; Note Parent edit ID
 global HQNUSL1
 global HQNUSl2
 global HQNUSl3
@@ -47,6 +48,7 @@ global CatBox
 global CatFilter
 
 global CatBoxContents
+global NoteParent
 
 global TRowsOver
 global OpenInQuickNote
@@ -417,8 +419,10 @@ Iniread, UserTimeFormat,%iniPath%,General,UserTimeFormat,yy/MM/dd
 ;-------------------------------------------------
 ;Set Globals that need values from the ini
 ;-------------------------------------------------
-global HelpIconx := LibW-15
-global SearchW := LibW-50
+global HelpIconx := LibW-18
+global SearchW := LibW * 0.8 - 50
+global CatX := SearchW
+global CatW := LibW * 0.2
 global StickyTW := StickyW-80
 global StickyMaxH
 global VSBW
