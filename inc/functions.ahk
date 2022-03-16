@@ -91,7 +91,7 @@ BuildGUI1(){
 	
 	Gui, 1:Add,Edit, section x0 yp+5 -E0x200 hwndHPT  r1 w%HalfLibW% C%U_MFC% vTagBox center,
 	
-	Gui, 1:Add, DropDownList,xp%HalfLibW% yp0 -E0x200 r5 w%HalfLibW% vCatBox, Black|White|Red|Green|Blue
+	Gui, 1:Add, DropDownList,xp%HalfLibW% yp0 -E0x200 r5 w%HalfLibW% vCatBox, %CatBoxContents%
 	
 	MakeFileList(1)
 	CLV := New LV_Colors(HLV)
@@ -204,7 +204,7 @@ BuildGUI2(){
 		
 	Gui, 2:Add,Edit,  yp+5 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r1 w%HalfQuickNoteEditW% vQuickNoteTags hwndHQNT
 	
-	Gui, 2:Add, DropDownList, Sort xp%HalfQuickNoteEditW% yp0 -E0x200 r5 w%HalfQuickNoteEditW% vQuickNoteCat hwndHQNC, Black|White|Red|Green|Blue
+	Gui, 2:Add, DropDownList, Sort xp%HalfQuickNoteEditW% yp0 -E0x200 r5 w%HalfQuickNoteEditW% vQuickNoteCat hwndHQNC,%CatBoxContents%
 	
 	if (HideScrollbars = 1) {
 		LVM_ShowScrollBar(HQNB,1,False)

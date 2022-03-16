@@ -43,6 +43,7 @@ global HTRowsOver ; Total Rows edit box for Template maker
 
 global TagBox
 global CatBox
+global CatBoxContents
 
 global TRowsOver
 global OpenInQuickNote
@@ -293,6 +294,8 @@ IniRead, rowSelectTextColor, %StartingTheme%, Colors, RowSelectTextColor , 0xfff
 ;-------------------------------------------------
 ; Read and from settings.ini
 ;-------------------------------------------------
+IniRead, CatBoxContents, %iniPath%,General,CatBoxContents,White|Black|Calico|Tabby
+
 IniRead, savedHK1, %iniPath%, Hotkeys, 1,#o
 IniRead, savedHK2, %iniPath%, Hotkeys, 2,#n
 IniRead, savedHK3, %iniPath%, Hotkeys, 3,#z

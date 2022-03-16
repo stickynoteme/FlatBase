@@ -1321,6 +1321,9 @@ Options:
 	Gui, 3:add,text, xs section, Unique stars list #2
 	Gui, 3:add,edit, xs section w300 vSelect_UniqueStarList2 gSet_UniqueStarList2, %UniqueStarList2% 
 	
+	Gui, 3:add,text, xs section, Pipe "|" sperated list of Categories. (Example: Black,White,Calico..etc)
+	Gui, 3:add,edit, xs section w300 vSelect_CatBoxContents gSet_CatBoxContents, %CatBoxContents% 
+	
 	Gui, 3:Add,CheckBox, xs vSelect_ShowStarHelper gSet_ShowStarHelper, Show star filter by search box?
 	GuiControl,,Select_ShowStarHelper,%ShowStarHelper%
 
@@ -1520,6 +1523,8 @@ SaveAndReload:
 	IniRead, UniqueStarList, %iniPath%, General, UniqueStarList
 	GuiControlGet,Select_UniqueStarList2
 	IniRead, UniqueStarList2, %iniPath%, General, UniqueStarList2
+	GuiControlGet,Select_CatBoxContents
+	IniRead, CatBoxContents, %iniPath%, General, CatBoxContents
 	GuiControlGet,Select_ExternalEditor
 	IniWrite, %Select_ExternalEditor%, %iniPath%, General, ExternalEditor
 	GuiControlGet,Select_CtrlEnter
@@ -1653,6 +1658,13 @@ Set_UniqueStarList2:
 	GuiControlGet,Select_UniqueStarList2
 	IniWrite, %Select_UniqueStarList2%,%iniPath%,General, UniqueStarList2
 	IniRead, UniqueStarList2, %iniPath%, General, UniqueStarList2
+	return
+}
+Set_CatBoxContents:
+{
+	GuiControlGet,Select_CatBoxContents
+	IniWrite, %Select_CatBoxContents%,%iniPath%,General, CatBoxContents
+	IniRead, CatBoxContents, %iniPath%, General, CatBoxContents
 	return
 }
 Set_DeafultSort:
