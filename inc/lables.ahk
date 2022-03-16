@@ -376,6 +376,8 @@ Search:
 					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 				}Else if (InStr(Note.5, SArray.1) != 0 or InStr(Note.5, SArray.2) != 0  && SearchDates =1){
 					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
+				}Else if (InStr(Note.10, SArray.1) != 0 or InStr(Note.10, SArray.2) != 0){
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 				}
 				
 			}
@@ -406,6 +408,9 @@ Search:
 					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 				}Else if (InStr(Note.5, SArray.1) != 0 && InStr(Note.5, SArray.2) != 0  && SearchDates =1){
 					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
+				}Else if (InStr(Note.10, SArray.1) != 0 && InStr(Note.10, SArray.2) != 0){
+					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
+				
 				}
 				
 			}
@@ -432,6 +437,9 @@ Search:
 			{
 				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 		   }Else if (InStr(Note.5, SearchTerm) != 0 && SearchDates =1)
+			{
+				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
+			}Else if (InStr(Note.10, SearchTerm) != 0)
 			{
 				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10)
 			}
