@@ -85,13 +85,14 @@ BuildGUI1(){
 	
 	Gui, 1:Add,Edit, section x0 hwndHPB -E0x200 r%PreviewRows% w%LibW% C%U_MFC% gPreviewBox vPreviewBox,
 	
-	HalfLibW := Libw *0.5
+	TagLibW := Libw *0.8
+	CatLibW := Libw *0.2
 	
-		Gui, 1:Add, ListBox, +0x100 r1 w%HalfLibW% x0 y+1 -E0x200 Disabled -Tabstop
+		Gui, 1:Add, ListBox, +0x100 r1 w%TagLibW% x0 y+1 -E0x200 Disabled -Tabstop
 	
-	Gui, 1:Add,Edit, section x0 yp+5 -E0x200 hwndHPT  r1 w%HalfLibW% C%U_MFC% vTagBox center,
+	Gui, 1:Add,Edit, section x0 yp+5 -E0x200 hwndHPT  r1 w%TagLibW% C%U_MFC% vTagBox center,
 	
-	Gui, 1:Add, DropDownList,xp%HalfLibW% yp0 -E0x200 r5 w%HalfLibW% vCatBox, %CatBoxContents%
+	Gui, 1:Add, DropDownList,xp%TagLibW% yp0 -E0x200 r5 w%CatLibW% vCatFilter gSearch HwndHCF, %CatBoxContents%
 	
 	MakeFileList(1)
 	CLV := New LV_Colors(HLV)
@@ -131,6 +132,7 @@ BuildGUI1(){
 	OnMessage( WM_RBUTTONDOWN, "HandleMessage" )
 
 	Gui, 1:Add,Edit, w35 y-2000 x-2000 vSearchFilter HwndHSF -Tabstop,
+	;Gui, 1:Add,Edit, w35 y-2200 x-2200 vCatFilter HwndHCF -Tabstop,
 	if (ShowStarHelper = 1) {
 			Gui, 1:Font, s8 Q%FontRendering%, Segoe UI Emoji
 , %U_MFC%

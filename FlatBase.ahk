@@ -27,7 +27,8 @@ global HSterm ; Lib Searchbox
 global HQNB ; QuickNoteBox
 global HLV ;Lib listview
 global HPB ;
-global HSF ;
+global HSF ; SearchFilter edit ID
+global HCF ; CatFilter edit ID
 global HQNUSL1
 global HQNUSl2
 global HQNUSl3
@@ -43,6 +44,8 @@ global HTRowsOver ; Total Rows edit box for Template maker
 
 global TagBox
 global CatBox
+global CatFilter
+
 global CatBoxContents
 
 global TRowsOver

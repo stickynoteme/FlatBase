@@ -337,6 +337,7 @@ Search:
 		}
 	gosub SortNow
 	gosub SearchFilter
+	gosub CatFilter
 	gosub UpdateStatusBar
 	return
 	}
@@ -355,6 +356,7 @@ Search:
 		}
 	gosub SortNow
 	gosub SearchFilter
+	gosub CatFilter
 	gosub UpdateStatusBar
 	return
 	}
@@ -387,6 +389,7 @@ Search:
 		}
 	gosub SortNow
 	gosub SearchFilter
+	gosub CatFilter
 	gosub UpdateStatusBar
 	return
 	}
@@ -420,6 +423,7 @@ Search:
 		}
 	gosub SortNow
 	gosub SearchFilter
+	gosub CatFilter
 	gosub UpdateStatusBar
 	return
 	}
@@ -449,6 +453,7 @@ Search:
 	}
 	gosub SortNow
 	gosub SearchFilter
+	gosub CatFilter
 	gosub UpdateStatusBar
 	Return
 }
@@ -470,6 +475,23 @@ SearchFilter:
 	}
 	return
 }
+CatFilter:
+{
+	GuiControlGet, CatFilter,, %HCF%
+	if (CatFilter != "")
+	{
+		Mloops := LV_GetCount()
+		while (Mloops--)
+		{
+			LV_GetText(RowVar,Mloops+1,11)
+			if (RowVar != CatFilter)
+				LV_Delete(Mloops+1)
+			if (Mloops = 0)
+				break
+		}	
+	}
+	return
+}
 UpdateStatusBar:
 {
 	Items := LV_GetCount()
@@ -479,21 +501,21 @@ UpdateStatusBar:
 		LV_GetText(LastNoteAdded, 1 , 4)
 		LV_GetText(LastNoteModded, 1 , 5)
 		LV_GetText(LastNoteTags, 1 , 10)
-		LV_GetText(LastNoteCat, 1 , 11)
+		;LV_GetText(LastNoteCat, 1 , 11)
 		GuiControl,,TitleBar, %LastResultName%
 		FileRead, LastResultBody,%U_NotePath%%LastFileName%
 		LastNoteIni := RegExReplace(LastFileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 
 		GuiControl,,PreviewBox, %LastResultBody%
 		GuiControl,,TagBox, %LastNoteTags%
-		GuiControl, ChooseString, CatBox, %LastNoteCat%
+		;GuiControl, ChooseString, CatBox, %LastNoteCat%
 		GuiControl,, StatusbarM,M: %LastNoteModded%
 		GuiControl,, StatusbarA,A: %LastNoteAdded%
 		}else{
 			GuiControl,,TitleBar, 
 			GuiControl,,PreviewBox,
 			GuiControl,,TagBox,
-			GuiControl, ChooseString, CatBox,4
+			;GuiControl, ChooseString, CatBox,
 			GuiControl,,StatusBarM,M: 00\00\00 
 			GuiControl,,StatusBarA,A: 00\00\00
 		}
@@ -633,11 +655,11 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
     LV_GetText(C_Modded, A_EventInfo,5)
 	LV_GetText(C_Name, A_EventInfo,2)
 	LV_GetText(C_Tags, A_EventInfo,10)
-	LV_GetText(C_Cat, A_EventInfo,11)
+	;LV_GetText(C_Cat, A_EventInfo,11)
     FileRead, NoteFile, %U_NotePath%%RowText%
 	GuiControl,, PreviewBox, %NoteFile%
 	GuiControl,, TagBox, %C_Tags%
-	GuiControl, ChooseString, CatBox, %C_Cat%
+	;GuiControl, ChooseString, CatBox, %C_Cat%
 	GuiControl,, TitleBar, %C_Name%
 	GuiControl,, StatusbarM,M: %C_Modded%
 	GuiControl,, StatusbarA,A: %C_Added%

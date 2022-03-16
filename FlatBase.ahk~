@@ -27,7 +27,8 @@ global HSterm ; Lib Searchbox
 global HQNB ; QuickNoteBox
 global HLV ;Lib listview
 global HPB ;
-global HSF ;
+global HSF ; SearchFilter edit ID
+global HCF ; CatFilter edit ID
 global HQNUSL1
 global HQNUSl2
 global HQNUSl3
@@ -40,6 +41,12 @@ global HstarBox4
 global HTSLB ;Template Selection List Box
 global HTSGUI ;Template Select GUI
 global HTRowsOver ; Total Rows edit box for Template maker
+
+global TagBox
+global CatBox
+global CatFilter = ""
+
+global CatBoxContents
 
 global TRowsOver
 global OpenInQuickNote
@@ -57,6 +64,8 @@ global sNeedsSubmit
 global MyNotesArray := {}
 global OldNoteData
 global QuickNoteBody
+global QuickNoteTags
+global QuickNoteCat
 global QuickNoteName
 global U_MBG
 global U_MFC
@@ -76,6 +85,8 @@ global SortStar
 global SortName
 global SortAdded
 global SortModded
+global SortTags
+global SortCat
 global NextSortAdded
 global NextSortBody
 global NextSortName
@@ -94,11 +105,15 @@ global NamePercent
 global BodyPercent
 global AddedPercent
 global ModdedPercent
+global TagsPercent
+global CatPercent
 global oStarPercent
 global oNamePercent
 global oBodyPercent
 global oAddedPercent
 global oModdedPercent
+global oTagsPercent
+global oCatPercent
 global ShowStatusBar
 global StatusBarM
 global StatusBarA
@@ -237,6 +252,8 @@ if (isFristRun = "1") {
 	IniWrite, 45,%iniPath%, General,BodyPercent
 	IniWrite, 20,%iniPath%, General,AddedPercent
 	IniWrite, 0,%iniPath%, General,ModdedPercent
+	IniWrite, 0,%iniPath%, General,TagsPercent
+	IniWrite, 0,%iniPath%, General,CatPercent
 	IniWrite, yy/MM/dd,%iniPath%, General,UserTimeFormat
 	IniWrite, 0, %iniPath%, General, isFristRun
 	IniWrite, 0, %iniPath%, General, isFristRun
@@ -280,6 +297,8 @@ IniRead, rowSelectTextColor, %StartingTheme%, Colors, RowSelectTextColor , 0xfff
 ;-------------------------------------------------
 ; Read and from settings.ini
 ;-------------------------------------------------
+IniRead, CatBoxContents, %iniPath%,General,CatBoxContents,White|Black|Calico|Tabby
+
 IniRead, savedHK1, %iniPath%, Hotkeys, 1,#o
 IniRead, savedHK2, %iniPath%, Hotkeys, 2,#n
 IniRead, savedHK3, %iniPath%, Hotkeys, 3,#z
@@ -345,6 +364,8 @@ IniRead, oNamePercent,%iniPath%, General,NamePercent,30
 IniRead, oBodyPercent,%iniPath%, General,BodyPercent,45
 IniRead, oAddedPercent,%iniPath%, General,AddedPercent,20
 IniRead, oModdedPercent,%iniPath%, General,ModdedPercent,0
+IniRead, oTagsPercent,%iniPath%, General,TagsPercent,0
+IniRead, oCatPercent,%iniPath%, General,CatPercent,0
 
 if oStarPercent between 0 and 9
 	oStarPercent = 0%oStarPercent%
@@ -354,12 +375,19 @@ if oBodyPercent between 0 and 9
 	oBodyPercent = 0%oBodyPercent%
 if oModdedPercent between 0 and 9
 	oModdedPercent = 0%oModdedPercent%
+if oTagsPercent between 0 and 9
+	oTagsPercent = 0%oTagsPercent%
+if oCatPercent between 0 and 9
+	oCatPercent = 0%oCatPercent%
 
 StarPercent = 0.%oStarPercent%
 NamePercent = 0.%oNamePercent%
 BodyPercent = 0.%oBodyPercent%
 AddedPercent = 0.%oAddedPercent%
 ModdedPercent = 0.%oModdedPercent%
+TagsPercent = 0.%oTagsPercent%
+CatPercent = 0.%oCatPercent%
+
 
 IniRead, HideScrollbars,%iniPath%,General,HideScrollbars,1
 IniRead, backupsToKeep,%iniPath%,General,backupsToKeep,3
@@ -404,10 +432,10 @@ if (HideScrollbars = 1)
 global StarColW := Round(libWColAdjust*StarPercent)
 global NameColW := Round(libWColAdjust*NamePercent)
 global BodyColW := Round(libWColAdjust*BodyPercent)
-global TagsColW := Round(libWColAdjust*TagsPercent)
-global ParentColW := Round(libWColAdjust*ParentPercent)
 global AddColW := Round(libWColAdjust*AddedPercent)
 global ModColW := Round(libWColAdjust*ModdedPercent)
+global TagColW := Round(libWColAdjust*TagsPercent)
+global CatColW := Round(libWColAdjust*CatPercent)
 ;-------------------------------------------------
 ;Acitvate User Hotkeys if any & make INI for new files
 ;-------------------------------------------------
