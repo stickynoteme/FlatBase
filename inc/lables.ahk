@@ -209,7 +209,7 @@ if(OutputVar == "SysListView321"){
 	gosub GuiEscape
 	return
 	}
-if(OutputVar == "Edit3"){
+if(OutputVar == "Edit3" or OutputVar == "Edit4" or OutputVar == "Edit5"){
 	global LVSelectedROW
 	if (LVSelectedROW="")
 		LVSelectedROW=1
