@@ -344,8 +344,9 @@ Search:
 	GuiControlGet, SearchTerm
 	GuiControl, -Redraw, LV
 	LV_Delete()
-	If (InStr(SearchTerm, "$$") != 0) {
-		SearchTerm := StrReplace(SearchTerm, "$$" , "")
+	;Search Only in the name
+	If (InStr(SearchTerm, "n::") != 0) {
+		SearchTerm := StrReplace(SearchTerm, "n::" , "")
 		For Each, Note In MyNotesArray
 		{
 		  If (SearchTerm != "")
@@ -363,8 +364,69 @@ Search:
 	gosub UpdateStatusBar
 	return
 	}
-	If (InStr(SearchTerm, "$*") != 0) {
-		SearchTerm := StrReplace(SearchTerm, "$*" , "")
+	;Search only in the body
+	If (InStr(SearchTerm, "b::") != 0) {
+		SearchTerm := StrReplace(SearchTerm, "b::" , "")
+		For Each, Note In MyNotesArray
+		{
+		  If (SearchTerm != "")
+		  {
+			If (InStr(Note.3, SearchTerm) != 0){
+			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
+			   }
+			}
+			Else
+			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
+		}
+	gosub SortNow
+	gosub SearchFilter
+	gosub CatFilter
+	gosub UpdateStatusBar
+	return
+	}
+	;Search only in the tags
+	If (InStr(SearchTerm, "t::") != 0) {
+		SearchTerm := StrReplace(SearchTerm, "t::" , "")
+		For Each, Note In MyNotesArray
+		{
+		  If (SearchTerm != "")
+		  {
+			If (InStr(Note.10, SearchTerm) != 0){
+			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
+			   }
+			}
+			Else
+			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
+		}
+	gosub SortNow
+	gosub SearchFilter
+	gosub CatFilter
+	gosub UpdateStatusBar
+	return
+	}
+	;search only in the parent
+	If (InStr(SearchTerm, "p::") != 0) {
+		SearchTerm := StrReplace(SearchTerm, "p::" , "")
+		For Each, Note In MyNotesArray
+		{
+		  If (SearchTerm != "")
+		  {
+			If (InStr(Note.12, SearchTerm) != 0){
+			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
+			   }
+			}
+			Else
+			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
+		}
+	gosub SortNow
+	gosub SearchFilter
+	gosub CatFilter
+	gosub UpdateStatusBar
+	return
+	}
+	;Search Only in stars
+	If (InStr(SearchTerm, "s::") != 0) {
+		SearchTerm := StrReplace(SearchTerm, "s::" , "")
 		For Each, Note In MyNotesArray
 		{
 		  If (SearchTerm != "")
@@ -2932,5 +2994,5 @@ ntSAVE:
 }
 
 HelpWindow:
-msgbox % "Advanced search: `n$$term = Search title only.`ntermA||termB = find a or b.`nTermA&&TermB = find a and b`nNote: for || and && terms most be in the same field. eg. You can't search for terms in title and body, they most both be in that title or body.`n`n[Legend: + = Shift, ^ = Ctrl, ! = Alt, # = Win]`n`nGLOBAL HOTKEYS:`nOpen Library (if Capslock not used): " savedHK1 "`nQuick Note: " savedHK2 "`nRapid Note: " savedHK3 "`nCancel Rapid Note: " savedHK4 "`nAppend to Rapid Note: " savedHK5 "`nAppend Template to Rapid Note" savedHK6 "`n`nMAIN WINDOW SHORTCUTS:`nFocus Search: "savedSK1 "`nFocus Results: " savedSK2 "`nFocus Edit/Preview: " savedSK3 "`nAdd Note From Template: " savedSK4 "`n`nINFO:`nQuick Note:`nSelect text and press the Quick Note hotkey to bring that text up as the body of a new blank note.`n`nRapid Note:`nUse the Rapid Note hotkey to quick add notes. Press the Rapid Note Hotkey once to copy the title, then again to copy the body or use the append hotkey to add any number of selected texts to the body of the note. When you are done use the Rapid Note hotekey to finish the note and select a star."
+msgbox % "Advanced search: `nn::term = Search names only.[Also works for b:: t:: and p:: for body, tags, and parent]`ntermA||termB = find a or b.`nTermA&&TermB = find a and b`nNote: for || and && terms most be in the same field. eg. You can't search for terms in title and body, they most both be in that title or body.`n`n[Legend: + = Shift, ^ = Ctrl, ! = Alt, # = Win]`n`nGLOBAL HOTKEYS:`nOpen Library (if Capslock not used): " savedHK1 "`nQuick Note: " savedHK2 "`nRapid Note: " savedHK3 "`nCancel Rapid Note: " savedHK4 "`nAppend to Rapid Note: " savedHK5 "`nAppend Template to Rapid Note" savedHK6 "`n`nMAIN WINDOW SHORTCUTS:`nFocus Search: "savedSK1 "`nFocus Results: " savedSK2 "`nFocus Edit/Preview: " savedSK3 "`nAdd Note From Template: " savedSK4 "`n`nINFO:`nQuick Note:`nSelect text and press the Quick Note hotkey to bring that text up as the body of a new blank note.`n`nRapid Note:`nUse the Rapid Note hotkey to quick add notes. Press the Rapid Note Hotkey once to copy the title, then again to copy the body or use the append hotkey to add any number of selected texts to the body of the note. When you are done use the Rapid Note hotekey to finish the note and select a star."
 return
