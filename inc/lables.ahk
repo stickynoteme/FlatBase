@@ -38,12 +38,9 @@ Label2:
 	BuildGUI2()
 	ControlFocus, Edit4, FlatNote - QuickNote
 
-	GuiControl,, QuickNoteName,%MyClip%
-	CBinfo = %MyClip%
-	GuiControl, ChooseString, QuickNoteCat, %LastCatFilter%
+	GuiControl,, QuickNoteName,%MyClip%	
 	
-	
-	FileSafeName := NameEncode(CBinfo)
+	FileSafeName := NameEncode(MyClip)
 	IfExist, %U_NotePath%%FileSafeName%.txt
 	{
 		FileRead, MyFile, %U_NotePath%%FileSafeName%.txt
@@ -58,6 +55,13 @@ Label2:
 			OldStarData = %Star4%
 		GuiControl,, QuickNoteBody,%MyFile%
 		GuiControl,, QuickStar,%OldStarData%
+		IniRead, OldCatData, %detailsPath%%FileSafeName%.ini,INFO,Cat
+		GuiControl, ChooseString, QuickNoteCat, %OldCatData%
+		
+		IniRead, OldTagsData, %detailsPath%%FileSafeName%.ini,INFO,Tags
+		GuiControl,, QuickNoteTags, %OldTagsData%
+		IniRead, OldParentData, %detailsPath%%FileSafeName%.ini,INFO,Parent
+		GuiControl,, QuickNoteParent, %OldParentData%
 	}
 	return
 }
@@ -790,11 +794,14 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 				gosub build_tEdit
 		}
 	}
+	
+	;1Star|2Title|3Body|4Added|5Modified|6RawAdded|7RawModded|8FileName|9RawStar|10Tags|11Cat|12Parent
+	
 	if A_GuiEvent in RightClick
 	{
 		LVSelectedROW := A_EventInfo
 		LV_GetText(NoteNameToEdit, LVSelectedROW,2)
-		LV_GetText(StarOldFile, LVSelectedROW,8)
+		LV_GetText(StarOldFile, LVSelectedROW,9)
 		LV_GetText(TitleOldFile, LVSelectedROW,8)
 		if (LV@sel_col=2) {
 			MouseGetPos, xPos, yPos
@@ -819,8 +826,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 				ControlFocus, Edit4, FlatNote - QuickNote
 
 				GuiControl,, QuickNoteName,%MyClip%
-				GuiControl, ChooseString, QuickNoteCat, %LastCatFilter%
-				e := NameEncode(CBinfo)
+				FileSafeName := NameEncode(NoteNameToEdit)
 				IfExist, %U_NotePath%%FileSafeName%.txt
 				{
 					FileRead, MyFile, %U_NotePath%%FileSafeName%.txt
@@ -2341,13 +2347,14 @@ Edit3SaveTimer:
 	FileSafeName := NameEncode(RowText)
 	GuiControlGet, PreviewBox
 	GuiControlGet, TagBox
-	GuiControlGet, CatFilter
+	iniRead,C_Cat,%detailsPath%%FileSafeName%.ini,INFO,Cat
 	GuiControlGet, NoteParent
 	
-	SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,CatFilter,NoteParent)
+	SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,C_Cat,NoteParent)
 	iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
+
 	FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
-	LV_Modify(LVSelectedROW,,, RowText, NewBodyText)
+	LV_Modify(LVSelectedROW,,,RowText, NewBodyText,,,,,,,,TagBox,,NoteParent)
 	savetimerrunning = 0
 	unsaveddataEdit3 = 0
 	ControlSend, Edit1,{left},FlatNotes - Library
