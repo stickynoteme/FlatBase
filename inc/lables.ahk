@@ -636,8 +636,8 @@ if (A_EventInfo = TotalItems && Doom = 1 && A_GuiEvent = "Normal"){
 ;Something for double click
 if (A_GuiEvent = "DoubleClick")
 {
-	if (LV@sel_col=2) {
-		LV_GetText(CopyText, A_EventInfo, 2)
+	if (LV@sel_col=2 or LV@sel_col=4 or LV@sel_col=5 or LV@sel_col=10 or LV@sel_col=11 or LV@sel_col=12) {
+		LV_GetText(CopyText, A_EventInfo, LV@sel_col)
 		clipboard := CopyText
 		Tooltip % CopyText " Copied"
 	}
@@ -647,18 +647,8 @@ if (A_GuiEvent = "DoubleClick")
 		fileread,CopyText,%U_NotePath%%FileTmp%
 		clipboard := CopyText
 		Tooltip % ToolTipText "... Copied"
+	}
 
-	}
-	if (LV@sel_col=4) {
-		LV_GetText(CopyText, A_EventInfo, 4)
-		clipboard := CopyText
-		Tooltip % CopyText " Copied"
-	}
-	if (LV@sel_col=5) {
-		LV_GetText(CopyText, A_EventInfo, 5)
-		clipboard := CopyText
-		Tooltip % CopyText " Copied"
-	} 
 	settimer,KillToolTip, -500
     return
 }
@@ -819,7 +809,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			LV@sel_col = "undoomCol1"
 			return
 		}
-		if (LV@sel_col=3) {
+		if (LV@sel_col=3 or LV@sel_col=10 or LV@sel_col=11 or LV@sel_col=12) {
 			
 			if (OpenInQuickNote = "1"){
 				MyClip := NoteNameToEdit
@@ -864,9 +854,11 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 	}
 return
 }
+
+;GUI for right click to edit name
 build_tEdit:
 {
-	GUI, t:new, ,TMPedit000
+	GUI, t:new, ,InlineNameEdit
 	Gui, t:Margin , 5, 5 
 	Gui, t:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
 	Gui, t:Color,%U_SBG%, %U_MBG%	
@@ -874,7 +866,7 @@ build_tEdit:
 	gui, t:add,text,w100 -E0x200 center c%U_SFC%,New Name
 	Gui, t:add,edit,w100 -E0x200 c%U_FBCA% vtEdit
 	gui, t:add,button, default gTitleSaveChange x-10000 y-10000
-	WinSet, Style,  -0xC00000,TMPedit000
+	WinSet, Style,  -0xC00000,InlineNameEdit
 	GUI, t:Show, x%xPos% y%yPos%
 	tNeedsSubmit = 1
 	return
@@ -2271,6 +2263,7 @@ SortNow:
 LV_ModifyCol(C_SortCol,C_SortDir)
 return
 }
+
 TitleSaveChange:
 {
 	GUI, t:Submit
