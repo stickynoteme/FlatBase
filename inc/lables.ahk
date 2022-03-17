@@ -214,15 +214,15 @@ if(OutputVar == "Edit3"){
 	if (LVSelectedROW="")
 		LVSelectedROW=1
 	LV_GetText(RowText, LVSelectedROW,2)
+	LV_GetText(C_Cat, LVSelectedROW,11)
 	FileSafeName := NameEncode(RowText)
 	GuiControlGet, PreviewBox
 	GuiControlGet, TagBox
-	GuiControlGet, QuickNoteCat
 	GuiControlGet, NoteParent
-	SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,QuickNoteCat,NoteParent)
+	SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,C_Cat,NoteParent)
 	iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
 	FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
-	LV_Modify(LVSelectedROW,,, RowText, NewBodyText)
+	LV_Modify(LVSelectedROW,,, RowText, NewBodyText,,,,,,,TagBox,,NoteParent)
 	ToolTip Saved 
 	SetTimer, KillToolTip, -500
 	unsaveddataEdit3 = 0
@@ -277,15 +277,15 @@ if (OutputVar = "Edit1"){
 		if (LVSelectedROW="")
 			LVSelectedROW=1
 		LV_GetText(RowText, LVSelectedROW,2)
+		LV_GetText(C_Cat, LVSelectedROW,11)
 		FileSafeName := NameEncode(RowText)
 		GuiControlGet, PreviewBox
 		GuiControlGet, TagBox
-		GuiControlGet, QuickNoteCat
 		GuiControlGet, NoteParent
-		SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,QuickNoteCat,NoteParent)
+		SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,C_Cat,NoteParent)
 		iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
 		FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
-		LV_Modify(LVSelectedROW,,, RowText, NewBodyText)
+		LV_Modify(LVSelectedROW,,, RowText, NewBodyText,,,,,,,TagBox,,NoteParent)
 		ToolTip Saved 
 		SetTimer, KillToolTip, -500
 		unsaveddataEdit3 = 0
@@ -2354,7 +2354,7 @@ Edit3SaveTimer:
 	iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
 
 	FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
-	LV_Modify(LVSelectedROW,,,RowText, NewBodyText,,,,,,,,TagBox,,NoteParent)
+	LV_Modify(LVSelectedROW,,,RowText, NewBodyText,,,,,,,TagBox,,NoteParent)
 	savetimerrunning = 0
 	unsaveddataEdit3 = 0
 	ControlSend, Edit1,{left},FlatNotes - Library
