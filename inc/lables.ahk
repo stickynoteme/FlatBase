@@ -1,4 +1,5 @@
 
+;Hotkey to open Library Window
 Label1:
 {
 	if (U_Capslock = "1"){
@@ -24,6 +25,7 @@ Label1:
 		return
 	}
 }
+;Hotkey to start a quicknote Win+N
 Label2:
 {
 	MyOldClip := clipboard
@@ -59,6 +61,7 @@ Label2:
 	}
 	return
 }
+;Hotkey to start a Rapid Note Win+z
 Label3:
 {
 	MyOldClip := clipboard
@@ -96,7 +99,7 @@ Label3:
 		zbody .= clipboard 
 		istitle = yes
 		FileReadLine, CheckExists, %U_NotePath%%TmpFileSafeName%.txt, 1
-		SaveFile(ztitle,ztitleEncoded,zbody,0,"tag-tmp","cat-tmp","p-tmp")
+		SaveFile(ztitle,ztitleEncoded,zbody,0,"RapidNote",LastCatFilter,"")
 		gosub search
 		tooltip B: %zbody%
 		settimer, KillToolTip, -500
@@ -110,6 +113,7 @@ Label3:
 	clipboard := MyOldClip
 	return
 }
+;Hotkey to Cancel Rapid note taking.
 Label4:
 {
 	istitle = yes
@@ -117,6 +121,7 @@ Label4:
 	settimer,KillToolTip,-1000
 	return 
 }
+;Hotkey to appened to a rapid note
 Label5:
 {
 	MyOldClip := clipboard
@@ -129,7 +134,9 @@ Label5:
 	clipboard := MyOldClip
 	return
 }
-Label6: ;Append Template to Rapid Note
+
+;hotkey to append a template to a Rapid note.
+Label6:
 {
 	RapidNTAppend = 1
 	gosub NoteTemplateSelectUI
@@ -205,7 +212,10 @@ if(OutputVar == "Edit3"){
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
 	GuiControlGet, PreviewBox
-	SaveFile(RowText,FileSafeName,PreviewBox,1,"tag-tmp","cat-tmp","p-tmp")
+	GuiControlGet, TagBox
+	GuiControlGet, QuickNoteCat
+	GuiControlGet, NoteParent
+	SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,QuickNoteCat,NoteParent)
 	iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
 	FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
 	LV_Modify(LVSelectedROW,,, RowText, NewBodyText)
@@ -265,7 +275,10 @@ if (OutputVar = "Edit1"){
 		LV_GetText(RowText, LVSelectedROW,2)
 		FileSafeName := NameEncode(RowText)
 		GuiControlGet, PreviewBox
-		SaveFile(RowText,FileSafeName,PreviewBox,1,"tag-tmp","cat-tmp","p-tmp")
+		GuiControlGet, TagBox
+		GuiControlGet, QuickNoteCat
+		GuiControlGet, NoteParent
+		SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,QuickNoteCat,NoteParent)
 		iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
 		FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
 		LV_Modify(LVSelectedROW,,, RowText, NewBodyText)
@@ -696,6 +709,9 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			}
 			LV_GetText(C_FileName, A_EventInfo, 8)
 			LV_GetText(C_Name, A_EventInfo, 2)
+			LV_GetText(C_Tags, A_EventInfo, 10)
+			LV_GetText(C_Cat, A_EventInfo, 11)
+			LV_GetText(C_Parent, A_EventInfo, 12)
 			C_ini := RegExReplace(C_FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 			C_SafeName := RegExReplace(C_FileName, "\.txt(?:^|$|\r\n|\r|\n)")
 			If CurrentStar not between 10000 and 10004
@@ -722,8 +738,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			LV_Modify(A_EventInfo ,,UpdateStar,,,,,,,,NextStar)
 			IniWrite, %NextStar%, %detailsPath%%C_ini%, INFO, Star
 			fileRead, C_Body, %U_NotePath%%C_FileName%
-			SaveFile(C_Name,C_SafeName,C_Body,1,"
-			-tmp","cat-tmp","p-tmp")	
+			SaveFile(C_Name,C_SafeName,C_Body,1,C_Tags,C_Cat,C_Parent)	
 			LV@sel_col = "undoomCol1"
 		}
 	}
@@ -732,6 +747,9 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 		LV_GetText(CurrentStar, LastRowSelected, 9)
 		LV_GetText(C_FileName, LastRowSelected, 8)
 		LV_GetText(C_Name, LastRowSelected, 2)
+		LV_GetText(C_Tags, LastRowSelected, 2)
+		LV_GetText(C_Cat, LastRowSelected, 2)
+		LV_GetText(C_Parent, LastRowSelected, 2)
 
 		if (CurrentStar !=A_Space and CurrentStar !=10000 and CurrentStar !=10001 and CurrentStar !=10002 and CurrentStar !=10003 and CurrentStar !=10004){
 				MsgBox, 4,, Clear Unique Star? (press Yes or No)
@@ -768,7 +786,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 		LV_Modify(LastRowSelected,,UpdateStar,,,,,,,,NextStar)
 		IniWrite, %NextStar%, %detailsPath%%C_ini%, INFO, Star
 		fileRead, C_Body, %U_NotePath%%C_FileName%
-		SaveFile(C_Name,C_SafeName,C_Body,1,"tag-tmp","cat-tmp","p-tmp")	
+		SaveFile(C_Name,C_SafeName,C_Body,1,C_Tags,C_Cat,C_Parent)	
 		return		
 	}
 	if (A_GuiEvent = "K") {
@@ -1035,13 +1053,16 @@ StarSaveChange:
 	}
 	FileRead, C_Body,%U_NotePath%%StarOldFile%
 	Iniread, TmpName,%detailsPath%%TmpFileINI%, INFO,Name
+	Iniread, TmpTags,%detailsPath%%TmpFileINI%, INFO,Tags
+	Iniread, TmpCat,%detailsPath%%TmpFileINI%, INFO,Cat
+	Iniread, TmpParent,%detailsPath%%TmpFileINI%, INFO,Parent
 	IniWrite, %NewStar%, %detailsPath%%TmpFileINI%, INFO, Star
 	for Each, Note in MyNotesArray{
 		If (Note.8 = StarOldFile){
 			MyNotesArray.RemoveAt(Each)
 		}
 	}
-	SaveFile(TmpName,TmpFileSafeName,C_Body,1,"tag-tmp","cat-tmp","p-tmp")
+	SaveFile(TmpName,TmpFileSafeName,C_Body,1,TmpTags,TmpCat,TmpParent)
 	ListStarToChange = 1
 	if (RapidStarNow = 1){
 		ListStarToChange = 0
@@ -2267,6 +2288,7 @@ TitleSaveChange:
 	NewIniName = %FileSafeName%.ini
 	NewTitleFileName = %FileSafeName%.txt
 	FileRead, C_Body,%U_NotePath%%TitleOldFile%
+	
 	if FileExist(U_NotePath NewTitleFileName){
 		MsgBox, A note with this name already exists.
 		tNeedsSubmit = 0
@@ -2303,9 +2325,12 @@ TitleSaveChange:
 				MyNotesArray.RemoveAt(Each)
 			}
 		}
+	Iniread, TmpTags,%detailsPath%%NewIniName%, INFO,Tags
+	Iniread, TmpCat,%detailsPath%%NewIniName%, INFO,Cat
+	Iniread, TmpParent,%detailsPath%%NewIniName%, INFO,Parent
 	
 	;FileRecycle, %detailsPath%%C_ini%%tOldFile%
-	SaveFile(NewTitle,FileSafeName,C_Body,1,"TAG-TMP","CAT-TMP","P-TMP")
+	SaveFile(NewTitle,FileSafeName,C_Body,1,TmpTags,TmpCat,TmpParent)
 	ListTitleToChange = 1
 	ControlFocus , Edit1, FlatNotes - Library
 	TitleOldFile := ""
@@ -2322,7 +2347,11 @@ Edit3SaveTimer:
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
 	GuiControlGet, PreviewBox
-	SaveFile(RowText,FileSafeName,PreviewBox,1,"tag-tmp","cat-tmp","p-tmp")
+	GuiControlGet, TagBox
+	GuiControlGet, CatFilter
+	GuiControlGet, NoteParent
+	
+	SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,CatFilter,NoteParent)
 	iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
 	FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
 	LV_Modify(LVSelectedROW,,, RowText, NewBodyText)
