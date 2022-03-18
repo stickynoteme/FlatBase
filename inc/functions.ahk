@@ -282,15 +282,7 @@ MakeFileList(ReFreshMyNoteArray){
 		IniRead, TagsField, %NoteIni%, INFO, Tags,
 		IniRead, CatField, %NoteIni%, INFO, Cat,
 		IniRead, ParentField, %NoteIni%, INFO, Parent,
-		
-		;Fix missing INI data to prevent TreeView errors.
-		
-		blank := ""
-			iniWrite,%blank%,%NoteIni%,INFO,Tags
-			iniWrite,%blank%,%NoteIni%,INFO,Cat
-			iniWrite,%blank%,%NoteIni%,INFO,Parent
-		
-		
+				
 		
 		FormatTime, UserTimeFormatA, %AddedField%, %UserTimeFormat%
 		FormatTime, UserTimeFormatM, %ModdedField%,%UserTimeFormat%

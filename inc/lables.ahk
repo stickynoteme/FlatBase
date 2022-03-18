@@ -3010,6 +3010,8 @@ TVcurrent = 0
 lastloopcheck = -1
 TVneeded := JEE_ObjCount(MyNotesArray)
 ;msgbox % TVcurrent
+
+;Built The root Parents.
 For Each, Note In MyNotesArray
 {
 	ParentFileName := NameEncodeSticky(Note.12)
@@ -3019,7 +3021,7 @@ For Each, Note In MyNotesArray
 	%TreeNodeName% := 0
 	if (not Note.12)
 	{
-		%TreeNodeName% := TV_Add(Note.2,,"Bold Expand" )
+		%TreeNodeName% := TV_Add(Note.2,,"Expand" )
 	}
 }
 ;TVcurrent := TV_GetCount()
@@ -3033,16 +3035,37 @@ while TV_GetCount() != TVneeded
 		if (Note.12)
 		{
 		
+			RealParentFileName := NameEncode( Note.12)
+			RealParentFileName := trim(RealParentFileName)
 			ParentFileName := NameEncodeSticky( Note.12)
 			ParentFileName := trim(ParentFileName)
 			TreeNodeName := NameEncodeSticky(Note.2)
 			TreeNodeName := trim(TreeNodeName)
 			
-			SelfExists := TV_Get(%TreeNodeName%,"Bold")
-			ParentExists := TV_Get(%ParentFileName%,"Bold")
-			if (SelfExists == 0 and ParentExists != 0)
+			
+			
+			TV_GetText(SelfExists,%TreeNodeName%)
+			;msgbox % SelfExists
+			TV_GetText(ParentExists,%ParentFileName%)
+			
+			if (!SelfExists)
 			{
-				%TreeNodeName% := TV_Add( Note.2,%ParentFileName%,"Bold Expand")
+				IfExist, %U_NotePath%%RealParentFileName%.txt
+				{
+				if (ParentExists)
+					{
+						%TreeNodeName% := TV_Add( Note.2,%ParentFileName%,"Expand")
+					}
+				}else
+				{
+					if (!ParentExists)
+					{
+						%ParentFileName% := TV_Add( Note.12,,"Bold Expand")
+						TVneeded++
+					}
+				
+					%TreeNodeName% := TV_Add( Note.2,%ParentFileName%,"Expand")
+				}
 			}
 		}
 	}
