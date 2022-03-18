@@ -214,6 +214,9 @@ global TemplateSymbol
 global ColBase = ,6,7,8,9
 global ColOrder = 1,2,3,4,5
 global SearchWholeNote
+global TreeFristRun = 0
+global TVReDraw
+global LoopCheck
 
 
 
@@ -548,6 +551,8 @@ return
 #Include inc\StickyGui.ahk
 #Include inc\shortcuts.ahk
 #Include inc\Class_LV_Colors.ahk
+#include inc\Object sort.ahk
+#include inc\string-object-file.ahk
 ;-!- Return after fucntions so lables don't get exacuted
 return
 #Include inc\DummyGui.ahk

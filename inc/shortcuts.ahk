@@ -56,6 +56,7 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 		 IfMsgBox, No
 			Return 
 		 IfMsgBox, Yes
+			TVReDraw = 1
 			FileRecycle %U_NotePath%%FileName%
 			FileRecycle %detailsPath%%iniFileName%
 			

@@ -81,7 +81,10 @@ BuildGUI1(){
 	;Gui, 1:Add,edit, readonly h6 -E0x200
 	title_h := PreviewFontSize*1.6
 	TitleWAdjust := round(LibW*0.9)
-	Gui, 1:Add,text, center xs c%U_SFC% -E0x200 w25 h%title_h% gLibTemplateAdd, %TemplateSymbol%
+	
+	;gLibTemplateAdd
+	
+	Gui, 1:Add,text, center xs c%U_SFC% -E0x200 w25 h%title_h% gBuildTreeUI, %TemplateSymbol%
 	Gui, 1:Add,edit, readonly center x+35 -E0x200 vTitleBar C%U_SFC% w%TitleWAdjust% h%title_h% backgroundTrans -Tabstop,
 	
 	
@@ -242,7 +245,10 @@ BuildGUI2(){
 	GuiControl, MoveDraw, %QNpinBar%
 	return  
 }
+
+
 MakeFileList(ReFreshMyNoteArray){
+	TVReDraw = 1
 	FileList := ""
 	MyNotesArray := {}
 	Loop, Files, %U_NotePath%*.txt
@@ -341,6 +347,7 @@ MakeFileList(ReFreshMyNoteArray){
 }
 
 ReFreshLV(){
+TVReDraw = 1
 GuiControl, 1:-Redraw, LV
 LV_Delete()
 For Each, Note In MyNotesArray
@@ -354,6 +361,7 @@ return
 }
  
 SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNoteCat,QuickNoteParent) {
+	TVReDraw = 1
 	FileSafeName := trim(FileSafeName)
 	QuickNoteName := trim(QuickNoteName)
 	FileNameTxt := FileSafeName ".txt"
@@ -604,4 +612,9 @@ OnMsgBox() {
     If (WinExist("ahk_class #32770 ahk_pid " . ErrorLevel)) {
         WinMove %xPos%, %yPos%
     }
+}
+
+JEE_ObjCount(oObj)
+{
+	return NumGet(&oObj + 4*A_PtrSize)
 }
