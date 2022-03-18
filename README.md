@@ -1,13 +1,32 @@
 ![Screenshot one](/ScreenShots/SS_01.png)
 
-# FlatBase
-a rewrite of the FlatNote AHKv1 codebase to be a used as a more generic database.
+# FlatNotes
+A flat file system note taking program made with AHKv1
 
 ## New
-- Nothing yet.
+v3
+- Automatic daily backup option
+- New Statusbar and option to hide it
+- Preview first search result automatically
+- Rapid Note [default Win+Z]
+	- Win+Z Once to get title
+	- Win+Z A second time to get body and save.
+	- Win+Shift+Z to Cancel after Title.
+	- A toottip will appear showing you the title and first line of the body on each Win+Z.
+- Column width settings
+	- Set to 0 to hide 
 
 ## Feature list:
-- Nothing yet
+- Quick search: 
+- Searches in all fields.
+- Sortable list headers.
+- Copy title to click board via Double Click or Enter
+- Copy body text by right clicking or Ctrl+Enter
+- Edit notes in the preview/Edit box [Enter to save Ctrl+Enter for new line]
+- Create new notes using the search box by simply typing a new name and hitting Enter.
+- If a note already exists it will be loaded into the the new note editor.
+	- Created dates are preserved even when over writing.
+- Notes are stored flat on your file system, meaning they are all induvial plain .txt files that you can easily edit with external programs, synced to where you would like, and manage like any other file.
 
 ## Hotkeys and Shortcuts:
 
