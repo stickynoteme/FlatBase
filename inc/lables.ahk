@@ -3144,7 +3144,7 @@ IfExist, %U_NotePath%%FileSafeName%.txt
 		;GuiControl,, QuickNoteBody,%MyFile%
 		;GuiControl,, QuickStar,%OldStarData%
 		GuiControl,,TVNoteName,%SelectedName%
-		GuiControl,,TVNoteBody,%MyFile%
+		GuiControl,,TVNotePreview,%MyFile%
 	}
 return
 

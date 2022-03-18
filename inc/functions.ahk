@@ -279,9 +279,19 @@ MakeFileList(ReFreshMyNoteArray){
 		IniRead, NameField, %NoteIni%, INFO, Name
 		IniRead, AddedField, %NoteIni%, INFO, Add
 		IniRead, ModdedField, %NoteIni%, INFO, Mod
-		IniRead, TagsField, %NoteIni%, INFO, Tags
-		IniRead, CatField, %NoteIni%, INFO, Cat
-		IniRead, ParentField, %NoteIni%, INFO, Parent
+		IniRead, TagsField, %NoteIni%, INFO, Tags,
+		IniRead, CatField, %NoteIni%, INFO, Cat,
+		IniRead, ParentField, %NoteIni%, INFO, Parent,
+		
+		;Fix missing INI data to prevent TreeView errors.
+		
+		blank := ""
+			iniWrite,%blank%,%NoteIni%,INFO,Tags
+			iniWrite,%blank%,%NoteIni%,INFO,Cat
+			iniWrite,%blank%,%NoteIni%,INFO,Parent
+		
+		
+		
 		FormatTime, UserTimeFormatA, %AddedField%, %UserTimeFormat%
 		FormatTime, UserTimeFormatM, %ModdedField%,%UserTimeFormat%
 
@@ -440,6 +450,9 @@ MakeAnyMissingINI(){
 				iniWrite,%A_Now%,%detailsPath%%NoteName%.ini,INFO,Mod
 				iniWrite,%A_Now%,%detailsPath%%NoteName%.ini,INFO,Add
 				iniWrite,10000,%detailsPath%%NoteName%.ini,INFO,Star
+				iniWrite,"",%detailsPath%%NoteName%.ini,INFO,Tags
+				iniWrite,"",%detailsPath%%NoteName%.ini,INFO,Cat
+				iniWrite,"",%detailsPath%%NoteName%.ini,INFO,Parent
 	}   } 
 return
 }
@@ -539,27 +552,46 @@ Name := strreplace(Name,"/","$9fslash%")
 return Name
 }
 NameEncodeSticky(Name){
-; RegExReplace(RowText, "\*|\?|\\|\||/|""|:|<|>"
-Name := strreplace(Name,"\","%1")
+; RegExReplace(RowText, "\*|\?|\\|\||/|""|:|<|>|;|,|$|[|]|(|)|{|}|&"
+Name := strreplace(Name,"\","_bs_")
 Name := strreplace(Name,"?","_qm_")
-Name := strreplace(Name,"*","_a_")
+Name := strreplace(Name,"@","_at_")
+Name := strreplace(Name,"!","_e_")
+Name := strreplace(Name,"-","_dash_")
+Name := strreplace(Name,"+","_ps_")
+Name := strreplace(Name,"=","_eq_")
+Name := strreplace(Name,"—","_emdash_")
+Name := strreplace(Name,"%","_per_")
+Name := strreplace(Name,"^","_sup_")
+Name := strreplace(Name,"*","_ast_")
 Name := strreplace(Name,"|","_pi_")
 Name := strreplace(Name,"""","_q_")
 Name := strreplace(Name,":","_d_")
+Name := strreplace(Name,"$","_ds_")
+Name := strreplace(Name,"&","_amp_")
+Name := strreplace(Name,"#","_pd_")
 Name := strreplace(Name,"<","_g_")
 Name := strreplace(Name,">","_l_")
+Name := strreplace(Name,"(","_rbl_")
+Name := strreplace(Name,")","_rbr_")
+Name := strreplace(Name,"[","_sbl_")
+Name := strreplace(Name,"]","_sbr_")
+Name := strreplace(Name,"{","_cbl_")
+Name := strreplace(Name,"}","_cbr_")
 Name := strreplace(Name,"/","_fs_")
 Name := strreplace(Name,".","_p_")
-Name := strreplace(Name,"1","one")
-Name := strreplace(Name,"2","two")
-Name := strreplace(Name,"3","three")
-Name := strreplace(Name,"4","four")
-Name := strreplace(Name,"5","five")
-Name := strreplace(Name,"6","six")
-Name := strreplace(Name,"7","seven")
-Name := strreplace(Name,"8","eight")
-Name := strreplace(Name,"9","nine")
-Name := strreplace(Name,"0","zero")
+Name := strreplace(Name,",","_c_")
+Name := strreplace(Name,";","_sc_")
+Name := strreplace(Name,"1","_none_")
+Name := strreplace(Name,"2","_ntwo_")
+Name := strreplace(Name,"3","_nthree_")
+Name := strreplace(Name,"4","_nfour_")
+Name := strreplace(Name,"5","_nfive_")
+Name := strreplace(Name,"6","_nsix_")
+Name := strreplace(Name,"7","_nseven_")
+Name := strreplace(Name,"8","_neight_")
+Name := strreplace(Name,"9","_nnine_")
+Name := strreplace(Name,"0","_nzero_")
 Name := strreplace(Name," ","_")
 return Name
 }
