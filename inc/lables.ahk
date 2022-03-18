@@ -3010,7 +3010,43 @@ TVcurrent = 0
 lastloopcheck = -1
 TVneeded := JEE_ObjCount(MyNotesArray)
 ;msgbox % TVcurrent
+;StarParents Options
+global UseStarsAsParents = True
+global TreeExpandByDeafultTrue = ""
+if (UseStarsAsParents == True)
+{
+	None := TV_Add("- None -",,  TreeExpandByDeafultTrue  )
+	TVneeded++
+	For Each, Note In MyNotesArray
+	{
+		if (Note.1)
+		{
+			StarName := NameEncodeSticky(Note.1)
+			StarName := trim(StarName)
+			
+			TV_GetText(StarParentExists,%StarName%)
 
+			if (!StarParentExists)
+			{
+				%StarName% := TV_Add(Note.1,,"Bold " .  TreeExpandByDeafultTrue)
+				TVneeded++
+			}
+		}
+	}
+	For Each, Note In MyNotesArray
+	{
+		TreeNodeName := NameEncodeSticky(Note.2)
+		TreeNodeName := trim(TreeNodeName)
+		%TreeNodeName% := 0
+		StarName := NameEncodeSticky(Note.1)
+		StarName := trim(StarName)
+		
+		if (StarName)
+			%TreeNodeName% := TV_Add(Note.2,%StarName%,"Expand" )
+		if (!StarName)
+			%TreeNodeName% := TV_Add(Note.2,None,"Expand")
+	}
+}else{
 ;Built The root Parents.
 For Each, Note In MyNotesArray
 {
@@ -3019,6 +3055,7 @@ For Each, Note In MyNotesArray
 	TreeNodeName := NameEncodeSticky(Note.2)
 	TreeNodeName := trim(TreeNodeName)
 	%TreeNodeName% := 0
+	
 	if (not Note.12)
 	{
 		%TreeNodeName% := TV_Add(Note.2,,"Expand" )
@@ -3098,6 +3135,7 @@ while TV_GetCount() != TVneeded
 		goto FailBreak
 	}
 }
+} ;end of star parent else
 return
 
 BuildTreeUI:
@@ -3108,7 +3146,7 @@ If (TreeFristRun == 1)
 	Gui, tree:+Resize
 	Gui, tree:Margin , 2, 2 
 	Gui, tree:Font, s%TitleBarFontSize% Q%FontRendering%, Verdana, %U_MFC%	
-	Gui, tree:Add, TreeView, h%TreeCol1H% w%TreeCol1W% hwndHTV AltSubmit gTreeViewInteraction -E0x200 vTVNoteTree
+	Gui, tree:Add, TreeView, h%TreeCol1H% w%TreeCol1W% hwndHTV AltSubmit %UseCheckBoxesTrue% gTreeViewInteraction -E0x200 vTVNoteTree
 	Gui, tree:Add,Edit, center y0 x%TreeCol2X% h%TreeNameH% w%TreeCol2W% vTVNoteName hwndHTVN vTVNoteName -E0x200, 
 	Gui, tree:Add, Edit, x%TreeCol2X% y%TreePreviewY% h%TreePreviewH% w%TreeCol2W% hwndHTVB vTVNotePreview -E0x200,
 	;Gui, tree:Add, Button, x%TreeW% y15 h%TreePreviewH% w111,test

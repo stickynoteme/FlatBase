@@ -245,6 +245,10 @@ global SearchWholeNote
 global TreeFristRun = 1
 global TVReDraw
 global LoopCheck
+global UseCheckBoxesTrue
+global UseCheckBoxes = true
+if (UseCheckBoxes == true)
+	UseCheckBoxesTrue := "Checked"
 
 
 
