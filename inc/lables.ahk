@@ -863,7 +863,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 	{
 		LVSelectedROW := A_EventInfo
 		LV_GetText(NoteNameToEdit, LVSelectedROW,2)
-		LV_GetText(StarOldFile, LVSelectedROW,9)
+		LV_GetText(StarOldFile, LVSelectedROW,8)
 		LV_GetText(TitleOldFile, LVSelectedROW,8)
 		if (LV@sel_col=2) {
 			MouseGetPos, xPos, yPos
@@ -1104,8 +1104,6 @@ StarSaveChange:
 		StarOldFile := ztitleEncoded ".txt"
 		RapidStarNow = 0
 	}
-	if (RapidStarNow == 0 or RapidStarNow == "" )
-		StarOldFile := TitleOldFile
 	
 	TmpFileINI := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 	TmpFileSafeName := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
