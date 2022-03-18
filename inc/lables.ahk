@@ -1086,6 +1086,7 @@ build_StarEditBox:
 }
 StarSaveChange:
 {
+	Gui, star:Default
 	GUI, star:Submit
 	sNeedsSubmit = 0
 	NewStar = %sEdit%
@@ -1098,16 +1099,22 @@ StarSaveChange:
 		NewStar = %StarSelectedBox3%
 	if (NewStar = "")
 		NewStar = %StarSelectedBox4%
-	if (RapidStarNow = 1)
+	if (RapidStarNow == 1)
+	{
 		StarOldFile := ztitleEncoded ".txt"
+		RapidStarNow = 0
+	}
+	if (RapidStarNow == 0 or RapidStarNow == "" )
+		StarOldFile := TitleOldFile
+	
 	TmpFileINI := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 	TmpFileSafeName := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
 	Iniread, OldStar,%detailsPath%%TmpFileINI%, INFO,Star
 	TmpName := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
 	;xthis
 
-	if (NewStar = OldStar or OldStar = "ERROR"){
-		msgbox Can't change to the same star.
+	if (NewStar == OldStar or OldStar == "ERROR"){
+		msgbox Can't change to the same star. OldStar:%OldStar% NewStar:%NewStar%
 		ListStarToChange = 0
 		return
 	}
@@ -3015,7 +3022,7 @@ For Each, Note In MyNotesArray
 	%TreeNodeName% := 0
 	if (not Note.12)
 	{
-		%TreeNodeName% := TV_Add(Note.2,,"Bold Expand" )
+		%TreeNodeName% := TV_Add(Note.1 Note.2,,"Bold Expand" )
 	}
 }
 ;TVcurrent := TV_GetCount()
@@ -3028,7 +3035,8 @@ while TV_GetCount() != TVneeded
 	{
 		if (Note.12)
 		{
-			ParentFileName := NameEncodeSticky(Note.12)
+		
+			ParentFileName := NameEncodeSticky( Note.12)
 			ParentFileName := trim(ParentFileName)
 			TreeNodeName := NameEncodeSticky(Note.2)
 			TreeNodeName := trim(TreeNodeName)
@@ -3037,7 +3045,7 @@ while TV_GetCount() != TVneeded
 			ParentExists := TV_Get(%ParentFileName%,"Bold")
 			if (SelfExists == 0 and ParentExists != 0)
 			{
-				%TreeNodeName% := TV_Add(Note.2,%ParentFileName%,"Bold Expand")
+				%TreeNodeName% := TV_Add(Note.1 Note.2,%ParentFileName%,"Bold Expand")
 			}
 		}
 	}
