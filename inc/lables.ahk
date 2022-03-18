@@ -3015,7 +3015,7 @@ For Each, Note In MyNotesArray
 	%TreeNodeName% := 0
 	if (not Note.12)
 	{
-		%TreeNodeName% := TV_Add(Note.2,,"Bold")
+		%TreeNodeName% := TV_Add(Note.2,,"Bold Expand" )
 	}
 }
 ;TVcurrent := TV_GetCount()
@@ -3037,7 +3037,7 @@ while TV_GetCount() != TVneeded
 			ParentExists := TV_Get(%ParentFileName%,"Bold")
 			if (SelfExists == 0 and ParentExists != 0)
 			{
-				%TreeNodeName% := TV_Add(Note.2,%ParentFileName%,"Bold")
+				%TreeNodeName% := TV_Add(Note.2,%ParentFileName%,"Bold Expand")
 			}
 		}
 	}

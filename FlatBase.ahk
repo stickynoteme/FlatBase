@@ -211,6 +211,7 @@ if (A_ScreenDPI > 120)
 
 ;tmp maybe
 global TemplateSymbol
+global TreeSymbol
 global ColBase = ,6,7,8,9
 global ColOrder = 1,2,3,4,5
 global SearchWholeNote
@@ -288,6 +289,7 @@ if (isFristRun = "1") {
 	iniread, TemplateAboveSymbol,%systemINI%,SYS,TemplateAboveSymbol,+
 	iniread, TemplateBelowSymbol,%systemINI%,SYS,TemplateBelowSymbol,-
 	iniread, TemplateSymbol,%systemINI%,SYS,TemplateSymbol,+
+	iniread, TreeSymbol,%systemINI%,SYS,TreeSymbol,🌳
 ;-------------------------------------------------
 ; Read from theme .ini 
 ;-------------------------------------------------

@@ -84,7 +84,12 @@ BuildGUI1(){
 	
 	;gLibTemplateAdd
 	
-	Gui, 1:Add,text, center xs c%U_SFC% -E0x200 w25 h%title_h% gBuildTreeUI, %TemplateSymbol%
+	Gui, 1:Add,text, center xs c%U_SFC% -E0x200 w25 h%title_h% gLibTemplateAdd, %TemplateSymbol%
+	
+	TreeIconX := LibW - 25
+	
+	Gui, 1:Add,text, center yp0 x%TreeIconX% c%U_SFC% -E0x200 w25 h%title_h% gBuildTreeUI, %TreeSymbol%
+	
 	Gui, 1:Add,edit, readonly center x+35 -E0x200 vTitleBar C%U_SFC% w%TitleWAdjust% h%title_h% backgroundTrans -Tabstop,
 	
 	
