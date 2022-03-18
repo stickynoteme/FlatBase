@@ -1,4 +1,3 @@
-
 ;Hotkey to open Library Window
 Label1:
 {
@@ -3020,7 +3019,7 @@ For Each, Note In MyNotesArray
 	%TreeNodeName% := 0
 	if (not Note.12)
 	{
-		%TreeNodeName% := TV_Add(Note.1 Note.2,,"Bold Expand" )
+		%TreeNodeName% := TV_Add(Note.2,,"Bold Expand" )
 	}
 }
 ;TVcurrent := TV_GetCount()
@@ -3043,7 +3042,7 @@ while TV_GetCount() != TVneeded
 			ParentExists := TV_Get(%ParentFileName%,"Bold")
 			if (SelfExists == 0 and ParentExists != 0)
 			{
-				%TreeNodeName% := TV_Add(Note.1 Note.2,%ParentFileName%,"Bold Expand")
+				%TreeNodeName% := TV_Add( Note.2,%ParentFileName%,"Bold Expand")
 			}
 		}
 	}
@@ -3080,13 +3079,17 @@ return
 
 BuildTreeUI:
 
-If (TreeFristRun == 0)
+If (TreeFristRun == 1)
 {
-	TreeFristRun = 1
 	Gui, tree:New,, FlatNote - Tree
+	Gui, tree:+Resize
 	Gui, tree:Margin , 2, 2 
 	Gui, tree:Font, s%TitleBarFontSize% Q%FontRendering%, Verdana, %U_MFC%	
-	Gui, tree:Add, TreeView, h300 hwndHTV	
+	Gui, tree:Add, TreeView, h%TreeCol1H% w%TreeCol1W% hwndHTV AltSubmit gTreeViewInteraction -E0x200 vTVNoteTree
+	Gui, tree:Add,Edit, center y0 x%TreeCol2X% h%TreeNameH% w%TreeCol2W% vTVNoteName hwndHTVN vTVNoteName -E0x200, 
+	Gui, tree:Add, Edit, x%TreeCol2X% y%TreePreviewY% h%TreePreviewH% w%TreeCol2W% hwndHTVB vTVNotePreview -E0x200,
+	;Gui, tree:Add, Button, x%TreeW% y15 h%TreePreviewH% w111,test
+	TreeFristRun = 0
 }
 
 if (TVReDraw == 1)
@@ -3095,7 +3098,54 @@ if (TVReDraw == 1)
 	gosub RefreshTV
 }
 FailBreak:
-Gui, tree:SHOW, h300
+TVBuilt = 1
+gosub TreeViewInteraction
+Gui, tree:SHOW, 
+return
+
+TreeViewInteraction:
+if (TVBuilt == 1)
+{
+	TVBuilt = 0
+	TopTV := TV_GetNext()
+	TV_GetText(SelectedName, TopTV)
+	FileSafeName := NameEncode(SelectedName)
+	gosub TreeViewUpdate
+}
+
+if (A_GuiEvent = "S")
+{
+	;msgbox % A_EventInfo
+	TV_GetText(SelectedName, A_EventInfo)
+	FileSafeName := NameEncode(SelectedName)
+	gosub TreeViewUpdate
+}
+return
+
+TreeViewUpdate:
+IfExist, %U_NotePath%%FileSafeName%.txt
+	{
+		FileRead, MyFile, %U_NotePath%%FileSafeName%.txt
+		IniRead, OldStarData, %detailsPath%%FileSafeName%.ini,INFO,Star
+		if (OldStarData = 10001)
+			OldStarData = %Star1%
+		if (OldStarData = 10002)
+			OldStarData = %Star2%
+		if (OldStarData = 10003)
+			OldStarData = %Star3%
+		if (OldStarData = 10004)
+			OldStarData = %Star4%
+		IniRead, OldCatData, %detailsPath%%FileSafeName%.ini,INFO,Cat
+		IniRead, OldTagsData, %detailsPath%%FileSafeName%.ini,INFO,Tags
+		IniRead, OldParentData, %detailsPath%%FileSafeName%.ini,INFO,Parent
+		;GuiControl,, QuickNoteParent, %OldParentData%
+		;GuiControl,, QuickNoteTags, %OldTagsData%
+		;GuiControl, ChooseString, QuickNoteCat, %OldCatData%
+		;GuiControl,, QuickNoteBody,%MyFile%
+		;GuiControl,, QuickStar,%OldStarData%
+		GuiControl,,TVNoteName,%SelectedName%
+		GuiControl,,TVNoteBody,%MyFile%
+	}
 return
 
 treeGuiClose:

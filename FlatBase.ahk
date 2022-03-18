@@ -22,6 +22,24 @@ Menu, Tray, Default, Library
 ;-------------------------------------------------
 ;Set up script global variables
 ;-------------------------------------------------
+global TreeLibW = 500
+global TreeLibH = 300
+global TreeBorder = 2
+
+
+global TreeCol1W = 125
+global TreeCol1H := TreeLibH
+global TreeCol2W := TreeLibW - TreeCol1W - TreeBorder
+global TreeCol2X := TreeCol1W + TreeBorder + TreeBorder
+global TreeNameH = 20
+global TreePreviewH := TreeLibH - TreeNameH - TreeBorder
+global TreePreviewY := TreeNameH + TreeBorder
+
+
+
+
+
+
 ;hwnd
 global HSterm ; Lib Searchbox 
 global HQNB ; QuickNoteBox
@@ -30,6 +48,7 @@ global HPB ;
 global HSF ; SearchFilter edit ID
 global HCF ; CatFilter edit ID
 global HNP ; Note Parent edit ID
+global HTVN ; TV Note Name ID
 global HQNUSL1
 global HQNUSl2
 global HQNUSl3
@@ -42,6 +61,14 @@ global HstarBox4
 global HTSLB ;Template Selection List Box
 global HTSGUI ;Template Select GUI
 global HTRowsOver ; Total Rows edit box for Template maker
+global TVBuilt
+global TVNoteName
+global TVNoteBody
+global TVNoteTags
+global TVNoteCat
+global TVNoteStar
+global TVNoteTree
+
 
 global TagBox
 global CatBox
@@ -215,7 +242,7 @@ global TreeSymbol
 global ColBase = ,6,7,8,9
 global ColOrder = 1,2,3,4,5
 global SearchWholeNote
-global TreeFristRun = 0
+global TreeFristRun = 1
 global TVReDraw
 global LoopCheck
 
@@ -499,10 +526,11 @@ if (ShowMainWindowOnStartUp = 0 and ColOrder != "1,2,3,4,5"){
 	WinHide, ahk_id %g1ID%
 }
 
-;-------------------------------------------------
+;------------------------------------------------- Dev Startup options
 ;-------------------------------------------------
 ;goto Options
 ;BuildGUI2()
+gosub BuildTreeUI
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------

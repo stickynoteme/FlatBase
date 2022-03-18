@@ -1,3 +1,30 @@
+; --------------------—
+; Handle Window specific things.
+; ---------------------
+
+;handle window resize
+treeGuiSize:
+  If A_EventInfo = 1  ; If minimized.
+    Return
+
+ TreeLibW := A_GuiWidth
+ TreeLibH := A_GuiHeight
+
+ TreeCol1W = 125
+ TreeCol1H := TreeLibH
+ TreeCol2W := TreeLibW - TreeCol1W - TreeBorder
+ TreeCol2X := TreeCol1W + TreeBorder + TreeBorder
+ TreeNameH = 20
+ TreePreviewH := TreeLibH - TreeNameH - TreeBorder
+ TreePreviewY := TreeNameH + TreeBorder
+
+
+  GuiControl Move, TVNoteTree, h%TreeCol1H% w%TreeCol1W%
+  GuiControl Move, TVNoteName, h%TreeNameH% w%TreeCol2W%
+  GuiControl Move, TVNotePreview, h%TreePreviewH% w%TreeCol2W%
+Return
+
+
 ;---------------------
 ;Other shortcut keys
 ;---------------------
