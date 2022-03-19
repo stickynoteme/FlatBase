@@ -47,7 +47,8 @@ Down::
 ControlGetFocus, OutputVar, FlatNotes - Library
 {
 	 If (OutputVar == "Edit1"){
-		sendinput {tab}{tab}
+		;sendinput {tab}{tab}{tab}
+		ControlFocus,SysListView321,FlatNotes - Library
 		return
 		}else
 			Down::Down

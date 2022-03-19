@@ -66,7 +66,12 @@ BuildGUI1(){
 
 	OD_Colors.SetItemHeight(SearchFontSize, CatFontFamily)
 	
+	CatBoxContents := "|" CatBoxContents
+	
 	Gui, 1:Add, DDL, x%CatX% y7 -E0x200 +0x0210 r6 w%CatW% -vCatFilter gSearch HwndHCF, %CatBoxContents%
+	
+	
+	Gui, 1:Add, combobox, c%U_FBCA% xp%TagsFilterX% y7 -E0x200 +0x0210 r6 w%TagsFilterW% vTagsFilter gSearch HwndHTF , %CatBoxContents%
 	
 	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%
 	Gui, 1:Add, text, x-3 c%U_SFC% w%StarColW% center gSortStar vSortStar, %Star1%
@@ -171,10 +176,13 @@ BuildGUI1(){
 	}
 	
 	;Listbox color
-	DDLTextColor := strreplace(U_SBG,"0x")
-	CtlColors.Attach(HCF, DDLTextColor)
-	
+	DDLbgColor := strreplace(U_SBG,"0x")
+	DDLbgColorb2 := strreplace(U_MBG,"0x")
+	DDLfontColorb2 := strreplace(U_MFC,"0x")
+	CtlColors.Attach(HCF, DDLbgColor)
 	OD_Colors.Attach(HCF, {T: U_SFC})
+	CtlColors.Attach(HTF, DDLbgColorb2,DDLfontColorb2)
+	OD_Colors.Attach(HTF, {T: U_MFC})
 	
 	Gui, 1:SHOW, Hide w%LibW% 
 	WinGet, g1ID,, FlatNotes - Library

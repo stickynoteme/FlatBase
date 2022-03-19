@@ -52,6 +52,7 @@ global HNP ; Note Parent edit ID
 global HTV ; Tree:gui Treeview ID
 global HTVN ; TV Note Name ID
 global HTVB ; Tree:gui Edit Preview / Body ID
+global HTF ; Listview tag Filter search box
 global HQNUSL1
 global HQNUSl2
 global HQNUSl3
@@ -76,6 +77,7 @@ global TVNoteTree
 global TagBox
 global CatBox
 global CatFilter
+global TagsFilter
 global LastCatFilter
 
 global CatBoxContents
@@ -492,9 +494,11 @@ Iniread, UserTimeFormat,%iniPath%,General,UserTimeFormat,yy/MM/dd
 ;Set Globals that need values from the ini
 ;-------------------------------------------------
 global HelpIconx := LibW-18
-global SearchW := LibW * 0.8 - 50
+global SearchW := LibW * 0.75 - 50
 global CatX := SearchW
-global CatW := LibW * 0.2
+global CatW := LibW * 0.1
+global TagsFilterX := CatW + 2
+global TagsFilterW := LibW * 0.15
 global StickyTW := StickyW-80
 global StickyMaxH
 global VSBW
@@ -562,7 +566,7 @@ if (ShowMainWindowOnStartUp = 0 and ColOrder != "1,2,3,4,5"){
 ;-------------------------------------------------
 ;goto Options
 ;BuildGUI2()
-gosub BuildTreeUI
+;gosub BuildTreeUI
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------

@@ -360,6 +360,7 @@ Search:
 	gosub SortNow
 	gosub SearchFilter
 	gosub CatFilter
+	gosub TagsFilter
 	gosub UpdateStatusBar
 	return
 	}
@@ -380,6 +381,7 @@ Search:
 	gosub SortNow
 	gosub SearchFilter
 	gosub CatFilter
+	gosub TagsFilter
 	gosub UpdateStatusBar
 	return
 	}
@@ -400,6 +402,7 @@ Search:
 	gosub SortNow
 	gosub SearchFilter
 	gosub CatFilter
+	gosub TagsFilter
 	gosub UpdateStatusBar
 	return
 	}
@@ -420,6 +423,7 @@ Search:
 	gosub SortNow
 	gosub SearchFilter
 	gosub CatFilter
+	gosub TagsFilter
 	gosub UpdateStatusBar
 	return
 	}
@@ -440,6 +444,7 @@ Search:
 	gosub SortNow
 	gosub SearchFilter
 	gosub CatFilter
+	gosub TagsFilter
 	gosub UpdateStatusBar
 	return
 	}
@@ -473,6 +478,7 @@ Search:
 	gosub SortNow
 	gosub SearchFilter
 	gosub CatFilter
+	gosub TagsFilter
 	gosub UpdateStatusBar
 	return
 	}
@@ -507,6 +513,7 @@ Search:
 	gosub SortNow
 	gosub SearchFilter
 	gosub CatFilter
+	gosub TagsFilter
 	gosub UpdateStatusBar
 	return
 	}
@@ -537,6 +544,7 @@ Search:
 	gosub SortNow
 	gosub SearchFilter
 	gosub CatFilter
+	gosub TagsFilter
 	gosub UpdateStatusBar
 	Return
 }
@@ -570,6 +578,25 @@ CatFilter:
 		{
 			LV_GetText(RowVar,Mloops+1,11)
 			if (RowVar != CatFilter)
+				LV_Delete(Mloops+1)
+			if (Mloops = 0)
+				break
+		}	
+	}
+	return
+}
+TagsFilter:
+{
+	GuiControlGet, TagsFilter,, %HTF%
+	GuiControlGet, LastTagsFilter,, %HTF%
+	
+	if (TagsFilter != "")
+	{
+		Mloops := LV_GetCount()
+		while (Mloops--)
+		{
+			LV_GetText(RowVar,Mloops+1,10)
+			if (!InStr(RowVar, TagsFilter))
 				LV_Delete(Mloops+1)
 			if (Mloops = 0)
 				break
@@ -1444,7 +1471,7 @@ Options:
 	Gui, 3:add,text, xs section, Unique stars list #2
 	Gui, 3:add,edit, xs section w300 vSelect_UniqueStarList2 gSet_UniqueStarList2, %UniqueStarList2% 
 	
-	Gui, 3:add,text, xs section, Pipe "|" sperated list of Categories. (Example: Black,White,Calico..etc)
+	Gui, 3:add,text, xs section, Pipe "|" sperated list of Categories. (Example: Black|White|Calico|..etc)
 	Gui, 3:add,edit, xs section w300 vSelect_CatBoxContents gSet_CatBoxContents, %CatBoxContents% 
 	
 	Gui, 3:Add,CheckBox, xs vSelect_ShowStarHelper gSet_ShowStarHelper, Show star filter by search box?
