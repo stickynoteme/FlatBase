@@ -3150,7 +3150,7 @@ If (TreeFristRun == 1)
 
 	Gui, tree:Add, TreeView, h%TreeCol1H% w%TreeCol1W% x%TreeCol1X% y0 hwndHTV -Hscroll AltSubmit +0x2 +0x1000 +E0x4000 -E0x200 %UseCheckBoxesTrue% gTreeViewInteraction  vTVNoteTree c%U_FBCA%
 	
-	Gui, tree:Add, ListBox, +0x100 r1 w%TreeCol2W% x%TreeCol2X% y1 -E0x200 Disabled -Tabstop
+	Gui, tree:Add, ListBox, vTVBGLB1 +0x100 r1 w%TreeCol2W% x%TreeCol2X% y1 -E0x200 Disabled -Tabstop
 	
 	Gui, tree:Add,Edit, center y7 x%TreeCol2X% h%TreeNameH% w%TreeCol2W% vTVNoteName hwndHTVN vTVNoteName c%U_FBCA% -E0x200, 
 	Gui, tree:Add, Edit, x%TreeCol2X% y%TreePreviewY% h%TreePreviewH% w%TreeCol2W% hwndHTVB vTVNotePreview -E0x200 c%U_FBCA%,

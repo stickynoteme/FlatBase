@@ -20,6 +20,7 @@ global TreePreviewH := TreeLibH - TreeNameH - TreeBorder
 global TreePreviewY := TreeNameH + TreeBorder + TreeBorder + TreeBorder + TreeBorder
 
   GuiControl Move, TVNoteTree, h%TreeCol1H% w%TreeCol1W%
+  GuiControl Move, TVBGLB1, w%TreeCol2W%
   GuiControl Move, TVNoteName, h%TreeNameH% w%TreeCol2W%
   GuiControl Move, TVNotePreview, h%TreePreviewH% w%TreeCol2W%
 Return
