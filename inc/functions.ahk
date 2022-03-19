@@ -63,7 +63,11 @@ BuildGUI1(){
 	Gui, 1:Add, ListBox, vLB1 +0x100 h8 w%LibW% x0 y0 -E0x200 Disabled -Tabstop
 	Gui, 1:Add, ListBox, vlB2 +0x100 h15 w%LibW% x0 ys0 -E0x200 Disabled -Tabstop
 	;ListBox used as background color for search area padding
-	Gui, 1:Add, DropDownList, x%CatX% y6 -E0x200 r5 w%CatW% vCatFilter gSearch HwndHCF, %CatBoxContents%
+	
+	OD_Colors.SetItemHeight(SearchFontSize, SearchFontFamily)
+	
+	Gui, 1:Add, DDL, x%CatX% y6 -E0x200 +0x0210 r6 w%CatW% vCatFilter gSearch HwndHCF, %CatBoxContents%
+	
 	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%
 	Gui, 1:Add, text, x-3 c%U_SFC% w%StarColW% center gSortStar vSortStar, %Star1%
 	Gui, 1:Add, text, c%U_SFC% xp+%StarColW% w%NameColW% center gSortName vSortName, Name
@@ -165,9 +169,19 @@ BuildGUI1(){
 		LVM_ShowScrollBar(HPB,1,False)
 		GuiControl,+Vscroll,%HPB%
 	}
+	
+	;Listbox color
+	DDLTextColor := strreplace(U_SBG,"0x")
+	CtlColors.Attach(HCF, DDLTextColor)
+	
+	OD_Colors.Attach(HCF, {T: U_SFC})
+	
 	Gui, 1:SHOW, Hide w%LibW%
 	WinGet, g1ID,, FlatNotes - Library
 	g1Open=0
+	;Gui, 1:%A_Gui% +LastFound
+	;WinSet, TransColor, 000000
+    ;WinSet, ReDraw
 	gosub search
 	return
 }

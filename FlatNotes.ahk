@@ -539,7 +539,7 @@ if (ShowMainWindowOnStartUp = 0 and ColOrder != "1,2,3,4,5"){
 ;-------------------------------------------------
 ;goto Options
 ;BuildGUI2()
-gosub BuildTreeUI
+;gosub BuildTreeUI
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------
@@ -590,6 +590,8 @@ return
 #Include inc\StickyGui.ahk
 #Include inc\shortcuts.ahk
 #Include inc\Class_LV_Colors.ahk
+#Include inc\Class_CtlColors.ahk
+#Include inc\Class_OD_Colors.ahk
 #include inc\Object sort.ahk
 #include inc\string-object-file.ahk
 ;-!- Return after fucntions so lables don't get exacuted

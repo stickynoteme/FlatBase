@@ -1,7 +1,6 @@
 ; --------------------—
 ; Handle Window specific things.
 ; ---------------------
-
 ;handle window resize
 treeGuiSize:
   If A_EventInfo = 1  ; If minimized.
