@@ -80,3 +80,7 @@ Try deleting the settings.ini file (make a backup first)
 ## Themes
 ![Themes Set one](/ScreenShots/SS_02.png)
 
+## Todo List
+
+
+### Maybe

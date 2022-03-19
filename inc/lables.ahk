@@ -592,18 +592,32 @@ TagsFilter:
 	
 	if (TagsFilter != "")
 	{
+		TagsSearched := StrSplit(TagsFilter," ")
+		
 		Mloops := LV_GetCount()
+		RemoveItem = false
 		while (Mloops--)
 		{
 			LV_GetText(RowVar,Mloops+1,10)
-			if (!InStr(RowVar, TagsFilter))
-				LV_Delete(Mloops+1)
+			for k, v in TagsSearched 
+			{
+				if (!InStr(RowVar, v))
+				{
+					RemoveItem = true
+					gosub SaveTimeDeletingLV
+					break
+				}
+			}
 			if (Mloops = 0)
 				break
 		}	
 	}
 	return
 }
+SaveTimeDeletingLV:
+	LV_Delete(Mloops+1)
+	RemoveItem = false
+return
 UpdateStatusBar:
 {
 	Items := LV_GetCount()
