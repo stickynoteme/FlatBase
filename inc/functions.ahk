@@ -48,7 +48,7 @@ BuildGUI1(){
 		return
 	}
 	firstDown = 1
-	Gui, 1:New,, FlatNotes - Library
+	Gui, 1:New,+0x800000, FlatNotes - Library
 	Gui, 1:Margin , 0, 0 
 	Gui, 1:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
 	Gui, 1:Color,%U_SBG%, %U_MBG%
@@ -66,7 +66,7 @@ BuildGUI1(){
 
 	OD_Colors.SetItemHeight(SearchFontSize, CatFontFamily)
 	
-	Gui, 1:Add, DDL, x%CatX% y7 -E0x200 +0x0210 r6 w%CatW% vCatFilter gSearch HwndHCF, %CatBoxContents%
+	Gui, 1:Add, DDL, x%CatX% y7 -E0x200 +0x0210 r6 w%CatW% -vCatFilter gSearch HwndHCF, %CatBoxContents%
 	
 	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%
 	Gui, 1:Add, text, x-3 c%U_SFC% w%StarColW% center gSortStar vSortStar, %Star1%
@@ -176,7 +176,7 @@ BuildGUI1(){
 	
 	OD_Colors.Attach(HCF, {T: U_SFC})
 	
-	Gui, 1:SHOW, Hide w%LibW%
+	Gui, 1:SHOW, Hide w%LibW% 
 	WinGet, g1ID,, FlatNotes - Library
 	g1Open=0
 	;Gui, 1:%A_Gui% +LastFound
@@ -296,6 +296,9 @@ MakeFileList(ReFreshMyNoteArray){
 		IniRead, TagsField, %NoteIni%, INFO, Tags,
 		IniRead, CatField, %NoteIni%, INFO, Cat,
 		IniRead, ParentField, %NoteIni%, INFO, Parent,
+		IniRead, CheckedField, %NoteIni%, INFO, Checked,
+		IniRead, MarkedField, %NoteIni%, INFO, Marked,
+		IniRead, ExtraField, %NoteIni%, INFO, Extra,
 				
 		
 		FormatTime, UserTimeFormatA, %AddedField%, %UserTimeFormat%
@@ -315,11 +318,11 @@ MakeFileList(ReFreshMyNoteArray){
 			StarFieldArray:= A_sapce
 		
 		if (ReFreshMyNoteArray = 1){
-			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField,TagsField,CatField,ParentField)
+			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField,TagsField,CatField,ParentField,CheckedField,MarkedField,ExtraField)
 			}
 		
 		UsedStars .= StarFieldArray "|"
-		MyNotesArray.Push({1:StarFieldArray,2:NameField,3:NoteField,4:UserTimeFormatA,5:UserTimeFormatM,6:AddedField,7:ModdedField,8:A_LoopField,9:StarField,10:TagsField,11:CatField,12:ParentField})
+		MyNotesArray.Push({1:StarFieldArray,2:NameField,3:NoteField,4:UserTimeFormatA,5:UserTimeFormatM,6:AddedField,7:ModdedField,8:A_LoopField,9:StarField,10:TagsField,11:CatField,12:ParentField,13:CheckedField,14:MarkedField,15:ExtraField})
 	} ; File loop end
 	UsedStars := RemoveDups(UsedStars,"|")
 	UsedStars := StrReplace(UsedStars,"||","|")
@@ -345,6 +348,12 @@ MakeFileList(ReFreshMyNoteArray){
 	LV_ModifyCol(11, "Logical")
 	LV_ModifyCol(12, ParentColW)
 	LV_ModifyCol(12, "Logical")
+	LV_ModifyCol(13, CheckedColW)
+	LV_ModifyCol(13, "Logical")
+	LV_ModifyCol(14, MarkedColW)
+	LV_ModifyCol(14, "Logical")
+	LV_ModifyCol(15, ExtraColW)
+	LV_ModifyCol(15, "Logical")
 	
 	if (DeafultSort = 1)
 			LV_ModifyCol(2, "Sort")
@@ -373,7 +382,7 @@ GuiControl, 1:-Redraw, LV
 LV_Delete()
 For Each, Note In MyNotesArray
 {
-	 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+	 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12,Note.13,Note.14,Note.15)
 }
 gosub SortNow
 TotalNotes := MyNotesArray.MaxIndex() 

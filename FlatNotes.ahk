@@ -17,8 +17,6 @@ Menu, Tray, Add, About
 Menu, Tray, Add, Options
 Menu, Tray, Add, Exit
 Menu, Tray, Default, Library
-
-
 ;-------------------------------------------------
 ;Set up script global variables
 ;-------------------------------------------------
@@ -145,6 +143,9 @@ global ModdedPercent
 global TagsPercent
 global ParentPercent
 global CatPercent
+global CheckedPercent
+global MarkedPercent
+global ExtraPercent
 global oStarPercent
 global oNamePercent
 global oBodyPercent
@@ -153,6 +154,9 @@ global oModdedPercent
 global oTagsPercent
 global oCatPercent
 global oParentPercent
+global oCheckedPercent
+global oMarkedPercent
+global oExtraPercent
 global ShowStatusBar
 global StatusBarM
 global StatusBarA
@@ -302,6 +306,9 @@ if (isFristRun = "1") {
 	IniWrite, 0,%iniPath%, General,TagsPercent
 	IniWrite, 0,%iniPath%, General,CatPercent
 	IniWrite, 0,%iniPath%, General,ParentPercent
+	IniWrite, 0,%iniPath%, General,CheckedPercent
+	IniWrite, 0,%iniPath%, General,MarkedPercent
+	IniWrite, 0,%iniPath%, General,ExtraPercent
 
 	IniWrite, yy/MM/dd,%iniPath%, General,UserTimeFormat
 	IniWrite, 0, %iniPath%, General, isFristRun
@@ -417,6 +424,9 @@ IniRead, oModdedPercent,%iniPath%, General,ModdedPercent,0
 IniRead, oTagsPercent,%iniPath%, General,TagsPercent,0
 IniRead, oCatPercent,%iniPath%, General,CatPercent,0
 IniRead, oParentPercent,%iniPath%, General,ParentPercent,0
+IniRead, oCheckedPercent,%iniPath%, General,ParentPercent,0
+IniRead, oMarkedPercent,%iniPath%, General,ParentPercent,0
+IniRead, oExtraPercent,%iniPath%, General,ParentPercent,0
 
 if oStarPercent between 0 and 9
 	oStarPercent = 0%oStarPercent%
@@ -432,6 +442,12 @@ if oCatPercent between 0 and 9
 	oCatPercent = 0%oCatPercent%
 if oParentPercent between 0 and 9
 	oParentPercent = 0%oParentPercent%
+if oCheckedPercent between 0 and 9
+	oCheckedPercent = 0%oParentPercent%
+if oMarkedPercent between 0 and 9
+	oMarkedPercent = 0%oParentPercent%
+if oExtraPercent between 0 and 9
+	oExtraPercent = 0%oParentPercent%
 
 StarPercent = 0.%oStarPercent%
 NamePercent = 0.%oNamePercent%
@@ -441,6 +457,10 @@ ModdedPercent = 0.%oModdedPercent%
 TagsPercent = 0.%oTagsPercent%
 CatPercent = 0.%oCatPercent%
 ParentPercent = 0.%oParentPercent%
+CheckedPercent = 0.%oCheckedPercent%
+MarkedPercent = 0.%oMarkedrcent%
+ExtraPercent = 0.%oExtraPercent%
+
 
 
 IniRead, HideScrollbars,%iniPath%,General,HideScrollbars,1
@@ -493,6 +513,9 @@ global ModColW := Round(libWColAdjust*ModdedPercent)
 global TagColW := Round(libWColAdjust*TagsPercent)
 global CatColW := Round(libWColAdjust*CatPercent)
 global ParentColW := Round(libWColAdjust*ParentPercent)
+global CheckedColW := Round(libWColAdjust*CheckedPercent)
+global MarkedColW := Round(libWColAdjust*MarkedPercent)
+global ExtraColW := Round(libWColAdjust*ExtraPercent)
 
 ;-------------------------------------------------
 ;Acitvate User Hotkeys if any & make INI for new files
@@ -561,6 +584,17 @@ if (g1Open=1) {
 	return
 }
 if (g1Open=0) {
+	RestoreClip := clipboardall
+	clipboard =
+	send {Ctrl Down}{c}{Ctrl up}
+	if (clipboard){
+		AutoSearch = true
+		AutoSearchTerm := clipboard
+		clipboard := RestoreClip 
+	}else {
+		AutoSearchTerm := ""
+		clipboard := RestoreClip
+	}
 	MouseGetPos, xPos, yPos	
 	xPos /= 1.5
 	yPos /= 1.5
@@ -572,6 +606,7 @@ if (g1Open=0) {
 	g1Open=1
 	ControlFocus,Edit1,FlatNotes - Library
 	sendinput {left}{right}
+	GuiControl,,SearchTerm,%AutoSearchTerm%
 	gosub search
 	gosub SortNow
 	return
