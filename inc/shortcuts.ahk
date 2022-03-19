@@ -17,8 +17,7 @@ global TreeCol2W := TreeLibW - TreeCol1W - TreeBorder + ScrollbarW + ScrollbarW
 global TreeCol2X := TreeCol1W + TreeBorder - ScrollbarW
 global TreeNameH = 20
 global TreePreviewH := TreeLibH - TreeNameH - TreeBorder
-global TreePreviewY := TreeNameH + TreeBorder
-
+global TreePreviewY := TreeNameH + TreeBorder + TreeBorder + TreeBorder + TreeBorder
 
   GuiControl Move, TVNoteTree, h%TreeCol1H% w%TreeCol1W%
   GuiControl Move, TVNoteName, h%TreeNameH% w%TreeCol2W%

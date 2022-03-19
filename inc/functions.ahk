@@ -63,10 +63,10 @@ BuildGUI1(){
 	Gui, 1:Add, ListBox, vLB1 +0x100 h8 w%LibW% x0 y0 -E0x200 Disabled -Tabstop
 	Gui, 1:Add, ListBox, vlB2 +0x100 h15 w%LibW% x0 ys0 -E0x200 Disabled -Tabstop
 	;ListBox used as background color for search area padding
+
+	OD_Colors.SetItemHeight(SearchFontSize, CatFontFamily)
 	
-	OD_Colors.SetItemHeight(SearchFontSize, SearchFontFamily)
-	
-	Gui, 1:Add, DDL, x%CatX% y6 -E0x200 +0x0210 r6 w%CatW% vCatFilter gSearch HwndHCF, %CatBoxContents%
+	Gui, 1:Add, DDL, x%CatX% y7 -E0x200 +0x0210 r6 w%CatW% vCatFilter gSearch HwndHCF, %CatBoxContents%
 	
 	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%
 	Gui, 1:Add, text, x-3 c%U_SFC% w%StarColW% center gSortStar vSortStar, %Star1%

@@ -36,7 +36,7 @@ global TreeCol2W := TreeLibW - TreeCol1W - TreeBorder + ScrollbarW + ScrollbarW
 global TreeCol2X := TreeCol1W + TreeBorder - ScrollbarW
 global TreeNameH = 20
 global TreePreviewH := TreeLibH - TreeNameH - TreeBorder
-global TreePreviewY := TreeNameH + TreeBorder
+global TreePreviewY := TreeNameH + TreeBorder + TreeBorder + TreeBorder + TreeBorder
 
 
 
@@ -251,7 +251,7 @@ global TreeFristRun = 1
 global TVReDraw
 global LoopCheck
 global UseCheckBoxesTrue
-global UseCheckBoxes = true
+global UseCheckBoxes = false
 if (UseCheckBoxes == true)
 	UseCheckBoxesTrue := "Checked"
 
@@ -539,7 +539,7 @@ if (ShowMainWindowOnStartUp = 0 and ColOrder != "1,2,3,4,5"){
 ;-------------------------------------------------
 ;goto Options
 ;BuildGUI2()
-;gosub BuildTreeUI
+gosub BuildTreeUI
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------
