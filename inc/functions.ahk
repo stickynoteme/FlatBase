@@ -632,6 +632,7 @@ LVM_ShowScrollBar(hLV,wBar,p_Show=True)
 
     Return RC ? True:False
     }
+	
 OnMsgBox() {
 	MouseGetPos, xPos, yPos
 	xPos /= 1.5

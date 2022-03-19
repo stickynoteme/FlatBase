@@ -10,13 +10,15 @@ treeGuiSize:
  TreeLibW := A_GuiWidth
  TreeLibH := A_GuiHeight
 
- TreeCol1W = 125
- TreeCol1H := TreeLibH
- TreeCol2W := TreeLibW - TreeCol1W - TreeBorder
- TreeCol2X := TreeCol1W + TreeBorder + TreeBorder
- TreeNameH = 20
- TreePreviewH := TreeLibH - TreeNameH - TreeBorder
- TreePreviewY := TreeNameH + TreeBorder
+global TreeCol1W := 125 + ScrollbarW
+global TreeCol1WSBH := TreeCol1W - ScrollbarW
+global TreeCol1X := 0 - ScrollbarW
+global TreeCol1H := TreeLibH
+global TreeCol2W := TreeLibW - TreeCol1W - TreeBorder + ScrollbarW + ScrollbarW
+global TreeCol2X := TreeCol1W + TreeBorder - ScrollbarW
+global TreeNameH = 20
+global TreePreviewH := TreeLibH - TreeNameH - TreeBorder
+global TreePreviewY := TreeNameH + TreeBorder
 
 
   GuiControl Move, TVNoteTree, h%TreeCol1H% w%TreeCol1W%

@@ -25,12 +25,15 @@ Menu, Tray, Default, Library
 global TreeLibW = 500
 global TreeLibH = 300
 global TreeBorder = 2
+Global ScrollbarW = 8
 
 
-global TreeCol1W = 125
+global TreeCol1W := 125 + ScrollbarW
+global TreeCol1WSBH := TreeCol1W - ScrollbarW
+global TreeCol1X := 0 - ScrollbarW
 global TreeCol1H := TreeLibH
-global TreeCol2W := TreeLibW - TreeCol1W - TreeBorder
-global TreeCol2X := TreeCol1W + TreeBorder + TreeBorder
+global TreeCol2W := TreeLibW - TreeCol1W - TreeBorder + ScrollbarW + ScrollbarW
+global TreeCol2X := TreeCol1W + TreeBorder - ScrollbarW
 global TreeNameH = 20
 global TreePreviewH := TreeLibH - TreeNameH - TreeBorder
 global TreePreviewY := TreeNameH + TreeBorder
@@ -48,7 +51,9 @@ global HPB ;
 global HSF ; SearchFilter edit ID
 global HCF ; CatFilter edit ID
 global HNP ; Note Parent edit ID
+global HTV ; Tree:gui Treeview ID
 global HTVN ; TV Note Name ID
+global HTVB ; Tree:gui Edit Preview / Body ID
 global HQNUSL1
 global HQNUSl2
 global HQNUSl3

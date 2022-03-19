@@ -3012,7 +3012,7 @@ TVneeded := JEE_ObjCount(MyNotesArray)
 ;msgbox % TVcurrent
 ;StarParents Options
 global UseStarsAsParents = True
-global TreeExpandByDeafultTrue = ""
+global TreeExpandByDeafultTrue = "Expand"
 if (UseStarsAsParents == True)
 {
 	None := TV_Add("- None -",,  TreeExpandByDeafultTrue  )
@@ -3145,10 +3145,15 @@ If (TreeFristRun == 1)
 	Gui, tree:New,, FlatNote - Tree
 	Gui, tree:+Resize
 	Gui, tree:Margin , 2, 2 
-	Gui, tree:Font, s%TitleBarFontSize% Q%FontRendering%, Verdana, %U_MFC%	
-	Gui, tree:Add, TreeView, h%TreeCol1H% w%TreeCol1W% hwndHTV AltSubmit %UseCheckBoxesTrue% gTreeViewInteraction -E0x200 vTVNoteTree
-	Gui, tree:Add,Edit, center y0 x%TreeCol2X% h%TreeNameH% w%TreeCol2W% vTVNoteName hwndHTVN vTVNoteName -E0x200, 
-	Gui, tree:Add, Edit, x%TreeCol2X% y%TreePreviewY% h%TreePreviewH% w%TreeCol2W% hwndHTVB vTVNotePreview -E0x200,
+	Gui, tree:Font, s%TitleBarFontSize% Q%FontRendering%, Verdana, %U_MFC%
+	Gui, tree:Color,%U_SBG%, %U_MBG%
+
+	Gui, tree:Add, TreeView, h%TreeCol1H% w%TreeCol1W% x%TreeCol1X% y0 hwndHTV -Hscroll AltSubmit +0x2 +0x1000 +E0x4000 -E0x200 %UseCheckBoxesTrue% gTreeViewInteraction  vTVNoteTree c%U_FBCA%
+	
+	
+	
+	Gui, tree:Add,Edit, center y0 x%TreeCol2X% h%TreeNameH% w%TreeCol2W% vTVNoteName hwndHTVN vTVNoteName c%U_FBCA% -E0x200, 
+	Gui, tree:Add, Edit, x%TreeCol2X% y%TreePreviewY% h%TreePreviewH% w%TreeCol2W% hwndHTVB vTVNotePreview -E0x200 c%U_FBCA%,
 	;Gui, tree:Add, Button, x%TreeW% y15 h%TreePreviewH% w111,test
 	TreeFristRun = 0
 }
@@ -3161,10 +3166,22 @@ if (TVReDraw == 1)
 FailBreak:
 TVBuilt = 1
 gosub TreeViewInteraction
-Gui, tree:SHOW, 
+;LVM_ShowScrollBar(HTV,1,false)
+Gui, tree:SHOW, h%TreeLibH% w%TreeLibW%
 return
 
 TreeViewInteraction:
+;ttip := A_EventInfo "::" A_GuiEvent
+;tooltip, %ttip%
+;SetTimer, KillToolTip, -5000
+if (A_GuiEvent = "Normal" or A_GuiEvent = "F" or A_GuiEvent = "K")
+{
+;LVM_ShowScrollBar(HTV,1,true)
+}
+if (A_GuiEvent = "f")
+{
+;LVM_ShowScrollBar(HTV,1,false)
+}
 if (TVBuilt == 1)
 {
 	TVBuilt = 0
