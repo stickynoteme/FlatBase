@@ -166,24 +166,17 @@ NewAndSaveHK:
 ControlGetFocus, OutputVar, FlatNotes - Library
 if (OutputVar = "Edit1"){
 	GuiControlGet, SearchTerm
-	FileSafeSearchTerm := NameEncode(SearchTerm)
 	
-	;Collect Current Data
-	FileRead, MyFile, %U_NotePath%%FileSafeSearchTerm%.txt
-	
-	iniRead,C_Star,%detailsPath%%FileSafeSearchTerm%.ini,INFO,Star,""
-	C_Star := ConvertStar(C_Star)
-	iniRead,C_Tags,%detailsPath%%FileSafeSearchTerm%.ini,INFO,Tags,
-	iniRead,C_Cat,%detailsPath%%FileSafeSearchTerm%.ini,INFO,Cat,""
-	iniRead,C_Parent,%detailsPath%%FileSafeSearchTerm%.ini,INFO,Parent,
-
+	C_SafeName := NameEncode(SearchTerm)
+	gosub GetCurrentNoteData
+	msgbox % C_Name
 	BuildGUI2()
 	
 	;Fill in current data.
 	GuiControl,, QuickNoteName,%SearchTerm%
-	GuiControl,, FileSafeName,%FileSafeSearchTerm%
+	GuiControl,, FileSafeName,%C_SafeName%
 	
-	if FileExist(U_NotePath FileSafeSearchTerm ".txt"){
+	if FileExist(U_NotePath C_SafeName ".txt"){
 		GuiControl,, QuickNoteBody,%MyFile%
 		GuiControl,, QuickStar,%C_Star%
 		GuiControl,, QuickNoteTags,%C_Tags%
@@ -215,7 +208,7 @@ if (OutputVar = "Edit1"){
 	SetTimer, KillToolTip, -500
 	gosub GuiEscape
 	return
-	}
+}
 if(OutputVar == "Edit3" or OutputVar == "Edit4" or OutputVar == "Edit5"){
 	global LVSelectedROW
 	if (LVSelectedROW="")

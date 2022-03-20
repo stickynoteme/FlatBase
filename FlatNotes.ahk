@@ -263,7 +263,16 @@ global UseCheckBoxes = false
 if (UseCheckBoxes == true)
 	UseCheckBoxesTrue := "Checked"
 
-
+;Reuseable Data Holders
+global C_File
+global C_Name
+global C_SafeName
+global C_Add
+global C_Mod
+global C_Star
+global C_Tags
+global C_Cat
+global C_Parent
 
 FileCreateDir, NoteDetails
 detailsPath := A_WorkingDir "\NoteDetails\"
@@ -642,6 +651,7 @@ return
 return
 #Include inc\DummyGui.ahk
 #Include inc\lables.ahk
+#include inc\FunLables.ahk
 #Include inc\tmLables.ahk
 return
 
