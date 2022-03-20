@@ -337,6 +337,7 @@ QuickSafeNameUpdate:
 }
 Search:
 {
+	SelectedRows :=
 	if (unsaveddataEdit3 = 1)
 		gosub Edit3SaveTimer
 	global SearchTerm
@@ -601,7 +602,7 @@ TagsFilter:
 			LV_GetText(RowVar,Mloops+1,10)
 			for k, v in TagsSearched 
 			{
-				if (!InStr(RowVar, v))
+				if (!RegExMatch(RowVar,"i)\b"v))
 				{
 					RemoveItem = true
 					gosub SaveTimeDeletingLV
@@ -693,10 +694,23 @@ HandleMessage( p_w, p_l, p_m, p_hw )
 NoteListView:
 {
 Critical
-;z := "#" A_GuiEvent ":" errorlevel ":" A_EventInfo ":" LV@sel_col
+;z .= "::" A_GuiEvent "::" errorlevel "::" ;A_EventInfo "::" LV@sel_col "`n"
 ;tooltip % z
 ;tooltip % x
 ;settimer,KillToolTip,-1000
+
+;Track Selected
+if (InStr(ErrorLevel, "S", true))
+{
+	SelectedRows .= A_EventInfo " "
+}
+if (InStr(ErrorLevel, "s", true))
+{
+	SelectedRows := RegExReplace(SelectedRows,"\b" A_EventInfo " ")
+}
+
+tooltip % SelectedRows
+settimer,KillToolTip,-1000
 
 if (WinActive(FlatNote - Library)) {
 	if (tNeedsSubmit = 1) {
@@ -2353,12 +2367,14 @@ GuiEscape:
 {
 	WinHide, ahk_id %g1ID%
 	g1Open=0
+	SelectedRows=
 	return
 }
 GuiClose:
 {
 	WinHide, ahk_id %g1ID%
 	g1Open=0
+	SelectedRows=
 	return
 }
 Exit:

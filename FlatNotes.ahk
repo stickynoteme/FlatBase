@@ -81,6 +81,7 @@ global TagsFilter
 global LastCatFilter
 
 global CatBoxContents
+global TagsFilterContents
 global NoteParent
 
 global TRowsOver
@@ -248,6 +249,7 @@ if (A_ScreenDPI > 120)
 	TitleBarFontSize = 8
 
 ;tmp maybe
+global SelectedRows
 global TemplateSymbol
 global TreeSymbol
 global ColBase = ,6,7,8,9
@@ -583,6 +585,7 @@ if (U_Capslock = "0"){
 if (g1Open=1) {
 	WinHide, FlatNotes - Library
 	g1Open=0
+	SelectedRows = 
 	GUI, star:destroy
 	GUI, t:destroy
 	return
@@ -596,21 +599,23 @@ if (g1Open=0) {
 		AutoSearchTerm := clipboard
 		clipboard := RestoreClip 
 	}else {
-		AutoSearchTerm := ""
+		GuiControlGet, LastSearch,,%HSterm%
+		AutoSearchTerm := LastSearch
 		clipboard := RestoreClip
 	}
 	MouseGetPos, xPos, yPos	
 	xPos /= 1.5
 	yPos /= 1.5
-	GuiControl,,%HSterm%, 
+	GuiControl,,%HSterm%,
+	GuiControl,,%HSterm%,%AutoSearchTerm%
 	WinMove, ahk_id %g1ID%, , %xPos%, %yPos%
 	WinShow, ahk_id %g1ID%
 	WinRestore, ahk_id %g1ID%
 	WinActivate, ahk_id %g1ID%
-	g1Open=1
+	g1Open=1	
 	ControlFocus,Edit1,FlatNotes - Library
-	sendinput {left}{right}
-	GuiControl,,SearchTerm,%AutoSearchTerm%
+	;sendinput {left}{right}
+	sendinput {home}{shift down}{end}{shift up}
 	gosub search
 	gosub SortNow
 	return

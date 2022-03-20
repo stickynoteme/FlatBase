@@ -78,23 +78,41 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 {
 		 If (OutputVar == "SysListView321"){
 		 global LVSelectedROW
+		 SelectedRows := trim(SelectedRows)
+		 SelectedRowsArray := StrSplit(SelectedRows," "," ")
+		 SelectedRowsArrayLength := SelectedRowsArray.Count() - 1
 		 SaveRowNumber = %LVSelectedROW%
+		 
 		 LV_GetText(FileName, LVSelectedROW,8)
-		 iniFileName := RegExReplace(FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
-		 MsgBox , 0x40024, Delete - Note , Delete: %FileName%
+
+		 MsgBox , 0x40024, Delete - Note , Delete: %FileName% and %SelectedRowsArrayLength% others?
 		 IfMsgBox, No
 			Return 
 		 IfMsgBox, Yes
 			TVReDraw = 1
-			FileRecycle %U_NotePath%%FileName%
-			FileRecycle %detailsPath%%iniFileName%
 			
-			for Each, Note in MyNotesArray{
+			SelectedRowsArray:=ObjectSort(SelectedRowsArray,,,true)
+			;v = row numbers
+			for k, v in SelectedRowsArray{
+				msgbox % v
+				LV_GetText(FileName, v,8)
+				iniFileName := RegExReplace(FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
+				
+				FileRecycle %U_NotePath%%FileName%
+				FileRecycle %detailsPath%%iniFileName%
+				
+							; remove from MyNoteArray
+				for Each, Note in MyNotesArray{
 					If (Note.8 = FileName){
 						MyNotesArray.RemoveAt(Each)
 					}
 				}
-			LV_Delete(LVSelectedROW)
+				; remove from ListView
+				LV_Delete(v)
+			}
+			
+			;Display a new LV if any.
+			
 			RowsCount := LV_GetCount()
 			if (RowsCount > SaveRowNumber) {
 				NextUp = %SaveRowNumber%

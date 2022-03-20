@@ -81,6 +81,6 @@ Try deleting the settings.ini file (make a backup first)
 ![Themes Set one](/ScreenShots/SS_02.png)
 
 ## Todo List
-
+FIX - Star not in search edit quick note
 
 ### Maybe

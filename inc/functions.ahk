@@ -70,8 +70,7 @@ BuildGUI1(){
 	
 	Gui, 1:Add, DDL, x%CatX% y7 -E0x200 +0x0210 r6 w%CatW% -vCatFilter gSearch HwndHCF, %CatBoxContents%
 	
-	
-	Gui, 1:Add, combobox, c%U_FBCA% xp%TagsFilterX% y7 -E0x200 +0x0210 r6 w%TagsFilterW% vTagsFilter gSearch HwndHTF , %CatBoxContents%
+	Gui, 1:Add, combobox, c%U_FBCA% xp%TagsFilterX% y7 -E0x200 +0x0210 r6 w%TagsFilterW% vTagsFilter gSearch HwndHTF , %TagsFilterContents%
 	
 	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%
 	Gui, 1:Add, text, x-3 c%U_SFC% w%StarColW% center gSortStar vSortStar, %Star1%
@@ -83,7 +82,7 @@ BuildGUI1(){
 	Gui, 1:Add, text, yp0 xp+%TagColW% w%CatColW% center c%U_SFC% vSortCat, Cat
 	Gui, 1:Add, text, yp0 xp+%CatColW% w%ParentColW% center c%U_SFC% vSortParent, Parent
 	
-	Gui, 1:Add, ListView,section -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar|Tags|Cat|Parent|
+	Gui, 1:Add, ListView,section -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit  Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar|Tags|Cat|Parent|
 
 	;Allow User set prevent/edit font
 	Gui, 1:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
@@ -381,8 +380,27 @@ MakeFileList(ReFreshMyNoteArray){
 			LV_ModifyCol(7, "SortDesc")
 	TotalNotes := MyNotesArray.MaxIndex()
 	gosub MakeOOKStarList
+	gosub TagFilterUpdate
 	return
 }
+
+TagFilterUpdate:
+TagsFilterContents := 
+for k, note in MyNotesArray 
+{
+	TmpTags := StrSplit(Note.10,[A_Tab, A_Space,","])
+	for k, v in TmpTags
+	{
+		v := trim(v)
+		strreplace(v,"\","\\")
+		if (!instr(TagsFilterContents,v))
+		{
+			TagsFilterContents .= "|" v 
+		}
+	}
+}
+GuiControl,,TagsFilter, %TagsFilterContents%
+return
 
 ReFreshLV(){
 TVReDraw = 1
@@ -450,6 +468,7 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 	iniWrite,%QuickNoteParent%,%detailsPath%%FileSafeName%.ini,INFO,Parent
 	FileAppend , %QuickNoteBody%, %SaveFileName%, UTF-8
 ;ReFreshLV()
+gosub TagFilterUpdate
 return
 }
 MakeAnyMissingINI(){
