@@ -94,7 +94,8 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			SelectedRowsArray:=ObjectSort(SelectedRowsArray,,,true)
 			;v = row numbers
 			for k, v in SelectedRowsArray{
-				msgbox % v
+				;error checking to see each row before it's deleted.
+				;msgbox % v
 				LV_GetText(FileName, v,8)
 				iniFileName := RegExReplace(FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 				

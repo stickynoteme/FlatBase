@@ -44,14 +44,7 @@ Label2:
 	{
 		FileRead, MyFile, %U_NotePath%%FileSafeName%.txt
 		IniRead, OldStarData, %detailsPath%%FileSafeName%.ini,INFO,Star
-		if (OldStarData = 10001)
-			OldStarData = %Star1%
-		if (OldStarData = 10002)
-			OldStarData = %Star2%
-		if (OldStarData = 10003)
-			OldStarData = %Star3%
-		if (OldStarData = 10004)
-			OldStarData = %Star4%
+		OldStarData := ConvertStar(OldStarData)
 		GuiControl,, QuickNoteBody,%MyFile%
 		GuiControl,, QuickStar,%OldStarData%
 		IniRead, OldCatData, %detailsPath%%FileSafeName%.ini,INFO,Cat
@@ -174,24 +167,39 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 if (OutputVar = "Edit1"){
 	GuiControlGet, SearchTerm
 	FileSafeSearchTerm := NameEncode(SearchTerm)
-	CheckForOldNote = %U_NotePath%%FileSafeSearchTerm%.txt
-	FileRead, MyFile, %CheckForOldNote%
 	
-	BuildGUI2()
-	GuiControl,, QuickNoteName,%SearchTerm%
-	GuiControl, ChooseString, QuickNoteCat, %LastCatFilter%
-	GuiControl,, FileSafeName,%FileSafeSearchTerm%
-	ControlFocus, Edit4, FlatNote - QuickNote 
+	;Collect Current Data
+	FileRead, MyFile, %U_NotePath%%FileSafeSearchTerm%.txt
 	
+	iniRead,C_Star,%detailsPath%%FileSafeSearchTerm%.ini,INFO,Star,""
+	C_Star := ConvertStar(C_Star)
+	iniRead,C_Tags,%detailsPath%%FileSafeSearchTerm%.ini,INFO,Tags,
+	iniRead,C_Cat,%detailsPath%%FileSafeSearchTerm%.ini,INFO,Cat,""
+	iniRead,C_Parent,%detailsPath%%FileSafeSearchTerm%.ini,INFO,Parent,
 
-	if (MyFile !="")
-	{
-	MyNewFile := SubStr(MyFile, InStr(MyFile, "`n") + 1)
-	GuiControl,, QuickNoteBody,%MyNewFile%
+	BuildGUI2()
+	
+	;Fill in current data.
+	GuiControl,, QuickNoteName,%SearchTerm%
+	GuiControl,, FileSafeName,%FileSafeSearchTerm%
+	
+	if FileExist(U_NotePath FileSafeSearchTerm ".txt"){
+		GuiControl,, QuickNoteBody,%MyFile%
+		GuiControl,, QuickStar,%C_Star%
+		GuiControl,, QuickNoteTags,%C_Tags%
+		GuiControl, ChooseString, QuickNoteCat, %C_Cat%
+		GuiControl,, QuickNoteParent,%C_Parent%
+	}else {
+		GuiControl, ChooseString, QuickNoteCat, %LastCatFilter%
+
 	}
+		
+	;Set UI focus:
+	ControlFocus, Edit4, FlatNote - QuickNote 
+
 	return
 	}
-if(OutputVar == "SysListView321"){
+	if(OutputVar == "SysListView321"){
 	/* OLD copy Name text by default
 	global LVSelectedROW
 	LV_GetText(RowText, LVSelectedROW,2)
@@ -225,74 +233,15 @@ if(OutputVar == "Edit3" or OutputVar == "Edit4" or OutputVar == "Edit5"){
 	ToolTip Saved 
 	SetTimer, KillToolTip, -500
 	unsaveddataEdit3 = 0
-}else{
-	Send {enter}
+	}else{
+		if (CtrlEnter == 0)
+			Send {enter}
+		if (CtrlEnter == 0)
+			Send {ctrl down}{enter}{ctrl up}
+	}
 }
 return
-}
-NewAndSaveHK2:
-{
-ControlGetFocus, OutputVar, FlatNotes - Library
-if (OutputVar = "Edit1"){
-	GuiControlGet, SearchTerm
-		FileSafeSearchTerm := NameEncode(SearchTerm)
-		CheckForOldNote = %U_NotePath%%FileSafeSearchTerm%.txt
-		FileRead, MyFile, %CheckForOldNote%
-		
-		BuildGUI2()
-		GuiControl,, QuickNoteName,%SearchTerm%
-		GuiControl, ChooseString, QuickNoteCat, %LastCatFilter%
-		GuiControl,, FileSafeName,%FileSafeSearchTerm%
-		ControlFocus, Edit4, FlatNote - QuickNote 
-		
 
-		if (MyFile !="")
-		{
-		MyNewFile := SubStr(MyFile, InStr(MyFile, "`n") + 1)
-		GuiControl,, QuickNoteBody,%MyNewFile%
-		}
-		return
-		}
-	if(OutputVar == "SysListView321"){
-		global LVSelectedROW
-		
-		/* OLD Copy Name row
-		LV_GetText(RowText, LVSelectedROW,2)
-		clipboard = %RowText%
-		ToolTip Text: "%RowText%" Copied to clipboard
-		*/
-		LV_GetText(FileTmp, LVSelectedROW, 8)
-		LV_GetText(ToolTipText, LVSelectedROW, 3)
-		fileread,CopyText,%U_NotePath%%FileTmp%
-		clipboard := CopyText
-		Tooltip % ToolTipText "... Copied"
-		
-		SetTimer, KillToolTip, -500
-		gosub GuiEscape
-		return
-		}
-	if(OutputVar == "Edit3"){
-		global LVSelectedROW
-		if (LVSelectedROW="")
-			LVSelectedROW=1
-		LV_GetText(RowText, LVSelectedROW,2)
-		LV_GetText(C_Cat, LVSelectedROW,11)
-		FileSafeName := NameEncode(RowText)
-		GuiControlGet, PreviewBox
-		GuiControlGet, TagBox
-		GuiControlGet, NoteParent
-		SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,C_Cat,NoteParent)
-		iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
-		FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
-		LV_Modify(LVSelectedROW,,, RowText, NewBodyText,,,,,,,TagBox,,NoteParent)
-		ToolTip Saved 
-		SetTimer, KillToolTip, -500
-		unsaveddataEdit3 = 0
-}else{
-	Send {ctrl down}{enter}{ctrl up}
-}
-return
-}
 SaveButton:
 {
 	GuiControlGet,FileSafeName
@@ -305,14 +254,8 @@ SaveButton:
 	
 	Gui, 2:Submit
 	;convert used symbols to raw stars
-	if (QuickStar = Star1)
-		QuickStar = 10001
-	if (QuickStar = Star2)
-		QuickStar = 10002
-	if (QuickStar = Star3)
-		QuickStar = 10003
-	if (QuickStar = Star4)
-		QuickStar = 10004
+	QuickStar := EncodeStar(QuickStar)
+
 	Iniwrite, %QuickStar%, %detailsPath%%FileSafeName%.ini,INFO,Star
 	SaveMod = 0
 	IfExist, %U_NotePath%%FileSafeName%.txt
@@ -709,8 +652,8 @@ if (InStr(ErrorLevel, "s", true))
 	SelectedRows := RegExReplace(SelectedRows,"\b" A_EventInfo " ")
 }
 
-tooltip % SelectedRows
-settimer,KillToolTip,-1000
+;tooltip % SelectedRows
+;settimer,KillToolTip,-1000
 
 if (WinActive(FlatNote - Library)) {
 	if (tNeedsSubmit = 1) {
@@ -947,14 +890,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 				{
 					FileRead, MyFile, %U_NotePath%%FileSafeName%.txt
 					IniRead, OldStarData, %detailsPath%%FileSafeName%.ini,INFO,Star
-					if (OldStarData = 10001)
-						OldStarData = %Star1%
-					if (OldStarData = 10002)
-						OldStarData = %Star2%
-					if (OldStarData = 10003)
-						OldStarData = %Star3%
-					if (OldStarData = 10004)
-						OldStarData = %Star4%
+					OldStarData := ConvertStar(OldStarData)
 					IniRead, OldTagsData, %detailsPath%%FileSafeName%.ini,INFO,Tags
 					IniRead, OldCatData, %detailsPath%%FileSafeName%.ini,INFO,Cat
 					IniRead, OldParentData, %detailsPath%%FileSafeName%.ini,INFO,Parent
@@ -3262,14 +3198,7 @@ IfExist, %U_NotePath%%FileSafeName%.txt
 	{
 		FileRead, MyFile, %U_NotePath%%FileSafeName%.txt
 		IniRead, OldStarData, %detailsPath%%FileSafeName%.ini,INFO,Star
-		if (OldStarData = 10001)
-			OldStarData = %Star1%
-		if (OldStarData = 10002)
-			OldStarData = %Star2%
-		if (OldStarData = 10003)
-			OldStarData = %Star3%
-		if (OldStarData = 10004)
-			OldStarData = %Star4%
+		OldStarData := ConvertStar(OldStarData)
 		IniRead, OldCatData, %detailsPath%%FileSafeName%.ini,INFO,Cat
 		IniRead, OldTagsData, %detailsPath%%FileSafeName%.ini,INFO,Tags
 		IniRead, OldParentData, %detailsPath%%FileSafeName%.ini,INFO,Parent

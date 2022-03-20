@@ -9,7 +9,7 @@ SetUserHotKeys() {
 	if (CtrlEnter = 0)
 		Hotkey,Enter, NewAndSaveHK
 	if (CtrlEnter = 1)
-		Hotkey,^Enter, NewAndSaveHK2
+		Hotkey,^Enter, NewAndSaveHK
 		
 ;-------------------------------------------------
 ; Shortcuts
@@ -697,4 +697,30 @@ OnMsgBox() {
 JEE_ObjCount(oObj)
 {
 	return NumGet(&oObj + 4*A_PtrSize)
+}
+
+ConvertStar(C_Star)
+{
+if (C_Star == 10001)
+	C_Star = %Star1%
+if (C_Star == 10002)
+	C_Star = %Star2%
+if (C_Star == 10003)
+	C_Star = %Star3%
+if (C_Star == 10004)
+	C_Star = %Star4%
+	return C_Star
+}
+
+EncodeStar(C_Star)
+{
+	if (C_Star == Star1)
+		C_Star = 10001
+	if (C_Star == Star2)
+		C_Star = 10002
+	if (C_Star == Star3)
+		C_Star = 10003
+	if (C_Star == Star4)
+		C_Star = 10004
+	return C_Star
 }
