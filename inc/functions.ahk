@@ -88,7 +88,7 @@ BuildGUI1(){
 	Gui, 1:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
 	;Gui, 1:Add,edit, readonly h6 -E0x200
 	title_h := PreviewFontSize*1.6
-	TitleWAdjust := round(LibW*0.9)
+	TitleWAdjust := round(LibW*0.85)
 	
 	;gLibTemplateAdd
 	
@@ -96,9 +96,9 @@ BuildGUI1(){
 	
 	TreeIconX := LibW - 25
 	
-	Gui, 1:Add,text, center yp0 x%TreeIconX% c%U_SFC% -E0x200 w25 h%title_h% gBuildTreeUI, %TreeSymbol%
+	Gui, 1:Add,edit, readonly center x+15 -E0x200 vTitleBar C%U_SFC% w%TitleWAdjust% h%title_h% backgroundTrans -Tabstop,
 	
-	Gui, 1:Add,edit, readonly center x+35 -E0x200 vTitleBar C%U_SFC% w%TitleWAdjust% h%title_h% backgroundTrans -Tabstop,
+	Gui, 1:Add,text, center yp0 x%TreeIconX% c%U_SFC% -E0x200 w25 h%title_h% gBuildTreeUI, %TreeSymbol%
 	
 	
 	
@@ -421,6 +421,7 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 	FileSafeName := trim(FileSafeName)
 	QuickNoteName := trim(QuickNoteName)
 	FileNameTxt := FileSafeName ".txt"
+	
 	SaveFileName = %U_NotePath%%FileSafeName%.txt
 	if (SaveFileName =".txt" or Strlen(SaveFileName)<1) {
 		msgbox Name error #01
@@ -437,6 +438,19 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 	} else {
 		FileRead, QuickNoteBody,%U_NotePath%%FileSafeName%.txt
 	}
+	
+	tmpFullPath = %U_NotePath%%FileSafeName%.txt
+
+	if !FileExist(tmpFullPath)
+	{
+		ProbablyTooLong := StrLen(tmpFullPath)
+		msgbox :!:NOTE SAVE FAILED:!: `n`nThis is normally due to your title being too long. Your file path length with the provided title was %ProbablyTooLong% and windows max file path size is 255 characters which you should aim to be well below in case you want to move your files someday. P/s The Note body text was copied to your clipboard if it wasn't blank.
+		
+		if (QuickNoteBody)
+			Clipboard := QuickNoteBody
+	return
+	}
+	
 		
 	iniRead,CreatedDate,%detailsPath%%FileSafeName%.ini,INFO,Add,%A_Now%
 	iniRead,NoteStar,%detailsPath%%FileSafeName%.ini,INFO,Star,10000
@@ -698,6 +712,32 @@ OnMsgBox() {
     If (WinExist("ahk_class #32770 ahk_pid " . ErrorLevel)) {
         WinMove %xPos%, %yPos%
     }
+}
+
+HandleMessage( p_w, p_l, p_m, p_hw )
+{
+	if ( A_GuiControl = "LV" )
+	{
+		VarSetCapacity( htinfo, 20 )
+
+		DllCall( "RtlFillMemory", "uint", &htinfo, "uint", 1, "uchar", p_l & 0xFF )
+			DllCall( "RtlFillMemory", "uint", &htinfo+1, "uint", 1, "uchar", ( p_l >> 8 ) & 0xFF )
+		DllCall( "RtlFillMemory", "uint", &htinfo+4, "uint", 1, "uchar", ( p_l >> 16 ) & 0xFF )
+			DllCall( "RtlFillMemory", "uint", &htinfo+5, "uint", 1, "uchar", ( p_l >> 24 ) & 0xFF )
+		
+		; LVM_SUBITEMHITTEST
+		SendMessage, 0x1000+57, 0, &htinfo,, ahk_id %p_hw%
+		sel_item := ErrorLevel
+		
+		if ( sel_item = -1 )
+			return
+		
+		; LVHT_NOWHERE
+		if ( *( &htinfo+8 ) & 1 )
+			%A_GuiControl%@sel_col = 0
+		else
+			%A_GuiControl%@sel_col := 1+*( &htinfo+16 )
+	}
 }
 
 JEE_ObjCount(oObj)
