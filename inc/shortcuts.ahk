@@ -42,6 +42,7 @@ Return
 ;Main window shortcut keys below this point
 ;------------------------------------------
 #IfWinActive, FlatNotes - Library
+
 {
 Down::
 ControlGetFocus, OutputVar, FlatNotes - Library

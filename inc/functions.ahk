@@ -430,9 +430,16 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 		msgbox Name error #02
 		return
 		}
+	if (QuickNoteBody != false)
+	{
+		FileRecycle, %SaveFileName%
+		FileAppend , %QuickNoteBody%, %SaveFileName%, UTF-8
+	} else {
+		FileRead, QuickNoteBody,%U_NotePath%%FileSafeName%.txt
+	}
+		
 	iniRead,CreatedDate,%detailsPath%%FileSafeName%.ini,INFO,Add,%A_Now%
 	iniRead,NoteStar,%detailsPath%%FileSafeName%.ini,INFO,Star,10000
-	FileRecycle, %SaveFileName%
 	FormatTime, UserTimeFormatA, %CreatedDate%, %UserTimeFormat%
 	FormatTime, UserTimeFormatM, %A_Now%, %UserTimeFormat%
 	
@@ -466,8 +473,7 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 	iniWrite,%QuickNoteTags%,%detailsPath%%FileSafeName%.ini,INFO,Tags
 	iniWrite,%QuickNoteCat%,%detailsPath%%FileSafeName%.ini,INFO,Cat
 	iniWrite,%QuickNoteParent%,%detailsPath%%FileSafeName%.ini,INFO,Parent
-	FileAppend , %QuickNoteBody%, %SaveFileName%, UTF-8
-;ReFreshLV()
+	
 gosub TagFilterUpdate
 return
 }

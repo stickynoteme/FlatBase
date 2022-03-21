@@ -167,15 +167,14 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 if (OutputVar = "Edit1"){
 	GuiControlGet, SearchTerm
 	
-	C_SafeName := NameEncode(SearchTerm)
-	gosub GetCurrentNoteData
-	msgbox % C_Name
+	GetCurrentNoteData(NameEncode(SearchTerm))
+
 	BuildGUI2()
 	
 	;Fill in current data.
 	GuiControl,, QuickNoteName,%SearchTerm%
 	GuiControl,, FileSafeName,%C_SafeName%
-	
+
 	if FileExist(U_NotePath C_SafeName ".txt"){
 		GuiControl,, QuickNoteBody,%MyFile%
 		GuiControl,, QuickStar,%C_Star%
@@ -229,7 +228,7 @@ if(OutputVar == "Edit3" or OutputVar == "Edit4" or OutputVar == "Edit5"){
 	}else{
 		if (CtrlEnter == 0)
 			Send {enter}
-		if (CtrlEnter == 0)
+		if (CtrlEnter == 1)
 			Send {ctrl down}{enter}{ctrl up}
 	}
 }
@@ -735,7 +734,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 	GuiControl,, StatusbarM,M: %C_Modded%
 	GuiControl,, StatusbarA,A: %C_Added%
 }
-;1Star|2Title|3Body|4Added|5Modified|6RawAdded|7RawModded|8FileName|9RawStar|10Tags|11Cat|12Parent
+;1Star|2Title|3Body|4Added|5Modified|6RawAdded|7RawModded|8FileName|9RawStar|10Tags|11Cat|12Parent|12Checked|13Marked|14Extra
 
 	if A_GuiEvent in Normal
 	{
@@ -847,7 +846,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 		}
 	}
 	
-	;1Star|2Title|3Body|4Added|5Modified|6RawAdded|7RawModded|8FileName|9RawStar|10Tags|11Cat|12Parent
+	;1Star|2Title|3Body|4Added|5Modified|6RawAdded|7RawModded|8FileName|9RawStar|10Tags|11Cat|12Parent|12Checked|13Marked|14Extra
 	
 	if A_GuiEvent in RightClick
 	{
@@ -855,6 +854,15 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 		LV_GetText(NoteNameToEdit, LVSelectedROW,2)
 		LV_GetText(StarOldFile, LVSelectedROW,8)
 		LV_GetText(TitleOldFile, LVSelectedROW,8)
+		if LV@sel_col between 10 and 12
+		{
+			MouseGetPos, xPos, yPos
+			xPos := xPos+25
+	
+			ColEditName :=  ColList[LV@sel_col]
+			gosub build_ColEdit
+			return
+		}
 		if (LV@sel_col=2) {
 			MouseGetPos, xPos, yPos
 			xPos := xPos+25
@@ -923,25 +931,58 @@ build_tEdit:
 	return
 }
 
-;Get a list of all used stores.
-/*
-MakeUsedStarList:
-{
-Loops := LV_GetCount()
-AllStars := ""
-if (SearchFilter ="") {
-	loop % loops {
-			LV_GetText(starz,A_index,1)
-			AllStars .= starz "|"
+;GUI for right click col 10-12 for now and doing bulk operations.
+build_ColEdit:
+	GUI, ce:new, ,InlineNameEdit
+	Gui, ce:Margin , 5, 5 
+	Gui, ce:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
+	Gui, ce:Color,%U_SBG%, %U_MBG%	
+	gui, ce:add,text,w200 -E0x200 center c%U_SFC%,Replace %ColEditName% with:
+	
+	
+	
+	Gui, ce:add,edit,w200 -E0x200 c%U_FBCA% vceEdit
+	gui, ce:add,button, default gColEditSaveChange x-10000 y-10000
+	
+	
+	
+	WinSet, Style,  -0xC00000,InlineNameEdit
+	GUI, ce:Show, x%xPos% y%yPos%
+	
+	;figure out why I need this->
+	;tNeedsSubmit = 1
+	
+	return
+
+
+ColEditSaveChange:
+GuiControlGet, ceEdit ;get the new data
+ColVarName := CurrentCol[LV@sel_col]
+tmpColNum = Col%LV@sel_col%
+Gui, 1:Default 
+SelectedRows := trim(SelectedRows)
+SelectedRowsArray := StrSplit(SelectedRows," "," ")
+SelectedRowsArray:=ObjectSort(SelectedRowsArray,,,false)
+	;v = row numbers
+	for RowKey, CRowNum in SelectedRowsArray{
+		LV_GetText(tmpName,CRowNum,2)
+		C_SafeName := NameEncode(tmpName)
+		GetBody = false ;don't get the body
+		GetCurrentNoteData(C_SafeName)
+		;Error Check
+		if !FileExist( U_NotePath C_SafeName ".txt"){
+			Msgbox % "Error Report Code FNF#001"
+			break
+		}
+		;change what changed...
+		%ColVarName% := ceEdit
+		;save the new data
+		SaveFile(C_Name,C_SafeName,false,1,C_Tags,C_Cat,C_Parent)
+		LV_Modify(CRowNum,tmpColNum,ceEdit)
 	}
-	AllStars := RemoveDups(AllStars,"|")
-	sort AllStars, D|
-	AllStars :=  Trim(AllStars,"|")
-	UsedStars := StrReplace(AllStars,"||","|")
-	}
+gui, ce:destroy
 return
-}
-*/
+
 ;Make a list of all used stars - all user set stars.
 MakeOOKStarList:
 {
@@ -2245,6 +2286,12 @@ tsGuiEscape:
 {
 	Gui, ts:Destroy
 	RapidNTAppend = 0
+	return
+}
+ceGuiClose:
+ceGuiEscape:
+{
+	Gui, ce:Destroy
 	return
 }
 tGuiClose:

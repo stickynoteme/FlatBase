@@ -25,6 +25,10 @@ global TreeLibH = 300
 global TreeBorder = 2
 Global ScrollbarW = 8
 
+global ColEditName
+global GetBody
+global ColList = ["Star", "Title", "Body", "Added", "Modified", "RawAdded", "RawModded", "FileName", "RawStar", "Tags","Cat","Parent", "Checked", "Marked", "Extra"]
+
 
 global TreeCol1W := 125 + ScrollbarW
 global TreeCol1WSBH := TreeCol1W - ScrollbarW
@@ -84,6 +88,7 @@ global CatBoxContents
 global TagsFilterContents
 global NoteParent
 
+global ceEdit
 global TRowsOver
 global OpenInQuickNote
 global NewTemplateRows
@@ -264,6 +269,9 @@ if (UseCheckBoxes == true)
 	UseCheckBoxesTrue := "Checked"
 
 ;Reuseable Data Holders
+global CurrentCol = ["C_Star","C_Name","C_Body","C_Add","C_Mod","C_RawAdd","C_RawMod","C_FileName","C_RawStar","C_Tags","C_Cat","C_Parent","C_Marked","C_Extra"]
+
+
 global C_File
 global C_Name
 global C_SafeName
@@ -273,6 +281,7 @@ global C_Star
 global C_Tags
 global C_Cat
 global C_Parent
+global NoteNameToEdit
 
 FileCreateDir, NoteDetails
 detailsPath := A_WorkingDir "\NoteDetails\"
