@@ -854,7 +854,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 		LV_GetText(NoteNameToEdit, LVSelectedROW,2)
 		LV_GetText(StarOldFile, LVSelectedROW,8)
 		LV_GetText(TitleOldFile, LVSelectedROW,8)
-		if LV@sel_col between 10 and 12
+		if (LV@sel_col == 3 or LV@sel_col between 10 and 12)
 		{
 			MouseGetPos, xPos, yPos
 			xPos := xPos+25
@@ -863,51 +863,17 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			gosub build_ColEdit
 			return
 		}
-		if (LV@sel_col=2) {
+		if (LV@sel_col == 2) {
 			MouseGetPos, xPos, yPos
 			xPos := xPos+25
 			gosub build_tEdit
 			return
 		}
-		if (LV@sel_col=1) {
+		if (LV@sel_col == 1) {
 			MouseGetPos, xPos, yPos
 			xPos := xPos+25
 			gosub build_StarEditBox
 			LV@sel_col = "undoomCol1"
-			return
-		}
-		if (LV@sel_col=3 or LV@sel_col=10 or LV@sel_col=11 or LV@sel_col=12) {
-			
-			if (OpenInQuickNote = "1"){
-				MyClip := NoteNameToEdit
-
-				BuildGUI2()
-				
-				ControlFocus, Edit4, FlatNote - QuickNote
-
-				GuiControl,, QuickNoteName,%MyClip%
-				FileSafeName := NameEncode(NoteNameToEdit)
-				IfExist, %U_NotePath%%FileSafeName%.txt
-				{
-					FileRead, MyFile, %U_NotePath%%FileSafeName%.txt
-					IniRead, OldStarData, %detailsPath%%FileSafeName%.ini,INFO,Star
-					OldStarData := ConvertStar(OldStarData)
-					IniRead, OldTagsData, %detailsPath%%FileSafeName%.ini,INFO,Tags
-					IniRead, OldCatData, %detailsPath%%FileSafeName%.ini,INFO,Cat
-					IniRead, OldParentData, %detailsPath%%FileSafeName%.ini,INFO,Parent
-					GuiControl,, QuickNoteBody,%MyFile%
-					GuiControl,, QuickStar,%OldStarData%
-					GuiControl,, QuickNoteTags,%OldTagsData%
-					GuiControl, ChooseString, QuickNoteCat, %OldCatData%
-					GuiControl,, QuickNoteParent,%OldParentData%
-				}
-				return
-			}				
-			if (InStr(ExternalEditor,".") != 0 ){
-				Run, %ExternalEditor% %U_NotePath%%TitleOldFile%
-				return
-			}	
-			Run, open %U_NotePath%%TitleOldFile%
 			return
 		}
 	}
@@ -940,13 +906,16 @@ build_ColEdit:
 	gui, ce:add,text,w200 -E0x200 center c%U_SFC%,Replace %ColEditName% with:
 	
 	
-	
-	Gui, ce:add,edit,w200 -E0x200 c%U_FBCA% vceEdit
+	Gui, ce:add,edit,w200 -E0x200 c%U_FBCA% vceEdit r1 hwndHceEDIT
 	gui, ce:add,button, default gColEditSaveChange x-10000 y-10000
 	
 	
 	
 	WinSet, Style,  -0xC00000,InlineNameEdit
+	if (HideScrollbars = 1) {
+		LVM_ShowScrollBar(HceEDIT,1,False)
+		GuiControl,+Vscroll,%HceEDIT%
+	}
 	GUI, ce:Show, x%xPos% y%yPos%
 	
 	;figure out why I need this->
@@ -967,7 +936,8 @@ SelectedRowsArray:=ObjectSort(SelectedRowsArray,,,false)
 	for RowKey, CRowNum in SelectedRowsArray{
 		LV_GetText(tmpName,CRowNum,2)
 		C_SafeName := NameEncode(tmpName)
-		GetBody = false ;don't get the body
+		if (CRowNum !=3)
+			GetFile = false ;don't get the body
 		GetCurrentNoteData(C_SafeName)
 		;Error Check
 		if !FileExist( U_NotePath C_SafeName ".txt"){
@@ -977,7 +947,7 @@ SelectedRowsArray:=ObjectSort(SelectedRowsArray,,,false)
 		;change what changed...
 		%ColVarName% := ceEdit
 		;save the new data
-		SaveFile(C_Name,C_SafeName,false,1,C_Tags,C_Cat,C_Parent)
+		SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
 		LV_Modify(CRowNum,tmpColNum,ceEdit)
 	}
 gui, ce:destroy

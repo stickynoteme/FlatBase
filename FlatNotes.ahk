@@ -26,7 +26,7 @@ global TreeBorder = 2
 Global ScrollbarW = 8
 
 global ColEditName
-global GetBody
+global GetFile
 global ColList = ["Star", "Title", "Body", "Added", "Modified", "RawAdded", "RawModded", "FileName", "RawStar", "Tags","Cat","Parent", "Checked", "Marked", "Extra"]
 
 
@@ -269,7 +269,7 @@ if (UseCheckBoxes == true)
 	UseCheckBoxesTrue := "Checked"
 
 ;Reuseable Data Holders
-global CurrentCol = ["C_Star","C_Name","C_Body","C_Add","C_Mod","C_RawAdd","C_RawMod","C_FileName","C_RawStar","C_Tags","C_Cat","C_Parent","C_Marked","C_Extra"]
+global CurrentCol = ["C_Star","C_Name","C_File","C_Add","C_Mod","C_RawAdd","C_RawMod","C_FileName","C_RawStar","C_Tags","C_Cat","C_Parent","C_Marked","C_Extra"]
 
 
 global C_File
