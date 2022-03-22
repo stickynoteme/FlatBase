@@ -298,6 +298,7 @@ MakeFileList(ReFreshMyNoteArray){
 		NoteIni = %detailsPath%%NoteIniName%
 		IniRead, StarField, %NoteIni%, INFO, Star,S
 		IniRead, NameField, %NoteIni%, INFO, Name
+		NameField := strreplace(NameField,"$#$")
 		IniRead, AddedField, %NoteIni%, INFO, Add
 		IniRead, ModdedField, %NoteIni%, INFO, Mod
 		IniRead, TagsField, %NoteIni%, INFO, Tags,
@@ -327,7 +328,7 @@ MakeFileList(ReFreshMyNoteArray){
 		if (ReFreshMyNoteArray = 1){
 			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField,TagsField,CatField,ParentField,CheckedField,MarkedField,ExtraField)
 			}
-		
+
 		UsedStars .= StarFieldArray "|"
 		MyNotesArray.Push({1:StarFieldArray,2:NameField,3:NoteField,4:UserTimeFormatA,5:UserTimeFormatM,6:AddedField,7:ModdedField,8:A_LoopField,9:StarField,10:TagsField,11:CatField,12:ParentField,13:CheckedField,14:MarkedField,15:ExtraField})
 	} ; File loop end
@@ -418,8 +419,6 @@ return
  
 SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNoteCat,QuickNoteParent) {
 	TVReDraw = 1
-	FileSafeName := trim(FileSafeName)
-	QuickNoteName := trim(QuickNoteName)
 	FileNameTxt := FileSafeName ".txt"
 	
 	SaveFileName = %U_NotePath%%FileSafeName%.txt
@@ -481,7 +480,7 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 	
 
 	iniWrite,%CreatedDate%,%detailsPath%%FileSafeName%.ini,INFO,Add
-	iniWrite,%QuickNoteName%,%detailsPath%%FileSafeName%.ini,INFO,Name
+	iniWrite,$#$%QuickNoteName%$#$,%detailsPath%%FileSafeName%.ini,INFO,Name
 	iniWrite,%A_Now%,%detailsPath%%FileSafeName%.ini,INFO,Mod
 	iniWrite,%NoteStar%,%detailsPath%%FileSafeName%.ini,INFO,Star
 	iniWrite,%QuickNoteTags%,%detailsPath%%FileSafeName%.ini,INFO,Tags
@@ -508,7 +507,7 @@ MakeAnyMissingINI(){
 				DecodedNoteName := NameDecode(DecodedNoteName)
 				NoteName := RegExReplace(A_LoopField, "\.txt(?:^|$|\r\n|\r|\n)")
 				
-				iniWrite,%DecodedNoteName%,%detailsPath%%NoteName%.ini,INFO,Name
+				iniWrite,$#$%DecodedNoteName%$#$,%detailsPath%%NoteName%.ini,INFO,Name
 				iniWrite,%A_Now%,%detailsPath%%NoteName%.ini,INFO,Mod
 				iniWrite,%A_Now%,%detailsPath%%NoteName%.ini,INFO,Add
 				iniWrite,10000,%detailsPath%%NoteName%.ini,INFO,Star

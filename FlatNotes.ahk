@@ -20,6 +20,8 @@ Menu, Tray, Default, Library
 ;-------------------------------------------------
 ;Set up script global variables
 ;-------------------------------------------------
+global TemplateDisplayMode
+
 global TreeLibW = 500
 global TreeLibH = 300
 global TreeBorder = 2
@@ -660,6 +662,7 @@ return
 return
 #Include inc\DummyGui.ahk
 #Include inc\lables.ahk
+#include inc\TemplateSystem.ahk
 #include inc\FunLables.ahk
 #Include inc\tmLables.ahk
 return

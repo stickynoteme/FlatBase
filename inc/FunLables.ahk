@@ -8,6 +8,7 @@ GetCurrentNoteData(Fun_SafeName)
 	if (GetFile == false)
 		C_File = false
 	iniRead,C_Name,%detailsPath%%C_SafeName%.ini,INFO,Name,
+	C_Name := strreplace(C_Name,"$#$")
 	iniRead,C_Star,%detailsPath%%C_SafeName%.ini,INFO,Star,
 	iniRead,C_Add,%detailsPath%%C_SafeName%.ini,INFO,Add,
 	iniRead,C_Mod,%detailsPath%%C_SafeName%.ini,INFO,Mod,
