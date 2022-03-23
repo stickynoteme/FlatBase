@@ -93,6 +93,7 @@ BuildGUI1(){
 	;gLibTemplateAdd
 	
 	Gui, 1:Add,text, center xs c%U_SFC% -E0x200 w25 h%title_h% gLibTemplateAdd, %TemplateSymbol%
+	;Gui, 1:Add,text, center xs c%U_SFC% -E0x200 w25 h%title_h% gImport, ===
 	
 	TreeIconX := LibW - 25
 	
@@ -192,7 +193,6 @@ BuildGUI1(){
 	gosub search
 	return
 }
-
 BuildGUI2(){
 	QuickSubWidth := QuickNoteWidth-70
 	QuickNoteEditW := QuickNoteWidth-5
@@ -768,4 +768,29 @@ EncodeStar(C_Star)
 	if (C_Star == Star4)
 		C_Star = 10004
 	return C_Star
+}
+
+Deref(String)
+{
+    spo := 1
+    out := ""
+    while (fpo:=RegexMatch(String, "(%(.*?)%)|``(.)", m, spo))
+    {
+        out .= SubStr(String, spo, fpo-spo)
+        spo := fpo + StrLen(m)
+        if (m1)
+            out .= %m2%
+        else switch (m3)
+        {
+            case "a": out .= "`a"
+            case "b": out .= "`b"
+            case "f": out .= "`f"
+            case "n": out .= "`n"
+            case "r": out .= "`r"
+            case "t": out .= "`t"
+            case "v": out .= "`v"
+            default: out .= m3
+        }
+    }
+    return out SubStr(String, spo)
 }

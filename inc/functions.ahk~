@@ -9,7 +9,7 @@ SetUserHotKeys() {
 	if (CtrlEnter = 0)
 		Hotkey,Enter, NewAndSaveHK
 	if (CtrlEnter = 1)
-		Hotkey,^Enter, NewAndSaveHK2
+		Hotkey,^Enter, NewAndSaveHK
 		
 ;-------------------------------------------------
 ; Shortcuts
@@ -48,7 +48,7 @@ BuildGUI1(){
 		return
 	}
 	firstDown = 1
-	Gui, 1:New,, FlatNotes - Library
+	Gui, 1:New,+0x800000, FlatNotes - Library
 	Gui, 1:Margin , 0, 0 
 	Gui, 1:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
 	Gui, 1:Color,%U_SBG%, %U_MBG%
@@ -63,7 +63,15 @@ BuildGUI1(){
 	Gui, 1:Add, ListBox, vLB1 +0x100 h8 w%LibW% x0 y0 -E0x200 Disabled -Tabstop
 	Gui, 1:Add, ListBox, vlB2 +0x100 h15 w%LibW% x0 ys0 -E0x200 Disabled -Tabstop
 	;ListBox used as background color for search area padding
-	Gui, 1:Add, DropDownList, x%CatX% y6 -E0x200 r5 w%CatW% vCatFilter gSearch HwndHCF, %CatBoxContents%
+
+	OD_Colors.SetItemHeight(SearchFontSize, CatFontFamily)
+	
+	CatBoxContents := "|" CatBoxContents
+	
+	Gui, 1:Add, DDL, x%CatX% y7 -E0x200 +0x0210 r6 w%CatW% -vCatFilter gSearch HwndHCF, %CatBoxContents%
+	
+	Gui, 1:Add, combobox, c%U_FBCA% xp%TagsFilterX% y7 -E0x200 +0x0210 r6 w%TagsFilterW% vTagsFilter gSearch HwndHTF , %TagsFilterContents%
+	
 	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%
 	Gui, 1:Add, text, x-3 c%U_SFC% w%StarColW% center gSortStar vSortStar, %Star1%
 	Gui, 1:Add, text, c%U_SFC% xp+%StarColW% w%NameColW% center gSortName vSortName, Name
@@ -74,18 +82,24 @@ BuildGUI1(){
 	Gui, 1:Add, text, yp0 xp+%TagColW% w%CatColW% center c%U_SFC% vSortCat, Cat
 	Gui, 1:Add, text, yp0 xp+%CatColW% w%ParentColW% center c%U_SFC% vSortParent, Parent
 	
-	Gui, 1:Add, ListView,section -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit -Multi Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar|Tags|Cat|Parent|
+	Gui, 1:Add, ListView,section -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit  Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar|Tags|Cat|Parent|
 
 	;Allow User set prevent/edit font
 	Gui, 1:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
 	;Gui, 1:Add,edit, readonly h6 -E0x200
 	title_h := PreviewFontSize*1.6
-	TitleWAdjust := round(LibW*0.9)
+	TitleWAdjust := round(LibW*0.85)
 	
 	;gLibTemplateAdd
 	
-	Gui, 1:Add,text, center xs c%U_SFC% -E0x200 w25 h%title_h% gBuildTreeUI, %TemplateSymbol%
-	Gui, 1:Add,edit, readonly center x+35 -E0x200 vTitleBar C%U_SFC% w%TitleWAdjust% h%title_h% backgroundTrans -Tabstop,
+	Gui, 1:Add,text, center xs c%U_SFC% -E0x200 w25 h%title_h% gLibTemplateAdd, %TemplateSymbol%
+	Gui, 1:Add,text, center xs c%U_SFC% -E0x200 w25 h%title_h% gImport, ===
+	
+	TreeIconX := LibW - 25
+	
+	Gui, 1:Add,edit, readonly center x+15 -E0x200 vTitleBar C%U_SFC% w%TitleWAdjust% h%title_h% backgroundTrans -Tabstop,
+	
+	Gui, 1:Add,text, center yp0 x%TreeIconX% c%U_SFC% -E0x200 w25 h%title_h% gBuildTreeUI, %TreeSymbol%
 	
 	
 	
@@ -160,13 +174,46 @@ BuildGUI1(){
 		LVM_ShowScrollBar(HPB,1,False)
 		GuiControl,+Vscroll,%HPB%
 	}
-	Gui, 1:SHOW, Hide w%LibW%
+	
+	;Listbox color
+	DDLbgColor := strreplace(U_SBG,"0x")
+	DDLbgColorb2 := strreplace(U_MBG,"0x")
+	DDLfontColorb2 := strreplace(U_MFC,"0x")
+	CtlColors.Attach(HCF, DDLbgColor)
+	OD_Colors.Attach(HCF, {T: U_SFC})
+	CtlColors.Attach(HTF, DDLbgColorb2,DDLfontColorb2)
+	OD_Colors.Attach(HTF, {T: U_MFC})
+	
+	Gui, 1:SHOW, Hide w%LibW% 
 	WinGet, g1ID,, FlatNotes - Library
 	g1Open=0
+	;Gui, 1:%A_Gui% +LastFound
+	;WinSet, TransColor, 000000
+    ;WinSet, ReDraw
 	gosub search
 	return
 }
+Import:
+C_Loop = 0
+Loop
+{
+    FileReadLine, line,%A_WorkingDir%\Import.txt, %A_Index%
+    if ErrorLevel
+        break
+	C_Loop++
+	if (C_Loop == 1)
+		ImportFileName := line
+	if (C_Loop == 2){
+		C_Loop = 0
+		ImportFileBody := line
+		
+	}
+}
+MsgBox, The end of the file has been reached or there was a problem.
+return
 
+
+return
 BuildGUI2(){
 	QuickSubWidth := QuickNoteWidth-70
 	QuickNoteEditW := QuickNoteWidth-5
@@ -272,11 +319,17 @@ MakeFileList(ReFreshMyNoteArray){
 		NoteIni = %detailsPath%%NoteIniName%
 		IniRead, StarField, %NoteIni%, INFO, Star,S
 		IniRead, NameField, %NoteIni%, INFO, Name
+		NameField := strreplace(NameField,"$#$")
 		IniRead, AddedField, %NoteIni%, INFO, Add
 		IniRead, ModdedField, %NoteIni%, INFO, Mod
-		IniRead, TagsField, %NoteIni%, INFO, Tags
-		IniRead, CatField, %NoteIni%, INFO, Cat
-		IniRead, ParentField, %NoteIni%, INFO, Parent
+		IniRead, TagsField, %NoteIni%, INFO, Tags,
+		IniRead, CatField, %NoteIni%, INFO, Cat,
+		IniRead, ParentField, %NoteIni%, INFO, Parent,
+		IniRead, CheckedField, %NoteIni%, INFO, Checked,
+		IniRead, MarkedField, %NoteIni%, INFO, Marked,
+		IniRead, ExtraField, %NoteIni%, INFO, Extra,
+				
+		
 		FormatTime, UserTimeFormatA, %AddedField%, %UserTimeFormat%
 		FormatTime, UserTimeFormatM, %ModdedField%,%UserTimeFormat%
 
@@ -294,11 +347,11 @@ MakeFileList(ReFreshMyNoteArray){
 			StarFieldArray:= A_sapce
 		
 		if (ReFreshMyNoteArray = 1){
-			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField,TagsField,CatField,ParentField)
+			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField,TagsField,CatField,ParentField,CheckedField,MarkedField,ExtraField)
 			}
-		
+
 		UsedStars .= StarFieldArray "|"
-		MyNotesArray.Push({1:StarFieldArray,2:NameField,3:NoteField,4:UserTimeFormatA,5:UserTimeFormatM,6:AddedField,7:ModdedField,8:A_LoopField,9:StarField,10:TagsField,11:CatField,12:ParentField})
+		MyNotesArray.Push({1:StarFieldArray,2:NameField,3:NoteField,4:UserTimeFormatA,5:UserTimeFormatM,6:AddedField,7:ModdedField,8:A_LoopField,9:StarField,10:TagsField,11:CatField,12:ParentField,13:CheckedField,14:MarkedField,15:ExtraField})
 	} ; File loop end
 	UsedStars := RemoveDups(UsedStars,"|")
 	UsedStars := StrReplace(UsedStars,"||","|")
@@ -324,6 +377,12 @@ MakeFileList(ReFreshMyNoteArray){
 	LV_ModifyCol(11, "Logical")
 	LV_ModifyCol(12, ParentColW)
 	LV_ModifyCol(12, "Logical")
+	LV_ModifyCol(13, CheckedColW)
+	LV_ModifyCol(13, "Logical")
+	LV_ModifyCol(14, MarkedColW)
+	LV_ModifyCol(14, "Logical")
+	LV_ModifyCol(15, ExtraColW)
+	LV_ModifyCol(15, "Logical")
 	
 	if (DeafultSort = 1)
 			LV_ModifyCol(2, "Sort")
@@ -343,15 +402,35 @@ MakeFileList(ReFreshMyNoteArray){
 			LV_ModifyCol(7, "SortDesc")
 	TotalNotes := MyNotesArray.MaxIndex()
 	gosub MakeOOKStarList
+	gosub TagFilterUpdate
 	return
 }
 
+TagFilterUpdate:
+TagsFilterContents := 
+for k, note in MyNotesArray 
+{
+	TmpTags := StrSplit(Note.10,[A_Tab, A_Space,","])
+	for k, v in TmpTags
+	{
+		v := trim(v)
+		strreplace(v,"\","\\")
+		if (!instr(TagsFilterContents,v))
+		{
+			TagsFilterContents .= "|" v 
+		}
+	}
+}
+GuiControl,,TagsFilter, %TagsFilterContents%
+return
+
 ReFreshLV(){
+TVReDraw = 1
 GuiControl, 1:-Redraw, LV
 LV_Delete()
 For Each, Note In MyNotesArray
 {
-	 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11)
+	 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12,Note.13,Note.14,Note.15)
 }
 gosub SortNow
 TotalNotes := MyNotesArray.MaxIndex() 
@@ -360,11 +439,9 @@ return
 }
  
 SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNoteCat,QuickNoteParent) {
-		msgbox didit
-		
-	FileSafeName := trim(FileSafeName)
-	QuickNoteName := trim(QuickNoteName)
+	TVReDraw = 1
 	FileNameTxt := FileSafeName ".txt"
+	
 	SaveFileName = %U_NotePath%%FileSafeName%.txt
 	if (SaveFileName =".txt" or Strlen(SaveFileName)<1) {
 		msgbox Name error #01
@@ -374,9 +451,29 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 		msgbox Name error #02
 		return
 		}
+	if (QuickNoteBody != false)
+	{
+		FileRecycle, %SaveFileName%
+		FileAppend , %QuickNoteBody%, %SaveFileName%, UTF-8
+	} else {
+		FileRead, QuickNoteBody,%U_NotePath%%FileSafeName%.txt
+	}
+	
+	tmpFullPath = %U_NotePath%%FileSafeName%.txt
+
+	if !FileExist(tmpFullPath)
+	{
+		ProbablyTooLong := StrLen(tmpFullPath)
+		msgbox :!:NOTE SAVE FAILED:!: `n`nThis is normally due to your title being too long. Your file path length with the provided title was %ProbablyTooLong% and windows max file path size is 255 characters which you should aim to be well below in case you want to move your files someday. P/s The Note body text was copied to your clipboard if it wasn't blank.
+		
+		if (QuickNoteBody)
+			Clipboard := QuickNoteBody
+	return
+	}
+	
+		
 	iniRead,CreatedDate,%detailsPath%%FileSafeName%.ini,INFO,Add,%A_Now%
 	iniRead,NoteStar,%detailsPath%%FileSafeName%.ini,INFO,Star,10000
-	FileRecycle, %SaveFileName%
 	FormatTime, UserTimeFormatA, %CreatedDate%, %UserTimeFormat%
 	FormatTime, UserTimeFormatM, %A_Now%, %UserTimeFormat%
 	
@@ -404,14 +501,14 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 	
 
 	iniWrite,%CreatedDate%,%detailsPath%%FileSafeName%.ini,INFO,Add
-	iniWrite,%QuickNoteName%,%detailsPath%%FileSafeName%.ini,INFO,Name
+	iniWrite,$#$%QuickNoteName%$#$,%detailsPath%%FileSafeName%.ini,INFO,Name
 	iniWrite,%A_Now%,%detailsPath%%FileSafeName%.ini,INFO,Mod
 	iniWrite,%NoteStar%,%detailsPath%%FileSafeName%.ini,INFO,Star
 	iniWrite,%QuickNoteTags%,%detailsPath%%FileSafeName%.ini,INFO,Tags
 	iniWrite,%QuickNoteCat%,%detailsPath%%FileSafeName%.ini,INFO,Cat
 	iniWrite,%QuickNoteParent%,%detailsPath%%FileSafeName%.ini,INFO,Parent
-	FileAppend , %QuickNoteBody%, %SaveFileName%, UTF-8
-;ReFreshLV()
+	
+gosub TagFilterUpdate
 return
 }
 MakeAnyMissingINI(){
@@ -431,10 +528,13 @@ MakeAnyMissingINI(){
 				DecodedNoteName := NameDecode(DecodedNoteName)
 				NoteName := RegExReplace(A_LoopField, "\.txt(?:^|$|\r\n|\r|\n)")
 				
-				iniWrite,%DecodedNoteName%,%detailsPath%%NoteName%.ini,INFO,Name
+				iniWrite,$#$%DecodedNoteName%$#$,%detailsPath%%NoteName%.ini,INFO,Name
 				iniWrite,%A_Now%,%detailsPath%%NoteName%.ini,INFO,Mod
 				iniWrite,%A_Now%,%detailsPath%%NoteName%.ini,INFO,Add
 				iniWrite,10000,%detailsPath%%NoteName%.ini,INFO,Star
+				iniWrite,"",%detailsPath%%NoteName%.ini,INFO,Tags
+				iniWrite,"",%detailsPath%%NoteName%.ini,INFO,Cat
+				iniWrite,"",%detailsPath%%NoteName%.ini,INFO,Parent
 	}   } 
 return
 }
@@ -534,27 +634,46 @@ Name := strreplace(Name,"/","$9fslash%")
 return Name
 }
 NameEncodeSticky(Name){
-; RegExReplace(RowText, "\*|\?|\\|\||/|""|:|<|>"
-Name := strreplace(Name,"\","%1")
+; RegExReplace(RowText, "\*|\?|\\|\||/|""|:|<|>|;|,|$|[|]|(|)|{|}|&"
+Name := strreplace(Name,"\","_bs_")
 Name := strreplace(Name,"?","_qm_")
-Name := strreplace(Name,"*","_a_")
+Name := strreplace(Name,"@","_at_")
+Name := strreplace(Name,"!","_e_")
+Name := strreplace(Name,"-","_dash_")
+Name := strreplace(Name,"+","_ps_")
+Name := strreplace(Name,"=","_eq_")
+Name := strreplace(Name,"—","_emdash_")
+Name := strreplace(Name,"%","_per_")
+Name := strreplace(Name,"^","_sup_")
+Name := strreplace(Name,"*","_ast_")
 Name := strreplace(Name,"|","_pi_")
 Name := strreplace(Name,"""","_q_")
 Name := strreplace(Name,":","_d_")
+Name := strreplace(Name,"$","_ds_")
+Name := strreplace(Name,"&","_amp_")
+Name := strreplace(Name,"#","_pd_")
 Name := strreplace(Name,"<","_g_")
 Name := strreplace(Name,">","_l_")
+Name := strreplace(Name,"(","_rbl_")
+Name := strreplace(Name,")","_rbr_")
+Name := strreplace(Name,"[","_sbl_")
+Name := strreplace(Name,"]","_sbr_")
+Name := strreplace(Name,"{","_cbl_")
+Name := strreplace(Name,"}","_cbr_")
 Name := strreplace(Name,"/","_fs_")
 Name := strreplace(Name,".","_p_")
-Name := strreplace(Name,"1","one")
-Name := strreplace(Name,"2","two")
-Name := strreplace(Name,"3","three")
-Name := strreplace(Name,"4","four")
-Name := strreplace(Name,"5","five")
-Name := strreplace(Name,"6","six")
-Name := strreplace(Name,"7","seven")
-Name := strreplace(Name,"8","eight")
-Name := strreplace(Name,"9","nine")
-Name := strreplace(Name,"0","zero")
+Name := strreplace(Name,",","_c_")
+Name := strreplace(Name,";","_sc_")
+Name := strreplace(Name,"1","_none_")
+Name := strreplace(Name,"2","_ntwo_")
+Name := strreplace(Name,"3","_nthree_")
+Name := strreplace(Name,"4","_nfour_")
+Name := strreplace(Name,"5","_nfive_")
+Name := strreplace(Name,"6","_nsix_")
+Name := strreplace(Name,"7","_nseven_")
+Name := strreplace(Name,"8","_neight_")
+Name := strreplace(Name,"9","_nnine_")
+Name := strreplace(Name,"0","_nzero_")
 Name := strreplace(Name," ","_")
 return Name
 }
@@ -603,6 +722,7 @@ LVM_ShowScrollBar(hLV,wBar,p_Show=True)
 
     Return RC ? True:False
     }
+	
 OnMsgBox() {
 	MouseGetPos, xPos, yPos
 	xPos /= 1.5
@@ -614,7 +734,59 @@ OnMsgBox() {
     }
 }
 
+HandleMessage( p_w, p_l, p_m, p_hw )
+{
+	if ( A_GuiControl = "LV" )
+	{
+		VarSetCapacity( htinfo, 20 )
+
+		DllCall( "RtlFillMemory", "uint", &htinfo, "uint", 1, "uchar", p_l & 0xFF )
+			DllCall( "RtlFillMemory", "uint", &htinfo+1, "uint", 1, "uchar", ( p_l >> 8 ) & 0xFF )
+		DllCall( "RtlFillMemory", "uint", &htinfo+4, "uint", 1, "uchar", ( p_l >> 16 ) & 0xFF )
+			DllCall( "RtlFillMemory", "uint", &htinfo+5, "uint", 1, "uchar", ( p_l >> 24 ) & 0xFF )
+		
+		; LVM_SUBITEMHITTEST
+		SendMessage, 0x1000+57, 0, &htinfo,, ahk_id %p_hw%
+		sel_item := ErrorLevel
+		
+		if ( sel_item = -1 )
+			return
+		
+		; LVHT_NOWHERE
+		if ( *( &htinfo+8 ) & 1 )
+			%A_GuiControl%@sel_col = 0
+		else
+			%A_GuiControl%@sel_col := 1+*( &htinfo+16 )
+	}
+}
+
 JEE_ObjCount(oObj)
 {
 	return NumGet(&oObj + 4*A_PtrSize)
+}
+
+ConvertStar(C_Star)
+{
+if (C_Star == 10001)
+	C_Star = %Star1%
+if (C_Star == 10002)
+	C_Star = %Star2%
+if (C_Star == 10003)
+	C_Star = %Star3%
+if (C_Star == 10004)
+	C_Star = %Star4%
+	return C_Star
+}
+
+EncodeStar(C_Star)
+{
+	if (C_Star == Star1)
+		C_Star = 10001
+	if (C_Star == Star2)
+		C_Star = 10002
+	if (C_Star == Star3)
+		C_Star = 10003
+	if (C_Star == Star4)
+		C_Star = 10004
+	return C_Star
 }

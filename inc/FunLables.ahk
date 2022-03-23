@@ -19,3 +19,26 @@ GetCurrentNoteData(Fun_SafeName)
 	GetFile = true ;reset so it doesn't cause any strange issues and we can use it where ever we need it.
 return
 }
+
+Import:
+C_Loop = 0
+Loop
+{
+    FileReadLine, line,%A_WorkingDir%\Import.txt, %A_Index%
+    if ErrorLevel
+        break
+	C_Loop++
+	if (C_Loop == 1)
+		ImportFileName := line
+	if (C_Loop == 2){
+		C_Loop = 0
+		ImportFileBody := line
+		tempSafeName := NameEncode(ImportFileName)
+		SaveFile(ImportFileName,tempSafeName,ImportFileBody,0,"","","")
+	}
+}
+MsgBox, The end of the file has been reached or there was a problem.
+return
+
+
+return

@@ -248,6 +248,7 @@ SaveButton:
 	GuiControl,1: , SearchTerm,
 	GuiControl,1: , SearchTerm,%OldST%
 	tooltip Saved
+	ControlSend, Edit1,{ctrl down} {a} {ctrl up}
 	settimer, KillToolTip, -500
 return
 
@@ -265,210 +266,146 @@ Search:
 	GuiControlGet, SearchTerm
 	GuiControl, -Redraw, LV
 	LV_Delete()
-	;Search Only in the name
-	If (InStr(SearchTerm, "n::") != 0) {
-		SearchTerm := StrReplace(SearchTerm, "n::" , "")
-		For Each, Note In MyNotesArray
-		{
-		  If (SearchTerm != "")
-		  {
-			If (InStr(Note.2, SearchTerm) != 0){
-			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-			   }
-			}
-			Else
-			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
+	If (SearchTerm == "")
+		goto SkipToEndOfSearch
+;Search a specific column by using a flag.		
+	FlagSearch := RegExReplace(SearchTerm, "(.*?;;[a-zA-Z])","$1|",FlagCount)
+
+	If (FlagCount != 0) {
+
+		;msgbox % "f: " FlagSearch
+		;FlagSearch looks like:: Kion;;n|Mirra;;n|
+		FlagSearch := Trim(FlagSearch,"|")
+		
+		FlagBaseArray := StrSplit(FlagSearch, "|", "|")
+		
+		;msgbox % "base: "FlagBaseArray[1] " : " FlagBaseArray[2]
+		;FlagBaseArray looks like ["Kion;;n,"Mirra;;n"]
+		For x, FlagGroups in FlagBaseArray{
+			FlagArray%x% := StrSplit(FlagGroups, ";;", ";;")
 		}
-	gosub SortNow
-	gosub SearchFilter
-	gosub CatFilter
-	gosub TagsFilter
-	gosub UpdateStatusBar
-	return
-	}
-	;Search only in the body
-	If (InStr(SearchTerm, "b::") != 0) {
-		SearchTerm := StrReplace(SearchTerm, "b::" , "")
-		For Each, Note In MyNotesArray
-		{
-		  If (SearchTerm != "")
-		  {
-			If (InStr(Note.3, SearchTerm) != 0){
-			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-			   }
-			}
-			Else
-			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
+		
+		;msgbox % "FA:" FlagArray1[1] ":" FlagArray1[2]
+		;Each FlagArray# looks like: [Kion,n]
+
+		for x, FlagGroups in FlagBaseArray{
+			if (FlagArray%x%[2] == "n")
+				FlagArray%x%[2] := 2
+			else if (FlagArray%x%[2] == "b")
+				FlagArray%x%[2] := 3
+			else if (FlagArray%x%[2] == "t")
+				FlagArray%x%[2] := 10
+			else if (FlagArray%x%[2] == "c")
+				FlagArray%x%[2] := 11
+			else if (FlagArray%x%[2] == "p")
+				FlagArray%x%[2] := 12
+			else
+				FlagArray%x%[2] := 2
 		}
-	gosub SortNow
-	gosub SearchFilter
-	gosub CatFilter
-	gosub TagsFilter
-	gosub UpdateStatusBar
-	return
-	}
-	;Search only in the tags
-	If (InStr(SearchTerm, "t::") != 0) {
-		SearchTerm := StrReplace(SearchTerm, "t::" , "")
-		For Each, Note In MyNotesArray
-		{
-		  If (SearchTerm != "")
-		  {
-			If (InStr(Note.10, SearchTerm) != 0){
-			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-			   }
-			}
-			Else
-			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-		}
-	gosub SortNow
-	gosub SearchFilter
-	gosub CatFilter
-	gosub TagsFilter
-	gosub UpdateStatusBar
-	return
-	}
-	;search only in the parent
-	If (InStr(SearchTerm, "p::") != 0) {
-		SearchTerm := StrReplace(SearchTerm, "p::" , "")
-		For Each, Note In MyNotesArray
-		{
-		  If (SearchTerm != "")
-		  {
-			If (InStr(Note.12, SearchTerm) != 0){
-			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-			   }
-			}
-			Else
-			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-		}
-	gosub SortNow
-	gosub SearchFilter
-	gosub CatFilter
-	gosub TagsFilter
-	gosub UpdateStatusBar
-	return
-	}
-	;Search Only in stars
-	If (InStr(SearchTerm, "s::") != 0) {
-		SearchTerm := StrReplace(SearchTerm, "s::" , "")
-		For Each, Note In MyNotesArray
-		{
-		  If (SearchTerm != "")
-		  {
-			If (InStr(Note.1, SearchTerm) != 0){
-			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-			   }
-			}
-			Else
-			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-		}
-	gosub SortNow
-	gosub SearchFilter
-	gosub CatFilter
-	gosub TagsFilter
-	gosub UpdateStatusBar
-	return
-	}
-	If (InStr(SearchTerm, "||") != 0) {
-		SArray := StrSplit(SearchTerm , "||","||")
-		SearchTerm := StrReplace(SearchTerm, "||" , "")
-		For Each, Note In MyNotesArray
-		{
-			If (SearchTerm != "")
-			{
-				
-				If (InStr(Note.1, SArray.1) != 0 or InStr(Note.1, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-				}Else if (InStr(Note.2, SArray.1) != 0 or InStr(Note.2, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-				}Else if (InStr(Note.3, SArray.1) != 0 or InStr(Note.3, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-				}Else if (InStr(Note.4, SArray.1) != 0 or InStr(Note.4, SArray.2) != 0  && SearchDates =1){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-				}Else if (InStr(Note.5, SArray.1) != 0 or InStr(Note.5, SArray.2) != 0  && SearchDates =1){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-				}Else if (InStr(Note.10, SArray.1) != 0 or InStr(Note.10, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-				}
-				
-			}
-		Else
-			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
+		
+		
+		;msgbox % "test:" FlagArray1[2] FlagArray2[2]
+		;FlagArray# now looks like: [Kion,3]
+
+
+		;Flaggroup looks like: ["Kion;;n","Mirra Moon;;n"]
+		;msgbox % FlagBaseArray[1]
+		;msgbox % FlagArray1[1] " : " FlagArray2[1]
+		;msgbox % FlagBaseArray.Length()
+		
+		;Do normal-ish search to populate the LV with the first search set:
+		
+		SearchTerm := RegExReplace(SearchTerm,";;.*")
+		
+		SearchArray := StrSplit(SearchTerm , A_Space, A_Space)
+	
+		SearchTermsCount := SearchArray.Length()
+		
+		For Each, Note In MyNotesArray{
+			SearchContent := Note[FlagArray1[2]]
+			MatchedXTerms = 0
 			
+			For Each, Term in SearchArray{
+				If (InStr(SearchContent, Term) != 0)
+					MatchedXTerms++
+				if (MatchedXTerms == SearchTermsCount) {
+					gosub FoundSearchResult
+					MatchedXTerms = 0
+				}
+			}
 		}
-	gosub SortNow
-	gosub SearchFilter
-	gosub CatFilter
-	gosub TagsFilter
-	gosub UpdateStatusBar
-	return
+		
+		
+		
+		for x, FlagGroups in FlagBaseArray{
+			FlagArray%x%[1] := trim(FlagArray%x%[1])
+			SearchTermArray := StrSplit(FlagArray%x%[1],a_space,a_space)
+
+			SearchTermsCount := SearchTermArray.Length()
+			SearchCol := FlagArray%x%[2]
+
+			
+			;msgbox % SearchTermArray[1] " : " SearchTermArray[2] " : " SearchTermsCount " : " SearchCol
+		
+			Mloops := LV_GetCount()
+			RemoveItem = false
+			while (Mloops--)
+			{
+				LV_GetText(RowVar,Mloops+1,SearchCol)
+				
+				for k, v in SearchTermArray 
+				{		
+					if (!InStr(RowVar, v)){
+						RemoveItem = true
+						gosub SaveTimeDeletingLV
+						break
+					}
+				}
+				if (Mloops = 0)
+					break
+			}	
+		}
+
+	goto SkipToEndOfSearch
 	}
-	If (InStr(SearchTerm, "&&") != 0) {
-		SArray := StrSplit(SearchTerm , "&&","&&")
-		SearchTerm := StrReplace(SearchTerm, "&&" , "")
+	
+	;if no flag than do a normal search which matches all search terms in any single column.
+	SearchArray := StrSplit(SearchTerm , A_Space, A_Space)
+	
+	SearchTermsCount := SearchArray.Length()
+		
+	For Each, Note In MyNotesArray{
+		SearchContent := Note[2] " " Note[3] " " Note[10] " " Note[11]
+		MatchedXTerms = 0
+		
+		For Each, Term in SearchArray{
+			If (InStr(SearchContent, Term) != 0)
+				MatchedXTerms++
+			if (MatchedXTerms == SearchTermsCount) {
+				gosub FoundSearchResult
+				MatchedXTerms = 0
+			}
+		}
+	}
+	
+SkipToEndOfSearch:
+	If (SearchTerm == ""){
 		For Each, Note In MyNotesArray
 		{
-			If (SearchTerm != "")
-			{
-				
-				If (InStr(Note.1, SArray.1) != 0 && InStr(Note.1, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-				}Else if (InStr(Note.2, SArray.1) != 0 && InStr(Note.2, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-				}Else if (InStr(Note.3, SArray.1) != 0 && InStr(Note.3, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-				}Else if (InStr(Note.4, SArray.1) != 0 && InStr(Note.4, SArray.2) != 0  && SearchDates =1){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-				}Else if (InStr(Note.5, SArray.1) != 0 && InStr(Note.5, SArray.2) != 0  && SearchDates =1){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-				}Else if (InStr(Note.10, SArray.1) != 0 && InStr(Note.10, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-				
-				}
-				
-			}
-		Else
-			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-			
+			gosub FoundSearchResult
 		}
-	gosub SortNow
-	gosub SearchFilter
-	gosub CatFilter
-	gosub TagsFilter
-	gosub UpdateStatusBar
-	return
-	}
-	For Each, Note In MyNotesArray
-	{
-	   If (SearchTerm != "")
-	   {
-			If (InStr(Note.2, SearchTerm) != 0)
-			{
-				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-			}Else if (InStr(Note.3, SearchTerm) != 0)
-			{
-				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-			}Else if (InStr(Note.4, SearchTerm) != 0 && SearchDates =1)
-			{
-				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-		   }Else if (InStr(Note.5, SearchTerm) != 0 && SearchDates =1)
-			{
-				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-			}Else if (InStr(Note.10, SearchTerm) != 0)
-			{
-				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-			}
-		}
-		Else
-			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
-	}
+	}	
 	gosub SortNow
 	gosub SearchFilter
 	gosub CatFilter
 	gosub TagsFilter
 	gosub UpdateStatusBar
 Return
+
+FoundSearchResult:
+	LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
+Return
+
 
 SearchFilter:
 	global SearchFilter
