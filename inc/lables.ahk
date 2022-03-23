@@ -182,7 +182,7 @@ if (OutputVar = "Edit1"){
 
 	return
 	}
-	if(OutputVar == "SysListView321"){
+if(OutputVar == "SysListView321"){
 	/* OLD copy Name text by default
 	global LVSelectedROW
 	LV_GetText(RowText, LVSelectedROW,2)
@@ -199,7 +199,7 @@ if (OutputVar = "Edit1"){
 	gosub GuiEscape
 	return
 }
-if(OutputVar == "Edit3" or OutputVar == "Edit4" or OutputVar == "Edit5"){
+if(OutputVar == "Edit6" or OutputVar == "Edit4" or OutputVar == "Edit5"){
 	global LVSelectedROW
 	if (LVSelectedROW="")
 		LVSelectedROW=1
@@ -216,11 +216,6 @@ if(OutputVar == "Edit3" or OutputVar == "Edit4" or OutputVar == "Edit5"){
 	ToolTip Saved 
 	SetTimer, KillToolTip, -500
 	unsaveddataEdit3 = 0
-	}else{
-		if (CtrlEnter == 0)
-			Send {enter}
-		if (CtrlEnter == 1)
-			Send {ctrl down}{enter}{ctrl up}
 	}
 return
 
@@ -259,6 +254,11 @@ QuickSafeNameUpdate:
 return
 
 Search:
+z := ":" A_GuiEvent ":" errorlevel ":"A_EventInfo "::" LV@sel_col "`n"
+tooltip % z
+settimer,KillToolTip,-1000
+
+
 	SelectedRows :=
 	if (unsaveddataEdit3 = 1)
 		gosub Edit3SaveTimer
@@ -1361,8 +1361,6 @@ Options:
 ;Shortcuts Tab
 ;-------------------------------------------------
 	Gui, 3:Tab, Shortcuts
-	Gui, 3:Add, CheckBox, section vSelect_CtrlEnter gSet_CtrlEnter, Use Ctrl+Enter instead of Enter?
-	GuiControl,,Select_CtrlEnter,%CtrlEnter%
 
 	ShortcutNames := ["Focus Search","Focus Results","Focus Edit/Preview","Add Note From Tempalte"]
 	Loop,% 4 {
@@ -1540,8 +1538,6 @@ SaveAndReload:
 	IniRead, CatBoxContents, %iniPath%, General, CatBoxContents
 	GuiControlGet,Select_ExternalEditor
 	IniWrite, %Select_ExternalEditor%, %iniPath%, General, ExternalEditor
-	GuiControlGet,Select_CtrlEnter
-	IniWrite,%Select_CtrlEnter%, %iniPath%, General, CtrlEnter
 	GuiControlGet,Select_ShowStarHelper
 	IniWrite,%Select_ShowStarHelper%, %iniPath%, General, ShowStarHelper
 	GuiControlGet, Select_RapidStar
@@ -1707,16 +1703,6 @@ Set_ShowMainWindowOnStartUp:
 	if (A_GuiEvent == "Normal"){
 		IniWrite,%Select_ShowMainWindowOnStartUp%, %iniPath%, General, ShowMainWindowOnStartUp
 		IniRead,ShowMainWindowOnStartUp,%iniPath%,General,ShowMainWindowOnStartUp
-		
-	}
-return
-
-Set_CtrlEnter:
-	GuiControlGet,Select_CtrlEnter
-	
-	if (A_GuiEvent == "Normal"){
-		IniWrite,%Select_CtrlEnter%, %iniPath%, General, CtrlEnter
-		IniRead,CtrlEnter,%iniPath%,General,CtrlEnter
 		
 	}
 return

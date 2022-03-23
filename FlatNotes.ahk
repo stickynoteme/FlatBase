@@ -209,7 +209,6 @@ global LVSelectedROW
 global StarOldFile
 global TitleOldFile
 global ShowStarHelper
-global CtrlEnter
 global templatePath
 ;Pre-set globals
 global savedHK1
@@ -397,7 +396,6 @@ if (NewTemplateRows>30)
 	NewTemplateRows = 30
 IniRead, ExternalEditor, %iniPath%, General, ExternalEditor,NONE
 IniRead, OpenInQuickNote, %iniPath%, General, OpenInQuickNote,1
-IniRead, CtrlEnter,%iniPath%,General,CtrlEnter,0
 IniRead, ShowStarHelper,%iniPath%,General,ShowStarHelper,1
 
 IniRead, RapidStar,%iniPath%,General,RapidStar,1

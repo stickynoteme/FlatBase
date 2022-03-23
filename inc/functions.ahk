@@ -5,12 +5,7 @@ SetUserHotKeys() {
 	Hotkey,%savedHK4%, Label4
 	Hotkey,%savedHK5%, Label5
 	Hotkey,%savedHK6%, Label6
-	
-	if (CtrlEnter = 0)
-		Hotkey,Enter, NewAndSaveHK
-	if (CtrlEnter = 1)
-		Hotkey,^Enter, NewAndSaveHK
-		
+
 ;-------------------------------------------------
 ; Shortcuts
 ;-------------------------------------------------
@@ -59,7 +54,7 @@ BuildGUI1(){
 		CatX := CatX + 27
 	}
 	
-	Gui, 1:Add,Edit, c%U_FBCA% w%SearchW% y%FontSize% x%searchX% y8 vSearchTerm gSearch -E0x200 HwndHSterm
+	Gui, 1:Add,Edit, c%U_FBCA% w%SearchW% y%FontSize% x%searchX% y8 vSearchTerm gSearch -E0x200 HwndHSterm 
 	Gui, 1:Add, ListBox, vLB1 +0x100 h8 w%LibW% x0 y0 -E0x200 Disabled -Tabstop
 	Gui, 1:Add, ListBox, vlB2 +0x100 h15 w%LibW% x0 ys0 -E0x200 Disabled -Tabstop
 	;ListBox used as background color for search area padding
@@ -154,6 +149,8 @@ BuildGUI1(){
 	WM_RBUTTONDOWN = 0x0204
 	OnMessage( WM_RBUTTONDOWN, "HandleMessage" )
 
+
+	gui, 1:Add, Button, Default w15 y-2500 x-2500 gNewAndSaveHK, HK
 	Gui, 1:Add,Edit, w35 y-2000 x-2000 vSearchFilter HwndHSF -Tabstop,
 	;Gui, 1:Add,Edit, w35 y-2200 x-2200 vCatFilter HwndHCF -Tabstop,
 	
