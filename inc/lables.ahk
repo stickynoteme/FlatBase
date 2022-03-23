@@ -254,9 +254,10 @@ QuickSafeNameUpdate:
 return
 
 Search:
-z := ":" A_GuiEvent ":" errorlevel ":"A_EventInfo "::" LV@sel_col "`n"
-tooltip % z
-settimer,KillToolTip,-1000
+;event helper tools
+;z := ":" A_GuiEvent ":" errorlevel ":"A_EventInfo "::" LV@sel_col "`n"
+;tooltip % z
+;settimer,KillToolTip,-1000
 
 
 	SelectedRows :=
@@ -847,15 +848,14 @@ SelectedRowsArray:=ObjectSort(SelectedRowsArray,,,false)
 		;save the new data
 		SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
 		LV_Modify(CRowNum,tmpColNum,ceEdit)
-		
+	}
 		GuiControl,, PreviewBox, %C_File%
 		GuiControl,, TagBox, %C_Tags%
 		GuiControl,, NoteParent, %C_Parent%
 		GuiControl,, TitleBar, %C_Name%
 		GuiControl,, StatusbarM,M: %C_Mod%
 		GuiControl,, StatusbarA,A: %C_Add%
-
-	}
+	
 	gui, ce:destroy
 return
 

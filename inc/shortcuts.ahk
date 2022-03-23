@@ -38,6 +38,15 @@ Return
 	gosub ntInsert
 	return
 }
+#IfWinActive, FlatNote - QuickNote
+{
+!enter::
+	gosub SaveButton
+	return
++enter::
+	gosub SaveButton
+	return
+}
 ;------------------------------------------
 ;Main window shortcut keys below this point
 ;------------------------------------------

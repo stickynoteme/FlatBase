@@ -232,7 +232,7 @@ BuildGUI2(){
 	Gui, 2:Font, s%FontSize% Q%FontRendering%, %FontFamily%, %U_SFC%	
 	Gui, 2:Add,Edit, disabled hidden x+1 r1 w0
 	
-	Gui, 2:Add,Edit, xs section y+2 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r%QuickNoteRows% w%QuickNoteEditW% vQuickNoteBody hwndHQNB
+	Gui, 2:Add,Edit, xs section y+2 x%QuickNoteXOffset% -E0x200 C%U_MFC% r%QuickNoteRows% w%QuickNoteEditW% vQuickNoteBody hwndHQNB
 	
 	
 	; Tag Box
