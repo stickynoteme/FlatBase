@@ -754,13 +754,18 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			return
 		}
 		if (LV@sel_col == 1) {
-			MouseGetPos, xPos, yPos
-			xPos := xPos+25
-			gosub build_StarEditBox
-			LV@sel_col = "undoomCol1"
-			return
+			SelectedRows := trim(SelectedRows)
+			SelectedRowsArray := StrSplit(SelectedRows," "," ")
+			
+			if (SelectedRowsArray.Length() == 1){
+				MouseGetPos, xPos, yPos
+				xPos := xPos+25
+				gosub build_StarEditBox
+				LV@sel_col = "undoomCol1"
+				return
+			}
 		}
-		if (LV@sel_col == 3 or LV@sel_col == 10 or LV@sel_col == 11 or LV@sel_col == 12)
+		if (LV@sel_col == 1 or LV@sel_col == 3 or LV@sel_col == 10 or LV@sel_col == 11 or LV@sel_col == 12)
 		{
 			MouseGetPos, xPos, yPos
 			xPos := xPos+25
@@ -791,14 +796,24 @@ return
 
 ;GUI for right click col 10-12 for now and doing bulk operations.
 build_ColEdit:
+	Opt1 := [0, U_SBG, ,U_SFC]
 	GUI, ce:new, ,InlineNameEdit
 	Gui, ce:Margin , 5, 5 
 	Gui, ce:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
-	Gui, ce:Color,%U_SBG%, %U_MBG%	
-	gui, ce:add,text,w200 -E0x200 center c%U_SFC%,Replace %ColEditName% with:
+	Gui, ce:Color,%U_SBG%, %U_MBG%
+	if (LV@sel_col != 1)
+		gui, ce:add,text,w200 -E0x200 center c%U_SFC%,Replace %ColEditName% with:
 	
-	
-	
+	if (LV@sel_col == 1){
+		Gui, ce:add, button,w200 section gbuild_StarEditBox hwndHIB2, [ Star Selector ]
+		ColEditStar = 1
+		If !ImageButton.Create(HIB2, Opt1, Opt2)
+		MsgBox, 0, ImageButton Error IB1, % ImageButton.LastError
+	}
+	if (LV@sel_col == 3)
+		ColEditRows = 5
+	else
+		ColEditRows = 1
 	if (LV@sel_col == 11){
 		Gui, ce:add,DDL,w200 -E0x200 c%U_FBCA% vceEdit hwndHceDDL r6, %CatBoxContents%
 		
@@ -809,13 +824,12 @@ build_ColEdit:
 		OD_Colors.Attach(HceDDL, {T: U_MFC})
 	}
 	else 
-		Gui, ce:add,edit,w200 -E0x200 c%U_FBCA% vceEdit r1 hwndHceEDIT
+		Gui, ce:add,edit,w200 -E0x200 c%U_FBCA% vceEdit r%ColEditRows% hwndHceEDIT
 	
 
 		
 	gui, ce:add,button, default gColEditSaveChange w200 hwndHIB1 vIB1, [ Apply ]
 	
-	Opt1 := [0, U_SBG, ,U_SFC]
 	If !ImageButton.Create(HIB1, Opt1, Opt2)
 		MsgBox, 0, ImageButton Error IB1, % ImageButton.LastError
 	
@@ -833,6 +847,17 @@ return
 
 
 ColEditSaveChange:
+if (LV@sel_col == 1){
+		OnMessage(0x44, "OnMsgBox")
+		MsgBox 0x40024, Change Stars?, WARNING - All stars will be replace by unique stars. Are you sure you want to continue?
+		OnMessage(0x44, "")
+		IfMsgBox Yes, {
+			goto YesChangeStars
+		} Else IfMsgBox No, {
+			return
+		}
+}
+YesChangeStars:
 GuiControlGet, ceEdit ;get the new data
 ColVarName := CurrentCol[LV@sel_col]
 tmpColNum = Col%LV@sel_col%
@@ -860,8 +885,13 @@ SelectedRowsArray:=ObjectSort(SelectedRowsArray,,,false)
 		;change what changed...
 		%ColVarName% := ceEdit
 		;save the new data
+		if (LV@sel_col == 1)
+		{
+			IniWrite, %C_Star%, %detailsPath%%C_SafeName%.ini, INFO, Star
+		}
 		SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
 		LV_Modify(CRowNum,tmpColNum,ceEdit)
+		LV_Modify(CRowNum, "Select")
 	}
 		GuiControl,, PreviewBox, %C_File%
 		GuiControl,, TagBox, %C_Tags%
@@ -869,8 +899,11 @@ SelectedRowsArray:=ObjectSort(SelectedRowsArray,,,false)
 		GuiControl,, TitleBar, %C_Name%
 		GuiControl,, StatusbarM,M: %C_Mod%
 		GuiControl,, StatusbarA,A: %C_Add%
-		SelectedRows :=
+		;SelectedRows :=
+		;LV_Modify(CRowNum, "Select")
+
 	gui, ce:destroy
+
 return
 
 ;Make a list of all used stars - all user set stars.
@@ -995,10 +1028,12 @@ build_StarEditBox:
 return
 
 StarSaveChange:
+	
 	Gui, star:Default
 	GUI, star:Submit
 	sNeedsSubmit = 0
 	NewStar = %sEdit%
+	
 	;msgbox 	% RapidStar "|" TmpName "," TmpFileSafeName "," C_Body "," NewStar "," StarOldFile
 	if (NewStar = "")
 		NewStar = %StarSelectedBox%
@@ -1013,6 +1048,12 @@ StarSaveChange:
 		StarOldFile := ztitleEncoded ".txt"
 		RapidStarNow = 0
 	}
+	
+		if (ColEditStar == 1){
+		GuiControl,,%HceEDIT%,%NewStar%
+		return
+	}
+	
 	
 	TmpFileINI := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 	TmpFileSafeName := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
@@ -2085,6 +2126,7 @@ return
 ceGuiClose:
 ceGuiEscape:
 	Gui, ce:Destroy
+	ColEditStar = 0
 return
 
 
