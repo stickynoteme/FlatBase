@@ -656,6 +656,7 @@ return
 #Include inc\Class_OD_Colors.ahk
 #include inc\Object sort.ahk
 #include inc\string-object-file.ahk
+#include inc\Class_ImageButton.ahk
 ;-!- Return after fucntions so lables don't get exacuted
 return
 #Include inc\DummyGui.ahk

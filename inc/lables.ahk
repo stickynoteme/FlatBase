@@ -797,13 +797,27 @@ build_ColEdit:
 	Gui, ce:Color,%U_SBG%, %U_MBG%	
 	gui, ce:add,text,w200 -E0x200 center c%U_SFC%,Replace %ColEditName% with:
 	
-	if (LV@sel_col == 11)
-		Gui, ce:add,DDL,w200 -E0x200 c%U_FBCA% vceEdit r6, %CatBoxContents%
+	
+	
+	if (LV@sel_col == 11){
+		Gui, ce:add,DDL,w200 -E0x200 c%U_FBCA% vceEdit hwndHceDDL r6, %CatBoxContents%
+		
+		;Listbox color
+		DDLbgColorb2 := strreplace(U_MBG,"0x")
+		DDLfontColorb2 := strreplace(U_MFC,"0x")
+		CtlColors.Attach(HceDDL, DDLbgColorb2,DDLfontColorb2)
+		OD_Colors.Attach(HceDDL, {T: U_MFC})
+	}
 	else 
 		Gui, ce:add,edit,w200 -E0x200 c%U_FBCA% vceEdit r1 hwndHceEDIT
-		
-	gui, ce:add,button, default gColEditSaveChange x-10000 y-10000
 	
+
+		
+	gui, ce:add,button, default gColEditSaveChange w200 hwndHIB1 vIB1, [ Apply ]
+	
+	Opt1 := [0, U_SBG, ,U_SFC]
+	If !ImageButton.Create(HIB1, Opt1, Opt2)
+		MsgBox, 0, ImageButton Error IB1, % ImageButton.LastError
 	
 	
 	WinSet, Style,  -0xC00000,InlineNameEdit
@@ -855,7 +869,7 @@ SelectedRowsArray:=ObjectSort(SelectedRowsArray,,,false)
 		GuiControl,, TitleBar, %C_Name%
 		GuiControl,, StatusbarM,M: %C_Mod%
 		GuiControl,, StatusbarA,A: %C_Add%
-	
+		SelectedRows :=
 	gui, ce:destroy
 return
 
