@@ -458,7 +458,7 @@ TagsFilter:
 			LV_GetText(RowVar,Mloops+1,10)
 			for k, v in TagsSearched 
 			{
-				if (!RegExMatch(RowVar,"i)\b"v))
+				if (!RegExMatch(RowVar,"i)^" v "\s|\s" v "\s|" v "$"))
 				{
 					RemoveItem = true
 					gosub SaveTimeDeletingLV
