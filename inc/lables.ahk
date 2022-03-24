@@ -608,24 +608,7 @@ if (A_GuiEvent = "I")
 if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 {
 	LVSelectedROW := A_EventInfo
-	LV_GetText(StarOldFile, LVSelectedROW,8)
-	LV_GetText(TitleOldFile, LVSelectedROW,8)
-	LV_GetText(tOldFile, LVSelectedROW,8)
-    LV_GetText(RowText, A_EventInfo,8)
-	LV_GetText(C_Added, A_EventInfo,4)
-    LV_GetText(C_Modded, A_EventInfo,5)
-	LV_GetText(C_Name, A_EventInfo,2)
-	LV_GetText(C_Tags, A_EventInfo,10)
-	LV_GetText(C_Parent, A_EventInfo,12)
-	;LV_GetText(C_Cat, A_EventInfo,11)
-    FileRead, NoteFile, %U_NotePath%%RowText%
-	GuiControl,, PreviewBox, %NoteFile%
-	GuiControl,, TagBox, %C_Tags%
-	GuiControl,, NoteParent, %C_Parent%
-	;GuiControl, ChooseString, CatBox, %C_Cat%
-	GuiControl,, TitleBar, %C_Name%
-	GuiControl,, StatusbarM,M: %C_Modded%
-	GuiControl,, StatusbarA,A: %C_Added%
+	SetTimer, UpdateLVSelected, -250
 }
 ;1Star|2Title|3Body|4Added|5Modified|6RawAdded|7RawModded|8FileName|9RawStar|10Tags|11Cat|12Parent|12Checked|13Marked|14Extra
 
@@ -778,6 +761,29 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 return
 
 
+UpdateLVSelected:
+
+	LV_GetText(StarOldFile, LVSelectedROW,8)
+	LV_GetText(TitleOldFile, LVSelectedROW,8)
+	LV_GetText(tOldFile, LVSelectedROW,8)
+    LV_GetText(RowText, LVSelectedROW,8)
+	LV_GetText(C_Added, LVSelectedROW,4)
+    LV_GetText(C_Modded, LVSelectedROW,5)
+	LV_GetText(C_Name, LVSelectedROW,2)
+	LV_GetText(C_Tags, LVSelectedROW,10)
+	LV_GetText(C_Parent, LVSelectedROW,12)
+	;LV_GetText(C_Cat, A_EventInfo,11)
+    FileRead, NoteFile, %U_NotePath%%RowText%
+	GuiControl,, PreviewBox, %NoteFile%
+	GuiControl,, TagBox, %C_Tags%
+	GuiControl,, NoteParent, %C_Parent%
+	;GuiControl, ChooseString, CatBox, %C_Cat%
+	GuiControl,, TitleBar, %C_Name%
+	GuiControl,, StatusbarM,M: %C_Modded%
+	GuiControl,, StatusbarA,A: %C_Added%
+
+return
+
 ;GUI for right click to edit name
 build_tEdit:
 	GUI, t:new, ,InlineNameEdit
@@ -861,9 +867,11 @@ YesChangeStars:
 GuiControlGet, ceEdit ;get the new data
 ColVarName := CurrentCol[LV@sel_col]
 tmpColNum = Col%LV@sel_col%
+
 Gui, 1:Default 
 SelectedRows := trim(SelectedRows)
 SelectedRowsArray := StrSplit(SelectedRows," "," ")
+ChangeCount := SelectedRowsArray.Length()
 SelectedRowsArray:=ObjectSort(SelectedRowsArray,,,false)
 	;v = row numbers
 	for RowKey, CRowNum in SelectedRowsArray{
@@ -892,6 +900,9 @@ SelectedRowsArray:=ObjectSort(SelectedRowsArray,,,false)
 		SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
 		LV_Modify(CRowNum,tmpColNum,ceEdit)
 		LV_Modify(CRowNum, "Select")
+		tooltip, processing %RowKey% of %ChangeCount%
+
+
 	}
 		GuiControl,, PreviewBox, %C_File%
 		GuiControl,, TagBox, %C_Tags%
@@ -901,6 +912,7 @@ SelectedRowsArray:=ObjectSort(SelectedRowsArray,,,false)
 		GuiControl,, StatusbarA,A: %C_Add%
 		;SelectedRows :=
 		;LV_Modify(CRowNum, "Select")
+		settimer,KillToolTip,-1000
 
 	gui, ce:destroy
 

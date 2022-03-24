@@ -81,7 +81,6 @@ Try deleting the settings.ini file (make a backup first)
 ![Themes Set one](/ScreenShots/SS_02.png)
 
 ## Possible Road Map Ideas
-- Bulk edit stars
 - Import from CSV
 - export to CSV
 - Insert template layouts
