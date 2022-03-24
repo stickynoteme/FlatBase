@@ -40,5 +40,3 @@ Loop
 MsgBox, The end of the file has been reached or there was a problem.
 return
 
-
-return

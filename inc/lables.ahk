@@ -318,7 +318,10 @@ Search:
 		
 		SearchTerm := RegExReplace(SearchTerm,";;.*")
 		
-		SearchArray := StrSplit(SearchTerm , A_Space, A_Space)
+		if (SubStr(SearchTerm,1,1) == ";")
+			SearchArray := [SubStr(SearchTerm,2)]
+		else
+			SearchArray := StrSplit(SearchTerm , A_Space, A_Space)
 	
 		SearchTermsCount := SearchArray.Length()
 		
@@ -371,7 +374,11 @@ Search:
 	}
 	
 	;if no flag than do a normal search which matches all search terms in any single column.
-	SearchArray := StrSplit(SearchTerm , A_Space, A_Space)
+	if (SubStr(SearchTerm,1,1) == ";")
+		SearchArray := [SubStr(SearchTerm,2)]
+	else
+		SearchArray := StrSplit(SearchTerm , A_Space, A_Space)
+	
 	
 	SearchTermsCount := SearchArray.Length()
 		
