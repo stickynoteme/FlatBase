@@ -9,14 +9,13 @@ BuildTemplateInsertUI:
 	Gui, nt:Color,%U_SBG%, %U_MBG%
 
 	Gui, nt:add, text, c%U_SFC% center w%WindowW% -E0x200 gntInsert, [ Insert At Top ]
-	
+	global TemplateType
 	RadioX := round(WindowW *0.33)
 	
-	Gui, nt:Add, Radio,section,gou
-	Gui, nt:Add, Radio,xp+%RadioX%,boo
-	Gui, nt:Add, Radio,xp+%RadioX%,moo
+	Gui, nt:Add, DDL, section vTemplateType w100 r2, Horizontal|Vertical 
+	Gui, nt:Add, CheckBox, ys+2 xp+115 vExtraInput, Extra Input
 
-	Gui, nt:add, text, c%U_SFC%section xs center h0 w0 hidden
+	Gui, nt:add, text, c%U_SFC% section xs center h0 w0 hidden
 	for k, v in TemplateArr {
 		wTMP%k%:= ListBoxWarr[A_Index]
 		wwTMP := wTMP%k%
@@ -24,8 +23,9 @@ BuildTemplateInsertUI:
 			msgbox Width Row is missing a value.`n`nTry opening this template in the editor by right clicking it and using [Auto Width].
 			return
 		}
-		Gui, nt:add, edit, % "section -E0x200 c" U_MFC " x+3 y35 w" wwTMP " vNTeB" k " r1", 
-		Gui, nt:add, listbox, % "Multi -E0x200 c" U_MFC " w" wwTMP " vNTLB" k " r10", %v%
+		if (ExtraInput)
+			Gui, nt:add, edit, % " -E0x200 c" U_MFC " x+3 ys0 w" wwTMP " vNTeB" k " r1", 
+		Gui, nt:add, listbox, % "Multi -E0x200 c" U_MFC " w" wwTMP " vNTLB" k " r10 ys0" , %v%
 	}
 	Gui, nt:add, text, c%U_SFC% center y+3 x3 section w%WindowW% -E0x200 gntInsertB, [ Insert At Bottom ]
 	Gui, nt:show, x%xPos% y%yPos%

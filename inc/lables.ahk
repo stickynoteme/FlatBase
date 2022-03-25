@@ -529,7 +529,7 @@ return
 
 NoteListView:
 Critical
-;z := "::" A_GuiEvent "::" errorlevel "::"A_EventInfo "::" LV@sel_col "`n"
+;z := ":" A_GuiEvent ":" errorlevel ":";A_EventInfo ":" LV@sel_col "`n"
 ;tooltip % z
 ;tooltip % x
 ;settimer,KillToolTip,-1000
@@ -539,10 +539,13 @@ Critical
 if (InStr(ErrorLevel, "S", true))
 {
 	SelectedRows .= A_EventInfo " "
+	tooltip % SelectedRows
+	
 }
 if (InStr(ErrorLevel, "s", true))
 {
 	SelectedRows := RegExReplace(SelectedRows,"\b" A_EventInfo " ")
+	tooltip % SelectedRows
 }
 
 ;tooltip % SelectedRows
@@ -876,8 +879,8 @@ ColVarName := CurrentCol[LV@sel_col]
 tmpColNum = Col%LV@sel_col%
 
 Gui, 1:Default 
-SelectedRows := trim(SelectedRows)
-SelectedRowsArray := StrSplit(SelectedRows," "," ")
+TmpSelectedRows := trim(SelectedRows)
+SelectedRowsArray := StrSplit(TmpSelectedRows," "," ")
 ChangeCount := SelectedRowsArray.Length()
 SelectedRowsArray:=ObjectSort(SelectedRowsArray,,,false)
 	;v = row numbers
