@@ -1,6 +1,5 @@
-
+;Hotkey to open Library Window
 Label1:
-{
 	if (U_Capslock = "1"){
 		return
 	}
@@ -23,9 +22,10 @@ Label1:
 		g1Open=1
 		return
 	}
-}
+return
+
+;Hotkey to start a quicknote Win+N
 Label2:
-{
 	MyOldClip := clipboard
 	if (sendCtrlC="1")
 		send {Ctrl Down}{c}{Ctrl up}
@@ -36,28 +36,28 @@ Label2:
 	BuildGUI2()
 	ControlFocus, Edit4, FlatNote - QuickNote
 
-	GuiControl,, QuickNoteName,%MyClip%
-	CBinfo = %MyClip%
-	FileSafeName := NameEncode(CBinfo)
+	GuiControl,, QuickNoteName,%MyClip%	
+	
+	FileSafeName := NameEncode(MyClip)
 	IfExist, %U_NotePath%%FileSafeName%.txt
 	{
 		FileRead, MyFile, %U_NotePath%%FileSafeName%.txt
 		IniRead, OldStarData, %detailsPath%%FileSafeName%.ini,INFO,Star
-		if (OldStarData = 10001)
-			OldStarData = %Star1%
-		if (OldStarData = 10002)
-			OldStarData = %Star2%
-		if (OldStarData = 10003)
-			OldStarData = %Star3%
-		if (OldStarData = 10004)
-			OldStarData = %Star4%
+		OldStarData := ConvertStar(OldStarData)
 		GuiControl,, QuickNoteBody,%MyFile%
 		GuiControl,, QuickStar,%OldStarData%
+		IniRead, OldCatData, %detailsPath%%FileSafeName%.ini,INFO,Cat
+		GuiControl, ChooseString, QuickNoteCat, %OldCatData%
+		
+		IniRead, OldTagsData, %detailsPath%%FileSafeName%.ini,INFO,Tags
+		GuiControl,, QuickNoteTags, %OldTagsData%
+		IniRead, OldParentData, %detailsPath%%FileSafeName%.ini,INFO,Parent
+		GuiControl,, QuickNoteParent, %OldParentData%
 	}
-	return
-}
+return
+
+;Hotkey to start a Rapid Note Win+z
 Label3:
-{
 	MyOldClip := clipboard
 	if(istitle != "no") {
 		send {Ctrl Down}{c}{Ctrl up}
@@ -93,7 +93,7 @@ Label3:
 		zbody .= clipboard 
 		istitle = yes
 		FileReadLine, CheckExists, %U_NotePath%%TmpFileSafeName%.txt, 1
-		SaveFile(ztitle,ztitleEncoded,zbody,0)
+		SaveFile(ztitle,ztitleEncoded,zbody,0,"RapidNote",LastCatFilter,"")
 		gosub search
 		tooltip B: %zbody%
 		settimer, KillToolTip, -500
@@ -105,17 +105,18 @@ Label3:
 		}
 	}
 	clipboard := MyOldClip
-	return
-}
+return
+
+;Hotkey to Cancel Rapid note taking.
 Label4:
-{
 	istitle = yes
 	tooltip cancled
 	settimer,KillToolTip,-1000
-	return 
-}
+return
+
+
+;Hotkey to appened to a rapid note
 Label5:
-{
 	MyOldClip := clipboard
 	if(istitle = "no") {
 		send {Ctrl Down}{c}{Ctrl up}
@@ -124,57 +125,61 @@ Label5:
 		settimer, KillToolTip, -1000
 	}
 	clipboard := MyOldClip
-	return
-}
-Label6: ;Append Template to Rapid Note
-{
+return
+
+
+;hotkey to append a template to a Rapid note.
+Label6:
 	RapidNTAppend = 1
 	gosub NoteTemplateSelectUI
-	return
-}
+return
+
 LabelS1:
-{
 	;Focus Search
 	ControlFocus, Edit1, FlatNotes - Library
-	return
-}
+return
+
 LabelS2:
-{
 	;Focus Results 
 	ControlFocus, SysListView321, FlatNotes - Library
-	return
-}
+return
+
 LabelS3:
-{
 	;Focus Edit
 	ControlFocus, Edit3, FlatNotes - Library
-	return
-}
+return
+
 LabelS4:
-{
 	gosub LibTemplateAdd
-	return
-}
+return
+
 NewAndSaveHK:
-{
 ControlGetFocus, OutputVar, FlatNotes - Library
 if (OutputVar = "Edit1"){
 	GuiControlGet, SearchTerm
-	FileSafeSearchTerm := NameEncode(SearchTerm)
-	CheckForOldNote = %U_NotePath%%FileSafeSearchTerm%.txt
-	FileRead, MyFile, %CheckForOldNote%
 	
-	BuildGUI2()
-	GuiControl,, QuickNoteName,%SearchTerm%
-	GuiControl,, FileSafeName,%FileSafeSearchTerm%
-	ControlFocus, Edit4, FlatNote - QuickNote 
-	
+	GetCurrentNoteData(NameEncode(SearchTerm))
 
-	if (MyFile !="")
-	{
-	MyNewFile := SubStr(MyFile, InStr(MyFile, "`n") + 1)
-	GuiControl,, QuickNoteBody,%MyNewFile%
+	BuildGUI2()
+	
+	;Fill in current data.
+	GuiControl,, QuickNoteName,%SearchTerm%
+	GuiControl,, FileSafeName,%C_SafeName%
+
+	if FileExist(U_NotePath C_SafeName ".txt"){
+		GuiControl,, QuickNoteBody,%C_File%
+		GuiControl,, QuickStar,%C_Star%
+		GuiControl,, QuickNoteTags,%C_Tags%
+		GuiControl, ChooseString, QuickNoteCat, %C_Cat%
+		GuiControl,, QuickNoteParent,%C_Parent%
+	}else {
+		GuiControl, ChooseString, QuickNoteCat, %LastCatFilter%
+
 	}
+		
+	;Set UI focus:
+	ControlFocus, Edit4, FlatNote - QuickNote 
+
 	return
 	}
 if(OutputVar == "SysListView321"){
@@ -193,259 +198,224 @@ if(OutputVar == "SysListView321"){
 	SetTimer, KillToolTip, -500
 	gosub GuiEscape
 	return
-	}
-if(OutputVar == "Edit3"){
+}
+if(OutputVar == "Edit6" or OutputVar == "Edit4" or OutputVar == "Edit5"){
 	global LVSelectedROW
 	if (LVSelectedROW="")
 		LVSelectedROW=1
 	LV_GetText(RowText, LVSelectedROW,2)
+	LV_GetText(C_Cat, LVSelectedROW,11)
 	FileSafeName := NameEncode(RowText)
 	GuiControlGet, PreviewBox
-	SaveFile(RowText,FileSafeName,PreviewBox,1)
+	GuiControlGet, TagBox
+	GuiControlGet, NoteParent
+	SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,C_Cat,NoteParent)
 	iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
 	FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
-	LV_Modify(LVSelectedROW,,, RowText, NewBodyText)
+	LV_Modify(LVSelectedROW,,, RowText, NewBodyText,,,,,,,TagBox,,NoteParent)
 	ToolTip Saved 
 	SetTimer, KillToolTip, -500
 	unsaveddataEdit3 = 0
-}else{
-	Send {enter}
-}
+	}
 return
-}
-NewAndSaveHK2:
-{
-ControlGetFocus, OutputVar, FlatNotes - Library
-if (OutputVar = "Edit1"){
-	GuiControlGet, SearchTerm
-		FileSafeSearchTerm := NameEncode(SearchTerm)
-		CheckForOldNote = %U_NotePath%%FileSafeSearchTerm%.txt
-		FileRead, MyFile, %CheckForOldNote%
-		
-		BuildGUI2()
-		GuiControl,, QuickNoteName,%SearchTerm%
-		GuiControl,, FileSafeName,%FileSafeSearchTerm%
-		ControlFocus, Edit4, FlatNote - QuickNote 
-		
 
-		if (MyFile !="")
-		{
-		MyNewFile := SubStr(MyFile, InStr(MyFile, "`n") + 1)
-		GuiControl,, QuickNoteBody,%MyNewFile%
-		}
-		return
-		}
-	if(OutputVar == "SysListView321"){
-		global LVSelectedROW
-		
-		/* OLD Copy Name row
-		LV_GetText(RowText, LVSelectedROW,2)
-		clipboard = %RowText%
-		ToolTip Text: "%RowText%" Copied to clipboard
-		*/
-		LV_GetText(FileTmp, LVSelectedROW, 8)
-		LV_GetText(ToolTipText, LVSelectedROW, 3)
-		fileread,CopyText,%U_NotePath%%FileTmp%
-		clipboard := CopyText
-		Tooltip % ToolTipText "... Copied"
-		
-		SetTimer, KillToolTip, -500
-		gosub GuiEscape
-		return
-		}
-	if(OutputVar == "Edit3"){
-		global LVSelectedROW
-		if (LVSelectedROW="")
-			LVSelectedROW=1
-		LV_GetText(RowText, LVSelectedROW,2)
-		FileSafeName := NameEncode(RowText)
-		GuiControlGet, PreviewBox
-		SaveFile(RowText,FileSafeName,PreviewBox,1)
-		iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
-		FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
-		LV_Modify(LVSelectedROW,,, RowText, NewBodyText)
-		ToolTip Saved 
-		SetTimer, KillToolTip, -500
-		unsaveddataEdit3 = 0
-}else{
-	Send {ctrl down}{enter}{ctrl up}
-}
-return
-}
 SaveButton:
-{
 	GuiControlGet,FileSafeName
 	if (QuickNoteName == ""){
 		MsgBox Note Name Can Not Be Empty
 	return
 	}
-	QuickNoteName := trim(QuickNoteName)
-	FileSafeName := trim(FileSafeName)
+	;QuickNoteName := trim(QuickNoteName)
+	;FileSafeName := trim(FileSafeName)
 	
 	Gui, 2:Submit
 	;convert used symbols to raw stars
-	if (QuickStar = Star1)
-		QuickStar = 10001
-	if (QuickStar = Star2)
-		QuickStar = 10002
-	if (QuickStar = Star3)
-		QuickStar = 10003
-	if (QuickStar = Star4)
-		QuickStar = 10004
+	QuickStar := EncodeStar(QuickStar)
+
 	Iniwrite, %QuickStar%, %detailsPath%%FileSafeName%.ini,INFO,Star
 	SaveMod = 0
 	IfExist, %U_NotePath%%FileSafeName%.txt
 		SaveMod = 1
-	SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,SaveMod)
+	SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,SaveMod,QuickNoteTags,QuickNoteCat,QuickNoteParent)
 	;horrible fix to LV to update
 
 	GuiControlGet,OldST,,%HSterm%
 	GuiControl,1: , SearchTerm,
 	GuiControl,1: , SearchTerm,%OldST%
 	tooltip Saved
+	ControlSend, Edit1,{ctrl down} {a} {ctrl up}
 	settimer, KillToolTip, -500
-	return
-}
+return
 
 QuickSafeNameUpdate:
-{
 	GuiControlGet, QuickNoteName
 	NewFileSafeName := NameEncode(QuickNoteName)
 	GuiControl,, FileSafeName,%NewFileSafeName%
-	return
-}
+return
+
 Search:
-{
+;event helper tools
+;z := ":" A_GuiEvent ":" errorlevel ":"A_EventInfo "::" LV@sel_col "`n"
+;tooltip % z
+;settimer,KillToolTip,-1000
+
+
+	SelectedRows :=
 	if (unsaveddataEdit3 = 1)
 		gosub Edit3SaveTimer
 	global SearchTerm
 	GuiControlGet, SearchTerm
 	GuiControl, -Redraw, LV
 	LV_Delete()
-	If (InStr(SearchTerm, "$$") != 0) {
-		SearchTerm := StrReplace(SearchTerm, "$$" , "")
-		For Each, Note In MyNotesArray
-		{
-		  If (SearchTerm != "")
-		  {
-			If (InStr(Note.2, SearchTerm) != 0){
-			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-			   }
-			}
-			Else
-			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+	If (SearchTerm == "")
+		goto SkipToEndOfSearch
+;Search a specific column by using a flag.		
+	FlagSearch := RegExReplace(SearchTerm, "(.*?;;[a-zA-Z])","$1|",FlagCount)
+
+	If (FlagCount != 0) {
+
+		;msgbox % "f: " FlagSearch
+		;FlagSearch looks like:: Kion;;n|Mirra;;n|
+		FlagSearch := Trim(FlagSearch,"|")
+		
+		FlagBaseArray := StrSplit(FlagSearch, "|", "|")
+		
+		;msgbox % "base: "FlagBaseArray[1] " : " FlagBaseArray[2]
+		;FlagBaseArray looks like ["Kion;;n,"Mirra;;n"]
+		For x, FlagGroups in FlagBaseArray{
+			FlagArray%x% := StrSplit(FlagGroups, ";;", ";;")
 		}
-	gosub SortNow
-	gosub SearchFilter
-	gosub UpdateStatusBar
-	return
-	}
-	If (InStr(SearchTerm, "$*") != 0) {
-		SearchTerm := StrReplace(SearchTerm, "$*" , "")
-		For Each, Note In MyNotesArray
-		{
-		  If (SearchTerm != "")
-		  {
-			If (InStr(Note.1, SearchTerm) != 0){
-			 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-			   }
-			}
-			Else
-			  LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+		
+		;msgbox % "FA:" FlagArray1[1] ":" FlagArray1[2]
+		;Each FlagArray# looks like: [Kion,n]
+
+		for x, FlagGroups in FlagBaseArray{
+			if (FlagArray%x%[2] == "n")
+				FlagArray%x%[2] := 2
+			else if (FlagArray%x%[2] == "b")
+				FlagArray%x%[2] := 3
+			else if (FlagArray%x%[2] == "t")
+				FlagArray%x%[2] := 10
+			else if (FlagArray%x%[2] == "c")
+				FlagArray%x%[2] := 11
+			else if (FlagArray%x%[2] == "p")
+				FlagArray%x%[2] := 12
+			else
+				FlagArray%x%[2] := 2
 		}
-	gosub SortNow
-	gosub SearchFilter
-	gosub UpdateStatusBar
-	return
-	}
-	If (InStr(SearchTerm, "||") != 0) {
-		SArray := StrSplit(SearchTerm , "||","||")
-		SearchTerm := StrReplace(SearchTerm, "||" , "")
-		For Each, Note In MyNotesArray
-		{
-			If (SearchTerm != "")
-			{
-				
-				If (InStr(Note.1, SArray.1) != 0 or InStr(Note.1, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-				}Else if (InStr(Note.2, SArray.1) != 0 or InStr(Note.2, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-				}Else if (InStr(Note.3, SArray.1) != 0 or InStr(Note.3, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-				}Else if (InStr(Note.4, SArray.1) != 0 or InStr(Note.4, SArray.2) != 0  && SearchDates =1){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-				}Else if (InStr(Note.5, SArray.1) != 0 or InStr(Note.5, SArray.2) != 0  && SearchDates =1){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-				}
-				
-			}
-		Else
-			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
+		
+		
+		;msgbox % "test:" FlagArray1[2] FlagArray2[2]
+		;FlagArray# now looks like: [Kion,3]
+
+
+		;Flaggroup looks like: ["Kion;;n","Mirra Moon;;n"]
+		;msgbox % FlagBaseArray[1]
+		;msgbox % FlagArray1[1] " : " FlagArray2[1]
+		;msgbox % FlagBaseArray.Length()
+		
+		;Do normal-ish search to populate the LV with the first search set:
+		
+		SearchTerm := RegExReplace(SearchTerm,";;.*")
+		
+		if (SubStr(SearchTerm,1,1) == ";")
+			SearchArray := [SubStr(SearchTerm,2)]
+		else
+			SearchArray := StrSplit(SearchTerm , A_Space, A_Space)
+	
+		SearchTermsCount := SearchArray.Length()
+		
+		For Each, Note In MyNotesArray{
+			SearchContent := Note[FlagArray1[2]]
+			MatchedXTerms = 0
 			
+			For Each, Term in SearchArray{
+				If (InStr(SearchContent, Term) != 0)
+					MatchedXTerms++
+				if (MatchedXTerms == SearchTermsCount) {
+					gosub FoundSearchResult
+					MatchedXTerms = 0
+				}
+			}
 		}
-	gosub SortNow
-	gosub SearchFilter
-	gosub UpdateStatusBar
-	return
+		
+		
+		
+		for x, FlagGroups in FlagBaseArray{
+			FlagArray%x%[1] := trim(FlagArray%x%[1])
+			SearchTermArray := StrSplit(FlagArray%x%[1],a_space,a_space)
+
+			SearchTermsCount := SearchTermArray.Length()
+			SearchCol := FlagArray%x%[2]
+
+			
+			;msgbox % SearchTermArray[1] " : " SearchTermArray[2] " : " SearchTermsCount " : " SearchCol
+		
+			Mloops := LV_GetCount()
+			RemoveItem = false
+			while (Mloops--)
+			{
+				LV_GetText(RowVar,Mloops+1,SearchCol)
+				
+				for k, v in SearchTermArray 
+				{		
+					if (!InStr(RowVar, v)){
+						RemoveItem = true
+						gosub SaveTimeDeletingLV
+						break
+					}
+				}
+				if (Mloops = 0)
+					break
+			}	
+		}
+
+	goto SkipToEndOfSearch
 	}
-	If (InStr(SearchTerm, "&&") != 0) {
-		SArray := StrSplit(SearchTerm , "&&","&&")
-		SearchTerm := StrReplace(SearchTerm, "&&" , "")
+	
+	;if no flag than do a normal search which matches all search terms in any single column.
+	if (SubStr(SearchTerm,1,1) == ";")
+		SearchArray := [SubStr(SearchTerm,2)]
+	else
+		SearchArray := StrSplit(SearchTerm , A_Space, A_Space)
+	
+	
+	SearchTermsCount := SearchArray.Length()
+		
+	For Each, Note In MyNotesArray{
+		SearchContent := Note[2] " " Note[3] " " Note[10] " " Note[11]
+		MatchedXTerms = 0
+		
+		For Each, Term in SearchArray{
+			If (InStr(SearchContent, Term) != 0)
+				MatchedXTerms++
+			if (MatchedXTerms == SearchTermsCount) {
+				gosub FoundSearchResult
+				MatchedXTerms = 0
+			}
+		}
+	}
+	
+SkipToEndOfSearch:
+	If (SearchTerm == ""){
 		For Each, Note In MyNotesArray
 		{
-			If (SearchTerm != "")
-			{
-				
-				If (InStr(Note.1, SArray.1) != 0 && InStr(Note.1, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-				}Else if (InStr(Note.2, SArray.1) != 0 && InStr(Note.2, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-				}Else if (InStr(Note.3, SArray.1) != 0 && InStr(Note.3, SArray.2) != 0){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-				}Else if (InStr(Note.4, SArray.1) != 0 && InStr(Note.4, SArray.2) != 0  && SearchDates =1){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-				}Else if (InStr(Note.5, SArray.1) != 0 && InStr(Note.5, SArray.2) != 0  && SearchDates =1){
-					LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-				}
-				
-			}
-		Else
-			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-			
+			gosub FoundSearchResult
 		}
+	}	
 	gosub SortNow
 	gosub SearchFilter
+	gosub CatFilter
+	gosub TagsFilter
 	gosub UpdateStatusBar
-	return
-	}
-	For Each, Note In MyNotesArray
-	{
-	   If (SearchTerm != "")
-	   {
-			If (InStr(Note.2, SearchTerm) != 0)
-			{
-				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-			}Else if (InStr(Note.3, SearchTerm) != 0)
-			{
-				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-			}Else if (InStr(Note.4, SearchTerm) != 0 && SearchDates =1)
-			{
-				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-		   }Else if (InStr(Note.5, SearchTerm) != 0 && SearchDates =1)
-			{
-				LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-			}
-		}
-		Else
-			LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9)
-	}
-	gosub SortNow
-	gosub SearchFilter
-	gosub UpdateStatusBar
-	Return
-}
+Return
+
+FoundSearchResult:
+	LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
+Return
+
+
 SearchFilter:
-{
 	global SearchFilter
 	GuiControlGet, SearchFilter,, %HSF%
 	if (SearchFilter != "")
@@ -460,79 +430,126 @@ SearchFilter:
 				break
 		}	
 	}
-	return
-}
+return
+
+CatFilter:
+	GuiControlGet, CatFilter,, %HCF%
+	GuiControlGet, LastCatFilter,, %HCF%
+	
+	if (CatFilter != "")
+	{
+		Mloops := LV_GetCount()
+		while (Mloops--)
+		{
+			LV_GetText(RowVar,Mloops+1,11)
+			if (RowVar != CatFilter)
+				LV_Delete(Mloops+1)
+			if (Mloops = 0)
+				break
+		}	
+	}
+return
+
+TagsFilter:
+	GuiControlGet, TagsFilter,, %HTF%
+	GuiControlGet, LastTagsFilter,, %HTF%
+	
+	if (TagsFilter != "")
+	{
+		TagsSearched := StrSplit(TagsFilter," ")
+		
+		Mloops := LV_GetCount()
+		RemoveItem = false
+		while (Mloops--)
+		{
+			LV_GetText(RowVar,Mloops+1,10)
+			for k, v in TagsSearched 
+			{
+				if (!RegExMatch(RowVar,"i)^" v "\s|\s" v "\s|" v "$"))
+				{
+					RemoveItem = true
+					gosub SaveTimeDeletingLV
+					break
+				}
+			}
+			if (Mloops = 0)
+				break
+		}	
+	}
+return
+
+SaveTimeDeletingLV:
+	LV_Delete(Mloops+1)
+	RemoveItem = false
+return
 UpdateStatusBar:
-{
 	Items := LV_GetCount()
 	if (Items != 0) {
 		LV_GetText(LastResultName, 1 , 2)
 		LV_GetText(LastFileName, 1 , 8)
 		LV_GetText(LastNoteAdded, 1 , 4)
 		LV_GetText(LastNoteModded, 1 , 5)
+		LV_GetText(LastNoteTags, 1 , 10)
+		LV_GetText(LastNoteParent, 1 , 12)
+		;LV_GetText(LastNoteCat, 1 , 11)
 		GuiControl,,TitleBar, %LastResultName%
 		FileRead, LastResultBody,%U_NotePath%%LastFileName%
 		LastNoteIni := RegExReplace(LastFileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 
 		GuiControl,,PreviewBox, %LastResultBody%
+		GuiControl,,TagBox, %LastNoteTags%
+		GuiControl,,NoteParent, %LastNoteParent%
+		;GuiControl, ChooseString, CatBox, %LastNoteCat%
 		GuiControl,, StatusbarM,M: %LastNoteModded%
 		GuiControl,, StatusbarA,A: %LastNoteAdded%
 		}else{
 			GuiControl,,TitleBar, 
 			GuiControl,,PreviewBox,
+			GuiControl,,TagBox,
+			;GuiControl, ChooseString, CatBox,
+			GuiControl,,NoteParent,
 			GuiControl,,StatusBarM,M: 00\00\00 
 			GuiControl,,StatusBarA,A: 00\00\00
 		}
 	GuiControl,,StatusBarCount, %Items%
 	GuiControl, +Redraw, LV
-	return
-}
+return
+
+
 KillToolTip:
-{
    ToolTip
 Return
-}
+
 
 UnDoom:
-{
 	Doom = 0
 return
-}
-HandleMessage( p_w, p_l, p_m, p_hw )
-{
-	if ( A_GuiControl = "LV" )
-	{
-		VarSetCapacity( htinfo, 20 )
 
-		DllCall( "RtlFillMemory", "uint", &htinfo, "uint", 1, "uchar", p_l & 0xFF )
-			DllCall( "RtlFillMemory", "uint", &htinfo+1, "uint", 1, "uchar", ( p_l >> 8 ) & 0xFF )
-		DllCall( "RtlFillMemory", "uint", &htinfo+4, "uint", 1, "uchar", ( p_l >> 16 ) & 0xFF )
-			DllCall( "RtlFillMemory", "uint", &htinfo+5, "uint", 1, "uchar", ( p_l >> 24 ) & 0xFF )
-		
-		; LVM_SUBITEMHITTEST
-		SendMessage, 0x1000+57, 0, &htinfo,, ahk_id %p_hw%
-		sel_item := ErrorLevel
-		
-		if ( sel_item = -1 )
-			return
-		
-		; LVHT_NOWHERE
-		if ( *( &htinfo+8 ) & 1 )
-			%A_GuiControl%@sel_col = 0
-		else
-			%A_GuiControl%@sel_col := 1+*( &htinfo+16 )
-	}
-	
-	ToolTip
-}
+
+
 NoteListView:
-{
 Critical
-;z := "#" A_GuiEvent ":" errorlevel ":" A_EventInfo ":" LV@sel_col
+;z := ":" A_GuiEvent ":" errorlevel ":";A_EventInfo ":" LV@sel_col "`n"
 ;tooltip % z
 ;tooltip % x
 ;settimer,KillToolTip,-1000
 
+;tooltip % LV@sel_col
+;Track Selected
+if (InStr(ErrorLevel, "S", true))
+{
+	SelectedRows .= A_EventInfo " "
+	tooltip % SelectedRows
+	
+}
+if (InStr(ErrorLevel, "s", true))
+{
+	SelectedRows := RegExReplace(SelectedRows,"\b" A_EventInfo " ")
+	tooltip % SelectedRows
+}
+
+;tooltip % SelectedRows
+;settimer,KillToolTip,-1000
 if (WinActive(FlatNote - Library)) {
 	if (tNeedsSubmit = 1) {
 		tNeedsSubmit = 0
@@ -577,8 +594,8 @@ if (A_EventInfo = TotalItems && Doom = 1 && A_GuiEvent = "Normal"){
 ;Something for double click
 if (A_GuiEvent = "DoubleClick")
 {
-	if (LV@sel_col=2) {
-		LV_GetText(CopyText, A_EventInfo, 2)
+	if (LV@sel_col=2 or LV@sel_col=4 or LV@sel_col=5 or LV@sel_col=10 or LV@sel_col=11 or LV@sel_col=12) {
+		LV_GetText(CopyText, A_EventInfo, LV@sel_col)
 		clipboard := CopyText
 		Tooltip % CopyText " Copied"
 	}
@@ -588,18 +605,8 @@ if (A_GuiEvent = "DoubleClick")
 		fileread,CopyText,%U_NotePath%%FileTmp%
 		clipboard := CopyText
 		Tooltip % ToolTipText "... Copied"
+	}
 
-	}
-	if (LV@sel_col=4) {
-		LV_GetText(CopyText, A_EventInfo, 4)
-		clipboard := CopyText
-		Tooltip % CopyText " Copied"
-	}
-	if (LV@sel_col=5) {
-		LV_GetText(CopyText, A_EventInfo, 5)
-		clipboard := CopyText
-		Tooltip % CopyText " Copied"
-	} 
 	settimer,KillToolTip, -500
     return
 }
@@ -611,20 +618,9 @@ if (A_GuiEvent = "I")
 if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 {
 	LVSelectedROW := A_EventInfo
-	LV_GetText(StarOldFile, LVSelectedROW,8)
-	LV_GetText(TitleOldFile, LVSelectedROW,8)
-	LV_GetText(tOldFile, LVSelectedROW,8)
-    LV_GetText(RowText, A_EventInfo,8)
-	LV_GetText(C_Added, A_EventInfo,4)
-    LV_GetText(C_Modded, A_EventInfo,5)
-	LV_GetText(C_Name, A_EventInfo,2)
-    FileRead, NoteFile, %U_NotePath%%RowText%
-	GuiControl,, PreviewBox, %NoteFile%
-	GuiControl,, TitleBar, %C_Name%
-	GuiControl,, StatusbarM,M: %C_Modded%
-	GuiControl,, StatusbarA,A: %C_Added%
+	SetTimer, UpdateLVSelected, -250
 }
-;1Star|2Title|3Body|4Added|5Modified|6RawAdded|7RawModded|8FileName|9RawStar
+;1Star|2Title|3Body|4Added|5Modified|6RawAdded|7RawModded|8FileName|9RawStar|10Tags|11Cat|12Parent|12Checked|13Marked|14Extra
 
 	if A_GuiEvent in Normal
 	{
@@ -644,6 +640,9 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			}
 			LV_GetText(C_FileName, A_EventInfo, 8)
 			LV_GetText(C_Name, A_EventInfo, 2)
+			LV_GetText(C_Tags, A_EventInfo, 10)
+			LV_GetText(C_Cat, A_EventInfo, 11)
+			LV_GetText(C_Parent, A_EventInfo, 12)
 			C_ini := RegExReplace(C_FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 			C_SafeName := RegExReplace(C_FileName, "\.txt(?:^|$|\r\n|\r|\n)")
 			If CurrentStar not between 10000 and 10004
@@ -670,7 +669,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			LV_Modify(A_EventInfo ,,UpdateStar,,,,,,,,NextStar)
 			IniWrite, %NextStar%, %detailsPath%%C_ini%, INFO, Star
 			fileRead, C_Body, %U_NotePath%%C_FileName%
-			SaveFile(C_Name,C_SafeName,C_Body,1)	
+			SaveFile(C_Name,C_SafeName,C_Body,1,C_Tags,C_Cat,C_Parent)	
 			LV@sel_col = "undoomCol1"
 		}
 	}
@@ -679,6 +678,9 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 		LV_GetText(CurrentStar, LastRowSelected, 9)
 		LV_GetText(C_FileName, LastRowSelected, 8)
 		LV_GetText(C_Name, LastRowSelected, 2)
+		LV_GetText(C_Tags, LastRowSelected, 2)
+		LV_GetText(C_Cat, LastRowSelected, 2)
+		LV_GetText(C_Parent, LastRowSelected, 2)
 
 		if (CurrentStar !=A_Space and CurrentStar !=10000 and CurrentStar !=10001 and CurrentStar !=10002 and CurrentStar !=10003 and CurrentStar !=10004){
 				MsgBox, 4,, Clear Unique Star? (press Yes or No)
@@ -715,7 +717,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 		LV_Modify(LastRowSelected,,UpdateStar,,,,,,,,NextStar)
 		IniWrite, %NextStar%, %detailsPath%%C_ini%, INFO, Star
 		fileRead, C_Body, %U_NotePath%%C_FileName%
-		SaveFile(C_Name,C_SafeName,C_Body,1)	
+		SaveFile(C_Name,C_SafeName,C_Body,1,C_Tags,C_Cat,C_Parent)	
 		return		
 	}
 	if (A_GuiEvent = "K") {
@@ -729,66 +731,72 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 				gosub build_tEdit
 		}
 	}
+	
+	;1Star|2Title|3Body|4Added|5Modified|6RawAdded|7RawModded|8FileName|9RawStar|10Tags|11Cat|12Parent|12Checked|13Marked|14Extra
+	
 	if A_GuiEvent in RightClick
 	{
 		LVSelectedROW := A_EventInfo
 		LV_GetText(NoteNameToEdit, LVSelectedROW,2)
 		LV_GetText(StarOldFile, LVSelectedROW,8)
 		LV_GetText(TitleOldFile, LVSelectedROW,8)
-		if (LV@sel_col=2) {
+		if (LV@sel_col == 2) {
 			MouseGetPos, xPos, yPos
 			xPos := xPos+25
 			gosub build_tEdit
 			return
 		}
-		if (LV@sel_col=1) {
+		if (LV@sel_col == 1) {
+			SelectedRows := trim(SelectedRows)
+			SelectedRowsArray := StrSplit(SelectedRows," "," ")
+			
+			if (SelectedRowsArray.Length() == 1){
+				MouseGetPos, xPos, yPos
+				xPos := xPos+25
+				gosub build_StarEditBox
+				LV@sel_col = "undoomCol1"
+				return
+			}
+		}
+		if (LV@sel_col == 1 or LV@sel_col == 3 or LV@sel_col == 10 or LV@sel_col == 11 or LV@sel_col == 12)
+		{
 			MouseGetPos, xPos, yPos
 			xPos := xPos+25
-			gosub build_StarEditBox
-			LV@sel_col = "undoomCol1"
-			return
-		}
-		if (LV@sel_col=3) {
-			
-			if (OpenInQuickNote = "1"){
-				MyClip := NoteNameToEdit
-
-				BuildGUI2()
-				ControlFocus, Edit4, FlatNote - QuickNote
-
-				GuiControl,, QuickNoteName,%MyClip%
-				CBinfo = %MyClip%
-				FileSafeName := NameEncode(CBinfo)
-				IfExist, %U_NotePath%%FileSafeName%.txt
-				{
-					FileRead, MyFile, %U_NotePath%%FileSafeName%.txt
-					IniRead, OldStarData, %detailsPath%%FileSafeName%.ini,INFO,Star
-					if (OldStarData = 10001)
-						OldStarData = %Star1%
-					if (OldStarData = 10002)
-						OldStarData = %Star2%
-					if (OldStarData = 10003)
-						OldStarData = %Star3%
-					if (OldStarData = 10004)
-						OldStarData = %Star4%
-					GuiControl,, QuickNoteBody,%MyFile%
-					GuiControl,, QuickStar,%OldStarData%
-				}
-				return
-			}				
-			if (InStr(ExternalEditor,".") != 0 ){
-				Run, %ExternalEditor% %U_NotePath%%TitleOldFile%
-				return
-			}	
-			Run, open %U_NotePath%%TitleOldFile%
+	
+			ColEditName :=  ColList[LV@sel_col]
+			gosub build_ColEdit
 			return
 		}
 	}
 return
-}
+
+
+UpdateLVSelected:
+
+	LV_GetText(StarOldFile, LVSelectedROW,8)
+	LV_GetText(TitleOldFile, LVSelectedROW,8)
+	LV_GetText(tOldFile, LVSelectedROW,8)
+    LV_GetText(RowText, LVSelectedROW,8)
+	LV_GetText(C_Added, LVSelectedROW,4)
+    LV_GetText(C_Modded, LVSelectedROW,5)
+	LV_GetText(C_Name, LVSelectedROW,2)
+	LV_GetText(C_Tags, LVSelectedROW,10)
+	LV_GetText(C_Parent, LVSelectedROW,12)
+	;LV_GetText(C_Cat, A_EventInfo,11)
+    FileRead, NoteFile, %U_NotePath%%RowText%
+	GuiControl,, PreviewBox, %NoteFile%
+	GuiControl,, TagBox, %C_Tags%
+	GuiControl,, NoteParent, %C_Parent%
+	;GuiControl, ChooseString, CatBox, %C_Cat%
+	GuiControl,, TitleBar, %C_Name%
+	GuiControl,, StatusbarM,M: %C_Modded%
+	GuiControl,, StatusbarA,A: %C_Added%
+
+return
+
+;GUI for right click to edit name
 build_tEdit:
-{
-	GUI, t:new, ,TMPedit000
+	GUI, t:new, ,InlineNameEdit
 	Gui, t:Margin , 5, 5 
 	Gui, t:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
 	Gui, t:Color,%U_SBG%, %U_MBG%	
@@ -796,66 +804,163 @@ build_tEdit:
 	gui, t:add,text,w100 -E0x200 center c%U_SFC%,New Name
 	Gui, t:add,edit,w100 -E0x200 c%U_FBCA% vtEdit
 	gui, t:add,button, default gTitleSaveChange x-10000 y-10000
-	WinSet, Style,  -0xC00000,TMPedit000
+	WinSet, Style,  -0xC00000,InlineNameEdit
 	GUI, t:Show, x%xPos% y%yPos%
 	tNeedsSubmit = 1
-	return
-}
-
-;Get a list of all used stores.
-/*
-MakeUsedStarList:
-{
-Loops := LV_GetCount()
-AllStars := ""
-if (SearchFilter ="") {
-	loop % loops {
-			LV_GetText(starz,A_index,1)
-			AllStars .= starz "|"
-	}
-	AllStars := RemoveDups(AllStars,"|")
-	sort AllStars, D|
-	AllStars :=  Trim(AllStars,"|")
-	UsedStars := StrReplace(AllStars,"||","|")
-	}
 return
+
+
+;GUI for right click col 10-12 for now and doing bulk operations.
+build_ColEdit:
+	Opt1 := [0, U_SBG, ,U_SFC]
+	GUI, ce:new, ,InlineNameEdit
+	Gui, ce:Margin , 5, 5 
+	Gui, ce:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
+	Gui, ce:Color,%U_SBG%, %U_MBG%
+	if (LV@sel_col != 1)
+		gui, ce:add,text,w200 -E0x200 center c%U_SFC%,Replace %ColEditName% with:
+	
+	if (LV@sel_col == 1){
+		Gui, ce:add, button,w200 section gbuild_StarEditBox hwndHIB2, [ Star Selector ]
+		ColEditStar = 1
+		If !ImageButton.Create(HIB2, Opt1, Opt2)
+		MsgBox, 0, ImageButton Error IB1, % ImageButton.LastError
+	}
+	if (LV@sel_col == 3)
+		ColEditRows = 5
+	else
+		ColEditRows = 1
+	if (LV@sel_col == 11){
+		Gui, ce:add,DDL,w200 -E0x200 c%U_FBCA% vceEdit hwndHceDDL r6, %CatBoxContents%
+		
+		;Listbox color
+		DDLbgColorb2 := strreplace(U_MBG,"0x")
+		DDLfontColorb2 := strreplace(U_MFC,"0x")
+		CtlColors.Attach(HceDDL, DDLbgColorb2,DDLfontColorb2)
+		OD_Colors.Attach(HceDDL, {T: U_MFC})
+	}
+	else 
+		Gui, ce:add,edit,w200 -E0x200 c%U_FBCA% vceEdit r%ColEditRows% hwndHceEDIT
+	
+
+		
+	gui, ce:add,button, default gColEditSaveChange w200 hwndHIB1 vIB1, [ Apply ]
+	
+	If !ImageButton.Create(HIB1, Opt1, Opt2)
+		MsgBox, 0, ImageButton Error IB1, % ImageButton.LastError
+	
+	
+	WinSet, Style,  -0xC00000,InlineNameEdit
+	if (HideScrollbars = 1) {
+		LVM_ShowScrollBar(HceEDIT,1,False)
+		GuiControl,+Vscroll,%HceEDIT%
+	}
+	GUI, ce:Show, x%xPos% y%yPos%
+	
+	;figure out why I need this->
+	;tNeedsSubmit = 1
+return
+
+
+ColEditSaveChange:
+if (LV@sel_col == 1){
+		OnMessage(0x44, "OnMsgBox")
+		MsgBox 0x40024, Change Stars?, WARNING - All stars will be replace by unique stars. Are you sure you want to continue?
+		OnMessage(0x44, "")
+		IfMsgBox Yes, {
+			goto YesChangeStars
+		} Else IfMsgBox No, {
+			return
+		}
 }
-*/
+YesChangeStars:
+GuiControlGet, ceEdit ;get the new data
+ColVarName := CurrentCol[LV@sel_col]
+tmpColNum = Col%LV@sel_col%
+
+Gui, 1:Default 
+TmpSelectedRows := trim(SelectedRows)
+SelectedRowsArray := StrSplit(TmpSelectedRows," "," ")
+ChangeCount := SelectedRowsArray.Length()
+SelectedRowsArray:=ObjectSort(SelectedRowsArray,,,false)
+	;v = row numbers
+	for RowKey, CRowNum in SelectedRowsArray{
+		LV_GetText(tmpName,CRowNum,8)
+		
+		tmpName := strreplace(tmpName,".txt",".ini")
+		Iniread, tmpName,%detailsPath%%tmpName%, INFO,Name
+		tmpname := strreplace(tmpName,"$#$")
+		C_SafeName := NameEncode(tmpName)
+		if (CRowNum !=3)
+			GetFile = false ;don't get the body
+		GetCurrentNoteData(C_SafeName)
+		;Error Check
+		if !FileExist( U_NotePath C_SafeName ".txt"){
+			Msgbox % "Error Report Code FNF#001 Details: `n" U_NotePath C_SafeName ".txt"
+			
+			break
+		}
+		;change what changed...
+		%ColVarName% := ceEdit
+		;save the new data
+		if (LV@sel_col == 1)
+		{
+			IniWrite, %C_Star%, %detailsPath%%C_SafeName%.ini, INFO, Star
+		}
+		SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
+		LV_Modify(CRowNum,tmpColNum,ceEdit)
+		LV_Modify(CRowNum, "Select")
+		tooltip, processing %RowKey% of %ChangeCount%
+
+
+	}
+		GuiControl,, PreviewBox, %C_File%
+		GuiControl,, TagBox, %C_Tags%
+		GuiControl,, NoteParent, %C_Parent%
+		GuiControl,, TitleBar, %C_Name%
+		GuiControl,, StatusbarM,M: %C_Mod%
+		GuiControl,, StatusbarA,A: %C_Add%
+		;SelectedRows :=
+		;LV_Modify(CRowNum, "Select")
+		settimer,KillToolTip,-1000
+
+	gui, ce:destroy
+
+return
+
 ;Make a list of all used stars - all user set stars.
 MakeOOKStarList:
-{
-Loops := LV_GetCount()
-GuiControlGet,SearchFilterState,,%HSF%
-if (SearchFilterState ="") {
-	OOKStars := ""
-	loop % loops {
-			LV_GetText(starz,A_index,1)
-			OOKStars .= starz "|"
+	Loops := LV_GetCount()
+	GuiControlGet,SearchFilterState,,%HSF%
+	if (SearchFilterState ="") {
+		OOKStars := ""
+		loop % loops {
+				LV_GetText(starz,A_index,1)
+				OOKStars .= starz "|"
+		}
+		OOKStars := StrReplace(OOKStars,Star1,"")
+		OOKStars := StrReplace(OOKStars,Star2,"")
+		OOKStars := StrReplace(OOKStars,Star3,"")
+		OOKStars := StrReplace(OOKStars,Star4,"")
+		OOKStars := RemoveDups(OOKStars,"|")
+		OOKArr := StrSplit(OOKStars,"|","|")
+		NewOOKStars := ""
+		AllMyStarsList := UniqueStarList "|" UniqueStarList2
+		if (AllMyStarsList != "|") {
+			for k, v in OOKArr
+				if (InStr(AllMyStarsList,v) !=0)
+					Continue
+				else
+					NewOOKStars .= v "|"
+		}
+		sort NewOOKStars, D|
+		NewOOKStars :=  Trim(NewOOKStars,"|")
+		OOKStars := StrReplace(NewOOKStars,"||","|")
 	}
-	OOKStars := StrReplace(OOKStars,Star1,"")
-	OOKStars := StrReplace(OOKStars,Star2,"")
-	OOKStars := StrReplace(OOKStars,Star3,"")
-	OOKStars := StrReplace(OOKStars,Star4,"")
-	OOKStars := RemoveDups(OOKStars,"|")
-	OOKArr := StrSplit(OOKStars,"|","|")
-	NewOOKStars := ""
-	AllMyStarsList := UniqueStarList "|" UniqueStarList2
-	if (AllMyStarsList != "|") {
-		for k, v in OOKArr
-			if (InStr(AllMyStarsList,v) !=0)
-				Continue
-			else
-				NewOOKStars .= v "|"
-	}
-	sort NewOOKStars, D|
-	NewOOKStars :=  Trim(NewOOKStars,"|")
-	OOKStars := StrReplace(NewOOKStars,"||","|")
-}
 return
-}
+
 
 StarFilterBox:
-{
 	gosub MakeOOKStarList
 	; var with all used stars = UsedStars
 	GUI, sb:new,-Caption +ToolWindow +hWndHSEB2,StarPicker
@@ -888,10 +993,9 @@ StarFilterBox:
 	}
 	Gui, sb:show, x%xPos% y%yPos%
 	SetTimer, GuiTimerSB
-	return
-}
+return
+
 Do_ApplyStarFilter:
-{
 	Gui sb:Submit
 	if (StarFilter="")
 		StarFilter:=StarFilter2
@@ -907,11 +1011,10 @@ Do_ApplyStarFilter:
 	StarFilter2 := ""
 	StarFilter3 := ""
 	StarFilter4 := ""
-	return
-}
+return
+
 
 build_StarEditBox:
-{
 	gosub MakeOOKStarList
 	GUI, star:new, +hWndHSEB ,TMPedit001
 	Gui, star:Margin , 5, 5 
@@ -944,13 +1047,15 @@ build_StarEditBox:
 	if (RapidStarNow = 0 and AddStar = 0)
 		sNeedsSubmit = 1
 	SetTimer, GuiTimerStar
-	return
-}
+return
+
 StarSaveChange:
-{
+	
+	Gui, star:Default
 	GUI, star:Submit
 	sNeedsSubmit = 0
 	NewStar = %sEdit%
+	
 	;msgbox 	% RapidStar "|" TmpName "," TmpFileSafeName "," C_Body "," NewStar "," StarOldFile
 	if (NewStar = "")
 		NewStar = %StarSelectedBox%
@@ -960,28 +1065,42 @@ StarSaveChange:
 		NewStar = %StarSelectedBox3%
 	if (NewStar = "")
 		NewStar = %StarSelectedBox4%
-	if (RapidStarNow = 1)
+	if (RapidStarNow == 1)
+	{
 		StarOldFile := ztitleEncoded ".txt"
+		RapidStarNow = 0
+	}
+	
+		if (ColEditStar == 1){
+		GuiControl,,%HceEDIT%,%NewStar%
+		return
+	}
+	
+	
 	TmpFileINI := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 	TmpFileSafeName := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
 	Iniread, OldStar,%detailsPath%%TmpFileINI%, INFO,Star
 	TmpName := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
 	;xthis
 
-	if (NewStar = OldStar or OldStar = "ERROR"){
-		msgbox Can't change to the same star.
+	if (NewStar == OldStar or OldStar == "ERROR"){
+		msgbox Can't change to the same star. OldStar:%OldStar% NewStar:%NewStar%
 		ListStarToChange = 0
 		return
 	}
 	FileRead, C_Body,%U_NotePath%%StarOldFile%
 	Iniread, TmpName,%detailsPath%%TmpFileINI%, INFO,Name
+	TmpName := strreplace(TmpName,"$#$")
+	Iniread, TmpTags,%detailsPath%%TmpFileINI%, INFO,Tags
+	Iniread, TmpCat,%detailsPath%%TmpFileINI%, INFO,Cat
+	Iniread, TmpParent,%detailsPath%%TmpFileINI%, INFO,Parent
 	IniWrite, %NewStar%, %detailsPath%%TmpFileINI%, INFO, Star
 	for Each, Note in MyNotesArray{
 		If (Note.8 = StarOldFile){
 			MyNotesArray.RemoveAt(Each)
 		}
 	}
-	SaveFile(TmpName,TmpFileSafeName,C_Body,1)
+	SaveFile(TmpName,TmpFileSafeName,C_Body,1,TmpTags,TmpCat,TmpParent)
 	ListStarToChange = 1
 	if (RapidStarNow = 1){
 		ListStarToChange = 0
@@ -993,52 +1112,45 @@ StarSaveChange:
 	ControlFocus , Edit1, FlatNotes - Library
 	gosub search
 	StarOldFile := ""
-	return
-}
-StarSelected:
-{
-z := "::" A_GuiEvent ":" errorlevel ":" A_EventInfo ":" LV@sel_col ":" GuiControlEvent
-tooltip % z
-;tooltip % x
-settimer,KillToolTip,-1000
- return
-}
-About:
-{
-Gui, 4:add,text,,FlatNotes Version 3.0.0 June 2020
-Gui, 4:Add,Link,,<a href="https://github.com/chaosdrop/FlatNotes">GitHub Page</a>
-Gui, 4:add,button,g4GuiEscape,Close
-Gui, 4:Show
 return
-}
+
+StarSelected:
+	z := "::" A_GuiEvent ":" errorlevel ":" A_EventInfo ":" LV@sel_col ":" GuiControlEvent
+	tooltip % z
+	;tooltip % x
+	settimer,KillToolTip,-1000
+return
+
+About:
+	Gui, 4:add,text,,FlatNotes Version 3.0.0 June 2020
+	Gui, 4:Add,Link,,<a href="https://github.com/chaosdrop/FlatNotes">GitHub Page</a>
+	Gui, 4:add,button,g4GuiEscape,Close
+	Gui, 4:Show
+return
 
 Library:
-{
     WinGetPos,,, Width, Height, ahk_id %g1ID%
 	WinMove, ahk_id %g1ID%,, (A_ScreenWidth/2)-(Width/2), (A_ScreenHeight/2)-(Height/2)
 	g1Open=1
 	WinShow, ahk_id %g1ID%
 	WinRestore, ahk_id %g1ID%
-	return
-}
+return
+
 CtrlCToggle:
-{
 	GuiControlGet, SetCtrlC
 	if (SetCtrlC = 1)
 		IniWrite, 1, %iniPath%, General, sendCtrlC
 	if (SetCtrlC = 0)
 		IniWrite, 0, %iniPath%, General, sendCtrlC
-	return
-}
+return
+
 Set_RapidStar:
-{
 	GuiControlGet, Select_RapidStar
 	IniWrite, %RapidStar%, %iniPath%, General, RapidStar
-	return
-}
+return
+
 
 UseCapslockToggle:
-{
 	GuiControlGet, UseCapslock
 	
 	if (UseCapslock = 1)
@@ -1050,10 +1162,8 @@ UseCapslockToggle:
 		return
 	}
 return
-}
 
 ColorPicked:
-{
 	if (A_GuiEvent == "Normal"){	
 		GuiControlGet, ColorPicked,,ColorChoice
 		pathToTheme = %A_WorkingDir%\sys\Themes\%ColorPicked%.ini
@@ -1077,10 +1187,9 @@ ColorPicked:
 		
 	}
 	gosub DummyGUI1
-	return
-}
+return
+
 SortStar:
-	{
 		if (NextSortStar ="1") {
 			LV_ModifyCol(1, "SortDesc")
 			NextSortStar = 0
@@ -1105,10 +1214,9 @@ SortStar:
 			GuiControl, Font, SortModded
 			
 		}
-		return
-	}
+return
+
 SortName:
-	{
 		if (NextSortName ="1") {
 			LV_ModifyCol(2, "SortDesc")
 			NextSortName = 0
@@ -1133,10 +1241,9 @@ SortName:
 			GuiControl, Font, SortModded
 			GuiControl, Font, SortStar
 		}
-	return
-	}
+return
+
 SortBody:
-{
 	if (NextSortBody ="1") {
 		LV_ModifyCol(3, "SortDesc")
 		NextSortBody = 0
@@ -1161,10 +1268,9 @@ SortBody:
 		GuiControl, Font, SortModded
 		GuiControl, Font, SortStar
 	}
-	return
-}
+return
+
 SortAdded:
-{
 	if (NextSortAdded ="1") {
 		LV_ModifyCol(6, "SortDesc")
 		NextSortAdded = 0
@@ -1189,10 +1295,9 @@ SortAdded:
 		GuiControl, Font, SortModded
 		GuiControl, Font, SortStar
 	}
-	return
-}
+return
+
 SortModded:
-{
 	if (NextSortAdded ="1") {
 		LV_ModifyCol(7, "SortDesc")
 		NextSortAdded = 0
@@ -1217,10 +1322,9 @@ SortModded:
 		GuiControl, Font, SortAdded
 		GuiControl, Font, SortStar
 	}
-	return
-}
+return
+
 FolderSelect:
-{
 	WinSet, AlwaysOnTop, Off, FlatNotes - Options
 	FileSelectFolder, NewNotesFolder, , 123
 	if NewNotesFolder = "")
@@ -1230,10 +1334,9 @@ FolderSelect:
 		IniWrite, %NewNotesFolder%\, %iniPath%, General, MyNotePath
 	}
 	WinSet, AlwaysOnTop, On, FlatNotes - Options
-	return
-}
+return
+
 Set_ExternalEditor:
-{
 	WinSet, AlwaysOnTop, Off, FlatNotes - Options
 	FileSelectFile, NewExternalEditor, 3, , Select a program, Programs (*.exe; *.jar;)
 		if (NewExternalEditor = "")
@@ -1243,11 +1346,9 @@ Set_ExternalEditor:
 			IniWrite, %NewExternalEditor%, %iniPath%, General, ExternalEditor
 		}
 	WinSet, AlwaysOnTop, On, FlatNotes - Options
-	return
-}
-Options:
-{
+return
 
+Options:
 	Fontlist := "sys\fontlist.cfg"
 	FileRead, FontFile, % Fontlist
 	FontOptionsArray := []
@@ -1299,6 +1400,9 @@ Options:
 	Gui, 3:add,text, xs section, Unique stars list #2
 	Gui, 3:add,edit, xs section w300 vSelect_UniqueStarList2 gSet_UniqueStarList2, %UniqueStarList2% 
 	
+	Gui, 3:add,text, xs section, Pipe "|" sperated list of Categories. (Example: Black|White|Calico|..etc)
+	Gui, 3:add,edit, xs section w300 vSelect_CatBoxContents gSet_CatBoxContents, %CatBoxContents% 
+	
 	Gui, 3:Add,CheckBox, xs vSelect_ShowStarHelper gSet_ShowStarHelper, Show star filter by search box?
 	GuiControl,,Select_ShowStarHelper,%ShowStarHelper%
 
@@ -1334,8 +1438,6 @@ Options:
 ;Shortcuts Tab
 ;-------------------------------------------------
 	Gui, 3:Tab, Shortcuts
-	Gui, 3:Add, CheckBox, section vSelect_CtrlEnter gSet_CtrlEnter, Use Ctrl+Enter instead of Enter?
-	GuiControl,,Select_CtrlEnter,%CtrlEnter%
 
 	ShortcutNames := ["Focus Search","Focus Results","Focus Edit/Preview","Add Note From Tempalte"]
 	Loop,% 4 {
@@ -1421,18 +1523,35 @@ Options:
 	CurrentStickyFontSize := StickyFontSize*0.5
 	Gui, 3:add,DropDownList, x+10 Choose%CurrentStickyFontSize% vStickyFontSizeSelect gSetStickyFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
 	
-	Gui, 3:Add,Text,xs,Column Width Percentage Star | Name | Body | Added | Modified 
+	Gui, 3:Add,Text, xs section
+
+	gui, 3:add, text,,Star
+	gui, 3:add, text, xp+55,Name
+	gui, 3:add, text, xp+55,Body
+	gui, 3:add, text, xp+55,Added
+	gui, 3:add, text, xp+55,Modded
+	gui, 3:add, text, xp+55,Tags
+	gui, 3:add, text, xp+55,Cat
+	gui, 3:add, text, xp+55,Parent
+
+	gui, 3:add, text, xs section
 	
-	Gui, Add, Edit, w50
+	Gui, 3:Add, Edit, w50
 	Gui, 3:Add,UpDown, vStarPercentSelect gSet_StarPercent Range0-100, %oStarPercent%
-	Gui, Add, Edit, w50 x+5
+	Gui, 3:Add, Edit, w50 x+5
 	Gui, 3:Add,UpDown, vNamePercentSelect gSet_NamePercent Range0-100, %oNamePercent%
-	Gui, Add, Edit, w50 x+5
+	Gui, 3:Add, Edit, w50 x+5
 	Gui, 3:Add,UpDown,  vBodyPercentSelect gSet_BodyPercent Range0-100, %oBodyPercent%
-	Gui, Add, Edit, w50 x+5
+	Gui, 3:Add, Edit, w50 x+5
 	Gui, 3:Add,UpDown,  vAddedPercentSelect gSet_AddedPercent Range0-100, %oAddedPercent%
-	Gui, Add, Edit, w50 x+5
+	Gui, 3:Add, Edit, w50 x+5
 	Gui, 3:Add,UpDown,  vModdedPercentSelect gSet_ModdedPercent Range0-100, %oModdedPercent%
+	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add,UpDown,  vTagsPercentSelect gSet_TagsPercent Range0-100, %oTagsPercent%
+	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add,UpDown,  vCatPercentSelect gSet_CatPercent Range0-100, %oCatPercent%
+	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add,UpDown,  vParentPercentSelect gSet_ParentPercent Range0-100, %oParentPercent%
 	
 	;Window Size Options Tab
 	Gui, 3:Tab, Window Size
@@ -1485,19 +1604,17 @@ Options:
 		GuiControl, Disable, Select_ExternalEditor
 	Gui, 3:SHOW 
 	WinSet, AlwaysOnTop, On, FlatNotes - Options
-	return
-}
+return
   
 SaveAndReload:
-{ 	
 	GuiControlGet,Select_UniqueStarList
 	IniRead, UniqueStarList, %iniPath%, General, UniqueStarList
 	GuiControlGet,Select_UniqueStarList2
 	IniRead, UniqueStarList2, %iniPath%, General, UniqueStarList2
+	GuiControlGet,Select_CatBoxContents
+	IniRead, CatBoxContents, %iniPath%, General, CatBoxContents
 	GuiControlGet,Select_ExternalEditor
 	IniWrite, %Select_ExternalEditor%, %iniPath%, General, ExternalEditor
-	GuiControlGet,Select_CtrlEnter
-	IniWrite,%Select_CtrlEnter%, %iniPath%, General, CtrlEnter
 	GuiControlGet,Select_ShowStarHelper
 	IniWrite,%Select_ShowStarHelper%, %iniPath%, General, ShowStarHelper
 	GuiControlGet, Select_RapidStar
@@ -1545,10 +1662,15 @@ SaveAndReload:
 	GuiControlGet, NamePercentSelect	
 	GuiControlGet, BodyPercentSelect	
 	GuiControlGet, AddedPercentSelect
-	GuiControlGet, ModdedPercentSelect	
+	GuiControlGet, ModdedPercentSelect
+	GuiControlGet, TagsPercentSelect
+	GuiControlGet, CatPercentSelect	
+	GuiControlGet, ParentPercentSelect
+
+	
 		
 
-	is100 := StarPercentSelect+NamePercentSelect+BodyPercentSelect+AddedPercentSelect+ModdedPercentSelect
+	is100 := StarPercentSelect+NamePercentSelect+BodyPercentSelect+AddedPercentSelect+ModdedPercentSelect+TagsPercentSelect+CatPercentSelect+ParentPercentSelect
 	WinSet, AlwaysOnTop, Off, FlatNotes - Options
 	if (is100 >= 110){
 		msgbox Column total width above 110 please fix.
@@ -1559,6 +1681,10 @@ SaveAndReload:
 	IniWrite, %BodyPercentSelect%,%iniPath%,General, BodyPercent		
 	IniWrite, %AddedPercentSelect%,%iniPath%,General, AddedPercent
 	IniWrite, %ModdedPercentSelect%,%iniPath%,General, ModdedPercent
+	IniWrite, %TagsPercentSelect%,%iniPath%,General, TagsPercent
+	IniWrite, %CatPercentSelect%,%iniPath%,General, CatPercent
+	IniWrite, %ParentPercentSelect%,%iniPath%,General, ParentPercent
+
 	GuiControlGet,Select_UserTimeFormat
 	IniWrite, %Select_UserTimeFormat%,%iniPath%,General, UserTimeFormat
 	GuiControlGet,Select_DeafultSort
@@ -1580,80 +1706,75 @@ reload
 	IniWrite,%Select_SearchDates%, %iniPath%, General, SearchDates
 	GuiControlGet,Select_SearchWholeNote
 	IniWrite,%Select_SearchWholeNote%, %iniPath%, General, SearchWholeNote
-	return
-}
+return
+
 Set_Star1:
-{
 	GuiControlGet,Select_Star1
 	IniWrite, %Select_Star1%,%iniPath%,General, Star1
 	IniRead, Star1, %iniPath%, General, Star1
-	return
-}
+return
+
 Set_Star2:
-{
 	GuiControlGet,Select_Star2
 	IniWrite, %Select_Star2%,%iniPath%,General, Star2
 	IniRead, Star2, %iniPath%, General, Star2
-	return
-}
+return
+
 Set_Star3:
-{
 	GuiControlGet,Select_Star3
 	IniWrite, %Select_Star3%,%iniPath%,General, Star3
 	IniRead, Star3, %iniPath%, General, Star3
-	return
-}
+return
+
 Set_Star4:
-{
 	GuiControlGet,Select_Star4
 	IniWrite, %Select_Star4%,%iniPath%,General, Star4
 	IniRead, Star4, %iniPath%, General, Star4
-	return
-}
+return
+
 Set_UniqueStarList:
-{
 	GuiControlGet,Select_UniqueStarList
 	IniWrite, %Select_UniqueStarList%,%iniPath%,General, UniqueStarList
 	IniRead, UniqueStarList, %iniPath%, General, UniqueStarList
-	return
-}
+return
+
 Set_UniqueStarList2:
-{
 	GuiControlGet,Select_UniqueStarList2
 	IniWrite, %Select_UniqueStarList2%,%iniPath%,General, UniqueStarList2
 	IniRead, UniqueStarList2, %iniPath%, General, UniqueStarList2
-	return
-}
+return
+
+Set_CatBoxContents:
+	GuiControlGet,Select_CatBoxContents
+	IniWrite, %Select_CatBoxContents%,%iniPath%,General, CatBoxContents
+	IniRead, CatBoxContents, %iniPath%, General, CatBoxContents
+return
+
 Set_DeafultSort:
-{
 	GuiControlGet,Select_DeafultSort
 	IniWrite, %Select_DeafultSort%,%iniPath%,General, DeafultSort
 	IniRead, DeafultSort, %iniPath%, General, DeafultSort
-	return
-}
+return
+
 Set_DeafultSortDir:
-{
 	GuiControlGet,Select_DeafultSortDir
 	IniWrite, %Select_DeafultSortDir%,%iniPath%,General, DeafultSortDir
 	IniRead, DeafultSortDir, %iniPath%, General, DeafultSortDir
-	return
-}
+return
+
 Set_UserTimeFormat:
-{
 	GuiControlGet,Select_UserTimeFormat
 	IniWrite, %Select_UserTimeFormat%,%iniPath%,General, UserTimeFormat
 	IniRead, UserTimeFormat, %iniPath%, General, UserTimeFormat
-	return
-}
+return
+
 Set_backupsToKeep:
-{
 	GuiControlGet,U_backupsToKeep,, backupsToKeepSelect	
 	IniWrite, %U_backupsToKeep%,%iniPath%,General, backupsToKeep
 	IniRead, backupsToKeep, %iniPath%, General, backupsToKeep
-	return
-}
+return
+
 Set_ShowMainWindowOnStartUp:
-{
 	GuiControlGet,Select_ShowMainWindowOnStartUp
 	
 	if (A_GuiEvent == "Normal"){
@@ -1662,20 +1783,8 @@ Set_ShowMainWindowOnStartUp:
 		
 	}
 return
-}
-Set_CtrlEnter:
-{
-	GuiControlGet,Select_CtrlEnter
-	
-	if (A_GuiEvent == "Normal"){
-		IniWrite,%Select_CtrlEnter%, %iniPath%, General, CtrlEnter
-		IniRead,CtrlEnter,%iniPath%,General,CtrlEnter
-		
-	}
-return
-}
+
 Set_SearchDates:
-{
 	GuiControlGet,Select_SearchDates
 	
 	if (A_GuiEvent == "Normal"){
@@ -1684,9 +1793,8 @@ Set_SearchDates:
 		
 	}
 return
-}
+
 Set_SearchWholeNote:
-{
 	GuiControlGet,Select_SearchWholeNote
 	
 	if (A_GuiEvent == "Normal"){
@@ -1694,9 +1802,8 @@ Set_SearchWholeNote:
 		IniRead,SearchWholeNote,%iniPath%,General,SearchWholeNote
 	}
 return
-}
+
 SetHideScrollbars:
-{
 	GuiControlGet,HideScrollbarsSelect
 	
 	if (A_GuiEvent == "Normal"){
@@ -1705,9 +1812,8 @@ SetHideScrollbars:
 		
 	}
 return
-}
+
 SetShowStatusBar:
-{
 	GuiControlGet,ShowStatusBarSelect
 	
 	if (A_GuiEvent == "Normal"){
@@ -1716,9 +1822,8 @@ SetShowStatusBar:
 		
 	}
 return
-}
+
 Set_ShowStarHelper:
-{
 	GuiControlGet,Select_ShowStarHelper
 	
 	if (A_GuiEvent == "Normal"){
@@ -1726,9 +1831,9 @@ Set_ShowStarHelper:
 		IniRead,ShowStarHelper,%iniPath%,General,ShowStarHelper
 	}
 return
-}
+
 Set_OpenInQuickNote:
-{
+
 	GuiControlGet,Select_OpenInQuickNote
 	if (OpenInQuickNote = 0)
 		GuiControl, Disable, Select_ExternalEditor
@@ -1739,25 +1844,22 @@ Set_OpenInQuickNote:
 		IniRead,OpenInQuickNote,%iniPath%,General,OpenInQuickNote
 	}
 return
-}
+
 SetPreviewRows:
-{
 	GuiControlGet, U_PreviewRows,,PreviewRowsSelect	
 	IniWrite, %U_PreviewRows%,%iniPath%,General, PreviewRows	
 	IniRead, PreviewRows, %iniPath%, General, PreviewRows
 	gosub DummyGUI1
-	return
-}
+return
+
 SetResultRows:
-{
 	GuiControlGet, U_ResultRows,,ResultRowsSelect	
 	IniWrite, %U_ResultRows%,%iniPath%,General, ResultRows		
 	IniRead, ResultRows, %iniPath%, General, ResultRows
 	gosub DummyGUI1
-	return 
-}
+return 
+
 SetQuickNoteRows:
-{
 	GuiControlGet, U_QuickNoteRows,,QuickNoteRowsSelect	
 	IniWrite, %U_QuickNoteRows%,%iniPath%,General, QuickNoteRows	
 	IniRead, QuickNoteRows, %iniPath%, General, QuickNoteRows
@@ -1771,10 +1873,9 @@ SetQuickNoteRows:
 		WinActivate ; use the window found above
 	else
 		WinActivate, FlatNotes
-	return
-}
+return
+
 SetQuickW:
-{ 
 	GuiControlGet, U_QuickNoteWidth,,QuickWSelect	
 	IniWrite, %U_QuickNoteWidth%,%iniPath%,General, QuickNoteWidth	
 	IniRead, QuickNoteWidth,%iniPath%, General,QuickNoteWidth
@@ -1787,31 +1888,27 @@ SetQuickW:
 		WinActivate ; use the window found above
 	else
 		WinActivate, FlatNotes
-	return
-}
+return
+
 Set_USSLR:
-{
 	GuiControlGet,Select_USSLR	
 	IniWrite, %Select_USSLR%,%iniPath%,General, USSLR	
 	IniRead, USSLR, %iniPath%, General, USSLR
-	return
-}
+return
+
 Set_StickyRows:
-{
 	GuiControlGet,Select_StickyRows	
 	IniWrite, %Select_StickyRows%,%iniPath%,General, StickyRows	
 	IniRead, StickyRows, %iniPath%, General, StickyRows
-	return
-}
-Set_StickyW:
-{ 
+return
+
+Set_StickyW: 
 	GuiControlGet, Select_StickyW	
 	IniWrite, %Select_StickyW%,%iniPath%,General, StickyW	
 	IniRead, StickyW,%iniPath%, General,StickyW
-	return
-}
+return
+
 SetMainW:
-{
 	GuiControlGet, U_MainNoteWidth,,MainWSelect	
 	IniWrite, %U_MainNoteWidth%,%iniPath%,General, WindowWidth	
 	IniRead, LibW, %iniPath%, General, WindowWidth ,530	
@@ -1820,80 +1917,69 @@ SetMainW:
 	NameColW := Round(ColAdjust*0.4)
 	BodyColW := Round(ColAdjust*0.6)
 	gosub DummyGUI1
-	return 
-}
+return 
+
 SetFontRendering:
-{
 	GuiControlGet, U_FontRendering,,FontRenderingSelect	
 	IniWrite, %U_FontRendering%,%iniPath%,General, FontRendering		
 	IniRead, FontRendering,%iniPath%, General,FontRendering
 	gosub DummyGUI1
-	return
-} 
+return
+
 SetSearchFontFamily:
-{
 	GuiControlGet, U_SearchFontFamily,,SearchFontFamilySelect
 	IniWrite, %U_SearchFontFamily%,%iniPath%,General, SearchFontFamily	
 	IniRead, SearchFontFamily, %iniPath%, General, SearchFontFamily
 	gosub DummyGUI1
-	return 
-}
+return 
+
 SetSearchFontSize:
-{
 	GuiControlGet, U_SearchSize,,SearchFontSizeSelect	
 	IniWrite, %U_SearchSize%,%iniPath%,General, SearchFontSize
 	IniRead, SearchFontSize, %iniPath%, General, SearchFontSize
 	gosub DummyGUI1
-	return 
-}
+return 
+
 SetResultFontFamily:
-{
 	GuiControlGet, U_ResultFontFamily,,ResultFontFamilySelect
 	IniWrite, %U_ResultFontFamily%,%iniPath%,General, ResultFontFamily	
 	IniRead, ResultFontFamily, %iniPath%, General, ResultFontFamily
 	gosub DummyGUI1
-	return 
-}
+return 
+
 SetResultFontSize:
-{
 	GuiControlGet, U_ResultSize,,ResultFontSizeSelect	
 	IniWrite, %U_ResultSize%,%iniPath%,General, ResultFontSize
 	IniRead, ResultFontSize, %iniPath%, General, ResultFontSize
 	gosub DummyGUI1
-	return 
-}
+return 
+
 SetPreviewFontFamily:
-{
 	GuiControlGet, U_PreviewFontFamily,,PreviewFontFamilySelect
 	IniWrite, %U_PreviewFontFamily%,%iniPath%,General, PreviewFontFamily	
 	IniRead, PreviewFontFamily, %iniPath%, General, PreviewFontFamily
 	gosub DummyGUI1
-	return
-}
+return
 SetPreviewFontSize:
-{
 	GuiControlGet, U_PreviewSize,,PreviewFontSizeSelect	
 	IniWrite, %U_PreviewSize%,%iniPath%,General, PreviewFontSize
 	IniRead, PreviewFontSize, %iniPath%, General, PreviewFontSize
 	gosub DummyGUI1
-	return
-}
+return
+
 SetStickyFontFamily:
-{
 	GuiControlGet, U_StickyFontFamily,,StickyFontFamilySelect
 	IniWrite, %U_StickyFontFamily%,%iniPath%,General, StickyFontFamily	
 	IniRead, StickyFontFamily, %iniPath%, General, StickyFontFamily
-	return
-}
+return
+
 SetStickyFontSize:
-{
 	GuiControlGet, U_StickySize,,StickyFontSizeSelect	
 	IniWrite, %U_StickySize%,%iniPath%,General, StickyFontSize
 	IniRead, StickyFontSize, %iniPath%, General, StickyFontSize
-	return
-}
+return
+
 SetFontFamily:
-{ 
 	GuiControlGet, U_FontFamily,,FontFamilySelect
 	IniWrite, %U_FontFamily%,%iniPath%,General, FontFamily	
 	IniRead, FontFamily, %iniPath%, General, FontFamily ,Verdana
@@ -1909,10 +1995,12 @@ SetFontFamily:
 		WinActivate, FlatNotes
 	GuiControl,,QuickNoteName, Sample Text
 	GuiControl,,QuickNoteBody, Sample Text
-	return
-}
+	GuiControl,,QuickNoteTags, Sample Text
+	GuiControl,,QuickNoteCat, Sample Text
+	GuiControl,,QuickNoteParent, Sample Text
+return
+
 SetFontSize:
-{
 	GuiControlGet, U_FontSize,,FontSizeSelect	
 	IniWrite, %U_FontSize%,%iniPath%,General, FontSize
 	IniRead, FontSize, %iniPath%, General, FontSize
@@ -1926,56 +2014,76 @@ SetFontSize:
 		WinActivate, FlatNotes
 	GuiControl,,QuickNoteName, Sample Text
 	GuiControl,,QuickNoteBody, Sample Text
-	return
-}
+	GuiControl,,QuickNoteTags, Sample Text
+	GuiControl,,QuickNoteCat, Sample Text
+	GuiControl,,QuickNoteParent, Sample Text
+return
+
 Set_StarPercent:
-{
 	GuiControlGet, StarPercentSelect	
 	IniWrite, %StarPercentSelect%,%iniPath%,General, StarPercent		
 	IniRead, oNamePercent,%iniPath%, General,StarPercent
 	StarPercent = 0.%oStarPercent%
 	gosub DummyGUI1
-	return
-}
+return
+
 Set_NamePercent:
-{
 	GuiControlGet, NamePercentSelect	
 	IniWrite, %NamePercentSelect%,%iniPath%,General, NamePercent		
 	IniRead, oNamePercent,%iniPath%, General,NamePercent
 	NamePercent = 0.%oNamePercent%
 	gosub DummyGUI1
-	return
-}
+return
+
 Set_BodyPercent:
-{
 	GuiControlGet, BodyPercentSelect	
 	IniWrite, %BodyPercentSelect%,%iniPath%,General, BodyPercent		
 	IniRead, oBodyPercent,%iniPath%, General,BodyPercent
 	BodyPercent = 0.%oBodyPercent%
 	gosub DummyGUI1
-	return
-}
+return
+
 Set_AddedPercent:
-{
 	GuiControlGet, AddedPercentSelect	
 	IniWrite, %AddedPercentSelect%,%iniPath%,General, AddedPercent		
 	IniRead, oAddedPercent,%iniPath%, General,AddedPercent
 	AddedPercent = 0.%oAddedPercent%
 	gosub DummyGUI1
-	return
-}
+return
+
 Set_ModdedPercent:
-{
 	GuiControlGet, ModdedPercentSelect	
 	IniWrite, %ModdedPercentSelect%,%iniPath%,General, ModdedPercent	
 	IniRead, oModdedPercent,%iniPath%, General,ModdedPercent
 	ModdedPercent = 0.%oModdedPercent%
 	gosub DummyGUI1
-	return
-}
+return
+
+Set_TagsPercent:
+	GuiControlGet, TagsPercentSelect	
+	IniWrite, %TagsPercentSelect%,%iniPath%,General, TagsPercent	
+	IniRead, oTagsPercent,%iniPath%, General,TagsPercent
+	TagsPercent = 0.%oTagsPercent%
+	gosub DummyGUI1
+return
+
+Set_CatPercent:
+	GuiControlGet, CatPercentSelect	
+	IniWrite, %CatPercentSelect%,%iniPath%,General, CatPercent	
+	IniRead, oCatPercent,%iniPath%, General,CatPercent
+	CatPercent = 0.%oCatPercent%
+	gosub DummyGUI1
+return
+
+Set_ParentPercent:
+	GuiControlGet, ParentPercentSelect	
+	IniWrite, %ParentPercentSelect%,%iniPath%,General, ParentPercent	
+	IniRead, oParentPercent,%iniPath%, General,ParentPercent
+	ParentPercent = 0.%oParentPercent%
+	gosub DummyGUI1
+return
 
 Label:
-{
 	If %A_GuiControl% in +,^,!,+^,+!,^!,+^!    ;If the hotkey contains only modifiers, return to wait for a key.
 		return
 	num := SubStr(A_GuiControl,3)              ;Get the index number of the hotkey control.
@@ -1998,10 +2106,9 @@ Label:
 	}
 	If (savedHK%num% || HK%num%)
 		setHK(num, savedHK%num%, HK%num%)
-	return
-}
+return
+
 LabelS:
-{
 	If %A_GuiControl% in +,^,!,+^,+!,^!,+^!   
 		return
 	num := SubStr(A_GuiControl,3)              
@@ -2024,67 +2131,45 @@ LabelS:
 	}
 	If (savedSK%num% || SK%num%)
 		setSK(num, savedSK%num%, SK%num%)
-	return
-}
-ntmGuiClose:
-{
-	Gui, ntm:Destroy
-	return
-}
-ntGuiEscape:
-ntGuiClose:
-{
-	Gui, nt:Destroy
-	RapidNTAppend = 0
-	return
-}
+return
+
+
 sbGuiEscape:
 sbGuiClose:
-{
 	Gui, sb:Destroy
-	return
-}
+return
+
 StarGuiEscape:
 StarGuiClose:
-{
 	Gui, Star:Destroy
-	return
-}
-tsGuiClose:
-tsGuiEscape:
-{
-	Gui, ts:Destroy
-	RapidNTAppend = 0
-	return
-}
-tGuiClose:
-tGuiEscape:
-{
-	Gui, t:Destroy
-	return
-}
+return
+
+
+ceGuiClose:
+ceGuiEscape:
+	Gui, ce:Destroy
+	ColEditStar = 0
+return
+
+
 6GuiEscape:
 6GuiClose:
-{
 	Gui, 6:Destroy
-	return
-}
+return
+
 4GuiEscape:
 4GuiClose:
-{
 	Gui, 4:Destroy
-	return
-}
+return
+
 3GuiEscape:
 3GuiClose:
-{
 	Gui, 3:Destroy
 	reload
-	return
-}
+return
+
 2GuiEscape:
 2GuiClose:
-{
 	GuiControlGet,working_QuickNote,,%HQNB%
 	GuiControlGet,working_QuickNoteSafeName,,%HQNFSN%
 	FileRead, CheckForOldNote, %U_NotePath%%working_QuickNoteSafeName%.txt
@@ -2100,37 +2185,34 @@ tGuiEscape:
 		}
 	}
 	Gui, 2:Destroy 
-	return
-}
+return
+
 GuiEscape:
-{
 	WinHide, ahk_id %g1ID%
 	g1Open=0
-	return
-}
+	SelectedRows=
+return
+
 GuiClose:
-{
 	WinHide, ahk_id %g1ID%
 	g1Open=0
-	return
-}
+	SelectedRows=
+return
+
 Exit:
-{
 	ExitApp
-}
+
 CheckBackupLaterTimer:
-{
- BackupNotes()
- return
-}
+	BackupNotes()
+return
+
 
 SortNow:
-{
-LV_ModifyCol(C_SortCol,C_SortDir)
+	LV_ModifyCol(C_SortCol,C_SortDir)
 return
-}
+
+
 TitleSaveChange:
-{
 	GUI, t:Submit
 	global LVSelectedROW
 	tNeedsSubmit = 0
@@ -2146,6 +2228,7 @@ TitleSaveChange:
 	NewIniName = %FileSafeName%.ini
 	NewTitleFileName = %FileSafeName%.txt
 	FileRead, C_Body,%U_NotePath%%TitleOldFile%
+	
 	if FileExist(U_NotePath NewTitleFileName){
 		MsgBox, A note with this name already exists.
 		tNeedsSubmit = 0
@@ -2182,75 +2265,75 @@ TitleSaveChange:
 				MyNotesArray.RemoveAt(Each)
 			}
 		}
+	Iniread, TmpTags,%detailsPath%%NewIniName%, INFO,Tags
+	Iniread, TmpCat,%detailsPath%%NewIniName%, INFO,Cat
+	Iniread, TmpParent,%detailsPath%%NewIniName%, INFO,Parent
 	
 	;FileRecycle, %detailsPath%%C_ini%%tOldFile%
-	SaveFile(NewTitle,FileSafeName,C_Body,1)
+	SaveFile(NewTitle,FileSafeName,C_Body,1,TmpTags,TmpCat,TmpParent)
 	ListTitleToChange = 1
 	ControlFocus , Edit1, FlatNotes - Library
 	TitleOldFile := ""
-	return
-}
+return
+
 
 
 
 Edit3SaveTimer:
-{
 	global LVSelectedROW
 	if (LVSelectedROW="")
 		LVSelectedROW=1
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
 	GuiControlGet, PreviewBox
-	SaveFile(RowText,FileSafeName,PreviewBox,1)
+	GuiControlGet, TagBox
+	iniRead,C_Cat,%detailsPath%%FileSafeName%.ini,INFO,Cat
+	GuiControlGet, NoteParent
+	
+	SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,C_Cat,NoteParent)
 	iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
+
 	FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
-	LV_Modify(LVSelectedROW,,, RowText, NewBodyText)
+	LV_Modify(LVSelectedROW,,,RowText, NewBodyText,,,,,,,TagBox,,NoteParent)
 	savetimerrunning = 0
 	unsaveddataEdit3 = 0
 	ControlSend, Edit1,{left},FlatNotes - Library
-	return
-}
+return
+
 PreviewBox:
-{
 	unsaveddataEdit3 = 1
 if (savetimerrunning = 0) {
 	savetimerrunning = 1
 	settimer, Edit3SaveTimer, -10000
 	}
 return
-}
+
 uiMove:
-{
 	PostMessage, 0xA1, 2,,, A 
-	Return
-}
+Return
+
 Xsticky:
-{
 	Gui +LastFound 
 	gui destroy
 	WinClose
-	return
-}
+return
+
 Usticky:
-{
 	Gui +LastFound 
 	WinMove, , , ,  , , 26
-	return
-}
+return
+
 Hsticky:
-{
 	Gui +LastFound 
 	WinMove, , , ,  , , %StickyMaxH%
-	return
-}
+return
+
 Pinsticky:
-{
 	Gui +LastFound 
 	WinSet, AlwaysOnTop , Toggle
-	return
-}
+return
+
 StarQN:
-{
 	GUI, sb:new,-Caption +ToolWindow +hWndHSEB2,StarPicker
 	Gui, sb:Margin , 5, 5 
 	Gui, sb:Font, s10 Q%FontRendering%, Verdana, %U_MFC%
@@ -2280,10 +2363,9 @@ StarQN:
 	}
 	Gui, sb:show, x%xPos% y%yPos%
 	SetTimer, GuiTimerSB
-	return
-}
+return
+	
 Do_ApplyStarQN:
-{
 	Gui sb:Submit
 	if (StarQN="")
 		StarQN:=Star2QN
@@ -2296,478 +2378,248 @@ Do_ApplyStarQN:
 	StarQN2 := ""
 	StarQN3 := ""
 	StarQN4 := ""
-	return
-}
+return
+
 GuiTimerStar:
-{
 	IfWinNotActive, TMPedit001
 	{	
 		Gui, Star:destroy
 		SetTimer, GuiTimerStar, Off
 	}
-	Return
-}
+Return
+
 GuiTimerSB:
-{
 	IfWinNotActive, StarPicker
 	{	
 		Gui, sb:destroy
 		SetTimer, GuiTimerSB, Off
 	}
-	Return
-}
-LibTemplateAdd:
-{
-	LibWindow = 1
-	gosub NoteTemplateSelectUI
-	return
-}
-NoteTemplateSelectUI:
-{
-	MouseGetPos, xPos, yPos
-	xPos /= 1.15
-	yPos /= 1.15
-	TemplateFileList := ""
-	Loop, Files, %templatePath%*.txt 
-		TemplateFileList .= A_LoopFileName "|"
-	gui, ts:new, +hwndHTSGUI ,Template Select - FlatNotes
-	Gui, ts:Margin, 3,3
-	Gui, ts:Font, s10, Courier New,
-	Gui, ts:Color,%U_SBG%, %U_MBG%
-	TemplateLBW := 227+VSBW
-	Gui, ts:Add, ListView, hwndHTSLB r10 x+-6 w%TemplateLBW% gNoteTemplateUI vSelected_NoteTemplate -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid C%U_MFC% +altsubmit -Multi Report, Name
-	if (HideScrollbars = 1) {
-		LVM_ShowScrollBar(HTSLB,1,False)
-		GuiControl,+Vscroll,%HTSLB%
-	}
-	TemplateFileList := Trim(TemplateFileList,"|")
-	TemplateFileListLVArr := strsplit(TemplateFileList, "|","|")
-	for k,v in TemplateFileListLVArr
-		LV_Add("",v)
-	LV_ModifyCol(1, 227)
-	LV_ModifyCol(1, "Logical")
-	LV_ModifyCol(1, "Sort")
-	
-	Gui, ts:add, edit, c%U_MFC% center hwndHTRowsOver r1 -E0x200 x197 w25 vTRowsOver gTRowsOver, %NewTemplateRows%
-	Gui, ts:add, text, c%U_SFC% center x0 w148 yp+5 gNoteTemplateMaker,  [ Make New ]
-	
-	CLV := New LV_Colors(HTSLB)
-	CLV.SelectionColors(rowSelectColor,rowSelectTextColor)
-	Gui, ts:show, x%xPos% y%yPos% w225
-	Gui, ts:add, button, default x-1000 h0 gNoteTemplateEnterButton, OK
-	Gui +LastFound 
-	WinSet, AlwaysOnTop , Toggle
-return
-}
-TRowsOver:
-{
-	GuiControlGet,TRowsOver
-	if (TRowsOver>30)
-		TRowsOver = 30
-	IniWrite, %TRowsOver%,%iniPath%, General, NewTemplateRows
-	Iniread, NewTemplateRows,%iniPath%, General, NewTemplateRows
-	return
-}
+Return
 
-NoteTemplateUI:
-{
-
-	if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
-	{
-		TemplateLVSelectedROW := A_EventInfo
-	}
-	LV_GetText(Selected_NoteTemplate,A_EventInfo)
-	;z := "#" A_GuiEvent ":" errorlevel ":" A_EventInfo ":" LV@sel_col ":" ;Selected_NoteTemplate
-	;tooltip % z
-	;settimer,KillToolTip,-1000
-	;return
-
-	if A_GuiEvent in RightClick
-	{
-		if WinExist("Template Maker - FlatNotes"){
-		msgbox Sorry only one template can be open at a time.
-		gui,ts:destroy
-		return
-		}
-		FileRead,TemplateToEdit,%templatePath%%Selected_NoteTemplate%
-		TemplateEditName := RegExReplace(Selected_NoteTemplate, "\.txt(?:^|$|\r\n|\r|\n)")
-		TTEArr := StrSplit(TemplateToEdit,"`n","`n")
-		Gui, ntm:new,hwndHNTM ,Template Maker - FlatNotes
-		Gui, ntm:Margin, 3,3
-		Gui, ntm:Font, s10, Courier New,
-		Gui, ntm:Color,%U_SBG%, %U_MBG%
-		Gui, ntm:add, text, c%U_SFC% section y+3 w50, Name:
-		Gui, ntm:add, Edit, center c%U_MFC% x+3 w300 r1 -E0x200 vTemplateFileName,%TemplateEditName%
-		Gui, ntm:add, text, c%U_SFC% x+3 w50, .txt
-		Gui, ntm:add, text, section xs center h0 w0 hidden
-		Gui, ntm:add, text, c%U_SFC% center w400, Width of each list: (50|70|100)
-		Gui, ntm:add, text, c%U_SFC% center w200 gAutoWidth, [ Auto Width ]
-		Gui, ntm:add, text, c%U_SFC% center w200 x+3 gntSAVE, [ Save ]
-		TTEArrW := TTEArr[1]
-		Gui, ntm:add, Edit, center c%U_MFC% section xs w400 r1 -E0x200 vListBoxWidthRow,%TTEArrW%
-		TTEArr.RemoveAt(1)
-		
-		Gui, ntm:add, text, c%U_SFC%section xs center w400, List below here: (Red|Blue|Green) 
-		for, k,v  in TTEArr {
-			RowDetails := TTEArr[A_Index]
-			Gui, ntm:add, text, c%U_SFC% section xs w30, %a_index%:
-			;370 
-			Gui, ntm:add, Edit, c%U_MFC% x+3 w350 r1 -E0x200  vTMLB%a_index%,%RowDetails%
-			Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMup%a_index%,%TemplateAboveSymbol%
-			Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMdown%a_index%,%TemplateBelowSymbol%
-		}
-		BlankRows := TTEArr.MaxIndex()
-		GuiControlGet,TRowsOver,, %HTRowsOver%
-		CheckRows := TRowsOver - BlankRows
-		if (CheckRows>0)
-			Loop %CheckRows% {
-				BlankRows++
-				Gui, ntm:add, text, c%U_SFC% section xs w30, %BlankRows%:
-				Gui, ntm:add, Edit, c%U_MFC% x+3 w350 r1 -E0x200  vTMLB%BlankRows%,
-				Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMup%BlankRows%,%TemplateAboveSymbol%
-				Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMdown%BlankRows%,%TemplateBelowSymbol%
-			}
-		Gui, ntm:show
-		return
-	}
-	if (A_GuiEvent = "K" and A_EventInfo = "32")
-		{
-		LV_GetText(Selected_NoteTemplate,TemplateLVSelectedROW)
-		;msgbox % Selected_NoteTemplate "  &  " TemplateLVSelectedROW
-		if (Selected_NoteTemplate = "")
-			return
-		Gui, nt:destroy
-		Gui, ts:submit
-		Gui, ts:destroy
-		MouseGetPos, xPos, yPos
-		xPos /= 1.15
-		yPos /= 1.15
-		WindowW := ""
-		FileRead, TemplateTMP, %templatePath%%Selected_NoteTemplate%
-		TemplateTMP := trim(TemplateTMP,"`n")
-		TemplateTMP := trim(TemplateTMP,"`r")
-		NewTemplateArr := SubStr(TemplateTMP, InStr(TemplateTMP, "`n") + 1)
-		TemplateArr := StrSplit(NewTemplateArr, "`n","`n")
-		FileReadLine ListBoxWs, %templatePath%%Selected_NoteTemplate%, 1
-		ListBoxWArr := StrSplit(ListBoxWs, "|","|")
-		for k, v in TemplateArr {
-			wTMP%k%:= ListBoxWarr[A_Index]
-			wwTMP := wTMP%k%
-			WindowW += wwTMP+3
-		}
-		Gui, nt:New,, FlatNotes - Note From Template
-		Gui, nt:Margin, 3,3
-		Gui, nt:Font, s10, Courier New,
-		Gui, nt:Color,%U_SBG%, %U_MBG%
-		Gui, nt:add, text, c%U_SFC% center w%WindowW% -E0x200 gntInsert, [ Insert At Top ]
-		Gui, nt:add, text, c%U_SFC%section xs center h0 w0 hidden
-		for k, v in TemplateArr {
-			wTMP%k%:= ListBoxWarr[A_Index]
-			wwTMP := wTMP%k%
-			if (wwTMP = ""){
-				msgbox Width Row is missing a value.`n`nTry opening this template in the editor by right clicking it and using [Auto Width].
-				return
-			}
-			Gui, nt:add, edit, % "section -E0x200 c" U_MFC " x+3 y35 w" wwTMP " vNTeB" k " r1", 
-			Gui, nt:add, listbox, % "Multi -E0x200 c" U_MFC " w" wwTMP " vNTLB" k " r10", %v%
-		}
-		Gui, nt:add, text, c%U_SFC% center y+3 x3 section w%WindowW% -E0x200 gntInsertB, [ Insert At Bottom ]
-		Gui, nt:show, x%xPos% y%yPos%
-		return
-	}
-	
-	if A_GuiEvent in Normal
-		{
-		if (Selected_NoteTemplate = "")
-			return
-		Gui, nt:destroy
-		Gui, ts:submit
-		Gui, ts:destroy
-		MouseGetPos, xPos, yPos
-		xPos /= 1.15
-		yPos /= 1.15
-		WindowW := ""
-		FileRead, TemplateTMP, %templatePath%%Selected_NoteTemplate%
-		TemplateTMP := trim(TemplateTMP,"`n")
-		TemplateTMP := trim(TemplateTMP,"`r")
-		NewTemplateArr := SubStr(TemplateTMP, InStr(TemplateTMP, "`n") + 1)
-		TemplateArr := StrSplit(NewTemplateArr, "`n","`n")
-		FileReadLine ListBoxWs, %templatePath%%Selected_NoteTemplate%, 1
-		ListBoxWArr := StrSplit(ListBoxWs, "|","|")
-		for k, v in TemplateArr {
-			wTMP%k%:= ListBoxWarr[A_Index]
-			wwTMP := wTMP%k%
-			WindowW += wwTMP+3
-		}
-		;this is the + interface in the main GUI...
-		Gui, nt:New,, FlatNotes - Note From Template
-		Gui, nt:Margin, 3,3
-		Gui, nt:Font, s10, Courier New,
-		Gui, nt:Color,%U_SBG%, %U_MBG%
-		Gui, nt:add, text, c%U_SFC% center w%WindowW% -E0x200 gntInsert, [ Insert At Top ]
-		Gui, nt:add, text, c%U_SFC%section xs center h0 w0 hidden
-		for k, v in TemplateArr {
-			wTMP%k%:= ListBoxWarr[A_Index]
-			wwTMP := wTMP%k%
-			if (wwTMP = ""){
-				msgbox Width Row is missing a value.`n`nTry opening this template in the editor by right clicking it and using [Auto Width].
-				return
-			}
-			Gui, nt:add, edit, % "section -E0x200 c" U_MFC " x+3 y35 w" wwTMP " vNTeB" k " r1", 
-			Gui, nt:add, listbox, % "Multi -E0x200 c" U_MFC " w" wwTMP " vNTLB" k " r10", %v%
-		}
-		Gui, nt:add, text, c%U_SFC% center y+3 x3 section w%WindowW% -E0x200 gntInsertB, [ Insert At Bottom ]
-		TT.Add("Static1","Shift+Enter")
-		Gui, nt:show, x%xPos% y%yPos%
-		return
-	}
-	return
-}
-ntInsert:
-{
-	Gui, nt:Submit
-	for k, v in TemplateArr {
-		AddSpace :=
-		AddSapce2 :=
-		if (StrLen(NTeB%k%) > 0){
-			AddSapce2 := A_SPACE
-		}
-		if (StrLen(NTLB%k%) > 0){
-			AddSpace := A_SPACE
-			AddSapce2 := 
-		}
-		NTLB%k% := trim(NTLB%k%)
-		NTLB%k% := trim(NTLB%k%,"`n")
-		NTLB%k% := trim(NTLB%k%,"`r")
-		NTBody .= NTeB%k% AddSapce2 NTLB%k% AddSpace
-	}
-	Gui, nt:Destroy
-	NL = `n
-	if (RapidNTAppend = 1) {
-		zbody = %NTBody%%NL%%zbody%
-		zbody := trim(zbody,"`n")
-		RapidNTAppend = 0
-	}
-	if (RapidNTAppend = 0 or RapidNTAppend = "") {
-		GuiControlGet,Old_QuickNote,,%HQNB%
-		if (StrLen(Old_QuickNote) > 0)
-			NL = `n
-		GuiControl,,%HQNB%,%NTBody%%NL%%Old_QuickNote%
-	}
-	if (LibWindow = 1) {
-		GuiControlGet,Old_PreviewNote,,%HPB%
-		if (StrLen(Old_PreviewNote) > 0)
-			NL = `n
-		GuiControl,,%HPB%,%NTBody%%NL%%Old_PreviewNote%
-		LibWindow = 0
-		gosub PreviewBox
-	}
-	for k, v in TemplateArr {
-		NTLB%k% := ""
-		wTMP%k% := ""
-	}
-	NL := ""
-	NTBody := ""
-	WindowW := ""
-	TemplateArr := []
-	ListBoxWArr := []
-	NewTemplateArr :=[]
-	return
-}
-NoteTemplateEnterButton:
-{
-		LV_GetText(Selected_NoteTemplate,TemplateLVSelectedROW)
-		;msgbox % Selected_NoteTemplate "  &  " TemplateLVSelectedROW
-		if (Selected_NoteTemplate = "")
-			return
-		Gui, nt:destroy
-		Gui, ts:submit
-		Gui, ts:destroy
-		MouseGetPos, xPos, yPos
-		xPos /= 1.15
-		yPos /= 1.15
-		WindowW := ""
-		FileRead, TemplateTMP, %templatePath%%Selected_NoteTemplate%
-		TemplateTMP := trim(TemplateTMP,"`n")
-		TemplateTMP := trim(TemplateTMP,"`r")
-		NewTemplateArr := SubStr(TemplateTMP, InStr(TemplateTMP, "`n") + 1)
-		TemplateArr := StrSplit(NewTemplateArr, "`n","`n")
-		FileReadLine ListBoxWs, %templatePath%%Selected_NoteTemplate%, 1
-		ListBoxWArr := StrSplit(ListBoxWs, "|","|")
-		for k, v in TemplateArr {
-			wTMP%k%:= ListBoxWarr[A_Index]
-			wwTMP := wTMP%k%
-			WindowW += wwTMP+3
-		}
-		Gui, nt:New,, FlatNotes - Note From Template
-		Gui, nt:Margin, 3,3
-		Gui, nt:Font, s10, Courier New,
-		Gui, nt:Color,%U_SBG%, %U_MBG%
-		Gui, nt:add, text, c%U_SFC% center w%WindowW% -E0x200 gntInsert, [ Insert At Top ]
-		Gui, nt:add, text, c%U_SFC%section xs center h0 w0 hidden
-		for k, v in TemplateArr {
-			wTMP%k%:= ListBoxWarr[A_Index]
-			wwTMP := wTMP%k%
-			if (wwTMP = ""){
-				msgbox Width Row is missing a value.`n`nTry opening this template in the editor by right clicking it and using [Auto Width].
-				return
-			}
-			Gui, nt:add, edit, % "section -E0x200 c" U_MFC " x+3 y35 w" wwTMP " vNTeB" k " r1", 
-			Gui, nt:add, listbox, % "Multi -E0x200 c" U_MFC " w" wwTMP " vNTLB" k " r10", %v%
-		}
-		Gui, nt:add, text, c%U_SFC% center y+3 x3 section w%WindowW% -E0x200 gntInsertB, [ Insert At Bottom ]
-		Gui, nt:show, x%xPos% y%yPos%
-		return
-}
-
-
-ntInsertB:
-{
-	Gui, nt:Submit
-	for k, v in TemplateArr {
-		AddSpace :=
-		AddSapce2 :=
-		if (StrLen(NTeB%k%) > 0){
-			AddSapce2 := A_SPACE
-		}
-		if (StrLen(NTLB%k%) > 0) {
-			AddSpace := A_SPACE
-			AddSapce2 :=
-		}
-		NTLB%k% := trim(NTLB%k%)
-		NTLB%k% := trim(NTLB%k%,"`n")
-		NTLB%k% := trim(NTLB%k%,"`r")
-		NTBody .= NTeB%k% AddSapce2 NTLB%k% AddSpace
-	}
-	Gui, nt:Destroy
-	NL = `n
-	if (RapidNTAppend = 1) {
-		zbody = %zbody%%NL%%NTBody%
-		zbody := trim(zbody,"`n")
-		RapidNTAppend = 0
-	}
-	if (RapidNTAppend = 0 or RapidNTAppend = "") {
-		GuiControlGet,Old_QuickNote,,%HQNB%
-		Old_QuickNote := RTrim(Old_QuickNote,"`n")
-		if (Strlen(Old_QuickNote)>0)
-			NL = `n
-		Results = %Old_QuickNote%%NL%%NTBody%
-		Results := Trim(Results,"`n")
-		GuiControl,,%HQNB%,%Results%
-	}
-	if (LibWindow = 1) {
-		GuiControlGet,Old_PreviewNote,,%HPB%
-		Old_PreviewNote :=RTrim(Old_PreviewNote,"`n")
-		if (StrLen(Old_PreviewNote) > 0) {
-			NL = `n
-			}
-		Results = %Old_PreviewNote%%NL%%NTBody%
-		Results := Trim(Results,"`n")
-		GuiControl,,%HPB%,%Results%
-		LibWindow = 0
-		gosub PreviewBox
-	}
-	for k, v in TemplateArr {
-		NTLB%k% := ""
-		wTMP%k% := ""
-	}
-	NL := ""
-	NTBody := ""
-	WindowW := ""
-	TemplateArr := []
-	ListBoxWArr := []
-	NewTemplateArr :=[]
-	return
-}
-NoteTemplateMaker:
-{
-	gui, ntm:new,hwndHNTM ,Template Maker - FlatNotes
-	Gui, ntm:Margin, 3,3
-	Gui, ntm:Font, s10, Courier New,
-	Gui, ntm:Color,%U_SBG%, %U_MBG%
-	Gui, ntm:add, text, c%U_SFC% section y+3 w50, Name:
-	Gui, ntm:add, Edit, c%U_MFC% x+3 w300 r1 -E0x200 vTemplateFileName,
-	Gui, ntm:add, text, c%U_SFC% x+3 w50, .txt
-	Gui, ntm:add, text, section xs center h0 w0 hidden
-	Gui, ntm:add, text, c%U_SFC% center w400, Width of each list: (50|70|100)
-	Gui, ntm:add, text, c%U_SFC% center w200 gAutoWidth, [ Auto Width ]
-	Gui, ntm:add, text, c%U_SFC% center w200 x+3 gntSAVE, [ Save ]
-	Gui, ntm:add, Edit, c%U_MFC% section xs w400 r1 -E0x200 vListBoxWidthRow,
-
-	Gui, ntm:add, text, c%U_SFC%section xs center w400, List below here: (Red|Blue|Green) 
-	Loop %NewTemplateRows% {
-		Gui, ntm:add, text, c%U_SFC% section xs w30, %a_index%:
-		Gui, ntm:add, Edit, c%U_MFC% x+3 w370 r1 -E0x200  vTMLB%a_index%,
-		Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMup%a_index%,%TemplateAboveSymbol%
-		Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMdown%a_index%,%TemplateBelowSymbol%
-	}
-	Gui, ntm:show
-	return 
-}
-
-AutoWidth:
-{
-BigSizeList :=""
- Loop %NewTemplateRows% {
-	GuiControlGet,TMLB%a_index%
-	TmpArr := strsplit(TMLB%a_index%,"|","|")
-	num++
-	for k, v in TmpArr
-		SizeList%num% .= StrLen(v) ","
-	Sort SizeList%num%, N R D,
-	RegExMatch(SizeList%num%, "\d+" , Match)
-	SizeList%num% := Match * 9
-	BigSizeList .= SizeList%num% "|"
- }
- BigSizeList := trim(BigSizeList,"|")
- GuiControl,,ListBoxWidthRow, %BigSizeList%
- ;MsgBox % SizeList1 "|" SizeList2
-return
-}
-
-
-ntSAVE:
-{
-	GuiControlGet,TemplateFileName
-		if (TemplateFileName = ""){
-			msgbox Name can't be blank.
-			return
-		}
-		IfExist, %templatePath%%TemplateFileName%.txt
-		{
-			OnMessage(0x44, "OnMsgBox")
-			MsgBox 0x40040, ,, Overwrite?, Overwrite existing template?
-			OnMessage(0x44, "")
-			IfMsgBox Yes, {
-				
-			} Else IfMsgBox No, {
-				return
-			}
-		}
-	GuiControlGet,ListBoxWidthRow
-	TemplateFileText := ListBoxWidthRow "`n"
-	Loop %NewTemplateRows% {
-		GuiControlGet,TMLB%a_index%
-		
-		if (TMLB%a_index% > 0)
-			TemplateFileText .= TMLB%a_index% "`n"
-	}
-	FileRecycle,%templatePath%%TemplateFileName%.txt
-	FileAppend,%TemplateFileText%,%templatePath%%TemplateFileName%.txt, UTF-8
-		IfExist, %templatePath%%TemplateFileName%.txt
-		{
-			Gui, ntm:destroy
-			if (WinExist("Template Select - FlatNotes")) {
-				gui, ts:destroy
-				gosub NoteTemplateSelectUI
-				}
-			return
-		}else {
-			msgbox 0x40040, ,Soemthing went wrong...
-		}
-	return
-}
 
 HelpWindow:
-msgbox % "[Legend: + = Shift, ^ = Ctrl, ! = Alt, # = Win]`n`nGLOBAL HOTKEYS:`nOpen Library (if Capslock not used): " savedHK1 "`nQuick Note: " savedHK2 "`nRapid Note: " savedHK3 "`nCancel Rapid Note: " savedHK4 "`nAppend to Rapid Note: " savedHK5 "`nAppend Template to Rapid Note" savedHK6 "`n`nMAIN WINDOW SHORTCUTS:`nFocus Search: "savedSK1 "`nFocus Results: " savedSK2 "`nFocus Edit/Preview: " savedSK3 "`nAdd Note From Template: " savedSK4 "`n`nINFO:`nQuick Note:`nSelect text and press the Quick Note hotkey to bring that text up as the body of a new blank note.`n`nRapid Note:`nUse the Rapid Note hotkey to quick add notes. Press the Rapid Note Hotkey once to copy the title, then again to copy the body or use the append hotkey to add any number of selected texts to the body of the note. When you are done use the Rapid Note hotekey to finish the note and select a star."
+msgbox % "Advanced search: `nn::term = Search names only.[Also works for b:: t:: and p:: for body, tags, and parent]`ntermA||termB = find a or b.`nTermA&&TermB = find a and b`nNote: for || and && terms most be in the same field. eg. You can't search for terms in title and body, they most both be in that title or body.`n`n[Legend: + = Shift, ^ = Ctrl, ! = Alt, # = Win]`n`nGLOBAL HOTKEYS:`nOpen Library (if Capslock not used): " savedHK1 "`nQuick Note: " savedHK2 "`nRapid Note: " savedHK3 "`nCancel Rapid Note: " savedHK4 "`nAppend to Rapid Note: " savedHK5 "`nAppend Template to Rapid Note" savedHK6 "`n`nMAIN WINDOW SHORTCUTS:`nFocus Search: "savedSK1 "`nFocus Results: " savedSK2 "`nFocus Edit/Preview: " savedSK3 "`nAdd Note From Template: " savedSK4 "`n`nINFO:`nQuick Note:`nSelect text and press the Quick Note hotkey to bring that text up as the body of a new blank note.`n`nRapid Note:`nUse the Rapid Note hotkey to quick add notes. Press the Rapid Note Hotkey once to copy the title, then again to copy the body or use the append hotkey to add any number of selected texts to the body of the note. When you are done use the Rapid Note hotekey to finish the note and select a star."
+return
+
+
+RefreshTV:
+Gui, tree:Default
+TVcurrent := TV_GetCount()
+TV_Delete()
+TVcurrent = 0
+lastloopcheck = -1
+TVneeded := JEE_ObjCount(MyNotesArray)
+;msgbox % TVcurrent
+;StarParents Options
+global UseStarsAsParents = True
+global TreeExpandByDeafultTrue = "Expand"
+if (UseStarsAsParents == True)
+{
+	None := TV_Add("- None -",,  TreeExpandByDeafultTrue  )
+	TVneeded++
+	For Each, Note In MyNotesArray
+	{
+		if (Note.1)
+		{
+			StarName := NameEncodeSticky(Note.1)
+			StarName := trim(StarName)
+			
+			TV_GetText(StarParentExists,%StarName%)
+
+			if (!StarParentExists)
+			{
+				%StarName% := TV_Add(Note.1,,"Bold " .  TreeExpandByDeafultTrue)
+				TVneeded++
+			}
+		}
+	}
+	For Each, Note In MyNotesArray
+	{
+		TreeNodeName := NameEncodeSticky(Note.2)
+		TreeNodeName := trim(TreeNodeName)
+		%TreeNodeName% := 0
+		StarName := NameEncodeSticky(Note.1)
+		StarName := trim(StarName)
+		
+		if (StarName)
+			%TreeNodeName% := TV_Add(Note.2,%StarName%,"Expand" )
+		if (!StarName)
+			%TreeNodeName% := TV_Add(Note.2,None,"Expand")
+	}
+}else{
+;Built The root Parents.
+For Each, Note In MyNotesArray
+{
+	ParentFileName := NameEncodeSticky(Note.12)
+	ParentFileName := trim(ParentFileName)
+	TreeNodeName := NameEncodeSticky(Note.2)
+	TreeNodeName := trim(TreeNodeName)
+	%TreeNodeName% := 0
+	
+	if (not Note.12)
+	{
+		%TreeNodeName% := TV_Add(Note.2,,"Expand" )
+	}
+}
+;TVcurrent := TV_GetCount()
+;msgbox % TVcurrent "::" TVneeded
+
+while TV_GetCount() != TVneeded
+{
+	LastCount := TV_GetCount()
+	For Each, Note In MyNotesArray
+	{
+		if (Note.12)
+		{
+		
+			RealParentFileName := NameEncode( Note.12)
+			RealParentFileName := trim(RealParentFileName)
+			ParentFileName := NameEncodeSticky( Note.12)
+			ParentFileName := trim(ParentFileName)
+			TreeNodeName := NameEncodeSticky(Note.2)
+			TreeNodeName := trim(TreeNodeName)
+			
+			
+			
+			TV_GetText(SelfExists,%TreeNodeName%)
+			;msgbox % SelfExists
+			TV_GetText(ParentExists,%ParentFileName%)
+			
+			if (!SelfExists)
+			{
+				IfExist, %U_NotePath%%RealParentFileName%.txt
+				{
+				if (ParentExists)
+					{
+						%TreeNodeName% := TV_Add( Note.2,%ParentFileName%,"Expand")
+					}
+				}else
+				{
+					if (!ParentExists)
+					{
+						%ParentFileName% := TV_Add( Note.12,,"Bold Expand")
+						TVneeded++
+					}
+				
+					%TreeNodeName% := TV_Add( Note.2,%ParentFileName%,"Expand")
+				}
+			}
+		}
+	}
+	;TVcurrent := TV_GetCount()
+	;msgbox % TVcurrent "::" TVneeded
+	if (TV_GetCount() == LastCount)
+	{
+		msgbox failed at %LastCount% of %TVneeded% 
+		For Each, Note In MyNotesArray
+		{
+			if (Note.12)
+			{
+				ParentFileName := NameEncodeSticky(Note.12)
+				ParentFileName := trim(ParentFileName)
+				TreeNodeName := NameEncodeSticky(Note.2)
+				TreeNodeName := trim(TreeNodeName)
+				
+				SelfExists := TV_Get(%TreeNodeName%,"Bold")
+				ParentExists := TV_Get(%ParentFileName%,"Bold")
+				if (ParentExists == 0)
+				{
+					msgbox Parent Failed: %TreeNodeName% Because: %ParentFileName%
+				}
+				if (SelfExists == 0)
+				{
+					msgbox Self Failed: %TreeNodeName% Because: %ParentFileName%
+				}
+			}
+		}
+		goto FailBreak
+	}
+}
+} ;end of star parent else
+return
+
+BuildTreeUI:
+
+If (TreeFristRun == 1)
+{
+	Gui, tree:New,, FlatNote - Tree
+	Gui, tree:+Resize
+	Gui, tree:Margin , 2, 2 
+	Gui, tree:Font, s%TitleBarFontSize% Q%FontRendering%, Verdana, %U_MFC%
+	Gui, tree:Color,%U_SBG%, %U_MBG%
+
+	Gui, tree:Add, TreeView, h%TreeCol1H% w%TreeCol1W% x%TreeCol1X% y0 hwndHTV -Hscroll AltSubmit +0x2 +0x1000 +E0x4000 -E0x200 %UseCheckBoxesTrue% gTreeViewInteraction  vTVNoteTree c%U_FBCA%
+	
+	Gui, tree:Add, ListBox, vTVBGLB1 +0x100 r1 w%TreeCol2W% x%TreeCol2X% y1 -E0x200 Disabled -Tabstop
+	
+	Gui, tree:Add,Edit, center y7 x%TreeCol2X% h%TreeNameH% w%TreeCol2W% vTVNoteName hwndHTVN vTVNoteName c%U_FBCA% -E0x200, 
+	Gui, tree:Add, Edit, x%TreeCol2X% y%TreePreviewY% h%TreePreviewH% w%TreeCol2W% hwndHTVB vTVNotePreview -E0x200 c%U_FBCA%,
+	;Gui, tree:Add, Button, x%TreeW% y15 h%TreePreviewH% w111,test
+	TreeFristRun = 0
+}
+
+if (TVReDraw == 1)
+{
+	TVReDraw = 0
+	gosub RefreshTV
+}
+FailBreak:
+TVBuilt = 1
+gosub TreeViewInteraction
+;LVM_ShowScrollBar(HTV,1,false)
+Gui, tree:SHOW, h%TreeLibH% w%TreeLibW%
+return
+
+TreeViewInteraction:
+;ttip := A_EventInfo "::" A_GuiEvent
+;tooltip, %ttip%
+;SetTimer, KillToolTip, -5000
+if (A_GuiEvent = "Normal" or A_GuiEvent = "F" or A_GuiEvent = "K")
+{
+;LVM_ShowScrollBar(HTV,1,true)
+}
+if (A_GuiEvent = "f")
+{
+;LVM_ShowScrollBar(HTV,1,false)
+}
+if (TVBuilt == 1)
+{
+	TVBuilt = 0
+	TopTV := TV_GetNext()
+	TV_GetText(SelectedName, TopTV)
+	FileSafeName := NameEncode(SelectedName)
+	gosub TreeViewUpdate
+}
+
+if (A_GuiEvent = "S")
+{
+	;msgbox % A_EventInfo
+	TV_GetText(SelectedName, A_EventInfo)
+	FileSafeName := NameEncode(SelectedName)
+	gosub TreeViewUpdate
+}
+return
+
+TreeViewUpdate:
+IfExist, %U_NotePath%%FileSafeName%.txt
+	{
+		FileRead, MyFile, %U_NotePath%%FileSafeName%.txt
+		IniRead, OldStarData, %detailsPath%%FileSafeName%.ini,INFO,Star
+		OldStarData := ConvertStar(OldStarData)
+		IniRead, OldCatData, %detailsPath%%FileSafeName%.ini,INFO,Cat
+		IniRead, OldTagsData, %detailsPath%%FileSafeName%.ini,INFO,Tags
+		IniRead, OldParentData, %detailsPath%%FileSafeName%.ini,INFO,Parent
+		;GuiControl,, QuickNoteParent, %OldParentData%
+		;GuiControl,, QuickNoteTags, %OldTagsData%
+		;GuiControl, ChooseString, QuickNoteCat, %OldCatData%
+		;GuiControl,, QuickNoteBody,%MyFile%
+		;GuiControl,, QuickStar,%OldStarData%
+		GuiControl,,TVNoteName,%SelectedName%
+		GuiControl,,TVNotePreview,%MyFile%
+	}
+return
+
+treeGuiClose:
+treeGuiEscape:
+	Gui, tree:HIDE
 return

@@ -1,3 +1,31 @@
+; --------------------—
+; Handle Window specific things.
+; ---------------------
+;handle window resize
+treeGuiSize:
+  If A_EventInfo = 1  ; If minimized.
+    Return
+
+ TreeLibW := A_GuiWidth
+ TreeLibH := A_GuiHeight
+
+global TreeCol1W := 125 + ScrollbarW
+global TreeCol1WSBH := TreeCol1W - ScrollbarW
+global TreeCol1X := 0 - ScrollbarW
+global TreeCol1H := TreeLibH
+global TreeCol2W := TreeLibW - TreeCol1W - TreeBorder + ScrollbarW + ScrollbarW
+global TreeCol2X := TreeCol1W + TreeBorder - ScrollbarW
+global TreeNameH = 20
+global TreePreviewH := TreeLibH - TreeNameH - TreeBorder
+global TreePreviewY := TreeNameH + TreeBorder + TreeBorder + TreeBorder + TreeBorder
+
+  GuiControl Move, TVNoteTree, h%TreeCol1H% w%TreeCol1W%
+  GuiControl Move, TVBGLB1, w%TreeCol2W%
+  GuiControl Move, TVNoteName, h%TreeNameH% w%TreeCol2W%
+  GuiControl Move, TVNotePreview, h%TreePreviewH% w%TreeCol2W%
+Return
+
+
 ;---------------------
 ;Other shortcut keys
 ;---------------------
@@ -10,16 +38,27 @@
 	gosub ntInsert
 	return
 }
+#IfWinActive, FlatNote - QuickNote
+{
+!enter::
+	gosub SaveButton
+	return
++enter::
+	gosub SaveButton
+	return
+}
 ;------------------------------------------
 ;Main window shortcut keys below this point
 ;------------------------------------------
 #IfWinActive, FlatNotes - Library
+
 {
 Down::
 ControlGetFocus, OutputVar, FlatNotes - Library
 {
 	 If (OutputVar == "Edit1"){
-		sendinput {tab}
+		;sendinput {tab}{tab}{tab}
+		ControlFocus,SysListView321,FlatNotes - Library
 		return
 		}else
 			Down::Down
@@ -49,22 +88,42 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 {
 		 If (OutputVar == "SysListView321"){
 		 global LVSelectedROW
+		 SelectedRows := trim(SelectedRows)
+		 SelectedRowsArray := StrSplit(SelectedRows," "," ")
+		 SelectedRowsArrayLength := SelectedRowsArray.Count() - 1
 		 SaveRowNumber = %LVSelectedROW%
+		 
 		 LV_GetText(FileName, LVSelectedROW,8)
-		 iniFileName := RegExReplace(FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
-		 MsgBox , 0x40024, Delete - Note , Delete: %FileName%
+
+		 MsgBox , 0x40024, Delete - Note , Delete: %FileName% and %SelectedRowsArrayLength% others?
 		 IfMsgBox, No
 			Return 
 		 IfMsgBox, Yes
-			FileRecycle %U_NotePath%%FileName%
-			FileRecycle %detailsPath%%iniFileName%
+			TVReDraw = 1
 			
-			for Each, Note in MyNotesArray{
+			SelectedRowsArray:=ObjectSort(SelectedRowsArray,,,true)
+			;v = row numbers
+			for k, v in SelectedRowsArray{
+				;error checking to see each row before it's deleted.
+				;msgbox % v
+				LV_GetText(FileName, v,8)
+				iniFileName := RegExReplace(FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
+				
+				FileRecycle %U_NotePath%%FileName%
+				FileRecycle %detailsPath%%iniFileName%
+				
+							; remove from MyNoteArray
+				for Each, Note in MyNotesArray{
 					If (Note.8 = FileName){
 						MyNotesArray.RemoveAt(Each)
 					}
 				}
-			LV_Delete(LVSelectedROW)
+				; remove from ListView
+				LV_Delete(v)
+			}
+			
+			;Display a new LV if any.
+			
 			RowsCount := LV_GetCount()
 			if (RowsCount > SaveRowNumber) {
 				NextUp = %SaveRowNumber%

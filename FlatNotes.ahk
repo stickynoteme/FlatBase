@@ -1,5 +1,5 @@
 ;-------------------------------------------------
-;Inialize FlateNotes AHK v1
+;Inialize FlatBase AHK v1
 ;-------------------------------------------------
 #SingleInstance Force
 FileEncoding ,UTF-8
@@ -17,17 +17,48 @@ Menu, Tray, Add, About
 Menu, Tray, Add, Options
 Menu, Tray, Add, Exit
 Menu, Tray, Default, Library
-
-
 ;-------------------------------------------------
 ;Set up script global variables
 ;-------------------------------------------------
+global TemplateDisplayMode
+
+global TreeLibW = 500
+global TreeLibH = 300
+global TreeBorder = 2
+Global ScrollbarW = 8
+
+global ColEditName
+global GetFile
+global ColList = ["Star", "Title", "Body", "Added", "Modified", "RawAdded", "RawModded", "FileName", "RawStar", "Tags","Cat","Parent", "Checked", "Marked", "Extra"]
+
+
+global TreeCol1W := 125 + ScrollbarW
+global TreeCol1WSBH := TreeCol1W - ScrollbarW
+global TreeCol1X := 0 - ScrollbarW
+global TreeCol1H := TreeLibH
+global TreeCol2W := TreeLibW - TreeCol1W - TreeBorder + ScrollbarW + ScrollbarW
+global TreeCol2X := TreeCol1W + TreeBorder - ScrollbarW
+global TreeNameH = 20
+global TreePreviewH := TreeLibH - TreeNameH - TreeBorder
+global TreePreviewY := TreeNameH + TreeBorder + TreeBorder + TreeBorder + TreeBorder
+
+
+
+
+
+
 ;hwnd
 global HSterm ; Lib Searchbox 
 global HQNB ; QuickNoteBox
 global HLV ;Lib listview
 global HPB ;
-global HSF ;
+global HSF ; SearchFilter edit ID
+global HCF ; CatFilter edit ID
+global HNP ; Note Parent edit ID
+global HTV ; Tree:gui Treeview ID
+global HTVN ; TV Note Name ID
+global HTVB ; Tree:gui Edit Preview / Body ID
+global HTF ; Listview tag Filter search box
 global HQNUSL1
 global HQNUSl2
 global HQNUSl3
@@ -40,7 +71,26 @@ global HstarBox4
 global HTSLB ;Template Selection List Box
 global HTSGUI ;Template Select GUI
 global HTRowsOver ; Total Rows edit box for Template maker
+global TVBuilt
+global TVNoteName
+global TVNoteBody
+global TVNoteTags
+global TVNoteCat
+global TVNoteStar
+global TVNoteTree
 
+
+global TagBox
+global CatBox
+global CatFilter
+global TagsFilter
+global LastCatFilter
+
+global CatBoxContents
+global TagsFilterContents
+global NoteParent
+
+global ceEdit
 global TRowsOver
 global OpenInQuickNote
 global NewTemplateRows
@@ -57,6 +107,9 @@ global sNeedsSubmit
 global MyNotesArray := {}
 global OldNoteData
 global QuickNoteBody
+global QuickNoteTags
+global QuickNoteParent
+global QuickNoteCat
 global QuickNoteName
 global U_MBG
 global U_MFC
@@ -76,6 +129,9 @@ global SortStar
 global SortName
 global SortAdded
 global SortModded
+global SortTags
+global SortCat
+global SortParent
 global NextSortAdded
 global NextSortBody
 global NextSortName
@@ -94,11 +150,23 @@ global NamePercent
 global BodyPercent
 global AddedPercent
 global ModdedPercent
+global TagsPercent
+global ParentPercent
+global CatPercent
+global CheckedPercent
+global MarkedPercent
+global ExtraPercent
 global oStarPercent
 global oNamePercent
 global oBodyPercent
 global oAddedPercent
 global oModdedPercent
+global oTagsPercent
+global oCatPercent
+global oParentPercent
+global oCheckedPercent
+global oMarkedPercent
+global oExtraPercent
 global ShowStatusBar
 global StatusBarM
 global StatusBarA
@@ -141,7 +209,6 @@ global LVSelectedROW
 global StarOldFile
 global TitleOldFile
 global ShowStarHelper
-global CtrlEnter
 global templatePath
 ;Pre-set globals
 global savedHK1
@@ -188,12 +255,34 @@ if (A_ScreenDPI > 120)
 	TitleBarFontSize = 8
 
 ;tmp maybe
+global SelectedRows
 global TemplateSymbol
+global TreeSymbol
 global ColBase = ,6,7,8,9
 global ColOrder = 1,2,3,4,5
 global SearchWholeNote
+global TreeFristRun = 1
+global TVReDraw
+global LoopCheck
+global UseCheckBoxesTrue
+global UseCheckBoxes = false
+if (UseCheckBoxes == true)
+	UseCheckBoxesTrue := "Checked"
+
+;Reuseable Data Holders
+global CurrentCol = ["C_Star","C_Name","C_File","C_Add","C_Mod","C_RawAdd","C_RawMod","C_FileName","C_RawStar","C_Tags","C_Cat","C_Parent","C_Marked","C_Extra"]
 
 
+global C_File
+global C_Name
+global C_SafeName
+global C_Add
+global C_Mod
+global C_Star
+global C_Tags
+global C_Cat
+global C_Parent
+global NoteNameToEdit
 
 FileCreateDir, NoteDetails
 detailsPath := A_WorkingDir "\NoteDetails\"
@@ -203,6 +292,13 @@ themePath = %A_WorkingDir%\sys\Themes
 templatePath = %A_WorkingDir%\NoteTemplates\
 IniRead, U_NotePath, %iniPath%, General, MyNotePath,%A_WorkingDir%\MyNotes\
 
+;set tray icon
+if A_IsCompiled
+	Menu, Tray, Icon, %A_ScriptFullPath%, -159
+else 
+	Menu, Tray, Icon, %A_WorkingDir%\- Assets\FlatNotes.ico
+
+; check for note path, then reset to default and warn user if the path can't be found.
 if InStr(FileExist(U_NotePath), "D") {
 	if (U_NotePath = "") {
 	U_NotePath = %A_WorkingDir%\MyNotes\
@@ -230,6 +326,13 @@ if (isFristRun = "1") {
 	IniWrite, 45,%iniPath%, General,BodyPercent
 	IniWrite, 20,%iniPath%, General,AddedPercent
 	IniWrite, 0,%iniPath%, General,ModdedPercent
+	IniWrite, 0,%iniPath%, General,TagsPercent
+	IniWrite, 0,%iniPath%, General,CatPercent
+	IniWrite, 0,%iniPath%, General,ParentPercent
+	IniWrite, 0,%iniPath%, General,CheckedPercent
+	IniWrite, 0,%iniPath%, General,MarkedPercent
+	IniWrite, 0,%iniPath%, General,ExtraPercent
+
 	IniWrite, yy/MM/dd,%iniPath%, General,UserTimeFormat
 	IniWrite, 0, %iniPath%, General, isFristRun
 	IniWrite, 0, %iniPath%, General, isFristRun
@@ -252,6 +355,7 @@ if (isFristRun = "1") {
 	iniread, TemplateAboveSymbol,%systemINI%,SYS,TemplateAboveSymbol,+
 	iniread, TemplateBelowSymbol,%systemINI%,SYS,TemplateBelowSymbol,-
 	iniread, TemplateSymbol,%systemINI%,SYS,TemplateSymbol,+
+	iniread, TreeSymbol,%systemINI%,SYS,TreeSymbol,🌳
 ;-------------------------------------------------
 ; Read from theme .ini 
 ;-------------------------------------------------
@@ -273,6 +377,8 @@ IniRead, rowSelectTextColor, %StartingTheme%, Colors, RowSelectTextColor , 0xfff
 ;-------------------------------------------------
 ; Read and from settings.ini
 ;-------------------------------------------------
+IniRead, CatBoxContents, %iniPath%,General,CatBoxContents,White|Black|Calico|Tabby
+
 IniRead, savedHK1, %iniPath%, Hotkeys, 1,#o
 IniRead, savedHK2, %iniPath%, Hotkeys, 2,#n
 IniRead, savedHK3, %iniPath%, Hotkeys, 3,#z
@@ -290,7 +396,6 @@ if (NewTemplateRows>30)
 	NewTemplateRows = 30
 IniRead, ExternalEditor, %iniPath%, General, ExternalEditor,NONE
 IniRead, OpenInQuickNote, %iniPath%, General, OpenInQuickNote,1
-IniRead, CtrlEnter,%iniPath%,General,CtrlEnter,0
 IniRead, ShowStarHelper,%iniPath%,General,ShowStarHelper,1
 
 IniRead, RapidStar,%iniPath%,General,RapidStar,1
@@ -338,6 +443,12 @@ IniRead, oNamePercent,%iniPath%, General,NamePercent,30
 IniRead, oBodyPercent,%iniPath%, General,BodyPercent,45
 IniRead, oAddedPercent,%iniPath%, General,AddedPercent,20
 IniRead, oModdedPercent,%iniPath%, General,ModdedPercent,0
+IniRead, oTagsPercent,%iniPath%, General,TagsPercent,0
+IniRead, oCatPercent,%iniPath%, General,CatPercent,0
+IniRead, oParentPercent,%iniPath%, General,ParentPercent,0
+IniRead, oCheckedPercent,%iniPath%, General,ParentPercent,0
+IniRead, oMarkedPercent,%iniPath%, General,ParentPercent,0
+IniRead, oExtraPercent,%iniPath%, General,ParentPercent,0
 
 if oStarPercent between 0 and 9
 	oStarPercent = 0%oStarPercent%
@@ -347,12 +458,32 @@ if oBodyPercent between 0 and 9
 	oBodyPercent = 0%oBodyPercent%
 if oModdedPercent between 0 and 9
 	oModdedPercent = 0%oModdedPercent%
+if oTagsPercent between 0 and 9
+	oTagsPercent = 0%oTagsPercent%
+if oCatPercent between 0 and 9
+	oCatPercent = 0%oCatPercent%
+if oParentPercent between 0 and 9
+	oParentPercent = 0%oParentPercent%
+if oCheckedPercent between 0 and 9
+	oCheckedPercent = 0%oParentPercent%
+if oMarkedPercent between 0 and 9
+	oMarkedPercent = 0%oParentPercent%
+if oExtraPercent between 0 and 9
+	oExtraPercent = 0%oParentPercent%
 
 StarPercent = 0.%oStarPercent%
 NamePercent = 0.%oNamePercent%
 BodyPercent = 0.%oBodyPercent%
 AddedPercent = 0.%oAddedPercent%
 ModdedPercent = 0.%oModdedPercent%
+TagsPercent = 0.%oTagsPercent%
+CatPercent = 0.%oCatPercent%
+ParentPercent = 0.%oParentPercent%
+CheckedPercent = 0.%oCheckedPercent%
+MarkedPercent = 0.%oMarkedrcent%
+ExtraPercent = 0.%oExtraPercent%
+
+
 
 IniRead, HideScrollbars,%iniPath%,General,HideScrollbars,1
 IniRead, backupsToKeep,%iniPath%,General,backupsToKeep,3
@@ -382,8 +513,12 @@ Iniread, UserTimeFormat,%iniPath%,General,UserTimeFormat,yy/MM/dd
 ;-------------------------------------------------
 ;Set Globals that need values from the ini
 ;-------------------------------------------------
-global HelpIconx := LibW-15
-global SearchW := LibW-50
+global HelpIconx := LibW-18
+global SearchW := LibW * 0.75 - 50
+global CatX := SearchW
+global CatW := LibW * 0.1
+global TagsFilterX := CatW + 2
+global TagsFilterW := LibW * 0.15
 global StickyTW := StickyW-80
 global StickyMaxH
 global VSBW
@@ -399,6 +534,13 @@ global NameColW := Round(libWColAdjust*NamePercent)
 global BodyColW := Round(libWColAdjust*BodyPercent)
 global AddColW := Round(libWColAdjust*AddedPercent)
 global ModColW := Round(libWColAdjust*ModdedPercent)
+global TagColW := Round(libWColAdjust*TagsPercent)
+global CatColW := Round(libWColAdjust*CatPercent)
+global ParentColW := Round(libWColAdjust*ParentPercent)
+global CheckedColW := Round(libWColAdjust*CheckedPercent)
+global MarkedColW := Round(libWColAdjust*MarkedPercent)
+global ExtraColW := Round(libWColAdjust*ExtraPercent)
+
 ;-------------------------------------------------
 ;Acitvate User Hotkeys if any & make INI for new files
 ;-------------------------------------------------
@@ -440,10 +582,11 @@ if (ShowMainWindowOnStartUp = 0 and ColOrder != "1,2,3,4,5"){
 	WinHide, ahk_id %g1ID%
 }
 
-;-------------------------------------------------
+;------------------------------------------------- Dev Startup options
 ;-------------------------------------------------
 ;goto Options
 ;BuildGUI2()
+;gosub BuildTreeUI
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------
@@ -460,22 +603,37 @@ if (U_Capslock = "0"){
 if (g1Open=1) {
 	WinHide, FlatNotes - Library
 	g1Open=0
+	SelectedRows = 
 	GUI, star:destroy
 	GUI, t:destroy
 	return
 }
 if (g1Open=0) {
+	RestoreClip := clipboardall
+	clipboard =
+	send {Ctrl Down}{c}{Ctrl up}
+	if (clipboard){
+		AutoSearch = true
+		AutoSearchTerm := clipboard
+		clipboard := RestoreClip 
+	}else {
+		GuiControlGet, LastSearch,,%HSterm%
+		AutoSearchTerm := LastSearch
+		clipboard := RestoreClip
+	}
 	MouseGetPos, xPos, yPos	
 	xPos /= 1.5
 	yPos /= 1.5
-	GuiControl,,%HSterm%, 
+	GuiControl,,%HSterm%,
+	GuiControl,,%HSterm%,%AutoSearchTerm%
 	WinMove, ahk_id %g1ID%, , %xPos%, %yPos%
 	WinShow, ahk_id %g1ID%
 	WinRestore, ahk_id %g1ID%
 	WinActivate, ahk_id %g1ID%
-	g1Open=1
+	g1Open=1	
 	ControlFocus,Edit1,FlatNotes - Library
-	sendinput {left}{right}
+	;sendinput {left}{right}
+	sendinput {home}{shift down}{end}{shift up}
 	gosub search
 	gosub SortNow
 	return
@@ -494,10 +652,17 @@ return
 #Include inc\StickyGui.ahk
 #Include inc\shortcuts.ahk
 #Include inc\Class_LV_Colors.ahk
+#Include inc\Class_CtlColors.ahk
+#Include inc\Class_OD_Colors.ahk
+#include inc\Object sort.ahk
+#include inc\string-object-file.ahk
+#include inc\Class_ImageButton.ahk
 ;-!- Return after fucntions so lables don't get exacuted
 return
 #Include inc\DummyGui.ahk
 #Include inc\lables.ahk
+#include inc\TemplateSystem.ahk
+#include inc\FunLables.ahk
 #Include inc\tmLables.ahk
 return
 

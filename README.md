@@ -80,3 +80,11 @@ Try deleting the settings.ini file (make a backup first)
 ## Themes
 ![Themes Set one](/ScreenShots/SS_02.png)
 
+## Possible Road Map Ideas
+- Import from CSV
+- export to CSV
+- Insert template layouts
+- 
+
+### Things to fix
+
