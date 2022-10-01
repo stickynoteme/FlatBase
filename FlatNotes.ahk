@@ -600,10 +600,10 @@ if (U_Capslock = "0"){
 	vk14::vk14
 	return
 }
+SelectedRows :=
 if (g1Open=1) {
 	WinHide, FlatNotes - Library
-	g1Open=0
-	SelectedRows = 
+	g1Open=0 
 	GUI, star:destroy
 	GUI, t:destroy
 	return
