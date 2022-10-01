@@ -540,12 +540,14 @@ if (InStr(ErrorLevel, "S", true))
 {
 	SelectedRows .= A_EventInfo " "
 	tooltip % SelectedRows
+	settimer,KillToolTip,-1000
 	
 }
 if (InStr(ErrorLevel, "s", true))
 {
 	SelectedRows := RegExReplace(SelectedRows,"\b" A_EventInfo " ")
 	tooltip % SelectedRows
+	settimer,KillToolTip,-1000
 }
 
 ;tooltip % SelectedRows
@@ -812,7 +814,9 @@ return
 
 ;GUI for right click col 10-12 for now and doing bulk operations.
 build_ColEdit:
-	Opt1 := [0, U_SBG, ,U_SFC]
+	color1 = %U_SBG%
+	color2 = %U_SFC%
+	Opt1 := [0, color1, ,color2]
 	GUI, ce:new, ,InlineNameEdit
 	Gui, ce:Margin , 5, 5 
 	Gui, ce:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
@@ -823,7 +827,7 @@ build_ColEdit:
 	if (LV@sel_col == 1){
 		Gui, ce:add, button,w200 section gbuild_StarEditBox hwndHIB2, [ Star Selector ]
 		ColEditStar = 1
-		If !ImageButton.Create(HIB2, Opt1, Opt2)
+		If !ImageButton.Create(HIB2, Opt1)
 		MsgBox, 0, ImageButton Error IB1, % ImageButton.LastError
 	}
 	if (LV@sel_col == 3)
@@ -846,7 +850,7 @@ build_ColEdit:
 		
 	gui, ce:add,button, default gColEditSaveChange w200 hwndHIB1 vIB1, [ Apply ]
 	
-	If !ImageButton.Create(HIB1, Opt1, Opt2)
+	If !ImageButton.Create(HIB1, Opt1)
 		MsgBox, 0, ImageButton Error IB1, % ImageButton.LastError
 	
 	
