@@ -25,7 +25,7 @@ global TemplateDisplayMode
 global TreeLibW = 500
 global TreeLibH = 300
 global TreeBorder = 2
-Global ScrollbarW = 8
+Global ScrollbarW = 0 
 
 global ColEditName
 global GetFile

@@ -539,14 +539,15 @@ Critical
 if (InStr(ErrorLevel, "S", true))
 {
 	SelectedRows .= A_EventInfo " "
-	tooltip % SelectedRows
+	;tooltip % SelectedRows
 	settimer,KillToolTip,-1000
 	
 }
+
 if (InStr(ErrorLevel, "s", true))
 {
-	SelectedRows := RegExReplace(SelectedRows,"\b" A_EventInfo " ")
-	tooltip % SelectedRows
+	SelectedRows := RegExReplace(SelectedRows,"\b" A_EventInfo " ","")
+	;tooltip % SelectedRows
 	settimer,KillToolTip,-1000
 }
 
@@ -749,12 +750,13 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			return
 		}
 		if (LV@sel_col == 1) {
-			SelectedRows := trim(SelectedRows)
+			;SelectedRowsStarTmp := trim(SelectedRows)
 			SelectedRowsArray := StrSplit(SelectedRows," "," ")
-			
-			if (SelectedRowsArray.Length() == 1){
+			;msgbox % SelectedRowsArray.Length() " :: "
+			if (SelectedRowsArray.Length() <= 2){
 				MouseGetPos, xPos, yPos
 				xPos := xPos+25
+				ColEditStar = 0
 				gosub build_StarEditBox
 				LV@sel_col = "undoomCol1"
 				return
@@ -1054,12 +1056,10 @@ build_StarEditBox:
 return
 
 StarSaveChange:
-	
 	Gui, star:Default
 	GUI, star:Submit
 	sNeedsSubmit = 0
 	NewStar = %sEdit%
-	
 	;msgbox 	% RapidStar "|" TmpName "," TmpFileSafeName "," C_Body "," NewStar "," StarOldFile
 	if (NewStar = "")
 		NewStar = %StarSelectedBox%
@@ -1080,18 +1080,17 @@ StarSaveChange:
 		return
 	}
 	
-	
 	TmpFileINI := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 	TmpFileSafeName := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
 	Iniread, OldStar,%detailsPath%%TmpFileINI%, INFO,Star
-	TmpName := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
-	;xthis
 
+	;xthis
 	if (NewStar == OldStar or OldStar == "ERROR"){
 		msgbox Can't change to the same star. OldStar:%OldStar% NewStar:%NewStar%
 		ListStarToChange = 0
 		return
 	}
+		
 	FileRead, C_Body,%U_NotePath%%StarOldFile%
 	Iniread, TmpName,%detailsPath%%TmpFileINI%, INFO,Name
 	TmpName := strreplace(TmpName,"$#$")

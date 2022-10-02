@@ -11,7 +11,7 @@ treeGuiSize:
 
 global TreeCol1W := 125 + ScrollbarW
 global TreeCol1WSBH := TreeCol1W - ScrollbarW
-global TreeCol1X := 0 - ScrollbarW
+global TreeCol1X := 0
 global TreeCol1H := TreeLibH
 global TreeCol2W := TreeLibW - TreeCol1W - TreeBorder + ScrollbarW + ScrollbarW
 global TreeCol2X := TreeCol1W + TreeBorder - ScrollbarW
