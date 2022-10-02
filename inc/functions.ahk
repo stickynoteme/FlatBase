@@ -63,10 +63,13 @@ BuildGUI1(){
 	
 	CatBoxContents := "|" CatBoxContents
 	
-	Gui, 1:Add, DDL, x%CatX% y7 -E0x200 +0x0210 r6 w%CatW% -vCatFilter gSearch HwndHCF, %CatBoxContents%
+	if (ShowCatFilterBoxHelper == 1) {
+		Gui, 1:Add, DDL, x%CatX% y7 -E0x200 +0x0210 r6 w%CatW% -vCatFilter gSearch HwndHCF, %CatBoxContents%
+	}
 	
-	Gui, 1:Add, combobox, c%U_FBCA% xp%TagsFilterX% y7 -E0x200 +0x0210 r6 w%TagsFilterW% vTagsFilter gSearch HwndHTF , %TagsFilterContents%
-	
+	if (ShowTagFilterBoxHelper == 1) {
+		Gui, 1:Add, combobox, c%U_FBCA% xp%TagsFilterX% y7 -E0x200 +0x0210 r6 w%TagsFilterW% vTagsFilter gSearch HwndHTF , %TagsFilterContents%
+	}
 	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%
 	Gui, 1:Add, text, x-3 c%U_SFC% w%StarColW% center gSortStar vSortStar, %Star1%
 	Gui, 1:Add, text, c%U_SFC% xp+%StarColW% w%NameColW% center gSortName vSortName, Name
@@ -178,10 +181,14 @@ BuildGUI1(){
 	DDLfontColorb2 := strreplace(U_MFC,"0x")
 	DDLfontcolorMFC = 0x%U_MFC%
 	DDLfontcolorSFC = 0x%U_SFC%
-	CtlColors.Attach(HCF, DDLbgColor)
-	OD_Colors.Attach(HCF, {T: DDLfontcolorSFC})
-	CtlColors.Attach(HTF, DDLbgColorb2,DDLfontColorb2)
-	OD_Colors.Attach(HTF, {T: DDLfontcolorMFC})
+	if (ShowCatFilterBoxHelper == 1) {
+		CtlColors.Attach(HCF, DDLbgColor)
+		OD_Colors.Attach(HCF, {T: DDLfontcolorSFC})
+	}
+	if (ShowTagFilterBoxHelper = 1) {
+		CtlColors.Attach(HTF, DDLbgColorb2,DDLfontColorb2)
+		OD_Colors.Attach(HTF, {T: DDLfontcolorMFC})
+	}
 	Gui, 1:SHOW, Hide w%LibW% 
 	WinGet, g1ID,, FlatNotes - Library
 	g1Open=0

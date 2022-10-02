@@ -1406,8 +1406,14 @@ Options:
 	Gui, 3:add,text, xs section, Pipe "|" sperated list of Categories. (Example: Black|White|Calico|..etc)
 	Gui, 3:add,edit, xs section w300 vSelect_CatBoxContents gSet_CatBoxContents, %CatBoxContents% 
 	
-	Gui, 3:Add,CheckBox, xs vSelect_ShowStarHelper gSet_ShowStarHelper, Show star filter by search box?
+	Gui, 3:Add,CheckBox, xs vSelect_ShowStarHelper gSet_ShowStarHelper, Show Star Filter Button?
 	GuiControl,,Select_ShowStarHelper,%ShowStarHelper%
+	
+	Gui, 3:Add,CheckBox, xs vSelect_ShowCatFilterBoxHelper gSet_ShowCatFilterBoxHelper, Show Category Filter Box?
+	GuiControl,,Select_ShowCatFilterBoxHelper,%ShowCatFilterBoxHelper%
+	
+	Gui, 3:Add,CheckBox, xs vSelect_ShowTagFilterBoxHelper gSet_ShowTagFilterBoxHelper, Show Tag Filter Box?
+	GuiControl,,Select_ShowTagFilterBoxHelper,%ShowTagFilterBoxHelper%
 
 	Gui, 3:Add,CheckBox, xs vSelect_OpenInQuickNote gSet_OpenInQuickNote, Use Quick Notes to edit on right click?
 	GuiControl,,Select_OpenInQuickNote,%OpenInQuickNote%
@@ -1620,6 +1626,10 @@ SaveAndReload:
 	IniWrite, %Select_ExternalEditor%, %iniPath%, General, ExternalEditor
 	GuiControlGet,Select_ShowStarHelper
 	IniWrite,%Select_ShowStarHelper%, %iniPath%, General, ShowStarHelper
+	GuiControlGet,Select_ShowCatFilterBoxHelper
+	IniWrite,%Select_ShowCatFilterBoxHelper%, %iniPath%, General, ShowCatFilterBoxHelper
+	GuiControlGet,Select_ShowTagFilterBoxHelper
+	IniWrite,%Select_ShowTagFilterBoxHelper%, %iniPath%, General, ShowCatFilterTagHelper
 	GuiControlGet, Select_RapidStar
 	IniWrite, %RapidStar%, %iniPath%, General, RapidStar
 	GuiControlGet, U_QuickNoteWidth,,QuickWSelect	
@@ -1832,6 +1842,24 @@ Set_ShowStarHelper:
 	if (A_GuiEvent == "Normal"){
 		IniWrite,%Select_ShowStarHelper%, %iniPath%, General, ShowStarHelper
 		IniRead,ShowStarHelper,%iniPath%,General,ShowStarHelper
+	}
+return
+
+Set_ShowCatFilterBoxHelper:
+	GuiControlGet,Select_ShowCatFilterBoxHelper
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ShowCatFilterBoxHelper%, %iniPath%, General, ShowCatFilterBoxHelper
+		IniRead,ShowCatFilterBoxHelper,%iniPath%,General,ShowCatFilterBoxHelper
+	}
+return
+
+Set_ShowTagFilterBoxHelper:
+	GuiControlGet,Select_ShowTagFilterBoxHelper
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ShowTagFilterBoxHelper%, %iniPath%, General, ShowTagFilterBoxHelper
+		IniRead,ShowTagFilterBoxHelper,%iniPath%,General,ShowTagFilterBoxHelper
 	}
 return
 
