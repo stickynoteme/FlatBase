@@ -2312,14 +2312,25 @@ return
 
 Edit3SaveTimer:
 	global LVSelectedROW
-	if (LVSelectedROW="")
-		LVSelectedROW=1
-	LV_GetText(RowText, LVSelectedROW,2)
-	FileSafeName := NameEncode(RowText)
+	if (LVSelectedROW=="")
+		LVSelectedROW = 1
 	GuiControlGet, PreviewBox
 	GuiControlGet, TagBox
-	iniRead,C_Cat,%detailsPath%%FileSafeName%.ini,INFO,Cat
 	GuiControlGet, NoteParent
+	LV_GetText(LVexists,1,2)
+	if (LVexists =="") {
+		; Trying to save new note through blank search.. not working.
+		
+		;GuiControlGet, SearchTerm
+		;FileSafeName := NameEncode(SearchTerm)
+		;C_Cat = Make Cat Box
+		;msgbox % "new note:" FileSafeName 
+		;SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,C_Cat,NoteParent)
+		return
+	}
+	LV_GetText(RowText, LVSelectedROW,2)
+	FileSafeName := NameEncode(RowText)
+	iniRead,C_Cat,%detailsPath%%FileSafeName%.ini,INFO,Cat
 	
 	SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,C_Cat,NoteParent)
 	iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
