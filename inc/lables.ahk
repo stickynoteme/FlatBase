@@ -539,14 +539,15 @@ Critical
 if (InStr(ErrorLevel, "S", true))
 {
 	SelectedRows .= A_EventInfo " "
-	tooltip % SelectedRows
+	;tooltip % SelectedRows
 	settimer,KillToolTip,-1000
 	
 }
+
 if (InStr(ErrorLevel, "s", true))
 {
-	SelectedRows := RegExReplace(SelectedRows,"\b" A_EventInfo " ")
-	tooltip % SelectedRows
+	SelectedRows := RegExReplace(SelectedRows,"\b" A_EventInfo " ","")
+	;tooltip % SelectedRows
 	settimer,KillToolTip,-1000
 }
 
@@ -749,12 +750,13 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			return
 		}
 		if (LV@sel_col == 1) {
-			SelectedRows := trim(SelectedRows)
+			;SelectedRowsStarTmp := trim(SelectedRows)
 			SelectedRowsArray := StrSplit(SelectedRows," "," ")
-			
-			if (SelectedRowsArray.Length() == 1){
+			;msgbox % SelectedRowsArray.Length() " :: "
+			if (SelectedRowsArray.Length() <= 2){
 				MouseGetPos, xPos, yPos
 				xPos := xPos+25
+				ColEditStar = 0
 				gosub build_StarEditBox
 				LV@sel_col = "undoomCol1"
 				return
@@ -1054,12 +1056,10 @@ build_StarEditBox:
 return
 
 StarSaveChange:
-	
 	Gui, star:Default
 	GUI, star:Submit
 	sNeedsSubmit = 0
 	NewStar = %sEdit%
-	
 	;msgbox 	% RapidStar "|" TmpName "," TmpFileSafeName "," C_Body "," NewStar "," StarOldFile
 	if (NewStar = "")
 		NewStar = %StarSelectedBox%
@@ -1080,18 +1080,17 @@ StarSaveChange:
 		return
 	}
 	
-	
 	TmpFileINI := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 	TmpFileSafeName := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
 	Iniread, OldStar,%detailsPath%%TmpFileINI%, INFO,Star
-	TmpName := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
-	;xthis
 
+	;xthis
 	if (NewStar == OldStar or OldStar == "ERROR"){
 		msgbox Can't change to the same star. OldStar:%OldStar% NewStar:%NewStar%
 		ListStarToChange = 0
 		return
 	}
+		
 	FileRead, C_Body,%U_NotePath%%StarOldFile%
 	Iniread, TmpName,%detailsPath%%TmpFileINI%, INFO,Name
 	TmpName := strreplace(TmpName,"$#$")
@@ -1407,8 +1406,14 @@ Options:
 	Gui, 3:add,text, xs section, Pipe "|" sperated list of Categories. (Example: Black|White|Calico|..etc)
 	Gui, 3:add,edit, xs section w300 vSelect_CatBoxContents gSet_CatBoxContents, %CatBoxContents% 
 	
-	Gui, 3:Add,CheckBox, xs vSelect_ShowStarHelper gSet_ShowStarHelper, Show star filter by search box?
+	Gui, 3:Add,CheckBox, xs vSelect_ShowStarHelper gSet_ShowStarHelper, Show Star Filter Button?
 	GuiControl,,Select_ShowStarHelper,%ShowStarHelper%
+	
+	Gui, 3:Add,CheckBox, xs vSelect_ShowCatFilterBoxHelper gSet_ShowCatFilterBoxHelper, Show Category Filter Box?
+	GuiControl,,Select_ShowCatFilterBoxHelper,%ShowCatFilterBoxHelper%
+	
+	Gui, 3:Add,CheckBox, xs vSelect_ShowTagFilterBoxHelper gSet_ShowTagFilterBoxHelper, Show Tag Filter Box?
+	GuiControl,,Select_ShowTagFilterBoxHelper,%ShowTagFilterBoxHelper%
 
 	Gui, 3:Add,CheckBox, xs vSelect_OpenInQuickNote gSet_OpenInQuickNote, Use Quick Notes to edit on right click?
 	GuiControl,,Select_OpenInQuickNote,%OpenInQuickNote%
@@ -1621,6 +1626,10 @@ SaveAndReload:
 	IniWrite, %Select_ExternalEditor%, %iniPath%, General, ExternalEditor
 	GuiControlGet,Select_ShowStarHelper
 	IniWrite,%Select_ShowStarHelper%, %iniPath%, General, ShowStarHelper
+	GuiControlGet,Select_ShowCatFilterBoxHelper
+	IniWrite,%Select_ShowCatFilterBoxHelper%, %iniPath%, General, ShowCatFilterBoxHelper
+	GuiControlGet,Select_ShowTagFilterBoxHelper
+	IniWrite,%Select_ShowTagFilterBoxHelper%, %iniPath%, General, ShowCatFilterTagHelper
 	GuiControlGet, Select_RapidStar
 	IniWrite, %RapidStar%, %iniPath%, General, RapidStar
 	GuiControlGet, U_QuickNoteWidth,,QuickWSelect	
@@ -1833,6 +1842,24 @@ Set_ShowStarHelper:
 	if (A_GuiEvent == "Normal"){
 		IniWrite,%Select_ShowStarHelper%, %iniPath%, General, ShowStarHelper
 		IniRead,ShowStarHelper,%iniPath%,General,ShowStarHelper
+	}
+return
+
+Set_ShowCatFilterBoxHelper:
+	GuiControlGet,Select_ShowCatFilterBoxHelper
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ShowCatFilterBoxHelper%, %iniPath%, General, ShowCatFilterBoxHelper
+		IniRead,ShowCatFilterBoxHelper,%iniPath%,General,ShowCatFilterBoxHelper
+	}
+return
+
+Set_ShowTagFilterBoxHelper:
+	GuiControlGet,Select_ShowTagFilterBoxHelper
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ShowTagFilterBoxHelper%, %iniPath%, General, ShowTagFilterBoxHelper
+		IniRead,ShowTagFilterBoxHelper,%iniPath%,General,ShowTagFilterBoxHelper
 	}
 return
 
@@ -2285,14 +2312,25 @@ return
 
 Edit3SaveTimer:
 	global LVSelectedROW
-	if (LVSelectedROW="")
-		LVSelectedROW=1
-	LV_GetText(RowText, LVSelectedROW,2)
-	FileSafeName := NameEncode(RowText)
+	if (LVSelectedROW=="")
+		LVSelectedROW = 1
 	GuiControlGet, PreviewBox
 	GuiControlGet, TagBox
-	iniRead,C_Cat,%detailsPath%%FileSafeName%.ini,INFO,Cat
 	GuiControlGet, NoteParent
+	LV_GetText(LVexists,1,2)
+	if (LVexists =="") {
+		; Trying to save new note through blank search.. not working.
+		
+		;GuiControlGet, SearchTerm
+		;FileSafeName := NameEncode(SearchTerm)
+		;C_Cat = Make Cat Box
+		;msgbox % "new note:" FileSafeName 
+		;SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,C_Cat,NoteParent)
+		return
+	}
+	LV_GetText(RowText, LVSelectedROW,2)
+	FileSafeName := NameEncode(RowText)
+	iniRead,C_Cat,%detailsPath%%FileSafeName%.ini,INFO,Cat
 	
 	SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,C_Cat,NoteParent)
 	iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
