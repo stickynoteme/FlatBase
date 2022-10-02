@@ -176,11 +176,12 @@ BuildGUI1(){
 	DDLbgColor := strreplace(U_SBG,"0x")
 	DDLbgColorb2 := strreplace(U_MBG,"0x")
 	DDLfontColorb2 := strreplace(U_MFC,"0x")
-	DDLfontcolor = 0x%U_MFC%
+	DDLfontcolorMFC = 0x%U_MFC%
+	DDLfontcolorSFC = 0x%U_SFC%
 	CtlColors.Attach(HCF, DDLbgColor)
-	OD_Colors.Attach(HCF, {T: U_SFC})
+	OD_Colors.Attach(HCF, {T: DDLfontcolorSFC})
 	CtlColors.Attach(HTF, DDLbgColorb2,DDLfontColorb2)
-	OD_Colors.Attach(HTF, {T: DDLfontcolor})
+	OD_Colors.Attach(HTF, {T: DDLfontcolorMFC})
 	Gui, 1:SHOW, Hide w%LibW% 
 	WinGet, g1ID,, FlatNotes - Library
 	g1Open=0
