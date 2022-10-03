@@ -179,15 +179,13 @@ BuildGUI1(){
 	DDLbgColor := strreplace(U_SBG,"0x")
 	DDLbgColorb2 := strreplace(U_MBG,"0x")
 	DDLfontColorb2 := strreplace(U_MFC,"0x")
-	DDLfontcolorMFC = 0x%U_MFC%
-	DDLfontcolorSFC = 0x%U_SFC%
 	if (ShowCatFilterBoxHelper == 1) {
 		CtlColors.Attach(HCF, DDLbgColor)
-		OD_Colors.Attach(HCF, {T: DDLfontcolorSFC})
+		OD_Colors.Attach(HCF, {T: U_SFC})
 	}
 	if (ShowTagFilterBoxHelper = 1) {
 		CtlColors.Attach(HTF, DDLbgColorb2,DDLfontColorb2)
-		OD_Colors.Attach(HTF, {T: DDLfontcolorMFC})
+		OD_Colors.Attach(HTF, {T: U_MFC})
 	}
 	Gui, 1:SHOW, Hide w%LibW% 
 	WinGet, g1ID,, FlatNotes - Library
