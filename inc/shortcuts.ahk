@@ -64,23 +64,20 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			Down::Down
 	return
 }
-^+Enter::
+^Enter::
 {
-
 ControlGetFocus, OutputVar, FlatNotes - Library
 		if(OutputVar == "SysListView321"){
 			global LVSelectedROW
 			LV_GetText(RowText, LVSelectedROW,2)
-			TmpFileSafeName := NameEncode(RowText)
-			FilePath = %U_NotePath%%TmpFileSafeName%.txt
-			FileReadLine, MyFile, %FilePath%,2
-			clipboard = %MyFile%
+			clipboard := RowText
 			ToolTip Text: "%RowText%" Copied to clipboard
 			SetTimer, KillToolTip, -500
 			gosub GuiEscape
+			msgbox % clipboard "::" LVSelectedROW
 			return
 			}else
-			^+Enter::^+Enter
+			^Enter::^Enter
 }
 
 del::
