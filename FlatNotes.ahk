@@ -211,6 +211,8 @@ global TitleOldFile
 global ShowStarHelper
 global ShowCatFilterBoxHelper
 global ShowTagFilterBoxHelper
+global ShowTagEditBoxHelper
+global ShowParentEditBoxHelper
 global templatePath
 ;Pre-set globals
 global savedHK1
@@ -403,8 +405,8 @@ IniRead, OpenInQuickNote, %iniPath%, General, OpenInQuickNote,1
 IniRead, ShowStarHelper,%iniPath%,General,ShowStarHelper,1
 IniRead, ShowCatFilterBoxHelper,%iniPath%,General,ShowCatFilterBoxHelper,1
 IniRead, ShowTagFilterBoxHelper,%iniPath%,General,ShowTagFilterBoxHelper,1
-
-
+IniRead, ShowTagEditBoxHelper,%iniPath%,General,ShowTagEditBoxHelper,1
+IniRead, ShowParentEditBoxHelper,%iniPath%,General,ShowParentEditBoxHelper,1
 
 IniRead, RapidStar,%iniPath%,General,RapidStar,1
 
@@ -528,6 +530,16 @@ global CatW := LibW * 0.1
 global TagsFilterX := CatW + 2
 global TagsFilterW := LibW * 0.15
 
+global TagLibW := Libw *0.8
+global ParentLibW := Libw *0.2 - 2
+global ParenetLibX := TagLibW + 1
+
+if (ShowParentEditBoxHelper == 0)
+	TagLibW := Libw
+if (ShowTagEditBoxHelper == 0) {
+	ParentLibW := Libw	
+	ParenetLibX := 0
+	}
 if (ShowTagFilterBoxHelper == 0)
 	CatX := CatX + TagsFilterW
 if (ShowCatFilterBoxHelper == 0)

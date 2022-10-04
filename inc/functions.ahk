@@ -102,18 +102,20 @@ BuildGUI1(){
 	
 	
 	Gui, 1:Add,Edit, section x0 hwndHPB -E0x200 r%PreviewRows% w%LibW% C%U_MFC% gPreviewBox vPreviewBox,
+		
+	; The two listboxes act as centering backgrounds for the tags and parent edits.
+	if (ShowTagEditBoxHelper OR ShowParentEditBoxHelper) {
+		Gui, 1:Add, ListBox, +0x100 r1 w%TagLibW% x0 y+1 -E0x200 Disabled -Tabstop
+		Gui, 1:Add, ListBox, +0x100 r1 w%ParentLibW% xp%ParenetLibX% -E0x200 Disabled -Tabstop
+	}
 	
-	TagLibW := Libw *0.8
-	ParentLibW := Libw *0.2 - 2
-	ParenetLibX := TagLibW + 1
+	if (ShowTagEditBoxHelper) {	
+		Gui, 1:Add,Edit, section x0 yp+6 -E0x200 hwndHPT  r1 w%TagLibW% C%U_MFC% vTagBox center,	
+	}
 	
-	; these two listboxes act as centering backgrounds for the tags and parent edits.
-	Gui, 1:Add, ListBox, +0x100 r1 w%TagLibW% x0 y+1 -E0x200 Disabled -Tabstop
-	Gui, 1:Add, ListBox, +0x100 r1 w%ParentLibW% xp%ParenetLibX% -E0x200 Disabled -Tabstop
-	
-	Gui, 1:Add,Edit, section x0 yp+6 -E0x200 hwndHPT  r1 w%TagLibW% C%U_MFC% vTagBox center,
-	
-	Gui, 1:Add, Edit,xp%ParenetLibX%  -E0x200 r1 center C%U_MFC% w%ParentLibW% vNoteParent HwndHNP,
+	if (ShowParentEditBoxHelper) {
+		Gui, 1:Add, Edit,xp%ParenetLibX%  -E0x200 r1 center C%U_MFC% w%ParentLibW% vNoteParent HwndHNP,
+	}
 	
 	MakeFileList(1)
 	CLV := New LV_Colors(HLV)
