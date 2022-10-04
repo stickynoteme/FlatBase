@@ -757,7 +757,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 	
 	;1Star|2Title|3Body|4Added|5Modified|6RawAdded|7RawModded|8FileName|9RawStar|10Tags|11Cat|12Parent|12Checked|13Marked|14Extra
 	
-	if A_GuiEvent in RightClick
+	if (A_GuiEvent == "RightClick" OR TriggedFromSK == 1)
 	{
 		LVSelectedROW := A_EventInfo
 		LV_GetText(NoteNameToEdit, LVSelectedROW,2)
@@ -834,6 +834,128 @@ build_tEdit:
 return
 
 
+;GUI to edit note details via shortcut key from the main window.
+build_SKColEdit:
+	Opt1 := [0, U_SBG, ,U_SFC]
+	GUI, skce:new, ,SKEditor
+	Gui, skce:Margin , 5, 5 
+	Gui, skce:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
+	Gui, skce:Color,%U_SBG%, %U_MBG%
+	if (LV@sel_col != 1)
+		gui, skce:add,text,w200 -E0x200 center c%U_SFC%,Replace %ColEditName% with:
+	
+	if (LV@sel_col == 1){
+		Gui, skce:add, button,w200 section gbuild_StarEditBox hwndHIB2, [ Star Selector ]
+		ColEditStar = 1
+		If !ImageButton.Create(HIB2, Opt1)
+		MsgBox, 0, ImageButton Error IB1, % ImageButton.LastError
+	}
+	if (LV@sel_col == 3)
+		ColEditRows = 5
+	else
+		ColEditRows = 1
+	if (LV@sel_col == 11){
+		Gui, skce:add,DDL,w200 -E0x200 c%U_FBCA% vceEdit hwndSKceDDL r6, %CatBoxContents%
+		
+		;Listbox color
+		DDLbgColorb2 := strreplace(U_MBG,"0x")
+		DDLfontColorb2 := strreplace(U_MFC,"0x")
+		CtlColors.Attach(SKceDDL, DDLbgColorb2,DDLfontColorb2)
+		OD_Colors.Attach(SKceDDL, {T: U_MFC})
+	}
+	else 
+		Gui, skce:add,edit,w200 -E0x200 c%U_FBCA% vskceEdit r%ColEditRows% hwndSKceEDIT
+	
+		
+	gui, skce:add,button, default gSKColEditSaveChange w200 hwndSKIB1 vIB1, [ Apply ]
+	
+	If !ImageButton.Create(SKIB1, Opt1)
+		MsgBox, 0, ImageButton Error IB1, % ImageButton.LastError
+	
+	
+	WinSet, Style,  -0xC00000,SKEditor
+	if (HideScrollbars = 1) {
+		LVM_ShowScrollBar(SKceEDIT,1,False)
+		GuiControl,+Vscroll,%SKceEDIT%
+	}
+	
+	WinGetPos, xPos, yPos,clibW,clibH,FlatNotes - Library
+	xPos := clibw / 3 + xPos
+	yPos := clibH / 3 + yPos
+	
+	GUI, skce:Show, x%xPos% y%yPos%
+	
+	ControlFocus,Edit1,SKEditor
+return
+
+
+;Save function for Shortcut column editor.
+
+SKColEditSaveChange:
+if (LV@sel_col == 1){
+		OnMessage(0x44, "OnMsgBox")
+		MsgBox 0x40024, Change Stars?, WARNING - All stars will be replace by unique stars. Are you sure you want to continue?
+		OnMessage(0x44, "")
+		IfMsgBox Yes, {
+			goto YesChangeStarsSk
+		} Else IfMsgBox No, {
+			return
+		}
+}
+YesChangeStarsSk:
+GuiControlGet, skceEdit ;get the new data
+ColVarName := CurrentCol[LV@sel_col]
+tmpColNum = Col%LV@sel_col%
+Gui, 1:Default 
+TmpSelectedRows := trim(SelectedRows)
+SelectedRowsArray := StrSplit(TmpSelectedRows," "," ")
+ChangeCount := SelectedRowsArray.Length()
+SelectedRowsArray:=ObjectSort(SelectedRowsArray,,,false)
+	;v = row numbers
+	for RowKey, CRowNum in SelectedRowsArray{
+		LV_GetText(tmpName,CRowNum,8)
+		
+		tmpName := strreplace(tmpName,".txt",".ini")
+		Iniread, tmpName,%detailsPath%%tmpName%, INFO,Name
+		tmpname := strreplace(tmpName,"$#$")
+		C_SafeName := NameEncode(tmpName)
+		if (CRowNum !=3)
+			GetFile = false ;don't get the body
+		GetCurrentNoteData(C_SafeName)
+		;Error Check
+		if !FileExist( U_NotePath C_SafeName ".txt"){
+			Msgbox % "Error Code SKE#001: `n" U_NotePath C_SafeName ".txt Does Not Exist"
+			
+			break
+		}
+		;change what changed...
+		%ColVarName% := skceEdit
+		;save the new data
+		if (LV@sel_col == 1)
+		{
+			IniWrite, %C_Star%, %detailsPath%%C_SafeName%.ini, INFO, Star
+		}
+		SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
+		LV_Modify(CRowNum,tmpColNum,skceEdit)
+		LV_Modify(CRowNum, "Select")
+		tooltip, processing %RowKey% of %ChangeCount%
+
+
+	}
+		GuiControl,, PreviewBox, %C_File%
+		GuiControl,, TagBox, %C_Tags%
+		GuiControl,, NoteParent, %C_Parent%
+		GuiControl,, TitleBar, %C_Name%
+		GuiControl,, StatusbarM,M: %C_Mod%
+		GuiControl,, StatusbarA,A: %C_Add%
+		;SelectedRows :=
+		;LV_Modify(CRowNum, "Select")
+		settimer,KillToolTip,-1000
+
+	gui, skce:destroy
+
+return
+
 ;GUI for right click col 10-12 for now and doing bulk operations.
 build_ColEdit:
 	color1 = %U_SBG%
@@ -868,13 +990,10 @@ build_ColEdit:
 	else 
 		Gui, ce:add,edit,w200 -E0x200 c%U_FBCA% vceEdit r%ColEditRows% hwndHceEDIT
 	
-
-		
 	gui, ce:add,button, default gColEditSaveChange w200 hwndHIB1 vIB1, [ Apply ]
 	
 	If !ImageButton.Create(HIB1, Opt1)
 		MsgBox, 0, ImageButton Error IB1, % ImageButton.LastError
-	
 	
 	WinSet, Style,  -0xC00000,InlineNameEdit
 	if (HideScrollbars = 1) {

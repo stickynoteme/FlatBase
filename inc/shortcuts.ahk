@@ -53,6 +53,14 @@ Return
 #IfWinActive, FlatNotes - Library
 
 {
+
+^s::
+{
+	LV@sel_col = 3
+	ColEditName :=  ColList[LV@sel_col]
+	gosub build_SKColEdit
+	return
+}
 Down::
 ControlGetFocus, OutputVar, FlatNotes - Library
 {
