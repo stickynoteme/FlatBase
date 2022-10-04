@@ -219,6 +219,7 @@ global savedHK3
 global savedHK4
 global savedHK5
 global savedHK6
+global savedHK7
 global savedSK1
 global savedSK2
 global savedSK3
@@ -383,10 +384,11 @@ IniRead, CatBoxContents, %iniPath%,General,CatBoxContents,White|Black|Calico|Tab
 
 IniRead, savedHK1, %iniPath%, Hotkeys, 1,#o
 IniRead, savedHK2, %iniPath%, Hotkeys, 2,#n
-IniRead, savedHK3, %iniPath%, Hotkeys, 3,#z
-IniRead, savedHK4, %iniPath%, Hotkeys, 4,#+z
-IniRead, savedHK5, %iniPath%, Hotkeys, 5,#a
-IniRead, savedHK6, %iniPath%, Hotkeys, 6,+#a
+IniRead, savedHK3, %iniPath%, Hotkeys, 2,#m
+IniRead, savedHK4, %iniPath%, Hotkeys, 3,#z
+IniRead, savedHK5, %iniPath%, Hotkeys, 4,#+z
+IniRead, savedHK6, %iniPath%, Hotkeys, 5,#a
+IniRead, savedHK7, %iniPath%, Hotkeys, 6,+#a
 IniRead, savedSK1, %iniPath%, Shortcuts, 1,!s
 IniRead, savedSK2, %iniPath%, Shortcuts, 2,!r
 IniRead, savedSK3, %iniPath%, Shortcuts, 3,!e

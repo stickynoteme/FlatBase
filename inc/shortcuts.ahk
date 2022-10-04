@@ -74,7 +74,6 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			ToolTip Text: "%RowText%" Copied to clipboard
 			SetTimer, KillToolTip, -500
 			gosub GuiEscape
-			msgbox % clipboard "::" LVSelectedROW
 			return
 			}else
 			^Enter::^Enter
