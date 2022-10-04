@@ -234,14 +234,21 @@ return
 
 SaveButton:
 	GuiControlGet,FileSafeName
+	Gui, 2:Submit
 	if (QuickNoteName == ""){
-		MsgBox Note Name Can Not Be Empty
-	return
+		;Old error message
+		;MsgBox Note Name Can Not Be Empty
+		;return
+		
+		;Use a timestamp if name is empty:
+		AutoNameTimeFormat = yyyy-MM-dd hh:mm:sstt
+		FormatTime, TimeString,, %AutoNameTimeFormat%
+		FileSafeName := NameEncode(QuickNoteName)
+		QuickNoteName := TimeString
+		FileSafeName := NameEncode(QuickNoteName)
 	}
 	;QuickNoteName := trim(QuickNoteName)
 	;FileSafeName := trim(FileSafeName)
-	
-	Gui, 2:Submit
 	;convert used symbols to raw stars
 	QuickStar := EncodeStar(QuickStar)
 
