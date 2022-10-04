@@ -527,6 +527,13 @@ global CatX := SearchW
 global CatW := LibW * 0.1
 global TagsFilterX := CatW + 2
 global TagsFilterW := LibW * 0.15
+
+if (ShowTagFilterBoxHelper == 0)
+	CatX := CatX + TagsFilterW
+if (ShowCatFilterBoxHelper == 0)
+	TagsFilterX := CatX + TagsFilterW
+
+
 global StickyTW := StickyW-80
 global StickyMaxH
 global VSBW
