@@ -211,6 +211,8 @@ global TitleOldFile
 global ShowStarHelper
 global ShowCatFilterBoxHelper
 global ShowTagFilterBoxHelper
+global ShowTagEditBoxHelper
+global ShowParentEditBoxHelper
 global templatePath
 ;Pre-set globals
 global savedHK1
@@ -219,6 +221,7 @@ global savedHK3
 global savedHK4
 global savedHK5
 global savedHK6
+global savedHK7
 global savedSK1
 global savedSK2
 global savedSK3
@@ -383,10 +386,11 @@ IniRead, CatBoxContents, %iniPath%,General,CatBoxContents,White|Black|Calico|Tab
 
 IniRead, savedHK1, %iniPath%, Hotkeys, 1,#o
 IniRead, savedHK2, %iniPath%, Hotkeys, 2,#n
-IniRead, savedHK3, %iniPath%, Hotkeys, 3,#z
-IniRead, savedHK4, %iniPath%, Hotkeys, 4,#+z
-IniRead, savedHK5, %iniPath%, Hotkeys, 5,#a
-IniRead, savedHK6, %iniPath%, Hotkeys, 6,+#a
+IniRead, savedHK3, %iniPath%, Hotkeys, 2,#m
+IniRead, savedHK4, %iniPath%, Hotkeys, 3,#z
+IniRead, savedHK5, %iniPath%, Hotkeys, 4,#+z
+IniRead, savedHK6, %iniPath%, Hotkeys, 5,#a
+IniRead, savedHK7, %iniPath%, Hotkeys, 6,+#a
 IniRead, savedSK1, %iniPath%, Shortcuts, 1,!s
 IniRead, savedSK2, %iniPath%, Shortcuts, 2,!r
 IniRead, savedSK3, %iniPath%, Shortcuts, 3,!e
@@ -401,8 +405,8 @@ IniRead, OpenInQuickNote, %iniPath%, General, OpenInQuickNote,1
 IniRead, ShowStarHelper,%iniPath%,General,ShowStarHelper,1
 IniRead, ShowCatFilterBoxHelper,%iniPath%,General,ShowCatFilterBoxHelper,1
 IniRead, ShowTagFilterBoxHelper,%iniPath%,General,ShowTagFilterBoxHelper,1
-
-
+IniRead, ShowTagEditBoxHelper,%iniPath%,General,ShowTagEditBoxHelper,1
+IniRead, ShowParentEditBoxHelper,%iniPath%,General,ShowParentEditBoxHelper,1
 
 IniRead, RapidStar,%iniPath%,General,RapidStar,1
 
@@ -525,6 +529,23 @@ global CatX := SearchW
 global CatW := LibW * 0.1
 global TagsFilterX := CatW + 2
 global TagsFilterW := LibW * 0.15
+
+global TagLibW := Libw *0.8
+global ParentLibW := Libw *0.2 - 2
+global ParenetLibX := TagLibW + 1
+
+if (ShowParentEditBoxHelper == 0)
+	TagLibW := Libw
+if (ShowTagEditBoxHelper == 0) {
+	ParentLibW := Libw	
+	ParenetLibX := 0
+	}
+if (ShowTagFilterBoxHelper == 0)
+	CatX := CatX + TagsFilterW
+if (ShowCatFilterBoxHelper == 0)
+	TagsFilterX := CatX + TagsFilterW
+
+
 global StickyTW := StickyW-80
 global StickyMaxH
 global VSBW

@@ -56,8 +56,21 @@ Label2:
 	}
 return
 
-;Hotkey to start a Rapid Note Win+z
+;Hotkey to start a quicknote Win+M where the select is the body instead of the title / name.
 Label3:
+	MyOldClip := clipboard
+	if (sendCtrlC="1")
+		send {Ctrl Down}{c}{Ctrl up}
+	MyClip := clipboard
+	clipboard := MyOldClip
+	MyClip := trim(MyClip)
+	BuildGUI2()
+	ControlFocus, Edit1, FlatNote - QuickNote
+	GuiControl,, QuickNoteBody,%MyClip%	
+return
+
+;Hotkey to start a Rapid Note Win+z
+Label4:
 	MyOldClip := clipboard
 	if(istitle != "no") {
 		send {Ctrl Down}{c}{Ctrl up}
@@ -108,7 +121,7 @@ Label3:
 return
 
 ;Hotkey to Cancel Rapid note taking.
-Label4:
+Label5:
 	istitle = yes
 	tooltip cancled
 	settimer,KillToolTip,-1000
@@ -116,7 +129,7 @@ return
 
 
 ;Hotkey to appened to a rapid note
-Label5:
+Label6:
 	MyOldClip := clipboard
 	if(istitle = "no") {
 		send {Ctrl Down}{c}{Ctrl up}
@@ -129,7 +142,7 @@ return
 
 
 ;hotkey to append a template to a Rapid note.
-Label6:
+Label7:
 	RapidNTAppend = 1
 	gosub NoteTemplateSelectUI
 return
@@ -221,14 +234,21 @@ return
 
 SaveButton:
 	GuiControlGet,FileSafeName
+	Gui, 2:Submit
 	if (QuickNoteName == ""){
-		MsgBox Note Name Can Not Be Empty
-	return
+		;Old error message
+		;MsgBox Note Name Can Not Be Empty
+		;return
+		
+		;Use a timestamp if name is empty:
+		AutoNameTimeFormat = yyyy-MM-dd hh:mm:sstt
+		FormatTime, TimeString,, %AutoNameTimeFormat%
+		FileSafeName := NameEncode(QuickNoteName)
+		QuickNoteName := TimeString
+		FileSafeName := NameEncode(QuickNoteName)
 	}
 	;QuickNoteName := trim(QuickNoteName)
 	;FileSafeName := trim(FileSafeName)
-	
-	Gui, 2:Submit
 	;convert used symbols to raw stars
 	QuickStar := EncodeStar(QuickStar)
 
@@ -1405,15 +1425,6 @@ Options:
 	
 	Gui, 3:add,text, xs section, Pipe "|" sperated list of Categories. (Example: Black|White|Calico|..etc)
 	Gui, 3:add,edit, xs section w300 vSelect_CatBoxContents gSet_CatBoxContents, %CatBoxContents% 
-	
-	Gui, 3:Add,CheckBox, xs vSelect_ShowStarHelper gSet_ShowStarHelper, Show Star Filter Button?
-	GuiControl,,Select_ShowStarHelper,%ShowStarHelper%
-	
-	Gui, 3:Add,CheckBox, xs vSelect_ShowCatFilterBoxHelper gSet_ShowCatFilterBoxHelper, Show Category Filter Box?
-	GuiControl,,Select_ShowCatFilterBoxHelper,%ShowCatFilterBoxHelper%
-	
-	Gui, 3:Add,CheckBox, xs vSelect_ShowTagFilterBoxHelper gSet_ShowTagFilterBoxHelper, Show Tag Filter Box?
-	GuiControl,,Select_ShowTagFilterBoxHelper,%ShowTagFilterBoxHelper%
 
 	Gui, 3:Add,CheckBox, xs vSelect_OpenInQuickNote gSet_OpenInQuickNote, Use Quick Notes to edit on right click?
 	GuiControl,,Select_OpenInQuickNote,%OpenInQuickNote%
@@ -1433,8 +1444,8 @@ Options:
 	GuiControl,,SetCtrlC,%sendCtrlC%
 	Gui, 3:Add,text, section h1 Disabled 			
 	
-	HotkeyNames := ["Show Library Window","Quick New Note","Rapid Note","Cancel Rapid Note","Rapid Note Append","Append Template to Rapid Note"]
-	Loop,% 6 {
+	HotkeyNames := ["Show Library Window","Quick New Note","Quick New Note Alt (Body)","Rapid Note","Cancel Rapid Note","Rapid Note Append","Append Template to Rapid Note"]
+	Loop,% 7 {
 		HotkeyNameTmp := HotkeyNames[A_Index]
 		Gui, 3:Add, Text, , Hotkey: %HotkeyNameTmp%
 		StringReplace, noMods, savedHK%A_Index%, ~                  
@@ -1562,7 +1573,29 @@ Options:
 	Gui, 3:Add, Edit, w50 x+5
 	Gui, 3:Add,UpDown,  vParentPercentSelect gSet_ParentPercent Range0-100, %oParentPercent%
 	
+	Gui, 3:Add,text,xs section, - Main Window -
+	
+	Gui, 3:Add,CheckBox, xs vSelect_ShowStarHelper gSet_ShowStarHelper, Show Star Filter Button?
+	GuiControl,,Select_ShowStarHelper,%ShowStarHelper%
+	
+	Gui, 3:Add,CheckBox, xs vSelect_ShowCatFilterBoxHelper gSet_ShowCatFilterBoxHelper, Show Category Filter Box?
+	GuiControl,,Select_ShowCatFilterBoxHelper,%ShowCatFilterBoxHelper%
+	
+	Gui, 3:Add,CheckBox, xs vSelect_ShowTagFilterBoxHelper gSet_ShowTagFilterBoxHelper, Show Tag Filter Box?
+	GuiControl,,Select_ShowTagFilterBoxHelper,%ShowTagFilterBoxHelper%
+	
+	Gui, 3:Add,CheckBox, xs vSelect_ShowTagEditBoxHelper gSet_ShowTagEditBoxHelper, Show Tag Edit Box?
+	GuiControl,,Select_ShowTagEditBoxHelper,%ShowTagEditBoxHelper%
+	
+	Gui, 3:Add,CheckBox, xs vSelect_ShowParentEditBoxHelper gSet_ShowParentEditBoxHelper, Show Parent Edit Box?
+	GuiControl,,Select_ShowParentEditBoxHelper,%ShowParentEditBoxHelper%
+	
+	Gui, 3:Add,text,xs section, - Quick Note Window -
+
+	
+	;—-------------------------
 	;Window Size Options Tab
+	;—--------------------------
 	Gui, 3:Tab, Window Size
 	Gui, 3:Add,Text,section,Main Window Width: (Default: 530)
 	Gui, 3:Add,Edit   
@@ -1630,6 +1663,10 @@ SaveAndReload:
 	IniWrite,%Select_ShowCatFilterBoxHelper%, %iniPath%, General, ShowCatFilterBoxHelper
 	GuiControlGet,Select_ShowTagFilterBoxHelper
 	IniWrite,%Select_ShowTagFilterBoxHelper%, %iniPath%, General, ShowCatFilterTagHelper
+	GuiControlGet,Select_ShowTagEditBoxHelper
+	IniWrite,%Select_ShowTagEditBoxHelper%, %iniPath%, General, ShowCatEditTagHelper
+	GuiControlGet,Select_ShowParentEditBoxHelper
+	IniWrite,%Select_ShowParentEditBoxHelper%, %iniPath%, General, ShowCatEditParentHelper
 	GuiControlGet, Select_RapidStar
 	IniWrite, %RapidStar%, %iniPath%, General, RapidStar
 	GuiControlGet, U_QuickNoteWidth,,QuickWSelect	
@@ -1860,6 +1897,24 @@ Set_ShowTagFilterBoxHelper:
 	if (A_GuiEvent == "Normal"){
 		IniWrite,%Select_ShowTagFilterBoxHelper%, %iniPath%, General, ShowTagFilterBoxHelper
 		IniRead,ShowTagFilterBoxHelper,%iniPath%,General,ShowTagFilterBoxHelper
+	}
+return
+
+Set_ShowParentEditBoxHelper:
+	GuiControlGet,Select_ShowParentEditBoxHelper
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ShowParentEditBoxHelper%, %iniPath%, General, ShowParentEditBoxHelper
+		IniRead,ShowParentEditBoxHelper,%iniPath%,General,ShowParentEditBoxHelper
+	}
+return
+
+Set_ShowTagEditBoxHelper:
+	GuiControlGet,Select_ShowTagEditBoxHelper
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ShowTagEditBoxHelper%, %iniPath%, General, ShowTagEditBoxHelper
+		IniRead,ShowTagEditBoxHelper,%iniPath%,General,ShowTagEditBoxHelper
 	}
 return
 
@@ -2440,7 +2495,7 @@ Return
 
 
 HelpWindow:
-msgbox % "Advanced search: `nn::term = Search names only.[Also works for b:: t:: and p:: for body, tags, and parent]`ntermA||termB = find a or b.`nTermA&&TermB = find a and b`nNote: for || and && terms most be in the same field. eg. You can't search for terms in title and body, they most both be in that title or body.`n`n[Legend: + = Shift, ^ = Ctrl, ! = Alt, # = Win]`n`nGLOBAL HOTKEYS:`nOpen Library (if Capslock not used): " savedHK1 "`nQuick Note: " savedHK2 "`nRapid Note: " savedHK3 "`nCancel Rapid Note: " savedHK4 "`nAppend to Rapid Note: " savedHK5 "`nAppend Template to Rapid Note" savedHK6 "`n`nMAIN WINDOW SHORTCUTS:`nFocus Search: "savedSK1 "`nFocus Results: " savedSK2 "`nFocus Edit/Preview: " savedSK3 "`nAdd Note From Template: " savedSK4 "`n`nINFO:`nQuick Note:`nSelect text and press the Quick Note hotkey to bring that text up as the body of a new blank note.`n`nRapid Note:`nUse the Rapid Note hotkey to quick add notes. Press the Rapid Note Hotkey once to copy the title, then again to copy the body or use the append hotkey to add any number of selected texts to the body of the note. When you are done use the Rapid Note hotekey to finish the note and select a star."
+msgbox % "Advanced search: `nn::term = Search names only.[Also works for b:: t:: and p:: for body, tags, and parent]`ntermA||termB = find a or b.`nTermA&&TermB = find a and b`nNote: for || and && terms most be in the same field. eg. You can't search for terms in title and body, they most both be in that title or body.`n`n[Legend: + = Shift, ^ = Ctrl, ! = Alt, # = Win]`n`nGLOBAL HOTKEYS:`nOpen Library (if Capslock not used): " savedHK1 "`nQuick Note: " savedHK2 "`nQuick Note Alt: " savedHK3 "`nRapid Note: " savedHK4 "`nCancel Rapid Note: " savedHK5 "`nAppend to Rapid Note: " savedHK6 "`nAppend Template to Rapid Note" savedHK7 "`n`nMAIN WINDOW SHORTCUTS:`nFocus Search: "savedSK1 "`nFocus Results: " savedSK2 "`nFocus Edit/Preview: " savedSK3 "`nAdd Note From Template: " savedSK4 "`n`nINFO:`nQuick Note:`nSelect text and press the Quick Note hotkey to bring that text up as the body of a new blank note.`n`nRapid Note:`nUse the Rapid Note hotkey to quick add notes. Press the Rapid Note Hotkey once to copy the title, then again to copy the body or use the append hotkey to add any number of selected texts to the body of the note. When you are done use the Rapid Note hotekey to finish the note and select a star."
 return
 
 
