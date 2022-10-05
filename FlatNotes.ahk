@@ -662,7 +662,6 @@ if (g1Open=0) {
 	if(StaticX != "" or StatricY != ""){
 	xPos := StaticX
 	yPos := StaticY
-	msgbox % StaticY "  " StaticX
 	}
 	GuiControl,,%HSterm%,
 	GuiControl,,%HSterm%,%AutoSearchTerm%

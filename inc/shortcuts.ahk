@@ -40,11 +40,11 @@ Return
 }
 #IfWinActive, FlatNote - QuickNote
 {
-!enter::
-	gosub SaveButton
+!enter::	
+	ControlClick,Button1,FlatNote - QuickNote
 	return
 +enter::
-	gosub SaveButton
+	ControlClick,Button1,FlatNote - QuickNote
 	return
 }
 ;------------------------------------------
