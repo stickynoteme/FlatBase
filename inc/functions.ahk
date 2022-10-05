@@ -97,7 +97,7 @@ BuildGUI1(){
 	Gui, 1:Add,edit, readonly center x+15 -E0x200 vTitleBar C%U_SFC% w%TitleWAdjust% h%title_h% backgroundTrans -Tabstop,
 	Gui, 1:Add,text, center yp0 x%TreeIconX% c%U_SFC% -E0x200 w25 h%title_h% gBuildTreeUI, %TreeSymbol%
 	
-	Gui, 1:Add,Edit, section x0 hwndHPB -E0x200 r%PreviewRows% w%LibW% C%U_MFC% gPreviewBox vPreviewBox,
+	Gui, 1:Add,Edit, section x0 hwndHPB -E0x200  r%PreviewRows% w%LibW% C%U_MFC% gPreviewBox vPreviewBox,
 	}
 	
 	; The two listboxes act as centering backgrounds for the tags and parent edits.
@@ -152,7 +152,7 @@ BuildGUI1(){
 	OnMessage( WM_RBUTTONDOWN, "HandleMessage" )
 
 
-	gui, 1:Add, Button, Default w15 y-2500 x-2500 gNewAndSaveHK, HK
+	gui, 1:Add, Button, Default w15 y-2500 x-2500 -Tabstop gNewAndSaveHK, HK
 	Gui, 1:Add,Edit, w35 y-2000 x-2000 vSearchFilter HwndHSF -Tabstop,
 	;Gui, 1:Add,Edit, w35 y-2200 x-2200 vCatFilter HwndHCF -Tabstop,
 	

@@ -8,12 +8,17 @@ Label1:
 		g1Open=0
 		GUI, star:destroy
 		GUI, t:destroy
+		gosub Edit3SaveTimer
 		return
 	}
 	if (g1Open=0) {
 		MouseGetPos, xPos, yPos	
 		xPos /= 1.5
 		yPos /= 1.5
+		if(StaticX != "" or StatricY != ""){
+			xPos := StaticX
+			yPos := StaticY
+		}
 		GuiControl,,%HSterm%, 
 		WinMove, ahk_id %g1ID%, , %xPos%, %yPos%
 		WinShow, ahk_id %g1ID%
@@ -1844,6 +1849,12 @@ Options:
 	Gui, 3:Add,Text,xs,Unique Star List Rows: (Default: 10)
 	Gui, 3:Add,Edit   
 	Gui, 3:Add,UpDown,vSelect_USSLR gSet_USSLR range1-99, %USSLR%
+
+	Gui, 3:Add,Text,xs,Static X window location: (Default: Blank [which uses the mouse position.])
+	Gui, 3:Add,Edit,vSelect_StaticX w100 gSet_StaticX, %StaticX%
+
+	Gui, 3:Add,Text,xs,Static Y window location: (Default: Blank  [which uses the mouse position.])
+	Gui, 3:Add,Edit,vSelect_StaticY w100 gSet_StaticY, %StaticX% 
 	
 	;Quick/Rapid Save Tab
 	Gui, 3:Tab, Quick/Rapid Save
@@ -1967,7 +1978,11 @@ reload
 	GuiControlGet,Select_UniqueStarList
 	IniWrite, %Select_UniqueStarList%,%iniPath%,General, UniqueStarList
 	GuiControlGet,Select_USSLR	
-	IniWrite, %Select_USSLR%,%iniPath%,General, USSLR	
+	IniWrite, %Select_USSLR%,%iniPath%,General, USSLR
+	GuiControlGet,Select_StaticX	
+	IniWrite, %Select_StaticX%,%iniPath%,General, StaticX
+	GuiControlGet,Select_StaticY	
+	IniWrite, %Select_StaticY%,%iniPath%,General, StaticY
 	GuiControlGet,Select_SearchDates
 	IniWrite,%Select_SearchDates%, %iniPath%, General, SearchDates
 	GuiControlGet,Select_SearchWholeNote
@@ -2205,6 +2220,18 @@ Set_USSLR:
 	GuiControlGet,Select_USSLR	
 	IniWrite, %Select_USSLR%,%iniPath%,General, USSLR	
 	IniRead, USSLR, %iniPath%, General, USSLR
+return
+
+Set_StaticX:
+	GuiControlGet,Select_StaticX	
+	IniWrite, %Select_StaticX%,%iniPath%,General, StaticX	
+	IniRead, StaticX, %iniPath%, General, StaticX
+return
+
+Set_StaticY:
+	GuiControlGet,Select_StaticY	
+	IniWrite, %Select_StaticY%,%iniPath%,General, StaticY	
+	IniRead, StaticY, %iniPath%, General, StaticY
 return
 
 Set_StickyRows:
