@@ -53,6 +53,48 @@ Return
 #IfWinActive, FlatNotes - Library
 
 {
+
+^b::
+{
+	LV@sel_col = 3
+	ColEditName :=  ColList[LV@sel_col]
+	gosub build_SKColEdit
+	return
+}
+
+^t::
+{
+	LV@sel_col = 10
+	ColEditName :=  ColList[LV@sel_col]
+	gosub build_SKColEdit
+	return
+}
+
+^c::
+{
+	LV@sel_col = 11
+	ColEditName :=  ColList[LV@sel_col]
+	gosub build_SKColEdit
+	return
+}
+
+^p::
+{
+	LV@sel_col = 12
+	ColEditName :=  ColList[LV@sel_col]
+	gosub build_SKColEdit
+	return
+}
+
+^n::
+{
+	LV@sel_col = 3
+	ColEditName :=  ColList[LV@sel_col]
+	LV_GetText(TitleOldFile, LVSelectedROW,8)
+	gosub build_SKNameEdit
+	return
+}
+
 Down::
 ControlGetFocus, OutputVar, FlatNotes - Library
 {

@@ -8,12 +8,17 @@ Label1:
 		g1Open=0
 		GUI, star:destroy
 		GUI, t:destroy
+		gosub Edit3SaveTimer
 		return
 	}
 	if (g1Open=0) {
 		MouseGetPos, xPos, yPos	
 		xPos /= 1.5
 		yPos /= 1.5
+		if(StaticX != "" or StatricY != ""){
+			xPos := StaticX
+			yPos := StaticY
+		}
 		GuiControl,,%HSterm%, 
 		WinMove, ahk_id %g1ID%, , %xPos%, %yPos%
 		WinShow, ahk_id %g1ID%
@@ -757,7 +762,7 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 	
 	;1Star|2Title|3Body|4Added|5Modified|6RawAdded|7RawModded|8FileName|9RawStar|10Tags|11Cat|12Parent|12Checked|13Marked|14Extra
 	
-	if A_GuiEvent in RightClick
+	if (A_GuiEvent == "RightClick" OR TriggedFromSK == 1)
 	{
 		LVSelectedROW := A_EventInfo
 		LV_GetText(NoteNameToEdit, LVSelectedROW,2)
@@ -833,6 +838,220 @@ build_tEdit:
 	tNeedsSubmit = 1
 return
 
+;GUI for Shortcut key to edit name
+build_SKNameEdit:
+	GUI, skne:new, ,SKNameEditor
+	Gui, skne:Margin , 5, 5 
+	Gui, skne:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
+	Gui, skne:Color,%U_SBG%, %U_MBG%	
+
+	gui, skne:add,text,w100 -E0x200 center c%U_SFC%,New Name
+	Gui, skne:add,edit,w100 -E0x200 c%U_FBCA% vSKNameEdit
+	gui, skne:add,button, default gSKTitleSaveChange x-10000 y-10000
+	WinSet, Style,  -0xC00000,SKNameEditor
+	
+	WinGetPos, xPos, yPos,clibW,clibH,FlatNotes - Library
+	xPos := clibw / 3 + xPos
+	yPos := clibH / 3 + yPos
+	
+	GUI, skne:Show, x%xPos% y%yPos%
+	tNeedsSubmit = 1
+	
+	ControlFocus,Edit1,SKNameEditor
+
+return
+
+TitleSaveChange:
+	GUI, t:Submit
+	NewTitle = %tEdit%
+	goto SaveNewName
+
+SKTitleSaveChange:
+	GUI, skne:Submit
+	NewTitle = %SKNameEdit%
+	goto SaveNewName
+	
+SaveNewName:
+		tNeedsSubmit = 0
+	if (NewTitle = ""){
+		ListTitleToChange = 0
+		TitleOldFile := ""
+		return
+	}
+	FileSafeName :=NameEncode(NewTitle)
+	OldIniName := RegExReplace(TitleOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
+	NewIniName = %FileSafeName%.ini
+	NewTitleFileName = %FileSafeName%.txt
+	FileRead, C_Body,%U_NotePath%%TitleOldFile%
+	
+	if FileExist(U_NotePath NewTitleFileName){
+		MsgBox, A note with this name already exists.
+		tNeedsSubmit = 0
+		ListTitleToChange = 0
+		TitleOldFile := ""
+		return
+	}
+	if (LVSelectedROW=""){
+		msgbox Name Save Error 1
+		tNeedsSubmit = 0
+		ListTitleToChange = 0
+		TitleOldFile := ""
+		return
+		}
+	if (NewIniName=""){
+		msgbox Name Save Error 2
+		tNeedsSubmit = 0
+		ListTitleToChange = 0
+		TitleOldFile := ""
+		return
+		}
+	if (OldIniName=""){
+		msgbox Name Save Error 3
+		tNeedsSubmit = 0
+		ListTitleToChange = 0
+		TitleOldFile := ""
+		return
+		}
+	FileMove, %detailsPath%%OldIniName%, %detailsPath%%NewIniName%
+	FileMove, %U_NotePath%%TitleOldFile%, %U_NotePath%%FileSafeName%.txt
+	
+	for Each, Note in MyNotesArray{
+			If (Note.8 = TitleOldFile){
+				MyNotesArray.RemoveAt(Each)
+			}
+		}
+	Iniread, TmpTags,%detailsPath%%NewIniName%, INFO,Tags
+	Iniread, TmpCat,%detailsPath%%NewIniName%, INFO,Cat
+	Iniread, TmpParent,%detailsPath%%NewIniName%, INFO,Parent
+	
+	;FileRecycle, %detailsPath%%C_ini%%tOldFile%
+	SaveFile(NewTitle,FileSafeName,C_Body,1,TmpTags,TmpCat,TmpParent)
+	ListTitleToChange = 1
+	ControlFocus , Edit1, FlatNotes - Library
+	TitleOldFile := ""
+return
+
+;GUI to edit note details via shortcut key from the main window.
+build_SKColEdit:
+	Opt1 := [0, U_SBG, ,U_SFC]
+	GUI, skce:new, ,SKEditor
+	Gui, skce:Margin , 5, 5 
+	Gui, skce:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
+	Gui, skce:Color,%U_SBG%, %U_MBG%
+	if (LV@sel_col != 1)
+		gui, skce:add,text,w200 -E0x200 center c%U_SFC%,Replace %ColEditName% with:
+	
+	if (LV@sel_col == 1){
+		Gui, skce:add, button,w200 section gbuild_StarEditBox hwndHIB2, [ Star Selector ]
+		ColEditStar = 1
+		If !ImageButton.Create(HIB2, Opt1)
+		MsgBox, 0, ImageButton Error IB1, % ImageButton.LastError
+	}
+	if (LV@sel_col == 3)
+		ColEditRows = 5
+	else
+		ColEditRows = 1
+	if (LV@sel_col == 11){
+		Gui, skce:add,DDL,w200 -E0x200 c%U_FBCA% vskceEdit hwndSKceDDL r6, %CatBoxContents%
+		
+		;Listbox color
+		DDLbgColorb2 := strreplace(U_MBG,"0x")
+		DDLfontColorb2 := strreplace(U_MFC,"0x")
+		CtlColors.Attach(SKceDDL, DDLbgColorb2,DDLfontColorb2)
+		OD_Colors.Attach(SKceDDL, {T: U_MFC})
+	}
+	else 
+		Gui, skce:add,edit,w200 -E0x200 c%U_FBCA% vskceEdit r%ColEditRows% hwndSKceEDIT
+	
+		
+	gui, skce:add,button, default gSKColEditSaveChange w200 hwndSKIB1 vIB1, [ Apply ]
+	
+	If !ImageButton.Create(SKIB1, Opt1)
+		MsgBox, 0, ImageButton Error IB1, % ImageButton.LastError
+	
+	
+	WinSet, Style,  -0xC00000,SKEditor
+	if (HideScrollbars = 1) {
+		LVM_ShowScrollBar(SKceEDIT,1,False)
+		GuiControl,+Vscroll,%SKceEDIT%
+	}
+	
+	WinGetPos, xPos, yPos,clibW,clibH,FlatNotes - Library
+	xPos := clibw / 3 + xPos
+	yPos := clibH / 3 + yPos
+	
+	GUI, skce:Show, x%xPos% y%yPos%
+	
+	ControlFocus,Edit1,SKEditor
+return
+
+
+;Save function for Shortcut column editor.
+
+SKColEditSaveChange:
+if (LV@sel_col == 1){
+		OnMessage(0x44, "OnMsgBox")
+		MsgBox 0x40024, Change Stars?, WARNING - All stars will be replace by unique stars. Are you sure you want to continue?
+		OnMessage(0x44, "")
+		IfMsgBox Yes, {
+			goto YesChangeStarsSk
+		} Else IfMsgBox No, {
+			return
+		}
+}
+YesChangeStarsSk:
+GuiControlGet, skceEdit ;get the new data
+ColVarName := CurrentCol[LV@sel_col]
+tmpColNum = Col%LV@sel_col%
+Gui, 1:Default 
+TmpSelectedRows := trim(SelectedRows)
+SelectedRowsArray := StrSplit(TmpSelectedRows," "," ")
+ChangeCount := SelectedRowsArray.Length()
+SelectedRowsArray:=ObjectSort(SelectedRowsArray,,,false)
+	;v = row numbers
+	for RowKey, CRowNum in SelectedRowsArray{
+		LV_GetText(tmpName,CRowNum,8)
+		
+		tmpName := strreplace(tmpName,".txt",".ini")
+		Iniread, tmpName,%detailsPath%%tmpName%, INFO,Name
+		tmpname := strreplace(tmpName,"$#$")
+		C_SafeName := NameEncode(tmpName)
+		if (CRowNum !=3)
+			GetFile = false ;don't get the body
+		GetCurrentNoteData(C_SafeName)
+		;Error Check
+		if !FileExist( U_NotePath C_SafeName ".txt"){
+			Msgbox % "Error Code SKE#001: `n" U_NotePath C_SafeName ".txt Does Not Exist"
+			
+			break
+		}
+		;change what changed...
+		%ColVarName% := skceEdit
+		;save the new data
+		if (LV@sel_col == 1)
+		{
+			IniWrite, %C_Star%, %detailsPath%%C_SafeName%.ini, INFO, Star
+		}
+		SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
+		LV_Modify(CRowNum,tmpColNum,skceEdit)
+		LV_Modify(CRowNum, "Select")
+		tooltip, processing %RowKey% of %ChangeCount%
+
+
+	}
+		GuiControl,, PreviewBox, %C_File%
+		GuiControl,, TagBox, %C_Tags%
+		GuiControl,, NoteParent, %C_Parent%
+		GuiControl,, TitleBar, %C_Name%
+		GuiControl,, StatusbarM,M: %C_Mod%
+		GuiControl,, StatusbarA,A: %C_Add%
+		;SelectedRows :=
+		;LV_Modify(CRowNum, "Select")
+		settimer,KillToolTip,-1000
+
+	gui, skce:destroy
+
+return
 
 ;GUI for right click col 10-12 for now and doing bulk operations.
 build_ColEdit:
@@ -868,13 +1087,10 @@ build_ColEdit:
 	else 
 		Gui, ce:add,edit,w200 -E0x200 c%U_FBCA% vceEdit r%ColEditRows% hwndHceEDIT
 	
-
-		
 	gui, ce:add,button, default gColEditSaveChange w200 hwndHIB1 vIB1, [ Apply ]
 	
 	If !ImageButton.Create(HIB1, Opt1)
 		MsgBox, 0, ImageButton Error IB1, % ImageButton.LastError
-	
 	
 	WinSet, Style,  -0xC00000,InlineNameEdit
 	if (HideScrollbars = 1) {
@@ -1590,6 +1806,9 @@ Options:
 	Gui, 3:Add,CheckBox, xs vSelect_ShowParentEditBoxHelper gSet_ShowParentEditBoxHelper, Show Parent Edit Box?
 	GuiControl,,Select_ShowParentEditBoxHelper,%ShowParentEditBoxHelper%
 	
+	Gui, 3:Add,CheckBox, xs vSelect_ShowPreviewEditBoxHelper gSet_ShowPreviewEditBoxHelper, Show Preview Edit Box?
+	GuiControl,,Select_ShowPreviewEditBoxHelper,%ShowPreviewEditBoxHelper%
+	
 	Gui, 3:Add,text,xs section, - Quick Note Window -
 
 	
@@ -1630,6 +1849,12 @@ Options:
 	Gui, 3:Add,Text,xs,Unique Star List Rows: (Default: 10)
 	Gui, 3:Add,Edit   
 	Gui, 3:Add,UpDown,vSelect_USSLR gSet_USSLR range1-99, %USSLR%
+
+	Gui, 3:Add,Text,xs,Static X window location: (Default: Blank [which uses the mouse position.])
+	Gui, 3:Add,Edit,vSelect_StaticX w100 gSet_StaticX, %StaticX%
+
+	Gui, 3:Add,Text,xs,Static Y window location: (Default: Blank  [which uses the mouse position.])
+	Gui, 3:Add,Edit,vSelect_StaticY w100 gSet_StaticY, %StaticX% 
 	
 	;Quick/Rapid Save Tab
 	Gui, 3:Tab, Quick/Rapid Save
@@ -1667,6 +1892,8 @@ SaveAndReload:
 	IniWrite,%Select_ShowTagEditBoxHelper%, %iniPath%, General, ShowCatEditTagHelper
 	GuiControlGet,Select_ShowParentEditBoxHelper
 	IniWrite,%Select_ShowParentEditBoxHelper%, %iniPath%, General, ShowCatEditParentHelper
+		GuiControlGet,Select_ShowPreviewEditBoxHelper
+	IniWrite,%Select_ShowPreviewEditBoxHelper%, %iniPath%, General, ShowCatEditPreviewHelper
 	GuiControlGet, Select_RapidStar
 	IniWrite, %RapidStar%, %iniPath%, General, RapidStar
 	GuiControlGet, U_QuickNoteWidth,,QuickWSelect	
@@ -1751,7 +1978,11 @@ reload
 	GuiControlGet,Select_UniqueStarList
 	IniWrite, %Select_UniqueStarList%,%iniPath%,General, UniqueStarList
 	GuiControlGet,Select_USSLR	
-	IniWrite, %Select_USSLR%,%iniPath%,General, USSLR	
+	IniWrite, %Select_USSLR%,%iniPath%,General, USSLR
+	GuiControlGet,Select_StaticX	
+	IniWrite, %Select_StaticX%,%iniPath%,General, StaticX
+	GuiControlGet,Select_StaticY	
+	IniWrite, %Select_StaticY%,%iniPath%,General, StaticY
 	GuiControlGet,Select_SearchDates
 	IniWrite,%Select_SearchDates%, %iniPath%, General, SearchDates
 	GuiControlGet,Select_SearchWholeNote
@@ -1909,6 +2140,15 @@ Set_ShowParentEditBoxHelper:
 	}
 return
 
+Set_ShowPreviewEditBoxHelper:
+	GuiControlGet,Select_ShowPreviewEditBoxHelper
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ShowPreviewEditBoxHelper%, %iniPath%, General, ShowPreviewEditBoxHelper
+		IniRead,ShowPreviewEditBoxHelper,%iniPath%,General,ShowPreviewEditBoxHelper
+	}
+return
+
 Set_ShowTagEditBoxHelper:
 	GuiControlGet,Select_ShowTagEditBoxHelper
 	
@@ -1980,6 +2220,18 @@ Set_USSLR:
 	GuiControlGet,Select_USSLR	
 	IniWrite, %Select_USSLR%,%iniPath%,General, USSLR	
 	IniRead, USSLR, %iniPath%, General, USSLR
+return
+
+Set_StaticX:
+	GuiControlGet,Select_StaticX	
+	IniWrite, %Select_StaticX%,%iniPath%,General, StaticX	
+	IniRead, StaticX, %iniPath%, General, StaticX
+return
+
+Set_StaticY:
+	GuiControlGet,Select_StaticY	
+	IniWrite, %Select_StaticY%,%iniPath%,General, StaticY	
+	IniRead, StaticY, %iniPath%, General, StaticY
 return
 
 Set_StickyRows:
@@ -2230,6 +2482,17 @@ StarGuiClose:
 	Gui, Star:Destroy
 return
 
+skceGuiClose:
+skceGuiEscape:
+	Gui, skce:Destroy
+	ColEditStar = 0
+return
+
+skneGuiClose:
+skneGuiEscape:
+	Gui, skne:Destroy
+	ColEditStar = 0
+return
 
 ceGuiClose:
 ceGuiEscape:
@@ -2295,71 +2558,6 @@ return
 
 SortNow:
 	LV_ModifyCol(C_SortCol,C_SortDir)
-return
-
-
-TitleSaveChange:
-	GUI, t:Submit
-	global LVSelectedROW
-	tNeedsSubmit = 0
-	NewTitle = %tEdit%
-	if (NewTitle = ""){
-		tNeedsSubmit = 0
-		ListTitleToChange = 0
-		TitleOldFile := ""
-		return
-	}
-	FileSafeName :=NameEncode(NewTitle)
-	OldIniName := RegExReplace(TitleOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
-	NewIniName = %FileSafeName%.ini
-	NewTitleFileName = %FileSafeName%.txt
-	FileRead, C_Body,%U_NotePath%%TitleOldFile%
-	
-	if FileExist(U_NotePath NewTitleFileName){
-		MsgBox, A note with this name already exists.
-		tNeedsSubmit = 0
-		ListTitleToChange = 0
-		TitleOldFile := ""
-		return
-	}
-	if (LVSelectedROW=""){
-		msgbox Name Save Erro 1
-		tNeedsSubmit = 0
-		ListTitleToChange = 0
-		TitleOldFile := ""
-		return
-		}
-	if (NewIniName=""){
-		msgbox Name Save Error 2
-		tNeedsSubmit = 0
-		ListTitleToChange = 0
-		TitleOldFile := ""
-		return
-		}
-	if (OldIniName=""){
-		msgbox Name Save Error 3
-		tNeedsSubmit = 0
-		ListTitleToChange = 0
-		TitleOldFile := ""
-		return
-		}
-	FileMove, %detailsPath%%OldIniName%, %detailsPath%%NewIniName%
-	FileMove, %U_NotePath%%TitleOldFile%, %U_NotePath%%FileSafeName%.txt
-	
-	for Each, Note in MyNotesArray{
-			If (Note.8 = TitleOldFile){
-				MyNotesArray.RemoveAt(Each)
-			}
-		}
-	Iniread, TmpTags,%detailsPath%%NewIniName%, INFO,Tags
-	Iniread, TmpCat,%detailsPath%%NewIniName%, INFO,Cat
-	Iniread, TmpParent,%detailsPath%%NewIniName%, INFO,Parent
-	
-	;FileRecycle, %detailsPath%%C_ini%%tOldFile%
-	SaveFile(NewTitle,FileSafeName,C_Body,1,TmpTags,TmpCat,TmpParent)
-	ListTitleToChange = 1
-	ControlFocus , Edit1, FlatNotes - Library
-	TitleOldFile := ""
 return
 
 

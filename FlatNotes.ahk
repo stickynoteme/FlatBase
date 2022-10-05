@@ -78,6 +78,8 @@ global TVNoteTags
 global TVNoteCat
 global TVNoteStar
 global TVNoteTree
+global StaticX
+global StaticY
 
 
 global TagBox
@@ -213,6 +215,7 @@ global ShowCatFilterBoxHelper
 global ShowTagFilterBoxHelper
 global ShowTagEditBoxHelper
 global ShowParentEditBoxHelper
+global ShowPreviewEditBoxHelper
 global templatePath
 ;Pre-set globals
 global savedHK1
@@ -407,6 +410,7 @@ IniRead, ShowCatFilterBoxHelper,%iniPath%,General,ShowCatFilterBoxHelper,1
 IniRead, ShowTagFilterBoxHelper,%iniPath%,General,ShowTagFilterBoxHelper,1
 IniRead, ShowTagEditBoxHelper,%iniPath%,General,ShowTagEditBoxHelper,1
 IniRead, ShowParentEditBoxHelper,%iniPath%,General,ShowParentEditBoxHelper,1
+IniRead, ShowPreviewEditBoxHelper,%iniPath%,General,ShowPreviewEditBoxHelper,1
 
 IniRead, RapidStar,%iniPath%,General,RapidStar,1
 
@@ -415,6 +419,8 @@ Iniread, SearchWholeNote,%iniPath%,General,SearchWholeNote,1
 Iniread, UniqueStarList,%iniPath%,General,UniqueStarList,1|2|3|4|5|6|7|8|9|0
 Iniread, UniqueStarList2,%iniPath%,General,UniqueStarList2,%a_space%
 Iniread, USSLR,%iniPath%,General,USSLR,10
+Iniread, StaticX,%iniPath%,General,StaticX,
+Iniread, StaticY,%iniPath%,General,StaticY,
 
 Iniread, SearchDates,%iniPath%,General,SearchDates,0
 
@@ -633,6 +639,7 @@ if (g1Open=1) {
 	g1Open=0 
 	GUI, star:destroy
 	GUI, t:destroy
+	gosub Edit3SaveTimer
 	return
 }
 if (g1Open=0) {
@@ -651,6 +658,12 @@ if (g1Open=0) {
 	MouseGetPos, xPos, yPos	
 	xPos /= 1.5
 	yPos /= 1.5
+	
+	if(StaticX != "" or StatricY != ""){
+	xPos := StaticX
+	yPos := StaticY
+	msgbox % StaticY "  " StaticX
+	}
 	GuiControl,,%HSterm%,
 	GuiControl,,%HSterm%,%AutoSearchTerm%
 	WinMove, ahk_id %g1ID%, , %xPos%, %yPos%
