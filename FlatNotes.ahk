@@ -262,7 +262,6 @@ global RapidNTAppend = 0
 global TitleBarFontSize = 10
 if (A_ScreenDPI > 120)
 	TitleBarFontSize = 8
-
 ;tmp maybe
 global SelectedRows
 global TemplateSymbol
