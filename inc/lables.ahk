@@ -1811,6 +1811,8 @@ Options:
 	
 	Gui, 3:Add,text,xs section, - Quick Note Window -
 
+	Gui, 3:Add,CheckBox, xs vSelect_ExtraInputInTemplatesHelper gSet_ExtraInputInTemplatesHelper, Show Preview Edit Box?
+	GuiControl,,Select_ExtraInputInTemplatesHelper,%ExtraInputInTemplatesHelper%
 	
 	;—-------------------------
 	;Window Size Options Tab
@@ -1892,8 +1894,11 @@ SaveAndReload:
 	IniWrite,%Select_ShowTagEditBoxHelper%, %iniPath%, General, ShowCatEditTagHelper
 	GuiControlGet,Select_ShowParentEditBoxHelper
 	IniWrite,%Select_ShowParentEditBoxHelper%, %iniPath%, General, ShowCatEditParentHelper
-		GuiControlGet,Select_ShowPreviewEditBoxHelper
+	GuiControlGet,Select_ShowPreviewEditBoxHelper
 	IniWrite,%Select_ShowPreviewEditBoxHelper%, %iniPath%, General, ShowCatEditPreviewHelper
+	Iniread, StaticY,%iniPath%,General,StaticY,10
+	GuiControlGet,Select_ExtraInputInTemplatesHelper
+	IniWrite,%Select_ExtraInputInTemplatesHelper%, %iniPath%, General, ShowCatEditPreviewHelper
 	GuiControlGet, Select_RapidStar
 	IniWrite, %RapidStar%, %iniPath%, General, RapidStar
 	GuiControlGet, U_QuickNoteWidth,,QuickWSelect	
@@ -2146,6 +2151,15 @@ Set_ShowPreviewEditBoxHelper:
 	if (A_GuiEvent == "Normal"){
 		IniWrite,%Select_ShowPreviewEditBoxHelper%, %iniPath%, General, ShowPreviewEditBoxHelper
 		IniRead,ShowPreviewEditBoxHelper,%iniPath%,General,ShowPreviewEditBoxHelper
+	}
+return
+
+Set_ExtraInputInTemplatesHelper:
+	GuiControlGet,Select_ExtraInputInTemplatesHelper
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ExtraInputInTemplatesHelper%, %iniPath%, General, ExtraInputInTemplatesHelper
+		IniRead,ExtraInputInTemplatesHelper,%iniPath%,General,ExtraInputInTemplatesHelper
 	}
 return
 
