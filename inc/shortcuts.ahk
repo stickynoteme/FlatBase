@@ -54,9 +54,33 @@ Return
 
 {
 
-^s::
+^b::
 {
 	LV@sel_col = 3
+	ColEditName :=  ColList[LV@sel_col]
+	gosub build_SKColEdit
+	return
+}
+
+^t::
+{
+	LV@sel_col = 10
+	ColEditName :=  ColList[LV@sel_col]
+	gosub build_SKColEdit
+	return
+}
+
+^c::
+{
+	LV@sel_col = 11
+	ColEditName :=  ColList[LV@sel_col]
+	gosub build_SKColEdit
+	return
+}
+
+^p::
+{
+	LV@sel_col = 12
 	ColEditName :=  ColList[LV@sel_col]
 	gosub build_SKColEdit
 	return

@@ -947,7 +947,7 @@ build_SKColEdit:
 	else
 		ColEditRows = 1
 	if (LV@sel_col == 11){
-		Gui, skce:add,DDL,w200 -E0x200 c%U_FBCA% vceEdit hwndSKceDDL r6, %CatBoxContents%
+		Gui, skce:add,DDL,w200 -E0x200 c%U_FBCA% vskceEdit hwndSKceDDL r6, %CatBoxContents%
 		
 		;Listbox color
 		DDLbgColorb2 := strreplace(U_MBG,"0x")
