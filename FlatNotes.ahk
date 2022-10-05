@@ -213,6 +213,7 @@ global ShowCatFilterBoxHelper
 global ShowTagFilterBoxHelper
 global ShowTagEditBoxHelper
 global ShowParentEditBoxHelper
+global ShowPreviewEditBoxHelper
 global templatePath
 ;Pre-set globals
 global savedHK1
@@ -407,6 +408,7 @@ IniRead, ShowCatFilterBoxHelper,%iniPath%,General,ShowCatFilterBoxHelper,1
 IniRead, ShowTagFilterBoxHelper,%iniPath%,General,ShowTagFilterBoxHelper,1
 IniRead, ShowTagEditBoxHelper,%iniPath%,General,ShowTagEditBoxHelper,1
 IniRead, ShowParentEditBoxHelper,%iniPath%,General,ShowParentEditBoxHelper,1
+IniRead, ShowPreviewEditBoxHelper,%iniPath%,General,ShowPreviewEditBoxHelper,1
 
 IniRead, RapidStar,%iniPath%,General,RapidStar,1
 

@@ -1801,6 +1801,9 @@ Options:
 	Gui, 3:Add,CheckBox, xs vSelect_ShowParentEditBoxHelper gSet_ShowParentEditBoxHelper, Show Parent Edit Box?
 	GuiControl,,Select_ShowParentEditBoxHelper,%ShowParentEditBoxHelper%
 	
+	Gui, 3:Add,CheckBox, xs vSelect_ShowPreviewEditBoxHelper gSet_ShowPreviewEditBoxHelper, Show Preview Edit Box?
+	GuiControl,,Select_ShowPreviewEditBoxHelper,%ShowPreviewEditBoxHelper%
+	
 	Gui, 3:Add,text,xs section, - Quick Note Window -
 
 	
@@ -1878,6 +1881,8 @@ SaveAndReload:
 	IniWrite,%Select_ShowTagEditBoxHelper%, %iniPath%, General, ShowCatEditTagHelper
 	GuiControlGet,Select_ShowParentEditBoxHelper
 	IniWrite,%Select_ShowParentEditBoxHelper%, %iniPath%, General, ShowCatEditParentHelper
+		GuiControlGet,Select_ShowPreviewEditBoxHelper
+	IniWrite,%Select_ShowPreviewEditBoxHelper%, %iniPath%, General, ShowCatEditPreviewHelper
 	GuiControlGet, Select_RapidStar
 	IniWrite, %RapidStar%, %iniPath%, General, RapidStar
 	GuiControlGet, U_QuickNoteWidth,,QuickWSelect	
@@ -2117,6 +2122,15 @@ Set_ShowParentEditBoxHelper:
 	if (A_GuiEvent == "Normal"){
 		IniWrite,%Select_ShowParentEditBoxHelper%, %iniPath%, General, ShowParentEditBoxHelper
 		IniRead,ShowParentEditBoxHelper,%iniPath%,General,ShowParentEditBoxHelper
+	}
+return
+
+Set_ShowPreviewEditBoxHelper:
+	GuiControlGet,Select_ShowPreviewEditBoxHelper
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ShowPreviewEditBoxHelper%, %iniPath%, General, ShowPreviewEditBoxHelper
+		IniRead,ShowPreviewEditBoxHelper,%iniPath%,General,ShowPreviewEditBoxHelper
 	}
 return
 
