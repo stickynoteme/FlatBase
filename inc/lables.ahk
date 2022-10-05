@@ -833,6 +833,98 @@ build_tEdit:
 	tNeedsSubmit = 1
 return
 
+;GUI for Shortcut key to edit name
+build_SKNameEdit:
+	GUI, skne:new, ,SKNameEditor
+	Gui, skne:Margin , 5, 5 
+	Gui, skne:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
+	Gui, skne:Color,%U_SBG%, %U_MBG%	
+
+	gui, skne:add,text,w100 -E0x200 center c%U_SFC%,New Name
+	Gui, skne:add,edit,w100 -E0x200 c%U_FBCA% vSKNameEdit
+	gui, skne:add,button, default gSKTitleSaveChange x-10000 y-10000
+	WinSet, Style,  -0xC00000,SKNameEditor
+	
+	WinGetPos, xPos, yPos,clibW,clibH,FlatNotes - Library
+	xPos := clibw / 3 + xPos
+	yPos := clibH / 3 + yPos
+	
+	GUI, skne:Show, x%xPos% y%yPos%
+	tNeedsSubmit = 1
+	
+	ControlFocus,Edit1,SKNameEditor
+
+return
+
+TitleSaveChange:
+	GUI, t:Submit
+	NewTitle = %tEdit%
+	goto SaveNewName
+
+SKTitleSaveChange:
+	GUI, skne:Submit
+	NewTitle = %SKNameEdit%
+	goto SaveNewName
+	
+SaveNewName:
+		tNeedsSubmit = 0
+	if (NewTitle = ""){
+		ListTitleToChange = 0
+		TitleOldFile := ""
+		return
+	}
+	FileSafeName :=NameEncode(NewTitle)
+	OldIniName := RegExReplace(TitleOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
+	NewIniName = %FileSafeName%.ini
+	NewTitleFileName = %FileSafeName%.txt
+	FileRead, C_Body,%U_NotePath%%TitleOldFile%
+	
+	if FileExist(U_NotePath NewTitleFileName){
+		MsgBox, A note with this name already exists.
+		tNeedsSubmit = 0
+		ListTitleToChange = 0
+		TitleOldFile := ""
+		return
+	}
+	if (LVSelectedROW=""){
+		msgbox Name Save Error 1
+		tNeedsSubmit = 0
+		ListTitleToChange = 0
+		TitleOldFile := ""
+		return
+		}
+	if (NewIniName=""){
+		msgbox Name Save Error 2
+		tNeedsSubmit = 0
+		ListTitleToChange = 0
+		TitleOldFile := ""
+		return
+		}
+	if (OldIniName=""){
+		msgbox Name Save Error 3
+		tNeedsSubmit = 0
+		ListTitleToChange = 0
+		TitleOldFile := ""
+		return
+		}
+	FileMove, %detailsPath%%OldIniName%, %detailsPath%%NewIniName%
+	FileMove, %U_NotePath%%TitleOldFile%, %U_NotePath%%FileSafeName%.txt
+	
+	for Each, Note in MyNotesArray{
+			If (Note.8 = TitleOldFile){
+				MyNotesArray.RemoveAt(Each)
+			}
+		}
+	Iniread, TmpTags,%detailsPath%%NewIniName%, INFO,Tags
+	Iniread, TmpCat,%detailsPath%%NewIniName%, INFO,Cat
+	Iniread, TmpParent,%detailsPath%%NewIniName%, INFO,Parent
+	
+	;FileRecycle, %detailsPath%%C_ini%%tOldFile%
+	SaveFile(NewTitle,FileSafeName,C_Body,1,TmpTags,TmpCat,TmpParent)
+	ListTitleToChange = 1
+	ControlFocus , Edit1, FlatNotes - Library
+	TitleOldFile := ""
+return
 
 ;GUI to edit note details via shortcut key from the main window.
 build_SKColEdit:
@@ -2349,6 +2441,17 @@ StarGuiClose:
 	Gui, Star:Destroy
 return
 
+skceGuiClose:
+skceGuiEscape:
+	Gui, skce:Destroy
+	ColEditStar = 0
+return
+
+skneGuiClose:
+skneGuiEscape:
+	Gui, skne:Destroy
+	ColEditStar = 0
+return
 
 ceGuiClose:
 ceGuiEscape:
@@ -2414,71 +2517,6 @@ return
 
 SortNow:
 	LV_ModifyCol(C_SortCol,C_SortDir)
-return
-
-
-TitleSaveChange:
-	GUI, t:Submit
-	global LVSelectedROW
-	tNeedsSubmit = 0
-	NewTitle = %tEdit%
-	if (NewTitle = ""){
-		tNeedsSubmit = 0
-		ListTitleToChange = 0
-		TitleOldFile := ""
-		return
-	}
-	FileSafeName :=NameEncode(NewTitle)
-	OldIniName := RegExReplace(TitleOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
-	NewIniName = %FileSafeName%.ini
-	NewTitleFileName = %FileSafeName%.txt
-	FileRead, C_Body,%U_NotePath%%TitleOldFile%
-	
-	if FileExist(U_NotePath NewTitleFileName){
-		MsgBox, A note with this name already exists.
-		tNeedsSubmit = 0
-		ListTitleToChange = 0
-		TitleOldFile := ""
-		return
-	}
-	if (LVSelectedROW=""){
-		msgbox Name Save Erro 1
-		tNeedsSubmit = 0
-		ListTitleToChange = 0
-		TitleOldFile := ""
-		return
-		}
-	if (NewIniName=""){
-		msgbox Name Save Error 2
-		tNeedsSubmit = 0
-		ListTitleToChange = 0
-		TitleOldFile := ""
-		return
-		}
-	if (OldIniName=""){
-		msgbox Name Save Error 3
-		tNeedsSubmit = 0
-		ListTitleToChange = 0
-		TitleOldFile := ""
-		return
-		}
-	FileMove, %detailsPath%%OldIniName%, %detailsPath%%NewIniName%
-	FileMove, %U_NotePath%%TitleOldFile%, %U_NotePath%%FileSafeName%.txt
-	
-	for Each, Note in MyNotesArray{
-			If (Note.8 = TitleOldFile){
-				MyNotesArray.RemoveAt(Each)
-			}
-		}
-	Iniread, TmpTags,%detailsPath%%NewIniName%, INFO,Tags
-	Iniread, TmpCat,%detailsPath%%NewIniName%, INFO,Cat
-	Iniread, TmpParent,%detailsPath%%NewIniName%, INFO,Parent
-	
-	;FileRecycle, %detailsPath%%C_ini%%tOldFile%
-	SaveFile(NewTitle,FileSafeName,C_Body,1,TmpTags,TmpCat,TmpParent)
-	ListTitleToChange = 1
-	ControlFocus , Edit1, FlatNotes - Library
-	TitleOldFile := ""
 return
 
 

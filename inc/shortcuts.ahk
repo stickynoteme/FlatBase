@@ -61,6 +61,16 @@ Return
 	gosub build_SKColEdit
 	return
 }
+
+^n::
+{
+	LV@sel_col = 3
+	ColEditName :=  ColList[LV@sel_col]
+	LV_GetText(TitleOldFile, LVSelectedROW,8)
+	gosub build_SKNameEdit
+	return
+}
+
 Down::
 ControlGetFocus, OutputVar, FlatNotes - Library
 {
