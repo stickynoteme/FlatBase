@@ -254,7 +254,19 @@ BuildGUI2(){
 		
 	Gui, 2:Add,Edit,  yp+5 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r1 w%HalfQuickNoteEditW% vQuickNoteParent hwndHQPT center
 	
-	Gui, 2:Add, DropDownList, Sort xp%HalfQuickNoteEditW% yp0 -E0x200 r5 w%HalfQuickNoteEditW% vQuickNoteCat hwndHQNC,%CatBoxContents%
+	
+	OD_Colors.SetItemHeight(SearchFontSize, CatFontFamily)
+	Gui, 2:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
+	Gui, 2:Color,%U_SBG%, %U_MBG%
+	
+	
+	Gui, 2:Add, DDL, Sort xp%HalfQuickNoteEditW% yp0 -E0x200 +0x0210 r5 w%HalfQuickNoteEditW% vQuickNoteCat hwndHQNC,%CatBoxContents%
+	
+	DDLbgColor := strreplace(U_SBG,"0x")
+	DDLbgColorb2 := strreplace(U_MBG,"0x")
+	DDLfontColorb2 := strreplace(U_MFC,"0x")
+	CtlColors.Attach(HQNC, DDLbgColor)
+	OD_Colors.Attach(HQNC, {T: U_SFC})
 	
 	if (HideScrollbars = 1) {
 		LVM_ShowScrollBar(HQNB,1,False)

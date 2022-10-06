@@ -216,6 +216,7 @@ global ShowTagFilterBoxHelper
 global ShowTagEditBoxHelper
 global ShowParentEditBoxHelper
 global ShowPreviewEditBoxHelper
+global ShowExtraInputInTemplatesHelper
 global templatePath
 ;Pre-set globals
 global savedHK1
@@ -254,6 +255,7 @@ global TotalNotes
 global unsaveddataEdit3
 global StickyW ;250
 global StickyRows ;8
+global UseStarsAsParents
 ;Var with starting values
 global istitle = yes
 global savetimerrunning = 0
@@ -261,7 +263,6 @@ global RapidNTAppend = 0
 global TitleBarFontSize = 10
 if (A_ScreenDPI > 120)
 	TitleBarFontSize = 8
-
 ;tmp maybe
 global SelectedRows
 global TemplateSymbol
@@ -411,8 +412,10 @@ IniRead, ShowTagFilterBoxHelper,%iniPath%,General,ShowTagFilterBoxHelper,1
 IniRead, ShowTagEditBoxHelper,%iniPath%,General,ShowTagEditBoxHelper,1
 IniRead, ShowParentEditBoxHelper,%iniPath%,General,ShowParentEditBoxHelper,1
 IniRead, ShowPreviewEditBoxHelper,%iniPath%,General,ShowPreviewEditBoxHelper,1
+IniRead, ExtraInputInTemplatesHelper,%iniPath%,General,ExtraInputInTemplatesHelper,1
 
 IniRead, RapidStar,%iniPath%,General,RapidStar,1
+IniRead, UseStarsAsParents,%iniPath%,General,UseStarsAsParents,0
 
 Iniread, SearchWholeNote,%iniPath%,General,SearchWholeNote,1
 
@@ -662,7 +665,6 @@ if (g1Open=0) {
 	if(StaticX != "" or StatricY != ""){
 	xPos := StaticX
 	yPos := StaticY
-	msgbox % StaticY "  " StaticX
 	}
 	GuiControl,,%HSterm%,
 	GuiControl,,%HSterm%,%AutoSearchTerm%

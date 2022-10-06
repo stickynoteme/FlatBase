@@ -12,8 +12,8 @@ BuildTemplateInsertUI:
 	global TemplateType
 	RadioX := round(WindowW *0.33)
 	
-	Gui, nt:Add, DDL, section vTemplateType w100 r2, Horizontal|Vertical 
-	Gui, nt:Add, CheckBox, ys+2 xp+115 vExtraInput, Extra Input
+	;Gui, nt:Add, DDL, section vTemplateType w100 r2, Horizontal|Vertical 
+	;Gui, nt:Add, CheckBox, ys+2 xp+115 vExtraInput, Extra Input
 
 	Gui, nt:add, text, c%U_SFC% section xs center h0 w0 hidden
 	for k, v in TemplateArr {
@@ -23,7 +23,7 @@ BuildTemplateInsertUI:
 			msgbox Width Row is missing a value.`n`nTry opening this template in the editor by right clicking it and using [Auto Width].
 			return
 		}
-		if (ExtraInput)
+		if (ExtraInputInTemplatesHelper)
 			Gui, nt:add, edit, % " -E0x200 c" U_MFC " x+3 ys0 w" wwTMP " vNTeB" k " r1", 
 		Gui, nt:add, listbox, % "Multi -E0x200 c" U_MFC " w" wwTMP " vNTLB" k " r10 ys0" , %v%
 	}
