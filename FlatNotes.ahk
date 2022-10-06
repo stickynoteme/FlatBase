@@ -255,6 +255,7 @@ global TotalNotes
 global unsaveddataEdit3
 global StickyW ;250
 global StickyRows ;8
+global UseStarsAsParents
 ;Var with starting values
 global istitle = yes
 global savetimerrunning = 0
@@ -414,6 +415,7 @@ IniRead, ShowPreviewEditBoxHelper,%iniPath%,General,ShowPreviewEditBoxHelper,1
 IniRead, ExtraInputInTemplatesHelper,%iniPath%,General,ExtraInputInTemplatesHelper,1
 
 IniRead, RapidStar,%iniPath%,General,RapidStar,1
+IniRead, UseStarsAsParents,%iniPath%,General,UseStarsAsParents,0
 
 Iniread, SearchWholeNote,%iniPath%,General,SearchWholeNote,1
 

@@ -1388,6 +1388,10 @@ Set_RapidStar:
 	IniWrite, %RapidStar%, %iniPath%, General, RapidStar
 return
 
+Set_UseStarsAsParents:
+	GuiControlGet, Select_UseStarsAsParents
+	IniWrite, %UseStarsAsParents%, %iniPath%, General, UseStarsAsParents
+return
 
 UseCapslockToggle:
 	GuiControlGet, UseCapslock
@@ -1598,7 +1602,7 @@ Options:
 
 
 	Gui, 3:New,,FlatNotes - Options
-	Gui, 3:Add, Tab3,, General|Hotkeys|Shortcuts|Appearance|Window Size|Quick/Rapid Save
+	Gui, 3:Add, Tab3,, General|Hotkeys|Shortcuts|Appearance|Window Size|Quick/Rapid Save|Tree View
 	Gui, 3:Tab, General
 	
 	Gui, 3:Add, CheckBox, section vSelect_ShowMainWindowOnStartUp gSet_ShowMainWindowOnStartUp, Show main window on startup?
@@ -1863,9 +1867,16 @@ Options:
 	Gui, 3:Add,CheckBox, vSelect_RapidStar gSet_RapidStar, Prompt for star at end of Rapid note?
 	GuiControl,,Select_RapidStar,%RapidStar%
 	
-	Gui, 3:Tab 
-	Gui, 3:Add, Button, Default gSaveAndReload, Save and Reload
+;—-------------------------
+;Tree View Options Tab
+;—--------------------------
+	Gui, 3:Tab, Tree View
+	Gui, 3:Add,CheckBox, vSelect_UseStarsAsParents gSet_UseStarsAsParents,Use stars for Tree View parents instead of user set parents.
+	GuiControl,,Select_UseStarsAsParents,%UseStarsAsParents%	
 	
+	
+	gui,3:Tab,
+	Gui, 3:Add, Button, Default gSaveAndReload, Save and Reload
 	
 	if (U_Capslock = 1)
 		GuiControl, Disable, msctls_hotkey321
@@ -1900,7 +1911,9 @@ SaveAndReload:
 	GuiControlGet,Select_ExtraInputInTemplatesHelper
 	IniWrite,%Select_ExtraInputInTemplatesHelper%, %iniPath%, General, ShowCatEditPreviewHelper
 	GuiControlGet, Select_RapidStar
-	IniWrite, %RapidStar%, %iniPath%, General, RapidStar
+	IniWrite, %Select_RapidStar%, %iniPath%, General, RapidStar
+	GuiControlGet, Select_UseStarsAsParents
+	IniWrite, %Select_UseStarsAsParents%, %iniPath%, General, UseStarsAsParents
 	GuiControlGet, U_QuickNoteWidth,,QuickWSelect	
 	IniWrite, %U_QuickNoteWidth%,%iniPath%,General, QuickNoteWidth
 	GuiControlGet, U_MainNoteWidth,,MainWSelect	
@@ -2719,10 +2732,8 @@ TVcurrent = 0
 lastloopcheck = -1
 TVneeded := JEE_ObjCount(MyNotesArray)
 ;msgbox % TVcurrent
-;StarParents Options
-global UseStarsAsParents = True
 global TreeExpandByDeafultTrue = "Expand"
-if (UseStarsAsParents == True)
+if (UseStarsAsParents)
 {
 	None := TV_Add("- None -",,  TreeExpandByDeafultTrue  )
 	TVneeded++
@@ -2859,10 +2870,14 @@ If (TreeFristRun == 1)
 
 	Gui, tree:Add, TreeView, h%TreeCol1H% w%TreeCol1W% x%TreeCol1X% y0 hwndHTV -Hscroll AltSubmit +0x2 +0x1000 +E0x4000 -E0x200 %UseCheckBoxesTrue% gTreeViewInteraction  vTVNoteTree c%U_FBCA%
 	
-	Gui, tree:Add, ListBox, vTVBGLB1 +0x100 r1 w%TreeCol2W% x%TreeCol2X% y1 -E0x200 Disabled -Tabstop
+	;needed to center in color if name is ediable. Currently it is not, because I don't care if it is.
+	;Gui, tree:Add, listbox, vTVBGLB1 +0x100 r1 w%TreeCol2W% x%TreeCol2X% y1 -E0x200 Disabled -Tabstop c000000
 	
-	Gui, tree:Add,Edit, center y7 x%TreeCol2X% h%TreeNameH% w%TreeCol2W% vTVNoteName hwndHTVN vTVNoteName c%U_FBCA% -E0x200, 
+	
+	Gui, tree:Add,Edit, center y7 x%TreeCol2X% h%TreeNameH% w%TreeCol2W% vTVNoteName hwndHTVN c%U_FBCA% -E0x200 readonly, 
 	Gui, tree:Add, Edit, x%TreeCol2X% y%TreePreviewY% h%TreePreviewH% w%TreeCol2W% hwndHTVB vTVNotePreview -E0x200 c%U_FBCA%,
+	
+	gui, tree:add, button, default x-4000 y-4000 gTreeViewSave, &Save
 	;Gui, tree:Add, Button, x%TreeW% y15 h%TreePreviewH% w111,test
 	TreeFristRun = 0
 }
@@ -2926,6 +2941,15 @@ IfExist, %U_NotePath%%FileSafeName%.txt
 		GuiControl,,TVNoteName,%SelectedName%
 		GuiControl,,TVNotePreview,%MyFile%
 	}
+return
+
+TreeViewSave:
+GuiControlGet, TVNoteName
+T_safename := NameEncode(TVNoteName)
+GetCurrentNoteData(T_safename)
+GuiControlget, TVNotePreview
+
+SaveFile(C_Name,C_SafeName,TVNotePreview,1,C_Tags,C_Cat,C_Parent)
 return
 
 treeGuiClose:

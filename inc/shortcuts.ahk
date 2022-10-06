@@ -47,6 +47,19 @@ Return
 	ControlClick,Button1,FlatNote - QuickNote
 	return
 }
+#IfWinActive, FlatNote - Tree
+{
+!enter::	
+	ControlClick,Button1,FlatNote - Tree
+	tooltip, saved
+	settimer, KillToolTip, -500
+	return
++enter::
+	ControlClick,Button1,FlatNote - Tree
+	tooltip, saved
+	settimer, KillToolTip, -500
+	return
+}
 ;------------------------------------------
 ;Main window shortcut keys below this point
 ;------------------------------------------
