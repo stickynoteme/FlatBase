@@ -271,6 +271,7 @@ global ColBase = ,6,7,8,9
 global ColOrder = 1,2,3,4,5
 global SearchWholeNote
 global TreeFristRun = 1
+global SearchClip = 0
 global TVReDraw
 global LoopCheck
 global UseCheckBoxesTrue
@@ -646,6 +647,7 @@ if (g1Open=1) {
 	return
 }
 if (g1Open=0) {
+	if(SearchClip == 1){
 	RestoreClip := clipboardall
 	clipboard =
 	send {Ctrl Down}{c}{Ctrl up}
@@ -658,6 +660,11 @@ if (g1Open=0) {
 		AutoSearchTerm := LastSearch
 		clipboard := RestoreClip
 	}
+	}else{
+	GuiControlGet, LastSearch,,%HSterm%
+	AutoSearchTerm := LastSearch
+	}
+	SearchClip = 0
 	MouseGetPos, xPos, yPos	
 	xPos /= 1.5
 	yPos /= 1.5

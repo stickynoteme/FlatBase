@@ -1643,8 +1643,12 @@ Options:
 	Gui, 3:add,text, xs section, Unique stars list #2
 	Gui, 3:add,edit, xs section w300 vSelect_UniqueStarList2 gSet_UniqueStarList2, %UniqueStarList2% 
 	
-	Gui, 3:add,text, xs section, Pipe "|" sperated list of Categories. (Example: Black|White|Calico|..etc)
-	Gui, 3:add,edit, xs section w300 vSelect_CatBoxContents gSet_CatBoxContents, %CatBoxContents% 
+	Gui, 3:add,text, xs section, Pipe "|" separated list of Categories. (Example: Black|White|Calico|..etc)
+	
+	CatBoxLitter = %CatBoxContents%
+	CatboxLitter := Trim(CatBoxLitter, "|")
+	
+	Gui, 3:add,edit, xs section w300 vSelect_CatBoxContents gSet_CatBoxContents, %CatboxLitter% 
 
 	Gui, 3:Add,CheckBox, xs vSelect_OpenInQuickNote gSet_OpenInQuickNote, Use Quick Notes to edit on right click?
 	GuiControl,,Select_OpenInQuickNote,%OpenInQuickNote%
