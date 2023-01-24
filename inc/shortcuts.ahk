@@ -83,7 +83,7 @@ Return
 	return
 }
 
-^c::
+^k::
 {
 	LV@sel_col = 11
 	ColEditName :=  ColList[LV@sel_col]

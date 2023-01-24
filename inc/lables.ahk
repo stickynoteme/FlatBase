@@ -173,7 +173,7 @@ return
 
 NewAndSaveHK:
 ControlGetFocus, OutputVar, FlatNotes - Library
-if (OutputVar = "Edit1"){
+if (OutputVar = "Edit1" or OutputVar = "Edit2" or Outputvar = "ComboBox1"){
 	GuiControlGet, SearchTerm
 	
 	GetCurrentNoteData(NameEncode(SearchTerm))
