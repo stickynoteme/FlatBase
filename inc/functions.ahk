@@ -173,7 +173,7 @@ BuildGUI1(){
 	OnMessage( WM_RBUTTONDOWN, "HandleMessage" )
 
 
-	gui, 1:Add, Button, Default w15 y-2500 x-2500 -Tabstop gNewAndSaveHK, HK
+	gui, 1:Add, Button, Default w15 y-2500 x-2500 -Tabstop gNewFromSearch, HK
 	Gui, 1:Add,Edit, w35 y-2000 x-2000 vSearchFilter HwndHSF -Tabstop,
 	;Gui, 1:Add,Edit, w35 y-2200 x-2200 vCatFilter HwndHCF -Tabstop,
 	
@@ -260,14 +260,12 @@ BuildGUI2(){
 	
 	Gui, 2:Add,Edit, xs section y+2 x%QuickNoteXOffset% -E0x200 C%U_MFC% r%QuickNoteRows% w%QuickNoteEditW% vQuickNoteBody hwndHQNB
 	
-	
+	HalfQuickNoteEditW := QuickNoteEditW * 0.5	
 	; Tag Box
 	if (ShowQuickTagEditBoxHelper == 1) {
 	Gui, 2:Add, ListBox, y+2 +0x100 h15 w%QuickNoteEditW%  -E0x200 Disabled -Tabstop
 
-	Gui, 2:Add,Edit,  yp+5 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r1 w%QuickNoteEditW% vQuickNoteTags hwndHQNT center
-	
-	HalfQuickNoteEditW := QuickNoteEditW * 0.5		
+	Gui, 2:Add,Edit,  yp+5 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r1 w%QuickNoteEditW% vQuickNoteTags hwndHQNT center	
 	Gui, 2:Add, ListBox, y+2 +0x100 h15 w%HalfQuickNoteEditW%  -E0x200 Disabled -Tabstop
 	}
 	

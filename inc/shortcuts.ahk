@@ -130,8 +130,17 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			SetTimer, KillToolTip, -500
 			gosub GuiEscape
 			return
-			}else
+		}else
 			^Enter::^Enter
+}
+
++Enter::
+{
+ControlGetFocus, OutputVar, FlatNotes - Library
+	If (OutputVar == "Edit1"){
+		gosub NewAndSaveHK
+	}else
+		+Enter::+Enter
 }
 
 del::

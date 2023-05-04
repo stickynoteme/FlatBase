@@ -171,6 +171,58 @@ LabelS4:
 	gosub LibTemplateAdd
 return
 
+NewFromSearch:
+	GuiControlGet,NewNoteFromSearch,,SearchTerm
+	if (NewNoteFromSearch){
+		TmpFileSafeName := NameEncode(NewNoteFromSearch)
+		if FileExist(U_NotePath TmpFileSafeName ".txt") {
+		
+		Loop % LV_GetCount()
+		{
+			LV_GetText(RetrievedText, A_Index,2)
+				if (RetrievedText==NewNoteFromSearch) {
+					LV_Modify(A_Index, "Select")
+				}
+		}
+			return
+		}
+		SaveFile(NewNoteFromSearch,TmpFileSafeName,"","","","","")
+		
+		
+		NoteIniName := TmpFileSafeName ".ini"
+		NoteIni = %detailsPath%%NoteIniName%
+		IniRead, StarField, %NoteIni%, INFO, Star,S
+		IniRead, NameField, %NoteIni%, INFO, Name
+		NameField := strreplace(NameField,"$#$")
+		IniRead, AddedField, %NoteIni%, INFO, Add
+		IniRead, ModdedField, %NoteIni%, INFO, Mod
+		IniRead, TagsField, %NoteIni%, INFO, Tags,
+		IniRead, CatField, %NoteIni%, INFO, Cat,
+		IniRead, ParentField, %NoteIni%, INFO, Parent,
+		IniRead, CheckedField, %NoteIni%, INFO, Checked,
+		IniRead, MarkedField, %NoteIni%, INFO, Marked,
+		IniRead, ExtraField, %NoteIni%, INFO, Extra,
+		
+		FormatTime, UserTimeFormatA, %C_Add%, %UserTimeFormat%
+		FormatTime, UserTimeFormatM, %C_Mod%,%UserTimeFormat%
+		
+		LV_Insert(1,Focus Select,StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField,TagsField,CatField,ParentField,CheckedField,MarkedField,ExtraField)
+
+		GuiControl,,PreviewBox,
+		GuiControl,,TagBox,
+		GuiControl,,NoteParent,
+		GuiControl,,TitleBar,%NewNoteFromSearch%
+		GuiControl,,StatusbarM,M: %UserTimeFormatM%
+		GuiControl,,StatusbarA,A: %UserTimeFormatA%
+		
+		
+		
+		GuiControl, Focus,PreviewBox
+		
+		LVSelectedROW = 1
+	}
+return
+
 NewAndSaveHK:
 ControlGetFocus, OutputVar, FlatNotes - Library
 if (OutputVar = "Edit1" or OutputVar = "Edit2" or Outputvar = "ComboBox1"){
