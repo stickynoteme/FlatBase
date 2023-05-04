@@ -273,6 +273,8 @@ global TreeSymbol
 global DiskSymbol
 global SaveSymbol
 global LoadSymbol
+global RestoreClipboard
+global StoreClipboard
 global ColBase = ,6,7,8,9
 global ColOrder = 1,2,3,4,5
 global SearchWholeNote

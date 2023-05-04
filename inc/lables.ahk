@@ -517,7 +517,16 @@ UpdateStatusBar:
 		LV_GetText(LastNoteTags, 1 , 10)
 		LV_GetText(LastNoteParent, 1 , 12)
 		;LV_GetText(LastNoteCat, 1 , 11)
-		GuiControl,,TitleBar, %LastResultName%
+		GuiControl,,TitleBar, %LastResultName%	
+		;check to see if clipboard exist and change icon accordingly.
+		LastClipboard := RegExReplace(LastFileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".clipboard")
+		if (FileExist(clipPath LastClipboard)){
+			GuiControl,text,StoreClipboard, %SaveSymbol%
+			GuiControl,text,RestoreClipboard, %LoadSymbol%
+		}else {
+		GuiControl,text,StoreClipboard, %DiskSymbol%
+		GuiControl,text,RestoreClipboard, 
+		}
 		FileRead, LastResultBody,%U_NotePath%%LastFileName%
 		LastNoteIni := RegExReplace(LastFileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 
@@ -820,6 +829,16 @@ UpdateLVSelected:
 	GuiControl,, TitleBar, %C_Name%
 	GuiControl,, StatusbarM,M: %C_Modded%
 	GuiControl,, StatusbarA,A: %C_Added%
+	
+	;check to see if clipboard exist and change icon accordingly.
+	LastClipboard := RegExReplace(RowText, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".clipboard")
+	if (FileExist(clipPath LastClipboard)){
+		GuiControl,text,StoreClipboard, %SaveSymbol%
+		GuiControl,text,RestoreClipboard, %LoadSymbol%
+	}else {
+	GuiControl,text,StoreClipboard, %DiskSymbol%
+	GuiControl,text,RestoreClipboard, 
+	}
 
 return
 
@@ -2928,12 +2947,16 @@ FileRecycle, %clipboard%,%clipPath%%FileSafeName%.clipboard
 LV_GetText(RowText, LVSelectedROW,2)
 FileSafeName := NameEncode(RowText)
 Fileappend,%clipboard%,%clipPath%%FileSafeName%.clipboard
+GuiControl,text,StoreClipboard, %SaveSymbol%
+GuiControl,text,RestoreClipboard, %LoadSymbol%
 return
 
 RestoreClipBoard:
 LV_GetText(RowText, LVSelectedROW,2)
 FileSafeName := NameEncode(RowText)
+if (FileExist(clipPath FileSafeName ".clipboard")){
 FileRead, clipboard, %clipPath%%FileSafeName%.clipboard
+}
 return
 
 

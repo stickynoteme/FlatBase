@@ -110,9 +110,9 @@ BuildGUI1(){
 	ClipIconX := LibW - 50
 	Clip2IconX := LibW - 25
 	
-	Gui, 1:Add,text, center yp-1 x%ClipIconX% c%U_SFC% -E0x200 w25 h%title_h% gCopyClipBoard, %SaveSymbol%
+	Gui, 1:Add,text, center yp-1 x%ClipIconX% vStoreClipboard c%U_SFC% -E0x200 w25 h%title_h% gCopyClipBoard, %SaveSymbol%
 	
-	Gui, 1:Add,text, center yp0 x%Clip2IconX% c%U_SFC% -E0x200 w25 h%title_h% gRestoreClipBoard, %LoadSymbol%
+	Gui, 1:Add,text, center yp0 x%Clip2IconX% vRestoreClipboard c%U_SFC% -E0x200 w25 h%title_h% gRestoreClipBoard, %LoadSymbol%
 	
 	
 	;Allow User set prevent/edit font
