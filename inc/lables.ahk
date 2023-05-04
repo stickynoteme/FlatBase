@@ -181,7 +181,7 @@ NewFromSearch:
 		{
 			LV_GetText(RetrievedText, A_Index,2)
 				if (RetrievedText==NewNoteFromSearch) {
-					LV_Modify(A_Index, "Select")
+					LV_Modify(A_Index, "Select Focus Vis")
 				}
 		}
 			return
