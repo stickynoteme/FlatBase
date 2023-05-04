@@ -299,6 +299,7 @@ global NoteNameToEdit
 
 FileCreateDir, NoteDetails
 detailsPath := A_WorkingDir "\NoteDetails\"
+clipPath := A_WorkingDir "\MyClipboards\"
 iniPath = %A_WorkingDir%\settings.ini
 systemINI = %A_WorkingDir%\sys\system.ini
 themePath = %A_WorkingDir%\sys\Themes

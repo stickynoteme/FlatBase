@@ -2918,6 +2918,19 @@ while TV_GetCount() != TVneeded
 } ;end of star parent else
 return
 
+CopyClipBoard:
+LV_GetText(RowText, LVSelectedROW,2)
+FileSafeName := NameEncode(RowText)
+Fileappend,%clipboard%,%clipPath%%FileSafeName%.clipboard
+return
+
+RestoreClipBoard:
+LV_GetText(RowText, LVSelectedROW,2)
+FileSafeName := NameEncode(RowText)
+FileRead, clipboard, %clipPath%%FileSafeName%.clipboard
+return
+
+
 BuildTreeUI:
 
 If (TreeFristRun == 1)

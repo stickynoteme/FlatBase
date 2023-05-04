@@ -92,11 +92,22 @@ BuildGUI1(){
 	
 	;gLibTemplateAdd
 	Gui, 1:Add,text, center xs c%U_SFC% -E0x200 w25 h%title_h% gLibTemplateAdd, %TemplateSymbol%
+		
+	
+	Gui, 1:Add,edit, readonly center x+15 -E0x200 vTitleBar C%U_SFC% w%TitleWAdjust% h%title_h% backgroundTrans -Tabstop,
 	
 	; Disable Tree  Because it's too error prone.
 	;TreeIconX := LibW - 25
-	;Gui, 1:Add,edit, readonly center x+15 -E0x200 vTitleBar C%U_SFC% w%TitleWAdjust% ;h%title_h% backgroundTrans -Tabstop,
 	;Gui, 1:Add,text, center yp0 x%TreeIconX% c%U_SFC% -E0x200 w25 h%title_h% gBuildTreeUI, %TreeSymbol%
+	
+	; Replaced Tree with clipboard copy
+	
+	ClipIconX := LibW - 50
+	Clip2IconX := LibW - 25
+	
+	Gui, 1:Add,text, center yp0 x%ClipIconX% c%U_SFC% -E0x200 w25 h%title_h% gCopyClipBoard, %TreeSymbol%
+	
+	Gui, 1:Add,text, center yp0 x%Clip2IconX% c%U_SFC% -E0x200 w25 h%title_h% gRestoreClipBoard, %TreeSymbol%
 	
 	Gui, 1:Add,Edit, section x0 hwndHPB -E0x200  r%PreviewRows% w%LibW% C%U_MFC% gPreviewBox vPreviewBox,
 	}
