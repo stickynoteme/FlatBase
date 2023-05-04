@@ -2945,9 +2945,9 @@ if (FileExist(clipPath FileSafeName ".clipboard")){
 MsgBox, 4404, , Clipboard for: "%FileSafeName%.clipboard" already exists overwrite it?
 IfMsgBox No
 	return
-FileRecycle, %clipboard%,%clipPath%%FileSafeName%.clipboard
+FileRecycle,%clipPath%%FileSafeName%.clipboard
 }
-Fileappend,%clipboard%,%clipPath%%FileSafeName%.clipboard
+Fileappend,%ClipboardAll%,%clipPath%%FileSafeName%.clipboard
 GuiControl,text,StoreClipboard, %SaveSymbol%
 GuiControl,text,RestoreClipboard, %LoadSymbol%
 return
@@ -2956,7 +2956,7 @@ RestoreClipBoard:
 LV_GetText(RowText, LVSelectedROW,2)
 FileSafeName := NameEncode(RowText)
 if (FileExist(clipPath FileSafeName ".clipboard")){
-FileRead, clipboard, %clipPath%%FileSafeName%.clipboard
+FileRead, clipboard, *c %clipPath%%FileSafeName%.clipboard
 }
 return
 
