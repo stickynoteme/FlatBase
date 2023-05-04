@@ -86,7 +86,7 @@ BuildGUI1(){
 	Gui, 1:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
 	;Gui, 1:Add,edit, readonly h6 -E0x200
 	title_h := PreviewFontSize*1.6
-	TitleWAdjust := round(LibW*0.85)
+	TitleWAdjust := round(LibW*0.80)
 	
 	if (ShowPreviewEditBoxHelper) {
 	
@@ -105,9 +105,9 @@ BuildGUI1(){
 	ClipIconX := LibW - 50
 	Clip2IconX := LibW - 25
 	
-	Gui, 1:Add,text, center yp0 x%ClipIconX% c%U_SFC% -E0x200 w25 h%title_h% gCopyClipBoard, %TreeSymbol%
+	Gui, 1:Add,text, center yp0 x%ClipIconX% c%U_SFC% -E0x200 w25 h%title_h% gCopyClipBoard, %SaveSymbol%
 	
-	Gui, 1:Add,text, center yp0 x%Clip2IconX% c%U_SFC% -E0x200 w25 h%title_h% gRestoreClipBoard, %TreeSymbol%
+	Gui, 1:Add,text, center yp0 x%Clip2IconX% c%U_SFC% -E0x200 w25 h%title_h% gRestoreClipBoard, %LoadSymbol%
 	
 	Gui, 1:Add,Edit, section x0 hwndHPB -E0x200  r%PreviewRows% w%LibW% C%U_MFC% gPreviewBox vPreviewBox,
 	}

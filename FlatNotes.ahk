@@ -270,6 +270,8 @@ if (A_ScreenDPI > 120)
 global SelectedRows
 global TemplateSymbol
 global TreeSymbol
+global SaveSymbol
+global LoadSymbol
 global ColBase = ,6,7,8,9
 global ColOrder = 1,2,3,4,5
 global SearchWholeNote
@@ -296,6 +298,8 @@ global C_Tags
 global C_Cat
 global C_Parent
 global NoteNameToEdit
+
+LVSelectedROW = 1
 
 FileCreateDir, NoteDetails
 detailsPath := A_WorkingDir "\NoteDetails\"
@@ -370,6 +374,8 @@ if (isFristRun = "1") {
 	iniread, TemplateBelowSymbol,%systemINI%,SYS,TemplateBelowSymbol,-
 	iniread, TemplateSymbol,%systemINI%,SYS,TemplateSymbol,+
 	iniread, TreeSymbol,%systemINI%,SYS,TreeSymbol,🌳
+	iniread, SaveSymbol,%systemINI%,SYS,SaveSymbol,📦
+	iniread, LoadSymbol,%systemINI%,SYS,LoadSymbol,📋
 ;-------------------------------------------------
 ; Read from theme .ini 
 ;-------------------------------------------------
