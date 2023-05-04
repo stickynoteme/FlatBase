@@ -2938,14 +2938,15 @@ while TV_GetCount() != TVneeded
 return
 
 CopyClipBoard:
+LV_GetText(RowText, LVSelectedROW,2)
+FileSafeName := NameEncode(RowText)
+
 if (FileExist(clipPath FileSafeName ".clipboard")){
-MsgBox, 4404, , Clipboard for: "%RowText%" already exists overwrite it?
+MsgBox, 4404, , Clipboard for: "%FileSafeName%.clipboard" already exists overwrite it?
 IfMsgBox No
 	return
 FileRecycle, %clipboard%,%clipPath%%FileSafeName%.clipboard
 }
-LV_GetText(RowText, LVSelectedROW,2)
-FileSafeName := NameEncode(RowText)
 Fileappend,%clipboard%,%clipPath%%FileSafeName%.clipboard
 GuiControl,text,StoreClipboard, %SaveSymbol%
 GuiControl,text,RestoreClipboard, %LoadSymbol%
