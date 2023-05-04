@@ -242,26 +242,26 @@ BuildGUI2(){
 	
 	
 	; Tag Box
+	if (ShowQuickTagEditBoxHelper == 1) {
 	Gui, 2:Add, ListBox, y+2 +0x100 h15 w%QuickNoteEditW%  -E0x200 Disabled -Tabstop
 
-	
 	Gui, 2:Add,Edit,  yp+5 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r1 w%QuickNoteEditW% vQuickNoteTags hwndHQNT center
 	
-	
-	HalfQuickNoteEditW := QuickNoteEditW * 0.5
-		
+	HalfQuickNoteEditW := QuickNoteEditW * 0.5		
 	Gui, 2:Add, ListBox, y+2 +0x100 h15 w%HalfQuickNoteEditW%  -E0x200 Disabled -Tabstop
-		
-		
-	Gui, 2:Add,Edit,  yp+5 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r1 w%HalfQuickNoteEditW% vQuickNoteParent hwndHQPT center
+	}
 	
+	if (ShowQuickParentEditBoxHelper == 1) {
+	Gui, 2:Add,Edit,  yp+5 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r1 w%HalfQuickNoteEditW% vQuickNoteParent hwndHQPT center
+	}
 	
 	OD_Colors.SetItemHeight(SearchFontSize, CatFontFamily)
 	Gui, 2:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
 	Gui, 2:Color,%U_SBG%, %U_MBG%
 	
-	
+	if (ShowQuickCatEditBoxHelper == 1) {
 	Gui, 2:Add, DDL, Sort xp%HalfQuickNoteEditW% yp0 -E0x200 +0x0210 r5 w%HalfQuickNoteEditW% vQuickNoteCat hwndHQNC,%CatBoxContents%
+	}
 	
 	DDLbgColor := strreplace(U_SBG,"0x")
 	DDLbgColorb2 := strreplace(U_MBG,"0x")

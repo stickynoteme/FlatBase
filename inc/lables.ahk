@@ -1822,6 +1822,18 @@ Options:
 	Gui, 3:Add,CheckBox, xs vSelect_ExtraInputInTemplatesHelper gSet_ExtraInputInTemplatesHelper, Show Preview Edit Box?
 	GuiControl,,Select_ExtraInputInTemplatesHelper,%ExtraInputInTemplatesHelper%
 	
+		Gui, 3:Add,CheckBox, xs vSelect_ShowQuickCatEditBoxHelper gSet_ShowQuickCatEditBoxHelper, Show Quick Category Edit Box?
+	GuiControl,,Select_ShowQuickCatEditBoxHelper,%ShowQuickCatEditBoxHelper%
+	
+	
+	Gui, 3:Add,CheckBox, xs vSelect_ShowQuickTagEditBoxHelper gSet_ShowQuickTagEditBoxHelper, Show Tag Edit Box?
+	GuiControl,,Select_ShowQuickTagEditBoxHelper,%ShowQuickTagEditBoxHelper%
+	
+	Gui, 3:Add,CheckBox, xs vSelect_ShowQuickParentEditBoxHelper gSet_ShowQuickParentEditBoxHelper, Show Quick Parent Edit Box?
+	GuiControl,,Select_ShowQuickParentEditBoxHelper,%ShowQuickParentEditBoxHelper%
+
+	
+	
 	;—-------------------------
 	;Window Size Options Tab
 	;—--------------------------
@@ -1903,6 +1915,14 @@ SaveAndReload:
 	IniWrite,%Select_ShowStarHelper%, %iniPath%, General, ShowStarHelper
 	GuiControlGet,Select_ShowCatFilterBoxHelper
 	IniWrite,%Select_ShowCatFilterBoxHelper%, %iniPath%, General, ShowCatFilterBoxHelper
+	
+	GuiControlGet,Select_ShowQuickCatEditBoxHelper
+	IniWrite,%Select_ShowQuickCatEditBoxHelper%, %iniPath%, General, ShowQuickCatEditBoxHelper
+	GuiControlGet,Select_ShowQuickParentEditBoxHelper
+	IniWrite,%Select_ShowQuickParentEditBoxHelper%, %iniPath%, General, ShowQuickParentEditBoxHelper
+	GuiControlGet,Select_ShowQuickTagEditBoxHelper
+	IniWrite,%Select_ShowQuickTagEditBoxHelper%, %iniPath%, General, ShowQuickTagEditBoxHelper
+	
 	GuiControlGet,Select_ShowTagFilterBoxHelper
 	IniWrite,%Select_ShowTagFilterBoxHelper%, %iniPath%, General, ShowCatFilterTagHelper
 	GuiControlGet,Select_ShowTagEditBoxHelper
@@ -2144,6 +2164,15 @@ Set_ShowCatFilterBoxHelper:
 	}
 return
 
+Set_ShowCatEditBoxHelper:
+	GuiControlGet,Select_ShowCatEditBoxHelper
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ShowCatEditBoxHelper%, %iniPath%, General, ShowCatEditBoxHelper
+		IniRead,ShowCatEditBoxHelper,%iniPath%,General,ShowCatEditBoxHelper
+	}
+return
+
 Set_ShowTagFilterBoxHelper:
 	GuiControlGet,Select_ShowTagFilterBoxHelper
 	
@@ -2159,6 +2188,33 @@ Set_ShowParentEditBoxHelper:
 	if (A_GuiEvent == "Normal"){
 		IniWrite,%Select_ShowParentEditBoxHelper%, %iniPath%, General, ShowParentEditBoxHelper
 		IniRead,ShowParentEditBoxHelper,%iniPath%,General,ShowParentEditBoxHelper
+	}
+return
+
+Set_ShowQuickParentEditBoxHelper:
+	GuiControlGet,Select_ShowQuickParentEditBoxHelper
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ShowQuickParentEditBoxHelper%, %iniPath%, General, ShowQuickParentEditBoxHelper
+		IniRead,ShowQuickParentEditBoxHelper,%iniPath%,General,ShowQuickParentEditBoxHelper
+	}
+return
+
+Set_ShowQuickTagEditBoxHelper:
+	GuiControlGet,Select_ShowQuickTagEditBoxHelper
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ShowQuickTagEditBoxHelper%, %iniPath%, General, ShowQuickTagEditBoxHelper
+		IniRead,ShowQuickTagEditBoxHelper,%iniPath%,General,ShowQuickTagEditBoxHelper
+	}
+return
+
+Set_ShowQuickCatEditBoxHelper:
+	GuiControlGet,Select_ShowQuickCatEditBoxHelper
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ShowQuickCatEditBoxHelper%, %iniPath%, General, ShowQuickCatEditBoxHelper
+		IniRead,ShowQuickCatEditBoxHelper,%iniPath%,General,ShowQuickCatEditBoxHelper
 	}
 return
 

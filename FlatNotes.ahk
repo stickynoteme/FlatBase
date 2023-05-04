@@ -215,6 +215,9 @@ global ShowCatFilterBoxHelper
 global ShowTagFilterBoxHelper
 global ShowTagEditBoxHelper
 global ShowParentEditBoxHelper
+global ShowQuickTagEditBoxHelper
+global ShowQuickParentEditBoxHelper
+global ShowQuickCatEditBoxHelper
 global ShowPreviewEditBoxHelper
 global ShowExtraInputInTemplatesHelper
 global templatePath
@@ -413,6 +416,11 @@ IniRead, ShowTagFilterBoxHelper,%iniPath%,General,ShowTagFilterBoxHelper,1
 IniRead, ShowTagEditBoxHelper,%iniPath%,General,ShowTagEditBoxHelper,1
 IniRead, ShowParentEditBoxHelper,%iniPath%,General,ShowParentEditBoxHelper,1
 IniRead, ShowPreviewEditBoxHelper,%iniPath%,General,ShowPreviewEditBoxHelper,1
+
+IniRead, ShowQuickCatEditBoxHelper,%iniPath%,General,ShowQuickCatEditBoxHelper,1
+IniRead, ShowQuickParentEditBoxHelper,%iniPath%,General,ShowQuickParentEditBoxHelper,1
+IniRead, ShowQuickTagEditBoxHelper,%iniPath%,General,ShowQuickTagEditBoxHelper,1
+
 IniRead, ExtraInputInTemplatesHelper,%iniPath%,General,ExtraInputInTemplatesHelper,1
 
 IniRead, RapidStar,%iniPath%,General,RapidStar,1
