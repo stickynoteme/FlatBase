@@ -82,8 +82,7 @@ BuildGUI1(){
 	
 	Gui, 1:Add, ListView,section -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit  Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar|Tags|Cat|Parent|
 
-	;Allow User set prevent/edit font
-	Gui, 1:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
+
 	;Gui, 1:Add,edit, readonly h6 -E0x200
 	title_h := PreviewFontSize*1.6
 	TitleWAdjust := round(LibW*0.80)
@@ -96,6 +95,12 @@ BuildGUI1(){
 	
 	Gui, 1:Add,edit, readonly center x+15 -E0x200 vTitleBar C%U_SFC% w%TitleWAdjust% h%title_h% backgroundTrans -Tabstop,
 	
+	
+	;Good font for symbols
+	
+	SymbolFontSize := PreviewFontSize - 1
+	Gui, 1:Font, s%SymbolFontSize% Q%FontRendering%, Segoe UI Emoji, %U_SFC%
+	
 	; Disable Tree  Because it's too error prone.
 	;TreeIconX := LibW - 25
 	;Gui, 1:Add,text, center yp0 x%TreeIconX% c%U_SFC% -E0x200 w25 h%title_h% gBuildTreeUI, %TreeSymbol%
@@ -105,9 +110,13 @@ BuildGUI1(){
 	ClipIconX := LibW - 50
 	Clip2IconX := LibW - 25
 	
-	Gui, 1:Add,text, center yp0 x%ClipIconX% c%U_SFC% -E0x200 w25 h%title_h% gCopyClipBoard, %SaveSymbol%
+	Gui, 1:Add,text, center yp-1 x%ClipIconX% c%U_SFC% -E0x200 w25 h%title_h% gCopyClipBoard, %SaveSymbol%
 	
 	Gui, 1:Add,text, center yp0 x%Clip2IconX% c%U_SFC% -E0x200 w25 h%title_h% gRestoreClipBoard, %LoadSymbol%
+	
+	
+	;Allow User set prevent/edit font
+	Gui, 1:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
 	
 	Gui, 1:Add,Edit, section x0 hwndHPB -E0x200  r%PreviewRows% w%LibW% C%U_MFC% gPreviewBox vPreviewBox,
 	}

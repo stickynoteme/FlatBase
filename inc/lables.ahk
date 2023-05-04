@@ -2920,7 +2920,7 @@ return
 
 CopyClipBoard:
 if (FileExist(clipPath FileSafeName ".clipboard")){
-MsgBox, 4404, , Clipboard already exists overread it?
+MsgBox, 4404, , Clipboard for: "%RowText%" already exists overwrite it?
 IfMsgBox No
 	return
 FileRecycle, %clipboard%,%clipPath%%FileSafeName%.clipboard

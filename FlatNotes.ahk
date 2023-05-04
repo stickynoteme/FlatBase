@@ -270,6 +270,7 @@ if (A_ScreenDPI > 120)
 global SelectedRows
 global TemplateSymbol
 global TreeSymbol
+global DiskSymbol
 global SaveSymbol
 global LoadSymbol
 global ColBase = ,6,7,8,9
@@ -376,6 +377,7 @@ if (isFristRun = "1") {
 	iniread, TreeSymbol,%systemINI%,SYS,TreeSymbol,🌳
 	iniread, SaveSymbol,%systemINI%,SYS,SaveSymbol,📦
 	iniread, LoadSymbol,%systemINI%,SYS,LoadSymbol,📋
+	iniread, DiskSymbol,%systemINI%,SYS,DiskSymbol,💾
 ;-------------------------------------------------
 ; Read from theme .ini 
 ;-------------------------------------------------
