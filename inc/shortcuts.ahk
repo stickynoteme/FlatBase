@@ -119,19 +119,36 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			Down::Down
 	return
 }
-^Enter::
+Enter::
 {
 ControlGetFocus, OutputVar, FlatNotes - Library
 		if(OutputVar == "SysListView321"){
-			global LVSelectedROW
-			LV_GetText(RowText, LVSelectedROW,2)
-			clipboard := RowText
-			ToolTip Text: "%RowText%" Copied to clipboard
-			SetTimer, KillToolTip, -500
-			gosub GuiEscape
-			return
+		LV_GetText(FileTmp, LVSelectedROW, 8)
+		fileread,clipboard,%U_NotePath%%FileTmp%
+		Tooltip % "Body Copied"
+		SetTimer, KillToolTip, -1000
+		gosub GuiEscape
+		return
 		}else
-			^Enter::^Enter
+			Enter::Enter
+}
+
+^Enter::
+{
+ControlGetFocus, OutputVar, FlatNotes - Library
+	if(OutputVar == "SysListView321"){
+		LV_GetText(FileTmp, LVSelectedROW, 8)
+		FileTmp := RegExReplace(FileTmp, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".clipboard")
+		
+		if (FileExist(clipPath FileTmp)){
+			FileRead, clipboard, *c %clipPath%%FileTmp%
+			Tooltip % "Packaged Clipboard Copied"
+			SetTimer, KillToolTip, -1000
+			gosub GuiEscape
+		}
+		return
+	}else
+		^Enter::^Enter
 }
 
 +Enter::
@@ -139,7 +156,14 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 ControlGetFocus, OutputVar, FlatNotes - Library
 	If (OutputVar == "Edit1"){
 		gosub NewAndSaveHK
-	}else
+	}else if(OutputVar == "SysListView321"){
+			LV_GetText(NameTmp, LVSelectedROW,2)
+			clipboard := NameTmp
+			Tooltip % "Name Copied"
+			SetTimer, KillToolTip, -500
+			gosub GuiEscape
+			return
+		}else
 		+Enter::+Enter
 }
 
