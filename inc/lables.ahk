@@ -3050,11 +3050,14 @@ if (A_GuiControl=="StoreClipboard") {
 if (A_GuiControl=="StoreRun"){
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
-	MsgBox, 4403, , Yes = .AHK NO = .BAT Cancel = Cancel 
+	SetTimer, TypeMsgButtonNames, 50
+	MsgBox, 4403,Script Type, Save Script As...
 	IfMsgBox Yes
 		SaveTypeAs = AHK
 	IfMsgBox No 
 		SaveTypeAs = BAT
+	IfMsgBox Cancel
+		return
 	
 	FileRecycle,%ScriptPath%%FileSafeName%.AHK
 	FileRecycle,%ScriptPath%%FileSafeName%.BAT
@@ -3070,6 +3073,15 @@ if (A_GuiControl=="StoreRun"){
 	}
 }
 
+return
+
+TypeMsgButtonNames:
+IfWinNotExist, Script Type
+	return  ; Keep waiting.
+SetTimer, TypeMsgButtonNames, Off 
+WinActivate 
+ControlSetText, Button1, &AHK 
+ControlSetText, Button2, &BAT 
 return
 
 RestoreClipboard:
