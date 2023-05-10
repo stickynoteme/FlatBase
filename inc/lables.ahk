@@ -3212,10 +3212,14 @@ FilterClip:
 		if (LV_GetCount()>0){
 			LV_Modify(1, "Select Focus Vis")
 		}
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortClip
 	}else {
 		GuiControl,text,SortClip, %DiskSymbol%
 		ClipFilterActive = 0
 		gosub Search
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortClip
 	}
 return
 
@@ -3247,10 +3251,14 @@ FilterBookmark:
 		if (LV_GetCount()>0){
 			LV_Modify(1, "Select Focus Vis")
 		}
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortBookmark
 	}else {
 		GuiControl,text,SortBookmark, %LinkSymbol%
 		BookmarkFilterActive = 0
 		gosub Search
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortBookmark
 	}
 return
 
@@ -3280,6 +3288,8 @@ FilterScript:
 		if (LV_GetCount()>0){
 			LV_Modify(1, "Select Focus Vis")
 		}
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortScript
 	} else if (ScriptFilterActive==2){
 		GuiControl,text,SortScript, %TypeBIcon%
 		
@@ -3303,6 +3313,8 @@ FilterScript:
 		GuiControl,text,SortScript, %RunIcon%
 		ScriptFilterActive = 0
 		gosub Search
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortScript
 	}
 return
 
