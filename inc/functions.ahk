@@ -114,9 +114,10 @@ BuildGUI1(){
 	
 	Gui, 1:Add,text, center yp-2 x%RunIconX% vStoreRun c%U_SFC% -E0x200 w25 h%title_h% gRunStoredCommand, %RunIcon%
 	
+	Gui, 1:Add,text, center yp0 x%ClipIconX% vStoreClipboard c%U_SFC% -E0x200 w25 h%title_h% gRestoreClipboard, %SaveSymbol%
+	
 	Gui, 1:Add,text, center yp0 x%BookmarkIconX% vStoreBookmark c%U_SFC% -E0x200 w25 h%title_h% gGotoBookmark, %WebSymbol%
 	
-	Gui, 1:Add,text, center yp0 x%ClipIconX% vStoreClipboard c%U_SFC% -E0x200 w25 h%title_h% gRestoreClipboard, %SaveSymbol%
 	
 	
 	

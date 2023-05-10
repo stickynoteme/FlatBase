@@ -569,21 +569,32 @@ UpdateStatusBar:
 		LV_GetText(LastNoteTags, 1 , 10)
 		LV_GetText(LastNoteParent, 1 , 12)
 		;LV_GetText(LastNoteCat, 1 , 11)
-		GuiControl,,TitleBar, %LastResultName%	
+		GuiControl,,TitleBar, %LastResultName%
+		IniName := RegExReplace(LastFileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
+
 		;check to see if clipboard exist and change icon accordingly.
 		LastClipboard := RegExReplace(LastFileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".clipboard")
-		Iniread, HasBookmark,%detailsPath%%NewIniName%, INFO,Bookmark
+		Iniread, HasBookmark,%detailsPath%%IniName%, INFO,Bookmark
 		if (HasBookmark){
 			GuiControl,text,StoreBookmark, %BookmarkSymbol%
 		} else {
 			GuiControl,text,StoreBookmark, %LinkSymbol%
 		}
-		Iniread, HasClip,%detailsPath%%NewIniName%, INFO,Clip
+		Iniread, HasClip,%detailsPath%%IniName%, INFO,Clip
 		if (HasCLip == 1){
 			GuiControl,text,StoreClipboard, %SaveSymbol%
 		}else {
 			GuiControl,text,StoreClipboard, %DiskSymbol%
 		}
+		Iniread, RunType,%detailsPath%%IniName%,INFO,RunType
+		if (RunType == "AHK"){
+			GuiControl,text,StoreRun, %TypeAIcon%
+		}else if (RunType == "BAT"){
+			GuiControl,text,StoreRun, %TypeBIcon%
+		}else {
+			GuiControl,text,StoreRun, %RunIcon%
+		}
+		
 		FileRead, LastResultBody,%U_NotePath%%LastFileName%
 		LastNoteIni := RegExReplace(LastFileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 
@@ -901,7 +912,15 @@ UpdateLVSelected:
 	}else {
 		GuiControl,text,StoreClipboard, %DiskSymbol%
 	}
-	tooltip, %HasBookmark% | %HasClip%
+	Iniread, RunType, %detailsPath%%FileSafeName%.ini,INFO,RunType
+	if (RunType == "AHK"){
+		GuiControl,text,StoreRun, %TypeAIcon%
+	}else if (RunType == "BAT"){
+		GuiControl,text,StoreRun, %TypeBIcon%
+	}else {
+		GuiControl,text,StoreRun, %RunIcon%
+	}
+	
 
 return
 
@@ -3012,6 +3031,8 @@ if (A_GuiControl=="StoreBookmark") {
 	}
 	FileCreateShortcut, %clipboard%, %bookmarkPath%%FileSafeName%.lnk
 	Iniwrite, 1, %detailsPath%%FileSafeName%.ini,INFO,Bookmark
+	GuiControl,text,StoreBookmark, %BookmarkSymbol%
+
 }
 if (A_GuiControl=="StoreClipboard") {
 	LV_GetText(RowText, LVSelectedROW,2)
