@@ -724,6 +724,18 @@ if (A_GuiEvent = "DoubleClick")
 		clipboard := CopyText
 		Tooltip % ToolTipText "... Copied"
 	}
+	if (LV@sel_col=16) {
+		gosub RunStoredCommand
+		Tooltip % ToolTipText "Running Script..."
+	}
+	if (LV@sel_col=17) {
+		gosub RestoreClipboard
+		Tooltip % ToolTipText "Clipboard Loaded"
+	}
+	if (LV@sel_col=18) {
+		gosub GotoBookmark
+		Tooltip % ToolTipText "Opening Link..."
+	}
 
 	settimer,KillToolTip, -500
     return
@@ -3211,7 +3223,10 @@ GotoBookmark:
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
 	if (FileExist(bookmarkPath FileSafeName ".lnk")){
-		Run % bookmarkPath FileSafeName ".lnk"
+		Run % bookmarkPath FileSafeName ".lnk",,UseErrorLevel
+		if (ErrorLevel=="ERROR"){
+			msgbox,262160,ERROR, BAD .lnk
+		}
 	}
 return
 
