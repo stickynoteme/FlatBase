@@ -485,6 +485,19 @@ SkipToEndOfSearch:
 	gosub CatFilter
 	gosub TagsFilter
 	gosub UpdateStatusBar
+	if (ClipFilterActive == 1){
+		gosub FilterClipSearch
+	}
+	if (BookmarkFilterActive == 1){
+		gosub FilterBookmarkSearch
+	}
+	if (ScriptFilterActive == 1){
+		gosub FilterScriptSearch
+	}
+	if (ScriptFilterActive == 2){
+		TypeBUpdate = 0
+		gosub FilterScriptSearch
+	}
 Return
 
 FoundSearchResult:
@@ -3171,12 +3184,26 @@ RestoreClipboard:
 return
 
 FilterClip:
-	FilterbyClip++
-	if (FilterbyClip==1){
+	ClipFilterActive++
+	FilterClipSearch:
+	if (ClipFilterActive==1){
 		GuiControl,text,SortClip, %SaveSymbol%
+		Mloops := LV_GetCount()
+		while (Mloops--)
+		{
+			LV_GetText(RowVar,Mloops+1,17)
+			if (RowVar == a_space)
+				LV_Delete(Mloops+1)
+			if (Mloops = 0)
+				break
+		}
+		if (LV_GetCount()>0){
+			LV_Modify(1, "Select Focus Vis")
+		}
 	}else {
 		GuiControl,text,SortClip, %DiskSymbol%
-	FilterbyClip = 0
+		ClipFilterActive = 0
+		gosub Search
 	}
 return
 
@@ -3189,12 +3216,26 @@ GotoBookmark:
 return
 
 FilterBookmark:
-	FilterbyBookmark++
-	if (FilterbyBookmark==1){
+	BookmarkFilterActive++
+	FilterBookmarkSearch:
+	if (BookmarkFilterActive==1){
 		GuiControl,text,SortBookmark, %BookmarkSymbol%
+		Mloops := LV_GetCount()
+		while (Mloops--)
+		{
+			LV_GetText(RowVar,Mloops+1,18)
+			if (RowVar == a_space)
+				LV_Delete(Mloops+1)
+			if (Mloops = 0)
+				break
+		}
+		if (LV_GetCount()>0){
+			LV_Modify(1, "Select Focus Vis")
+		}
 	}else {
 		GuiControl,text,SortBookmark, %LinkSymbol%
-	FilterbyBookmark = 0
+		BookmarkFilterActive = 0
+		gosub Search
 	}
 return
 
@@ -3208,14 +3249,45 @@ RunStoredCommand:
 return
 
 FilterScript:
-	RunFilterType++
-	if (RunFilterType==1){
+	ScriptFilterActive++
+	FilterScriptSearch:
+	if (ScriptFilterActive==1){
 		GuiControl,text,SortScript, %TypeAIcon%
-	} else if (RunFilterType==2){
+		Mloops := LV_GetCount()
+		while (Mloops--)
+		{
+			LV_GetText(RowVar,Mloops+1,16)
+			if (RowVar != TYpeAIcon)
+				LV_Delete(Mloops+1)
+			if (Mloops = 0)
+				break
+		}		
+		if (LV_GetCount()>0){
+			LV_Modify(1, "Select Focus Vis")
+		}
+	} else if (ScriptFilterActive==2){
 		GuiControl,text,SortScript, %TypeBIcon%
+		
+		if (TypeBUpdate == 1) {
+		gosub Search
+		}
+		TypeBUpdate = 1
+		Mloops := LV_GetCount()
+		while (Mloops--)
+		{
+			LV_GetText(RowVar,Mloops+1,16)
+			if (RowVar != TypeBIcon)
+				LV_Delete(Mloops+1)
+			if (Mloops = 0)
+				break
+		}
+		if (LV_GetCount()>0){
+			LV_Modify(1, "Select Focus Vis")
+		}
 	} else {
 		GuiControl,text,SortScript, %RunIcon%
-		RunFilterType = 0
+		ScriptFilterActive = 0
+		gosub Search
 	}
 return
 
