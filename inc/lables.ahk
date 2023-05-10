@@ -572,12 +572,17 @@ UpdateStatusBar:
 		GuiControl,,TitleBar, %LastResultName%	
 		;check to see if clipboard exist and change icon accordingly.
 		LastClipboard := RegExReplace(LastFileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".clipboard")
-		if (FileExist(clipPath LastClipboard)){
+		Iniread, HasBookmark,%detailsPath%%NewIniName%, INFO,Bookmark
+		if (HasBookmark){
+			GuiControl,text,StoreBookmark, %BookmarkSymbol%
+		} else {
+			GuiControl,text,StoreBookmark, %LinkSymbol%
+		}
+		Iniread, HasClip,%detailsPath%%NewIniName%, INFO,Clip
+		if (HasCLip == 1){
 			GuiControl,text,StoreClipboard, %SaveSymbol%
-			GuiControl,text,RestoreClipboard, %LoadSymbol%
 		}else {
-		GuiControl,text,StoreClipboard, %DiskSymbol%
-		GuiControl,text,RestoreClipboard, 
+			GuiControl,text,StoreClipboard, %DiskSymbol%
 		}
 		FileRead, LastResultBody,%U_NotePath%%LastFileName%
 		LastNoteIni := RegExReplace(LastFileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
@@ -883,14 +888,20 @@ UpdateLVSelected:
 	GuiControl,, StatusbarA,A: %C_Added%
 	
 	;check to see if clipboard exist and change icon accordingly.
-	LastClipboard := RegExReplace(RowText, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".clipboard")
-	if (FileExist(clipPath LastClipboard)){
-		GuiControl,text,StoreClipboard, %SaveSymbol%
-		GuiControl,text,RestoreClipboard, %LoadSymbol%
-	}else {
-	GuiControl,text,StoreClipboard, %DiskSymbol%
-	GuiControl,text,RestoreClipboard, 
+	FileSafeName := NameEncode(C_Name)
+	Iniread, HasBookmark,%detailsPath%%FileSafeName%.ini, INFO,Bookmark
+	if (HasBookmark == 1){
+		GuiControl,text,StoreBookmark, %BookmarkSymbol%
+	} else {
+		GuiControl,text,StoreBookmark, %LinkSymbol%
 	}
+	Iniread, HasClip,%detailsPath%%FileSafeName%.ini, INFO,Clip
+	if (HasCLip == 1){
+		GuiControl,text,StoreClipboard, %SaveSymbol%
+	}else {
+		GuiControl,text,StoreClipboard, %DiskSymbol%
+	}
+	tooltip, %HasBookmark% | %HasClip%
 
 return
 
@@ -2989,29 +3000,81 @@ while TV_GetCount() != TVneeded
 } ;end of star parent else
 return
 
-CopyClipBoard:
-LV_GetText(RowText, LVSelectedROW,2)
-FileSafeName := NameEncode(RowText)
-
-if (FileExist(clipPath FileSafeName ".clipboard")){
-MsgBox, 4404, , Clipboard for: "%FileSafeName%.clipboard" already exists overwrite it?
-IfMsgBox No
-	return
-FileRecycle,%clipPath%%FileSafeName%.clipboard
+GuiContextMenu:
+if (A_GuiControl=="StoreBookmark") {
+	LV_GetText(RowText, LVSelectedROW,2)
+	FileSafeName := NameEncode(RowText)
+	if (FileExist(bookmarkPath FileSafeName ".lnk")){
+	MsgBox, 4404, , Bookmark for: "%FileSafeName%.lnk" already exists overwrite it?
+	IfMsgBox No
+		return
+	FileRecycle,%bookmarkPath%%FileSafeName%.lnk
+	}
+	FileCreateShortcut, %clipboard%, %bookmarkPath%%FileSafeName%.lnk
+	Iniwrite, 1, %detailsPath%%FileSafeName%.ini,INFO,Bookmark
 }
-Fileappend,%ClipboardAll%,%clipPath%%FileSafeName%.clipboard
-GuiControl,text,StoreClipboard, %SaveSymbol%
-GuiControl,text,RestoreClipboard, %LoadSymbol%
+if (A_GuiControl=="StoreClipboard") {
+	LV_GetText(RowText, LVSelectedROW,2)
+	FileSafeName := NameEncode(RowText)
+	if (FileExist(clipPath FileSafeName ".clipboard")){
+		MsgBox, 4404, , "%FileSafeName%.clipboard" already exists overwrite it?
+		IfMsgBox No
+			return
+		FileRecycle,%clipPath%%FileSafeName%.clipboard
+	}
+	Fileappend,%ClipboardAll%,%clipPath%%FileSafeName%.clipboard
+	Iniwrite, 1, %detailsPath%%FileSafeName%.ini,INFO,Clip
+	GuiControl,text,StoreClipboard, %SaveSymbol%
+}
+if (A_GuiControl=="StoreRun"){
+	LV_GetText(RowText, LVSelectedROW,2)
+	FileSafeName := NameEncode(RowText)
+	MsgBox, 4403, , Yes = .AHK NO = .BAT Cancel = Cancel 
+	IfMsgBox Yes
+		SaveTypeAs = AHK
+	IfMsgBox No 
+		SaveTypeAs = BAT
+	
+	FileRecycle,%ScriptPath%%FileSafeName%.AHK
+	FileRecycle,%ScriptPath%%FileSafeName%.BAT
+	
+	if (SaveTypeAs == "AHK"){
+		GuiControl,text,StoreRun, %TypeAIcon%
+		Iniwrite, AHK, %detailsPath%%FileSafeName%.ini,INFO,RunType
+		Fileappend,%Clipboard%,%ScriptPath%%FileSafeName%.%SaveTypeAs%
+	}else{
+		GuiControl,text,StoreRun, %TypeBIcon%
+		Iniwrite, BAT, %detailsPath%%FileSafeName%.ini,INFO,RunType
+		Fileappend,%Clipboard%,%ScriptPath%%FileSafeName%.%SaveTypeAs%
+	}
+}
+
 return
 
-RestoreClipBoard:
-LV_GetText(RowText, LVSelectedROW,2)
-FileSafeName := NameEncode(RowText)
-if (FileExist(clipPath FileSafeName ".clipboard")){
-FileRead, clipboard, *c %clipPath%%FileSafeName%.clipboard
-}
+RestoreClipboard:
+	LV_GetText(RowText, LVSelectedROW,2)
+	FileSafeName := NameEncode(RowText)
+	if (FileExist(clipPath FileSafeName ".clipboard")){
+		FileRead, clipboard, *c %clipPath%%FileSafeName%.clipboard
+	}
 return
 
+GotoBookmark:
+	LV_GetText(RowText, LVSelectedROW,2)
+	FileSafeName := NameEncode(RowText)
+	if (FileExist(bookmarkPath FileSafeName ".lnk")){
+		Run % bookmarkPath FileSafeName ".lnk"
+	}
+return
+
+RunStoredCommand:
+	LV_GetText(RowText, LVSelectedROW,2)
+	FileSafeName := NameEncode(RowText)
+	iniRead,RunTypeAs,%detailsPath%%FileSafeName%.ini,INFO,RunType
+	if (FileExist(scriptPath FileSafeName "." RunTypeAs)){
+		Run % scriptPath FileSafeName "." RunTypeAs
+	}
+return
 
 BuildTreeUI:
 

@@ -85,7 +85,7 @@ BuildGUI1(){
 
 	;Gui, 1:Add,edit, readonly h6 -E0x200
 	title_h := PreviewFontSize*1.6
-	TitleWAdjust := round(LibW*0.80)
+	TitleWAdjust := round(LibW*0.75)
 	
 	if (ShowPreviewEditBoxHelper) {
 	
@@ -107,12 +107,17 @@ BuildGUI1(){
 	
 	; Replaced Tree with clipboard copy
 	
+	;TypeIconX := LibW - 100
+	RunIconX := LibW - 75
 	ClipIconX := LibW - 50
-	Clip2IconX := LibW - 25
+	BookmarkIconX := LibW - 25
 	
-	Gui, 1:Add,text, center yp-1 x%ClipIconX% vStoreClipboard c%U_SFC% -E0x200 w25 h%title_h% gCopyClipBoard, %SaveSymbol%
+	Gui, 1:Add,text, center yp-2 x%RunIconX% vStoreRun c%U_SFC% -E0x200 w25 h%title_h% gRunStoredCommand, %RunIcon%
 	
-	Gui, 1:Add,text, center yp0 x%Clip2IconX% vRestoreClipboard c%U_SFC% -E0x200 w25 h%title_h% gRestoreClipBoard, %LoadSymbol%
+	Gui, 1:Add,text, center yp0 x%BookmarkIconX% vStoreBookmark c%U_SFC% -E0x200 w25 h%title_h% gGotoBookmark, %WebSymbol%
+	
+	Gui, 1:Add,text, center yp0 x%ClipIconX% vStoreClipboard c%U_SFC% -E0x200 w25 h%title_h% gRestoreClipboard, %SaveSymbol%
+	
 	
 	
 	;Allow User set prevent/edit font

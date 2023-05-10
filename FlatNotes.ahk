@@ -249,6 +249,9 @@ global SearchFontFamily
 global SearchFontSize
 global FontRendering
 global detailsPath
+global scriptPath
+global bookmarkPath
+global clipPath
 global HideScrollbars
 global backupsToKeep
 global g1Open
@@ -269,10 +272,21 @@ if (A_ScreenDPI > 120)
 ;tmp maybe
 global SelectedRows
 global TemplateSymbol
+global RunSymbol
+global WebSymbol
+global WorldSymbol
+global LinkSymbol
 global TreeSymbol
 global DiskSymbol
 global SaveSymbol
 global LoadSymbol
+global TypeAIcon
+global TypeBIcon
+global RunIcon
+global BookmarkSymbol
+global StoreBookmark
+global StoreRun
+global ChangeRunType
 global RestoreClipboard
 global StoreClipboard
 global ColBase = ,6,7,8,9
@@ -307,6 +321,8 @@ LVSelectedROW = 1
 FileCreateDir, NoteDetails
 detailsPath := A_WorkingDir "\NoteDetails\"
 clipPath := A_WorkingDir "\MyClipboards\"
+bookmarkPath := A_WorkingDir "\MyBookmarks\"
+scriptpath := A_WorkingDir "\MyScripts\"
 iniPath = %A_WorkingDir%\settings.ini
 systemINI = %A_WorkingDir%\sys\system.ini
 themePath = %A_WorkingDir%\sys\Themes
@@ -380,6 +396,13 @@ if (isFristRun = "1") {
 	iniread, SaveSymbol,%systemINI%,SYS,SaveSymbol,📦
 	iniread, LoadSymbol,%systemINI%,SYS,LoadSymbol,📋
 	iniread, DiskSymbol,%systemINI%,SYS,DiskSymbol,💾
+	iniread, WorldSymbol,%systemINI%,SYS,WorldSymbol🌐
+	iniread, LinkSymbol,%systemINI%,SYS,LinkSymbol,🔗
+	iniread, WebSymbol,%systemINI%,SYS,WebSymbol,🕸️
+	iniread, BookmarkSymbol,%systemINI%,SYS,BookmarkSymbol,🔖
+	iniread, RunIcon, %systemINI%,SYS,RunIcon,👟
+	iniread, TypeAIcon, %systemINI%,SYS,TypeAIcon,🅰️
+	iniread, TypeBIcon, %systemINI%,SYS,TypeBIcon,🅱️
 ;-------------------------------------------------
 ; Read from theme .ini 
 ;-------------------------------------------------
