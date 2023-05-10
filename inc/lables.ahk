@@ -3043,13 +3043,12 @@ GuiContextMenu:
 
 }
 if (A_GuiControl=="StoreClipboard") {
-	LV_GetText(RowText, LVSelectedROW,2)
-	FileSafeName := NameEncode(RowText)
 	if GetKeyState("Shift"){
 		MsgBox, 4404,Delete?,Delete stored Clipboard?
 			IfMsgBox No
 				return
-			FileRecycle,%clipPath%%FileSafeName%
+			FileRecycle,%clipPath%%FileSafeName%.clipboard
+			Iniwrite, A_space, %detailsPath%%FileSafeName%.ini,INFO,Clip
 			GuiControl,text,StoreClipboard, %DiskSymbol%
 			return
 	}
@@ -3064,8 +3063,6 @@ if (A_GuiControl=="StoreClipboard") {
 	GuiControl,text,StoreClipboard, %SaveSymbol%
 }
 if (A_GuiControl=="StoreRun"){
-	LV_GetText(RowText, LVSelectedROW,2)
-	FileSafeName := NameEncode(RowText)
 	Iniread, ScriptExists, %detailsPath%%FileSafeName%.ini,INFO,RunType
 	if GetKeyState("Shift"){
 		MsgBox, 4404,Delete?,Delete stored Script?
