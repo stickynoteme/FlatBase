@@ -3020,9 +3020,17 @@ while TV_GetCount() != TVneeded
 return
 
 GuiContextMenu:
-if (A_GuiControl=="StoreBookmark") {
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
+	if (A_GuiControl=="StoreBookmark") {
+		if GetKeyState("Shift"){
+			MsgBox, 4404,Delete?,Delete Bookmark?
+				IfMsgBox No
+					return
+				FileRecycle,%bookmarkPath%%FileSafeName%.lnk
+				GuiControl,text,StoreBookmark, %LinkSymbol%
+				return
+		}
 	if (FileExist(bookmarkPath FileSafeName ".lnk")){
 	MsgBox, 4404, , Bookmark for: "%FileSafeName%.lnk" already exists overwrite it?
 	IfMsgBox No
@@ -3037,6 +3045,14 @@ if (A_GuiControl=="StoreBookmark") {
 if (A_GuiControl=="StoreClipboard") {
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
+	if GetKeyState("Shift"){
+		MsgBox, 4404,Delete?,Delete stored Clipboard?
+			IfMsgBox No
+				return
+			FileRecycle,%clipPath%%FileSafeName%
+			GuiControl,text,StoreClipboard, %DiskSymbol%
+			return
+	}
 	if (FileExist(clipPath FileSafeName ".clipboard")){
 		MsgBox, 4404, , "%FileSafeName%.clipboard" already exists overwrite it?
 		IfMsgBox No
@@ -3050,8 +3066,16 @@ if (A_GuiControl=="StoreClipboard") {
 if (A_GuiControl=="StoreRun"){
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
-	
 	Iniread, ScriptExists, %detailsPath%%FileSafeName%.ini,INFO,RunType
+	if GetKeyState("Shift"){
+		MsgBox, 4404,Delete?,Delete stored Script?
+			IfMsgBox No
+				return
+			FileRecycle,%ScriptPath%%FileSafeName%.%RunType%
+			Iniwrite, A_Space, %detailsPath%%FileSafeName%.ini,INFO,RunType
+			GuiControl,text,StoreRun, %RunIcon%
+			return
+	}
 	if (ScriptExists == "AHK"){
 		ExistsWARNING = WARNING: An .AHK file exists for this note.
 	} else if (ScriptExists == "BAT"){
