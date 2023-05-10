@@ -79,9 +79,9 @@ BuildGUI1(){
 	Gui, 1:Add, text, yp0 xp+%ModColW% w%TagColW% center c%U_SFC% vSortTags, Tags
 	Gui, 1:Add, text, yp0 xp+%TagColW% w%CatColW% center c%U_SFC% vSortCat, Cat
 	Gui, 1:Add, text, yp0 xp+%CatColW% w%ParentColW% center c%U_SFC% vSortParent, Parent
-	Gui, 1:Add, text, yp0 xp+%ParentColW% w%ScriptColW% center c%U_SFC% vSortScript, %RunIcon%
-	Gui, 1:Add, text, yp0 xp+%ScriptColW% w%ClipColW% center c%U_SFC% vSortClip, %SaveSymbol%
-	Gui, 1:Add, text, yp0 xp+%ClipColW% w%BookmarkColW% center c%U_SFC% vSortBookmark,%BookmarkSymbol%
+	Gui, 1:Add, text, yp0 xp+%ParentColW% w%ScriptColW% center c%U_SFC% gFilterScript vSortScript, %RunIcon%
+	Gui, 1:Add, text, yp0 xp+%ScriptColW% w%ClipColW% center c%U_SFC% gFilterClip vSortClip, %DiskSymbol%
+	Gui, 1:Add, text, yp0 xp+%ClipColW% w%BookmarkColW% center c%U_SFC% gFilterBookmark vSortBookmark,%LinkSymbol%
 	
 	Gui, 1:Add, ListView,section -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar|Tags|Cat|Parent|checked|Marked|Extra|Script|Clip|Bookmark
 

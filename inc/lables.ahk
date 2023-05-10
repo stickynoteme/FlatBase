@@ -3170,11 +3170,31 @@ RestoreClipboard:
 	}
 return
 
+FilterClip:
+	FilterbyClip++
+	if (FilterbyClip==1){
+		GuiControl,text,SortClip, %SaveSymbol%
+	}else {
+		GuiControl,text,SortClip, %DiskSymbol%
+	FilterbyClip = 0
+	}
+return
+
 GotoBookmark:
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
 	if (FileExist(bookmarkPath FileSafeName ".lnk")){
 		Run % bookmarkPath FileSafeName ".lnk"
+	}
+return
+
+FilterBookmark:
+	FilterbyBookmark++
+	if (FilterbyBookmark==1){
+		GuiControl,text,SortBookmark, %BookmarkSymbol%
+	}else {
+		GuiControl,text,SortBookmark, %LinkSymbol%
+	FilterbyBookmark = 0
 	}
 return
 
@@ -3186,6 +3206,19 @@ RunStoredCommand:
 		Run % scriptPath FileSafeName "." RunTypeAs
 	}
 return
+
+FilterScript:
+	RunFilterType++
+	if (RunFilterType==1){
+		GuiControl,text,SortScript, %TypeAIcon%
+	} else if (RunFilterType==2){
+		GuiControl,text,SortScript, %TypeBIcon%
+	} else {
+		GuiControl,text,SortScript, %RunIcon%
+		RunFilterType = 0
+	}
+return
+
 
 MakeSticky:
 	if !LastRowSelected
