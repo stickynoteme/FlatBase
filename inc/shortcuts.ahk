@@ -232,17 +232,5 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 		 }else
 			del::del
 }
-MButton::
-{
-	ControlGetFocus, OutputVar, FlatNotes - Library
-	{
-		MouseGetPos, mxPos, myPos
-		MouseClick, left, %mxPos%, %myPos%
-		LV_GetText(StickyNoteName,LastRowSelected,2)
-		LV_GetText(StickyNoteFile,LastRowSelected,8)
-		Build_Stickynote_GUI(StickyNoteName,StickyNoteFile)
-	}
-	return
-}
 }
 #IfWinActive

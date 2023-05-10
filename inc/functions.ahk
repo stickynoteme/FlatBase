@@ -107,12 +107,15 @@ BuildGUI1(){
 	
 	; Replaced Tree with clipboard copy
 	
-	;TypeIconX := LibW - 100
+	StickyIconX := LibW - 100
 	RunIconX := LibW - 75
 	ClipIconX := LibW - 50
 	BookmarkIconX := LibW - 25
 	
-	Gui, 1:Add,text, center yp-2 x%RunIconX% vStoreRun c%U_SFC% -E0x200 w25 h%title_h% gRunStoredCommand, %RunIcon%
+		Gui, 1:Add,text, center yp-2 x%StickyIconX% vMakeSticky c%U_SFC% -E0x200 w25 h%title_h% gMakeSticky, %StickyIcon%
+
+	
+	Gui, 1:Add,text, center yp0 x%RunIconX% vStoreRun c%U_SFC% -E0x200 w25 h%title_h% gRunStoredCommand, %RunIcon%
 	
 	Gui, 1:Add,text, center yp0 x%ClipIconX% vStoreClipboard c%U_SFC% -E0x200 w25 h%title_h% gRestoreClipboard, %SaveSymbol%
 	

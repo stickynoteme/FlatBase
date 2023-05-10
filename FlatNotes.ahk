@@ -176,7 +176,7 @@ global Fake
 global SaveMod
 global TitelBar
 global StatusBarCount
-global LastRowSelected
+global LastRowSelected, 1
 global StatusBar
 global C_SortCol
 global C_SortDir
@@ -283,6 +283,8 @@ global LoadSymbol
 global TypeAIcon
 global TypeBIcon
 global RunIcon
+global StickyIcon
+global MakeSticky
 global BookmarkSymbol
 global StoreBookmark
 global StoreRun
@@ -403,6 +405,7 @@ if (isFristRun = "1") {
 	iniread, RunIcon, %systemINI%,SYS,RunIcon,👟
 	iniread, TypeAIcon, %systemINI%,SYS,TypeAIcon,🅰️
 	iniread, TypeBIcon, %systemINI%,SYS,TypeBIcon,🅱️
+	iniread, StickyIcon, %systemINI%,SYS,StickyIcon,📌
 ;-------------------------------------------------
 ; Read from theme .ini 
 ;-------------------------------------------------

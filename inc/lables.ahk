@@ -3050,8 +3050,18 @@ if (A_GuiControl=="StoreClipboard") {
 if (A_GuiControl=="StoreRun"){
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
+	
+	Iniread, ScriptExists, %detailsPath%%FileSafeName%.ini,INFO,RunType
+	if (ScriptExists == "AHK"){
+		ExistsWARNING = WARNING: An .AHK file exists for this note.
+	} else if (ScriptExists == "BAT"){
+		ExistsWARNING = WARNING: A .BAT file exists for this note.
+	} else{
+		ExistsWARNING :=
+	}
+	
 	SetTimer, TypeMsgButtonNames, 50
-	MsgBox, 4403,Script Type, Save Script As...
+	MsgBox, 4387,Script Type, Save Clipboard content as...`n%ExistsWARNING%
 	IfMsgBox Yes
 		SaveTypeAs = AHK
 	IfMsgBox No 
@@ -3107,6 +3117,14 @@ RunStoredCommand:
 	if (FileExist(scriptPath FileSafeName "." RunTypeAs)){
 		Run % scriptPath FileSafeName "." RunTypeAs
 	}
+return
+
+MakeSticky:
+	if !LastRowSelected
+		LastRowSelected=1
+	LV_GetText(StickyNoteName,LastRowSelected,2)
+	LV_GetText(StickyNoteFile,LastRowSelected,8)
+	Build_Stickynote_GUI(StickyNoteName,StickyNoteFile)
 return
 
 BuildTreeUI:
