@@ -488,7 +488,7 @@ SkipToEndOfSearch:
 Return
 
 FoundSearchResult:
-	LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
+	LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12,Note.13,Note.14,Note.15,Note.16,Note.17,Note.18)
 Return
 
 
@@ -1878,6 +1878,9 @@ Options:
 	gui, 3:add, text, xp+55,Tags
 	gui, 3:add, text, xp+55,Cat
 	gui, 3:add, text, xp+55,Parent
+	gui, 3:add, text, xp+55,Run
+	gui, 3:add, text, xp+55,Clip
+	gui, 3:add, text, xp+55,Link
 
 	gui, 3:add, text, xs section
 	
@@ -1897,6 +1900,12 @@ Options:
 	Gui, 3:Add,UpDown,  vCatPercentSelect gSet_CatPercent Range0-100, %oCatPercent%
 	Gui, 3:Add, Edit, w50 x+5
 	Gui, 3:Add,UpDown,  vParentPercentSelect gSet_ParentPercent Range0-100, %oParentPercent%
+	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add,UpDown,  vScriptPercentSelect gSet_ScriptPercent Range0-100, %oScriptPercent%
+	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add,UpDown,  vClipPercentSelect gSet_ClipPercent Range0-100, %oClipPercent%
+	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add,UpDown,  vBookmarkPercentSelect gSet_BookmarkPercent Range0-100, %oBookmarkPercent%
 	
 	Gui, 3:Add,text,xs section, - Main Window -
 	
@@ -2086,11 +2095,14 @@ SaveAndReload:
 	GuiControlGet, TagsPercentSelect
 	GuiControlGet, CatPercentSelect	
 	GuiControlGet, ParentPercentSelect
+	GuiControlGet, ScriptPercentSelect
+	GuiControlGet, ClipPercentSelect
+	GuiControlGet, BookmarkPercentSelect
 
 	
 		
 
-	is100 := StarPercentSelect+NamePercentSelect+BodyPercentSelect+AddedPercentSelect+ModdedPercentSelect+TagsPercentSelect+CatPercentSelect+ParentPercentSelect
+	is100 := StarPercentSelect+NamePercentSelect+BodyPercentSelect+AddedPercentSelect+ModdedPercentSelect+TagsPercentSelect+CatPercentSelect+ParentPercentSelect+ScriptPercentSelect+ClipPercentSelect+BookmarkPercentSelect
 	WinSet, AlwaysOnTop, Off, FlatNotes - Options
 	if (is100 >= 110){
 		msgbox Column total width above 110 please fix.
@@ -2104,6 +2116,10 @@ SaveAndReload:
 	IniWrite, %TagsPercentSelect%,%iniPath%,General, TagsPercent
 	IniWrite, %CatPercentSelect%,%iniPath%,General, CatPercent
 	IniWrite, %ParentPercentSelect%,%iniPath%,General, ParentPercent
+	IniWrite, %ScriptPercentSelect%,%iniPath%,General, ScriptPercent
+	IniWrite, %ClipPercentSelect%,%iniPath%,General, ClipPercent
+	IniWrite, %BookmarkPercentSelect%,%iniPath%,General, BookmarkPercent
+
 
 	GuiControlGet,Select_UserTimeFormat
 	IniWrite, %Select_UserTimeFormat%,%iniPath%,General, UserTimeFormat
@@ -2609,6 +2625,30 @@ Set_ParentPercent:
 	gosub DummyGUI1
 return
 
+Set_ScriptPercent:
+	GuiControlGet, ScriptPercentSelect	
+	IniWrite, %ScriptPercentSelect%,%iniPath%,General, ScriptPercent	
+	IniRead, oScriptPercent,%iniPath%, General,ScriptPercent
+	ScriptPercent = 0.%oScriptPercent%
+	gosub DummyGUI1
+return
+
+Set_ClipPercent:
+	GuiControlGet, ClipPercentSelect	
+	IniWrite, %ClipPercentSelect%,%iniPath%,General, ClipPercent	
+	IniRead, oClipPercent,%iniPath%, General,ClipPercent
+	ClipPercent = 0.%oClipPercent%
+	gosub DummyGUI1
+return
+
+Set_BookmarkPercent:
+	GuiControlGet, BookMarkPercentSelect	
+	IniWrite, %BookmarkPercentSelect%,%iniPath%,General, BookmarkPercent	
+	IniRead, oBookmarkPercent,%iniPath%, General,BookmarkPercent
+	BookmarkPercent = 0.%oBookmarkPercent%
+	gosub DummyGUI1
+return
+
 Label:
 	If %A_GuiControl% in +,^,!,+^,+!,^!,+^!    ;If the hotkey contains only modifiers, return to wait for a key.
 		return
@@ -3029,6 +3069,7 @@ GuiContextMenu:
 					return
 				FileRecycle,%bookmarkPath%%FileSafeName%.lnk
 				GuiControl,text,StoreBookmark, %LinkSymbol%
+				LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,,A_Space)
 				return
 		}
 	if (FileExist(bookmarkPath FileSafeName ".lnk")){
@@ -3040,6 +3081,7 @@ GuiContextMenu:
 	FileCreateShortcut, %clipboard%, %bookmarkPath%%FileSafeName%.lnk
 	Iniwrite, 1, %detailsPath%%FileSafeName%.ini,INFO,Bookmark
 	GuiControl,text,StoreBookmark, %BookmarkSymbol%
+	LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,,BookmarkSymbol)
 
 }
 if (A_GuiControl=="StoreClipboard") {
@@ -3050,6 +3092,7 @@ if (A_GuiControl=="StoreClipboard") {
 			FileRecycle,%clipPath%%FileSafeName%.clipboard
 			Iniwrite, A_space, %detailsPath%%FileSafeName%.ini,INFO,Clip
 			GuiControl,text,StoreClipboard, %DiskSymbol%
+			LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,A_space)
 			return
 	}
 	if (FileExist(clipPath FileSafeName ".clipboard")){
@@ -3061,6 +3104,7 @@ if (A_GuiControl=="StoreClipboard") {
 	Fileappend,%ClipboardAll%,%clipPath%%FileSafeName%.clipboard
 	Iniwrite, 1, %detailsPath%%FileSafeName%.ini,INFO,Clip
 	GuiControl,text,StoreClipboard, %SaveSymbol%
+	LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,SaveSymbol)
 }
 if (A_GuiControl=="StoreRun"){
 	Iniread, ScriptExists, %detailsPath%%FileSafeName%.ini,INFO,RunType
@@ -3071,6 +3115,7 @@ if (A_GuiControl=="StoreRun"){
 			FileRecycle,%ScriptPath%%FileSafeName%.%RunType%
 			Iniwrite, A_Space, %detailsPath%%FileSafeName%.ini,INFO,RunType
 			GuiControl,text,StoreRun, %RunIcon%
+			LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,A_Space)
 			return
 	}
 	if (ScriptExists == "AHK"){
@@ -3097,10 +3142,12 @@ if (A_GuiControl=="StoreRun"){
 		GuiControl,text,StoreRun, %TypeAIcon%
 		Iniwrite, AHK, %detailsPath%%FileSafeName%.ini,INFO,RunType
 		Fileappend,%Clipboard%,%ScriptPath%%FileSafeName%.%SaveTypeAs%
+		LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,TypeAIcon)
 	}else{
 		GuiControl,text,StoreRun, %TypeBIcon%
 		Iniwrite, BAT, %detailsPath%%FileSafeName%.ini,INFO,RunType
 		Fileappend,%Clipboard%,%ScriptPath%%FileSafeName%.%SaveTypeAs%
+		LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,TypeBIcon)
 	}
 }
 

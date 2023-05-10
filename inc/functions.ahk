@@ -79,12 +79,15 @@ BuildGUI1(){
 	Gui, 1:Add, text, yp0 xp+%ModColW% w%TagColW% center c%U_SFC% vSortTags, Tags
 	Gui, 1:Add, text, yp0 xp+%TagColW% w%CatColW% center c%U_SFC% vSortCat, Cat
 	Gui, 1:Add, text, yp0 xp+%CatColW% w%ParentColW% center c%U_SFC% vSortParent, Parent
+	Gui, 1:Add, text, yp0 xp+%ParentColW% w%ScriptColW% center c%U_SFC% vSortScript, %RunIcon%
+	Gui, 1:Add, text, yp0 xp+%ScriptColW% w%ClipColW% center c%U_SFC% vSortClip, %SaveSymbol%
+	Gui, 1:Add, text, yp0 xp+%ClipColW% w%BookmarkColW% center c%U_SFC% vSortBookmark,%BookmarkSymbol%
 	
-	Gui, 1:Add, ListView,section -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit  Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar|Tags|Cat|Parent|
+	Gui, 1:Add, ListView,section -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar|Tags|Cat|Parent|checked|Marked|Extra|Script|Clip|Bookmark
 
 
 	;Gui, 1:Add,edit, readonly h6 -E0x200
-	title_h := PreviewFontSize*1.6
+	title_h := PreviewFontSize*1.8
 	TitleWAdjust := round(LibW*0.75)
 	
 	if (ShowPreviewEditBoxHelper) {
@@ -112,7 +115,7 @@ BuildGUI1(){
 	ClipIconX := LibW - 50
 	BookmarkIconX := LibW - 25
 	
-		Gui, 1:Add,text, center yp-2 x%StickyIconX% vMakeSticky c%U_SFC% -E0x200 w25 h%title_h% gMakeSticky, %StickyIcon%
+		Gui, 1:Add,text, center yp0 x%StickyIconX% vMakeSticky c%U_SFC% -E0x200 w25 h%title_h% gMakeSticky, %StickyIcon%
 
 	
 	Gui, 1:Add,text, center yp0 x%RunIconX% vStoreRun c%U_SFC% -E0x200 w25 h%title_h% gRunStoredCommand, %RunIcon%
@@ -349,7 +352,27 @@ MakeFileList(ReFreshMyNoteArray){
 		IniRead, CheckedField, %NoteIni%, INFO, Checked,
 		IniRead, MarkedField, %NoteIni%, INFO, Marked,
 		IniRead, ExtraField, %NoteIni%, INFO, Extra,
-				
+		IniRead, ScriptField, %NoteIni%, INFO, RunType
+		IniRead, ClipField, %NoteIni%, INFO, Clip
+		IniRead, BookmarkField, %NoteIni%, INFO, Bookmark
+		
+		if	(ClipField == 1){
+			ClipField := SaveSymbol
+		}else{
+			ClipField := A_space
+		}
+		if (BookmarkField == 1){
+			BookmarkField := BookmarkSymbol
+		}else{
+			BookmarkField := A_space
+		}
+		if (ScriptField == "AHK") {
+			ScriptField := TypeAIcon	
+		}else if (ScriptField == "BAT"){
+			ScriptField := TypeBIcon
+		} else{
+			ScriptField := A_space
+		}
 		
 		FormatTime, UserTimeFormatA, %AddedField%, %UserTimeFormat%
 		FormatTime, UserTimeFormatM, %ModdedField%,%UserTimeFormat%
@@ -368,11 +391,11 @@ MakeFileList(ReFreshMyNoteArray){
 			StarFieldArray:= A_sapce
 		
 		if (ReFreshMyNoteArray = 1){
-			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField,TagsField,CatField,ParentField,CheckedField,MarkedField,ExtraField)
+			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField,TagsField,CatField,ParentField,CheckedField,MarkedField,ExtraField,ScriptField,ClipFeild,BookmarkField)
 			}
 
 		UsedStars .= StarFieldArray "|"
-		MyNotesArray.Push({1:StarFieldArray,2:NameField,3:NoteField,4:UserTimeFormatA,5:UserTimeFormatM,6:AddedField,7:ModdedField,8:A_LoopField,9:StarField,10:TagsField,11:CatField,12:ParentField,13:CheckedField,14:MarkedField,15:ExtraField})
+		MyNotesArray.Push({1:StarFieldArray,2:NameField,3:NoteField,4:UserTimeFormatA,5:UserTimeFormatM,6:AddedField,7:ModdedField,8:A_LoopField,9:StarField,10:TagsField,11:CatField,12:ParentField,13:CheckedField,14:MarkedField,15:ExtraField,16:ScriptField,17:ClipField,18:BookmarkField})
 	} ; File loop end
 	UsedStars := RemoveDups(UsedStars,"|")
 	UsedStars := StrReplace(UsedStars,"||","|")
@@ -404,6 +427,12 @@ MakeFileList(ReFreshMyNoteArray){
 	LV_ModifyCol(14, "Logical")
 	LV_ModifyCol(15, ExtraColW)
 	LV_ModifyCol(15, "Logical")
+	LV_ModifyCol(16, ScriptColW)
+	LV_ModifyCol(16, "Center")
+	LV_ModifyCol(17, ClipColW)
+	LV_ModifyCol(17, "Center")
+	LV_ModifyCol(18, BookmarkColW)
+	LV_ModifyCol(18, "Center")
 	
 	if (DeafultSort = 1)
 			LV_ModifyCol(2, "Sort")
@@ -451,7 +480,7 @@ GuiControl, 1:-Redraw, LV
 LV_Delete()
 For Each, Note In MyNotesArray
 {
-	 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12,Note.13,Note.14,Note.15)
+	 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12,Note.13,Note.14,Note.15,Note.16,Note.17,Note.18)
 }
 gosub SortNow
 TotalNotes := MyNotesArray.MaxIndex() 
@@ -518,7 +547,7 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 			}
 		}
 	}	
-	MyNotesArray.Push({1:StarFieldArray, 2:QuickNoteName,3:QuickNoteBody,4:UserTimeFormatA,5:UserTimeFormatM,6:CreatedDate,7:A_Now,8:FileNameTxt,9:NoteStar,10:QuickNoteTags,11:QuickNoteCat,12:QuickNoteParent})
+	MyNotesArray.Push({1:StarFieldArray, 2:QuickNoteName,3:QuickNoteBody,4:UserTimeFormatA,5:UserTimeFormatM,6:CreatedDate,7:A_Now,8:FileNameTxt,9:NoteStar,10:QuickNoteTags,11:QuickNoteCat,12:QuickNoteParent,13:Script,14:Clip,15:Bookmark})
 	
 
 	iniWrite,%CreatedDate%,%detailsPath%%FileSafeName%.ini,INFO,Add
