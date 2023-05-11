@@ -898,6 +898,18 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			gosub build_ColEdit
 			return
 		}
+		if (LV@sel_col == 16) {
+			RC16 = 1
+			goto GuiContextMenu
+		}
+		if (LV@sel_col == 17) {
+			RC17 = 1
+			goto GuiContextMenu
+		}
+		if (LV@sel_col == 18) {
+			RC18 = 1
+			goto GuiContextMenu
+		}
 	}
 return
 
@@ -3087,7 +3099,8 @@ return
 GuiContextMenu:
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
-	if (A_GuiControl=="StoreBookmark") {
+	if (A_GuiControl=="StoreBookmark" OR RC18 == 1 ) {
+		RC18 = 0
 		if GetKeyState("Shift"){
 			MsgBox, 4404,Delete?,Delete Bookmark?
 				IfMsgBox No
@@ -3109,7 +3122,8 @@ GuiContextMenu:
 	LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,,BookmarkSymbol)
 
 }
-if (A_GuiControl=="StoreClipboard") {
+if (A_GuiControl=="StoreClipboard" OR RC17 == 1 ) {
+	RC17 = 0
 	if GetKeyState("Shift"){
 		MsgBox, 4404,Delete?,Delete stored Clipboard?
 			IfMsgBox No
@@ -3131,7 +3145,8 @@ if (A_GuiControl=="StoreClipboard") {
 	GuiControl,text,StoreClipboard, %SaveSymbol%
 	LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,SaveSymbol)
 }
-if (A_GuiControl=="StoreRun"){
+if (A_GuiControl=="StoreRun" OR RC16 == 1){
+	RC16 = 0
 	Iniread, ScriptExists, %detailsPath%%FileSafeName%.ini,INFO,RunType
 	if GetKeyState("Shift"){
 		MsgBox, 4404,Delete?,Delete stored Script?

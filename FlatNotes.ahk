@@ -279,6 +279,9 @@ global TitleBarFontSize = 10
 if (A_ScreenDPI > 120)
 	TitleBarFontSize = 8
 ;tmp maybe
+global RC16
+global RC17
+global RC18
 global TypeBUpdate,1
 global ScriptFilterActive
 global ClipFilterActive
