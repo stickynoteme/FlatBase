@@ -1433,6 +1433,7 @@ StarSaveChange:
 	Gui, star:Default
 	GUI, star:Submit
 	sNeedsSubmit = 0
+	NewStar := a_space
 	NewStar = %sEdit%
 	;msgbox 	% RapidStar "|" TmpName "," TmpFileSafeName "," C_Body "," NewStar "," StarOldFile
 	if (NewStar = "")
@@ -1464,7 +1465,6 @@ StarSaveChange:
 		ListStarToChange = 0
 		return
 	}
-		
 	FileRead, C_Body,%U_NotePath%%StarOldFile%
 	Iniread, TmpName,%detailsPath%%TmpFileINI%, INFO,Name
 	TmpName := strreplace(TmpName,"$#$")
