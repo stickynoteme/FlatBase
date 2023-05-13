@@ -173,6 +173,7 @@ return
 
 NewFromSearch:
 	GuiControlGet,NewNoteFromSearch,,SearchTerm
+	GuiControlget,CatFilter
 	if (NewNoteFromSearch){
 		TmpFileSafeName := NameEncode(NewNoteFromSearch)
 		if FileExist(U_NotePath TmpFileSafeName ".txt") {
@@ -186,7 +187,7 @@ NewFromSearch:
 		}
 			return
 		}
-		SaveFile(NewNoteFromSearch,TmpFileSafeName,"","","","","")
+		SaveFile(NewNoteFromSearch,TmpFileSafeName,"","","",CatFilter,"")
 		
 		
 		NoteIniName := TmpFileSafeName ".ini"
