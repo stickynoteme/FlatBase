@@ -547,7 +547,34 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 			}
 		}
 	}	
-	MyNotesArray.Push({1:StarFieldArray, 2:QuickNoteName,3:QuickNoteBody,4:UserTimeFormatA,5:UserTimeFormatM,6:CreatedDate,7:A_Now,8:FileNameTxt,9:NoteStar,10:QuickNoteTags,11:QuickNoteCat,12:QuickNoteParent,13:Script,14:Clip,15:Bookmark})
+	
+	Iniread, Script, %detailsPath%%FileSafeName%.ini,INFO,RunType,%a_space%
+	Iniread, Clip, %detailsPath%%FileSafeName%.ini,INFO,Clip,%a_space%
+	Iniread, Bookmark, %detailsPath%%FileSafeName%.ini,INFO,Bookmark,%a_space%
+	Iniread, Checked, %detailsPath%%FileSafeName%.ini,INFO,Bookmark,%a_space%
+	Iniread, Marked, %detailsPath%%FileSafeName%.ini,INFO,Bookmark,%a_space%
+	Iniread, Extra, %detailsPath%%FileSafeName%.ini,INFO,Bookmark,%a_space%
+	
+		if	(Clip == 1){
+		Clip := SaveSymbol
+		}else{
+			Clip := A_space
+		}
+		if (Bookmark == 1){
+			Bookmark := BookmarkSymbol
+		}else{
+			Bookmark := A_space
+		}
+		if (Script == "AHK") {
+			Script := TypeAIcon	
+		}else if (ScriptField == "BAT"){
+			Script := TypeBIcon
+		} else{
+			Script := A_space
+		}
+	
+	
+	MyNotesArray.Push({1:StarFieldArray, 2:QuickNoteName,3:QuickNoteBody,4:UserTimeFormatA,5:UserTimeFormatM,6:CreatedDate,7:A_Now,8:FileNameTxt,9:NoteStar,10:QuickNoteTags,11:QuickNoteCat,12:QuickNoteParent,13:Checked,14:Marked,15:Extra,16:Script,17:Clip,18:Bookmark})
 	
 
 	iniWrite,%CreatedDate%,%detailsPath%%FileSafeName%.ini,INFO,Add

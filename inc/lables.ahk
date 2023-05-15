@@ -938,7 +938,8 @@ UpdateLVSelected:
 	
 	;check to see if clipboard exist and change icon accordingly.
 	FileSafeName := NameEncode(C_Name)
-	Iniread, HasBookmark,%detailsPath%%FileSafeName%.ini, INFO,Bookmark
+	HasBookmark := a_space
+	Iniread,	 HasBookmark,%detailsPath%%FileSafeName%.ini, INFO,Bookmark
 	if (HasBookmark == 1){
 		GuiControl,text,StoreBookmark, %BookmarkSymbol%
 	} else {
@@ -3121,7 +3122,8 @@ GuiContextMenu:
 	Iniwrite, 1, %detailsPath%%FileSafeName%.ini,INFO,Bookmark
 	GuiControl,text,StoreBookmark, %BookmarkSymbol%
 	LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,,BookmarkSymbol)
-
+	GetCurrentNoteData(FileSafeName)
+	SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
 }
 if (A_GuiControl=="StoreClipboard" OR RC17 == 1 ) {
 	RC17 = 0
@@ -3145,6 +3147,8 @@ if (A_GuiControl=="StoreClipboard" OR RC17 == 1 ) {
 	Iniwrite, 1, %detailsPath%%FileSafeName%.ini,INFO,Clip
 	GuiControl,text,StoreClipboard, %SaveSymbol%
 	LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,SaveSymbol)
+	GetCurrentNoteData(FileSafeName)
+	SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
 }
 if (A_GuiControl=="StoreRun" OR RC16 == 1){
 	RC16 = 0
@@ -3189,6 +3193,8 @@ if (A_GuiControl=="StoreRun" OR RC16 == 1){
 		Iniwrite, BAT, %detailsPath%%FileSafeName%.ini,INFO,RunType
 		Fileappend,%Clipboard%,%ScriptPath%%FileSafeName%.%SaveTypeAs%
 		LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,TypeBIcon)
+		GetCurrentNoteData(FileSafeName)
+		SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
 	}
 }
 
