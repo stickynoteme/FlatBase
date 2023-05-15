@@ -193,10 +193,12 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 				LV_GetText(FileName, v,8)
 				iniFileName := RegExReplace(FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 				ClipFileName := RegExReplace(FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".clipboard")
+				BookmarkFileName := RegExReplace(FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".lnk")
 				
 				FileRecycle %U_NotePath%%FileName%
 				FileRecycle %detailsPath%%iniFileName%
 				FileRecycle %clipPath%%ClipFileName%
+				FileRecycle %bookmarkPath%%BookmarkFileName%
 				
 							; remove from MyNoteArray
 				for Each, Note in MyNotesArray{
