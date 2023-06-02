@@ -128,7 +128,7 @@ return
 ;Hotkey to Cancel Rapid note taking.
 Label5:
 	istitle = yes
-	tooltip cancled
+	tooltip canceled
 	settimer,KillToolTip,-1000
 return
 
@@ -209,13 +209,14 @@ NewFromSearch:
 		
 		LV_Insert(1,Focus Select,StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField,TagsField,CatField,ParentField,CheckedField,MarkedField,ExtraField)
 
+		gosub, PreviewState
+
 		GuiControl,,PreviewBox,
 		GuiControl,,TagBox,
 		GuiControl,,NoteParent,
 		GuiControl,,TitleBar,%NewNoteFromSearch%
 		GuiControl,,StatusbarM,M: %UserTimeFormatM%
 		GuiControl,,StatusbarA,A: %UserTimeFormatA%
-		
 		
 		
 		GuiControl, Focus,PreviewBox
@@ -331,12 +332,32 @@ QuickSafeNameUpdate:
 	GuiControl,, FileSafeName,%NewFileSafeName%
 return
 
+PreviewState:
+	NoteCountCheck := LV_GetCount()
+	if (NoteCountCheck == 0){
+	GuiControl,+disabled ,PreviewBox
+	GuiControl,+disabled ,MakeSticky
+	GuiControl,+disabled ,StoreBookmark
+	GuiControl,+disabled ,StoreClipboard
+	GuiControl,+disabled ,StoreRun
+	GuiControl,+disabled ,AddTemplateText
+	}else{
+	GuiControl,-disabled ,PreviewBox
+	GuiControl,-disabled ,MakeSticky
+	GuiControl,-disabled ,StoreBookmark
+	GuiControl,-disabled ,StoreClipboard
+	GuiControl,-disabled ,StoreRun
+	GuiControl,-disabled ,AddTemplateText
+	}
+return
+
 Search:
 ;event helper tools
 ;z := ":" A_GuiEvent ":" errorlevel ":"A_EventInfo "::" LV@sel_col "`n"
 ;tooltip % z
 ;settimer,KillToolTip,-1000
 
+gosub, PreviewState
 
 	SelectedRows :=
 	if (unsaveddataEdit3 = 1)
@@ -499,6 +520,7 @@ SkipToEndOfSearch:
 		TypeBUpdate = 0
 		gosub FilterScriptSearch
 	}
+	gosub, PreviewState
 Return
 
 FoundSearchResult:
@@ -586,16 +608,15 @@ UpdateStatusBar:
 		GuiControl,,TitleBar, %LastResultName%
 		IniName := RegExReplace(LastFileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 
-		;check to see if clipboard exist and change icon accordingly.
-		LastClipboard := RegExReplace(LastFileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".clipboard")
+		;update top status bar
 		Iniread, HasBookmark,%detailsPath%%IniName%, INFO,Bookmark
-		if (HasBookmark){
+		if (HasBookmark == 1){
 			GuiControl,text,StoreBookmark, %BookmarkSymbol%
 		} else {
 			GuiControl,text,StoreBookmark, %LinkSymbol%
 		}
 		Iniread, HasClip,%detailsPath%%IniName%, INFO,Clip
-		if (HasCLip == 1){
+		if (HasClip == 1){
 			GuiControl,text,StoreClipboard, %SaveSymbol%
 		}else {
 			GuiControl,text,StoreClipboard, %DiskSymbol%
@@ -2835,19 +2856,13 @@ Edit3SaveTimer:
 	if (LVSelectedROW=="")
 		LVSelectedROW = 1
 	GuiControlGet, PreviewBox
+	if (!PreviewBox){
+		;needed to ensure LV text is updated if the note is blanked.
+		PreviewBox := a_space
+	}
 	GuiControlGet, TagBox
 	GuiControlGet, NoteParent
 	LV_GetText(LVexists,1,2)
-	if (LVexists =="") {
-		; Trying to save new note through blank search.. not working.
-		
-		;GuiControlGet, SearchTerm
-		;FileSafeName := NameEncode(SearchTerm)
-		;C_Cat = Make Cat Box
-		;msgbox % "new note:" FileSafeName 
-		;SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,C_Cat,NoteParent)
-		return
-	}
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
 	iniRead,C_Cat,%detailsPath%%FileSafeName%.ini,INFO,Cat

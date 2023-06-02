@@ -304,6 +304,7 @@ global MakeSticky
 global BookmarkSymbol
 global StoreBookmark
 global StoreRun
+global AddTemplateText
 global ChangeRunType
 global RestoreClipboard
 global StoreClipboard

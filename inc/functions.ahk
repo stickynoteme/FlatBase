@@ -93,7 +93,7 @@ BuildGUI1(){
 	if (ShowPreviewEditBoxHelper) {
 	
 	;gLibTemplateAdd
-	Gui, 1:Add,text, center xs c%U_SFC% -E0x200 w25 h%title_h% gLibTemplateAdd, %TemplateSymbol%
+	Gui, 1:Add,text, center xs c%U_SFC% -E0x200 w25 h%title_h% gLibTemplateAdd vAddTemplateText, %TemplateSymbol%
 		
 	
 	Gui, 1:Add,edit, readonly center x+15 -E0x200 vTitleBar C%U_SFC% w%TitleWAdjust% h%title_h% backgroundTrans -Tabstop,
@@ -122,7 +122,7 @@ BuildGUI1(){
 	
 	Gui, 1:Add,text, center yp0 x%ClipIconX% vStoreClipboard c%U_SFC% -E0x200 w25 h%title_h% gRestoreClipboard, %SaveSymbol%
 	
-	Gui, 1:Add,text, center yp0 x%BookmarkIconX% vStoreBookmark c%U_SFC% -E0x200 w25 h%title_h% gGotoBookmark, %WebSymbol%
+	Gui, 1:Add,text, center yp0 x%BookmarkIconX% vStoreBookmark c%U_SFC% -E0x200 w25 h%title_h% gGotoBookmark, %LinkSymbol%
 	
 	
 	
