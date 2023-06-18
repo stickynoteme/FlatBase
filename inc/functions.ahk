@@ -318,7 +318,7 @@ BuildGUI2(){
 }
 
 
-MakeFileList(ReFreshMyNoteArray){
+MakeFileList(ReFreshMyNoteArray,R){
 	TVReDraw = 1
 	FileList := ""
 	MyNotesArray := {}
