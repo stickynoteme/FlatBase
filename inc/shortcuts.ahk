@@ -83,7 +83,7 @@ Return
 	return
 }
 
-^c::
+^k::
 {
 	LV@sel_col = 11
 	ColEditName :=  ColList[LV@sel_col]
@@ -119,19 +119,52 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			Down::Down
 	return
 }
-^Enter::
+Enter::
 {
 ControlGetFocus, OutputVar, FlatNotes - Library
 		if(OutputVar == "SysListView321"){
-			global LVSelectedROW
-			LV_GetText(RowText, LVSelectedROW,2)
-			clipboard := RowText
-			ToolTip Text: "%RowText%" Copied to clipboard
+		LV_GetText(FileTmp, LVSelectedROW, 8)
+		fileread,clipboard,%U_NotePath%%FileTmp%
+		Tooltip % "Body Copied"
+		SetTimer, KillToolTip, -1000
+		gosub GuiEscape
+		return
+		}else
+			Enter::Enter
+}
+
+^Enter::
+{
+ControlGetFocus, OutputVar, FlatNotes - Library
+	if(OutputVar == "SysListView321"){
+		LV_GetText(FileTmp, LVSelectedROW, 8)
+		FileTmp := RegExReplace(FileTmp, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".clipboard")
+		
+		if (FileExist(clipPath FileTmp)){
+			FileRead, clipboard, *c %clipPath%%FileTmp%
+			Tooltip % "Packaged Clipboard Copied"
+			SetTimer, KillToolTip, -1000
+			gosub GuiEscape
+		}
+		return
+	}else
+		^Enter::^Enter
+}
+
++Enter::
+{
+ControlGetFocus, OutputVar, FlatNotes - Library
+	If (OutputVar == "Edit1"){
+		gosub NewAndSaveHK
+	}else if(OutputVar == "SysListView321"){
+			LV_GetText(NameTmp, LVSelectedROW,2)
+			clipboard := NameTmp
+			Tooltip % "Name Copied"
 			SetTimer, KillToolTip, -500
 			gosub GuiEscape
 			return
-			}else
-			^Enter::^Enter
+		}else
+		+Enter::+Enter
 }
 
 del::
@@ -159,9 +192,13 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 				;msgbox % v
 				LV_GetText(FileName, v,8)
 				iniFileName := RegExReplace(FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
+				ClipFileName := RegExReplace(FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".clipboard")
+				BookmarkFileName := RegExReplace(FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".lnk")
 				
 				FileRecycle %U_NotePath%%FileName%
 				FileRecycle %detailsPath%%iniFileName%
+				FileRecycle %clipPath%%ClipFileName%
+				FileRecycle %bookmarkPath%%BookmarkFileName%
 				
 							; remove from MyNoteArray
 				for Each, Note in MyNotesArray{
@@ -196,18 +233,6 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			GuiControl,, StatusbarA,A: %NextUpAddedDate%
 		 }else
 			del::del
-}
-MButton::
-{
-	ControlGetFocus, OutputVar, FlatNotes - Library
-	{
-		MouseGetPos, mxPos, myPos
-		MouseClick, left, %mxPos%, %myPos%
-		LV_GetText(StickyNoteName,LastRowSelected,2)
-		LV_GetText(StickyNoteFile,LastRowSelected,8)
-		Build_Stickynote_GUI(StickyNoteName,StickyNoteFile)
-	}
-	return
 }
 }
 #IfWinActive

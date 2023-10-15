@@ -134,6 +134,9 @@ global SortModded
 global SortTags
 global SortCat
 global SortParent
+global SortScript
+global SortClip
+global SortBookmark
 global NextSortAdded
 global NextSortBody
 global NextSortName
@@ -158,6 +161,9 @@ global CatPercent
 global CheckedPercent
 global MarkedPercent
 global ExtraPercent
+global ScriptPercent
+global ClipPercent
+global BookmarkPercent
 global oStarPercent
 global oNamePercent
 global oBodyPercent
@@ -169,6 +175,9 @@ global oParentPercent
 global oCheckedPercent
 global oMarkedPercent
 global oExtraPercent
+global oScriptPercent
+global oClipPercent
+global oBookmarkPercent
 global ShowStatusBar
 global StatusBarM
 global StatusBarA
@@ -176,7 +185,7 @@ global Fake
 global SaveMod
 global TitelBar
 global StatusBarCount
-global LastRowSelected
+global LastRowSelected, 1
 global StatusBar
 global C_SortCol
 global C_SortDir
@@ -215,6 +224,9 @@ global ShowCatFilterBoxHelper
 global ShowTagFilterBoxHelper
 global ShowTagEditBoxHelper
 global ShowParentEditBoxHelper
+global ShowQuickTagEditBoxHelper
+global ShowQuickParentEditBoxHelper
+global ShowQuickCatEditBoxHelper
 global ShowPreviewEditBoxHelper
 global ShowExtraInputInTemplatesHelper
 global templatePath
@@ -246,6 +258,9 @@ global SearchFontFamily
 global SearchFontSize
 global FontRendering
 global detailsPath
+global scriptPath
+global bookmarkPath
+global clipPath
 global HideScrollbars
 global backupsToKeep
 global g1Open
@@ -264,13 +279,40 @@ global TitleBarFontSize = 10
 if (A_ScreenDPI > 120)
 	TitleBarFontSize = 8
 ;tmp maybe
+global RC16
+global RC17
+global RC18
+global TypeBUpdate,1
+global ScriptFilterActive
+global ClipFilterActive
+global BookmarkFilterActive
 global SelectedRows
 global TemplateSymbol
+global RunSymbol
+global WebSymbol
+global WorldSymbol
+global LinkSymbol
 global TreeSymbol
+global DiskSymbol
+global SaveSymbol
+global LoadSymbol
+global TypeAIcon
+global TypeBIcon
+global RunIcon
+global StickyIcon
+global MakeSticky
+global BookmarkSymbol
+global StoreBookmark
+global StoreRun
+global AddTemplateText
+global ChangeRunType
+global RestoreClipboard
+global StoreClipboard
 global ColBase = ,6,7,8,9
 global ColOrder = 1,2,3,4,5
 global SearchWholeNote
 global TreeFristRun = 1
+global SearchClip = 0
 global TVReDraw
 global LoopCheck
 global UseCheckBoxesTrue
@@ -293,8 +335,13 @@ global C_Cat
 global C_Parent
 global NoteNameToEdit
 
+LVSelectedROW = 1
+
 FileCreateDir, NoteDetails
 detailsPath := A_WorkingDir "\NoteDetails\"
+clipPath := A_WorkingDir "\MyClipboards\"
+bookmarkPath := A_WorkingDir "\MyBookmarks\"
+scriptpath := A_WorkingDir "\MyScripts\"
 iniPath = %A_WorkingDir%\settings.ini
 systemINI = %A_WorkingDir%\sys\system.ini
 themePath = %A_WorkingDir%\sys\Themes
@@ -341,6 +388,9 @@ if (isFristRun = "1") {
 	IniWrite, 0,%iniPath%, General,CheckedPercent
 	IniWrite, 0,%iniPath%, General,MarkedPercent
 	IniWrite, 0,%iniPath%, General,ExtraPercent
+	IniWrite, 0,%iniPath%, General,ScriptPercent
+	IniWrite, 0,%iniPath%, General,ClipPercent
+	IniWrite, 0,%iniPath%, General,BookmarkPercent
 
 	IniWrite, yy/MM/dd,%iniPath%, General,UserTimeFormat
 	IniWrite, 0, %iniPath%, General, isFristRun
@@ -365,6 +415,17 @@ if (isFristRun = "1") {
 	iniread, TemplateBelowSymbol,%systemINI%,SYS,TemplateBelowSymbol,-
 	iniread, TemplateSymbol,%systemINI%,SYS,TemplateSymbol,+
 	iniread, TreeSymbol,%systemINI%,SYS,TreeSymbol,🌳
+	iniread, SaveSymbol,%systemINI%,SYS,SaveSymbol,📦
+	iniread, LoadSymbol,%systemINI%,SYS,LoadSymbol,📋
+	iniread, DiskSymbol,%systemINI%,SYS,DiskSymbol,💾
+	iniread, WorldSymbol,%systemINI%,SYS,WorldSymbol🌐
+	iniread, LinkSymbol,%systemINI%,SYS,LinkSymbol,🔗
+	iniread, WebSymbol,%systemINI%,SYS,WebSymbol,🕸️
+	iniread, BookmarkSymbol,%systemINI%,SYS,BookmarkSymbol,🔖
+	iniread, RunIcon, %systemINI%,SYS,RunIcon,👟
+	iniread, TypeAIcon, %systemINI%,SYS,TypeAIcon,🅰️
+	iniread, TypeBIcon, %systemINI%,SYS,TypeBIcon,🅱️
+	iniread, StickyIcon, %systemINI%,SYS,StickyIcon,📌
 ;-------------------------------------------------
 ; Read from theme .ini 
 ;-------------------------------------------------
@@ -412,6 +473,11 @@ IniRead, ShowTagFilterBoxHelper,%iniPath%,General,ShowTagFilterBoxHelper,1
 IniRead, ShowTagEditBoxHelper,%iniPath%,General,ShowTagEditBoxHelper,1
 IniRead, ShowParentEditBoxHelper,%iniPath%,General,ShowParentEditBoxHelper,1
 IniRead, ShowPreviewEditBoxHelper,%iniPath%,General,ShowPreviewEditBoxHelper,1
+
+IniRead, ShowQuickCatEditBoxHelper,%iniPath%,General,ShowQuickCatEditBoxHelper,1
+IniRead, ShowQuickParentEditBoxHelper,%iniPath%,General,ShowQuickParentEditBoxHelper,1
+IniRead, ShowQuickTagEditBoxHelper,%iniPath%,General,ShowQuickTagEditBoxHelper,1
+
 IniRead, ExtraInputInTemplatesHelper,%iniPath%,General,ExtraInputInTemplatesHelper,1
 
 IniRead, RapidStar,%iniPath%,General,RapidStar,1
@@ -465,9 +531,12 @@ IniRead, oModdedPercent,%iniPath%, General,ModdedPercent,0
 IniRead, oTagsPercent,%iniPath%, General,TagsPercent,0
 IniRead, oCatPercent,%iniPath%, General,CatPercent,0
 IniRead, oParentPercent,%iniPath%, General,ParentPercent,0
-IniRead, oCheckedPercent,%iniPath%, General,ParentPercent,0
-IniRead, oMarkedPercent,%iniPath%, General,ParentPercent,0
-IniRead, oExtraPercent,%iniPath%, General,ParentPercent,0
+IniRead, oCheckedPercent,%iniPath%, General,CheckedPercent,0
+IniRead, oMarkedPercent,%iniPath%, General,MarkedPercent,0
+IniRead, oExtraPercent,%iniPath%, General,ExtraPercent,0
+IniRead, oScriptPercent,%iniPath%, General,ScriptPercent,0
+IniRead, oClipPercent,%iniPath%, General,ClipPercent,0
+IniRead, oBookmarkPercent,%iniPath%, General,BookmarkPercent,0
 
 if oStarPercent between 0 and 9
 	oStarPercent = 0%oStarPercent%
@@ -484,12 +553,18 @@ if oCatPercent between 0 and 9
 if oParentPercent between 0 and 9
 	oParentPercent = 0%oParentPercent%
 if oCheckedPercent between 0 and 9
-	oCheckedPercent = 0%oParentPercent%
+	oCheckedPercent = 0%oCheckedPercent%
 if oMarkedPercent between 0 and 9
-	oMarkedPercent = 0%oParentPercent%
+	oMarkedPercent = 0%oMarkedPercent%
 if oExtraPercent between 0 and 9
-	oExtraPercent = 0%oParentPercent%
-
+	oExtraPercent = 0%oExtraPercent%
+if oScriptPercent between 0 and 9
+	oScriptPercent = 0%oScriptPercent%
+if oClipPercent between 0 and 9
+	oClipPercent = 0%oClipPercent%
+if oBookMarkPercent between 0 and 9
+	oBookMarkPercent = 0%oBookmarkPercent%
+	
 StarPercent = 0.%oStarPercent%
 NamePercent = 0.%oNamePercent%
 BodyPercent = 0.%oBodyPercent%
@@ -501,6 +576,9 @@ ParentPercent = 0.%oParentPercent%
 CheckedPercent = 0.%oCheckedPercent%
 MarkedPercent = 0.%oMarkedrcent%
 ExtraPercent = 0.%oExtraPercent%
+ScriptPercent = 0.%oScriptPercent%
+ClipPercent = 0.%oClipPercent%
+BookmarkPercent = 0.%oBookmarkPercent%
 
 
 
@@ -576,6 +654,9 @@ global ParentColW := Round(libWColAdjust*ParentPercent)
 global CheckedColW := Round(libWColAdjust*CheckedPercent)
 global MarkedColW := Round(libWColAdjust*MarkedPercent)
 global ExtraColW := Round(libWColAdjust*ExtraPercent)
+global ScriptColW := Round(libWColAdjust*ScriptPercent)
+global ClipColW := Round(libWColAdjust*ClipPercent)
+global BookmarkColW := Round(libWColAdjust*BookmarkPercent)
 
 ;-------------------------------------------------
 ;Acitvate User Hotkeys if any & make INI for new files
@@ -646,6 +727,7 @@ if (g1Open=1) {
 	return
 }
 if (g1Open=0) {
+	if(SearchClip == 1){
 	RestoreClip := clipboardall
 	clipboard =
 	send {Ctrl Down}{c}{Ctrl up}
@@ -658,6 +740,11 @@ if (g1Open=0) {
 		AutoSearchTerm := LastSearch
 		clipboard := RestoreClip
 	}
+	}else{
+	GuiControlGet, LastSearch,,%HSterm%
+	AutoSearchTerm := LastSearch
+	}
+	SearchClip = 0
 	MouseGetPos, xPos, yPos	
 	xPos /= 1.5
 	yPos /= 1.5

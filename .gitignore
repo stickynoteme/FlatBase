@@ -1,13 +1,11 @@
 
-inc/lables.ahk~
+*~
 .tools
 NoteDetails/*
 MyNotes/*
 NoteTemplates/*
 Backups/*
 settings.ini
-FlatBase.ahk~
-inc/functions.ahk~
-*~
-inc/functions.ahk~
-
+*.clipboard
+MyScripts/*
+MyBookmarks/*

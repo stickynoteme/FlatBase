@@ -79,23 +79,56 @@ BuildGUI1(){
 	Gui, 1:Add, text, yp0 xp+%ModColW% w%TagColW% center c%U_SFC% vSortTags, Tags
 	Gui, 1:Add, text, yp0 xp+%TagColW% w%CatColW% center c%U_SFC% vSortCat, Cat
 	Gui, 1:Add, text, yp0 xp+%CatColW% w%ParentColW% center c%U_SFC% vSortParent, Parent
+	Gui, 1:Add, text, yp0 xp+%ParentColW% w%ScriptColW% center c%U_SFC% gFilterScript vSortScript, %RunIcon%
+	Gui, 1:Add, text, yp0 xp+%ScriptColW% w%ClipColW% center c%U_SFC% gFilterClip vSortClip, %DiskSymbol%
+	Gui, 1:Add, text, yp0 xp+%ClipColW% w%BookmarkColW% center c%U_SFC% gFilterBookmark vSortBookmark,%LinkSymbol%
 	
-	Gui, 1:Add, ListView,section -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit  Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar|Tags|Cat|Parent|
+	Gui, 1:Add, ListView,section -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar|Tags|Cat|Parent|checked|Marked|Extra|Script|Clip|Bookmark
 
-	;Allow User set prevent/edit font
-	Gui, 1:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
+
 	;Gui, 1:Add,edit, readonly h6 -E0x200
-	title_h := PreviewFontSize*1.6
-	TitleWAdjust := round(LibW*0.85)
+	title_h := PreviewFontSize*1.8
+	TitleWAdjust := round(LibW*0.75)
 	
 	if (ShowPreviewEditBoxHelper) {
 	
 	;gLibTemplateAdd
-	Gui, 1:Add,text, center xs c%U_SFC% -E0x200 w25 h%title_h% gLibTemplateAdd, %TemplateSymbol%
+	Gui, 1:Add,text, center xs c%U_SFC% -E0x200 w25 h%title_h% gLibTemplateAdd vAddTemplateText, %TemplateSymbol%
+		
 	
-	TreeIconX := LibW - 25
 	Gui, 1:Add,edit, readonly center x+15 -E0x200 vTitleBar C%U_SFC% w%TitleWAdjust% h%title_h% backgroundTrans -Tabstop,
-	Gui, 1:Add,text, center yp0 x%TreeIconX% c%U_SFC% -E0x200 w25 h%title_h% gBuildTreeUI, %TreeSymbol%
+	
+	
+	;Good font for symbols
+	
+	SymbolFontSize := PreviewFontSize - 1
+	Gui, 1:Font, s%SymbolFontSize% Q%FontRendering%, Segoe UI Emoji, %U_SFC%
+	
+	; Disable Tree  Because it's too error prone.
+	;TreeIconX := LibW - 25
+	;Gui, 1:Add,text, center yp0 x%TreeIconX% c%U_SFC% -E0x200 w25 h%title_h% gBuildTreeUI, %TreeSymbol%
+	
+	; Replaced Tree with clipboard copy
+	
+	StickyIconX := LibW - 100
+	RunIconX := LibW - 75
+	ClipIconX := LibW - 50
+	BookmarkIconX := LibW - 25
+	
+		Gui, 1:Add,text, center yp0 x%StickyIconX% vMakeSticky c%U_SFC% -E0x200 w25 h%title_h% gMakeSticky, %StickyIcon%
+
+	
+	Gui, 1:Add,text, center yp0 x%RunIconX% vStoreRun c%U_SFC% -E0x200 w25 h%title_h% gRunStoredCommand, %RunIcon%
+	
+	Gui, 1:Add,text, center yp0 x%ClipIconX% vStoreClipboard c%U_SFC% -E0x200 w25 h%title_h% gRestoreClipboard, %SaveSymbol%
+	
+	Gui, 1:Add,text, center yp0 x%BookmarkIconX% vStoreBookmark c%U_SFC% -E0x200 w25 h%title_h% gGotoBookmark, %LinkSymbol%
+	
+	
+	
+	
+	;Allow User set prevent/edit font
+	Gui, 1:Font, s%PreviewFontSize% Q%FontRendering%, %PreviewFontFamily%, %U_SFC%
 	
 	Gui, 1:Add,Edit, section x0 hwndHPB -E0x200  r%PreviewRows% w%LibW% C%U_MFC% gPreviewBox vPreviewBox,
 	}
@@ -152,7 +185,7 @@ BuildGUI1(){
 	OnMessage( WM_RBUTTONDOWN, "HandleMessage" )
 
 
-	gui, 1:Add, Button, Default w15 y-2500 x-2500 -Tabstop gNewAndSaveHK, HK
+	gui, 1:Add, Button, Default w15 y-2500 x-2500 -Tabstop gNewFromSearch, HK
 	Gui, 1:Add,Edit, w35 y-2000 x-2000 vSearchFilter HwndHSF -Tabstop,
 	;Gui, 1:Add,Edit, w35 y-2200 x-2200 vCatFilter HwndHCF -Tabstop,
 	
@@ -239,28 +272,26 @@ BuildGUI2(){
 	
 	Gui, 2:Add,Edit, xs section y+2 x%QuickNoteXOffset% -E0x200 C%U_MFC% r%QuickNoteRows% w%QuickNoteEditW% vQuickNoteBody hwndHQNB
 	
-	
+	HalfQuickNoteEditW := QuickNoteEditW * 0.5	
 	; Tag Box
+	if (ShowQuickTagEditBoxHelper == 1) {
 	Gui, 2:Add, ListBox, y+2 +0x100 h15 w%QuickNoteEditW%  -E0x200 Disabled -Tabstop
 
-	
-	Gui, 2:Add,Edit,  yp+5 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r1 w%QuickNoteEditW% vQuickNoteTags hwndHQNT center
-	
-	
-	HalfQuickNoteEditW := QuickNoteEditW * 0.5
-		
+	Gui, 2:Add,Edit,  yp+5 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r1 w%QuickNoteEditW% vQuickNoteTags hwndHQNT center	
 	Gui, 2:Add, ListBox, y+2 +0x100 h15 w%HalfQuickNoteEditW%  -E0x200 Disabled -Tabstop
-		
-		
-	Gui, 2:Add,Edit,  yp+5 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r1 w%HalfQuickNoteEditW% vQuickNoteParent hwndHQPT center
+	}
 	
+	if (ShowQuickParentEditBoxHelper == 1) {
+	Gui, 2:Add,Edit,  yp+5 x%QuickNoteXOffset% -E0x200 -WantReturn C%U_MFC% r1 w%HalfQuickNoteEditW% vQuickNoteParent hwndHQPT center
+	}
 	
 	OD_Colors.SetItemHeight(SearchFontSize, CatFontFamily)
 	Gui, 2:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
 	Gui, 2:Color,%U_SBG%, %U_MBG%
 	
-	
+	if (ShowQuickCatEditBoxHelper == 1) {
 	Gui, 2:Add, DDL, Sort xp%HalfQuickNoteEditW% yp0 -E0x200 +0x0210 r5 w%HalfQuickNoteEditW% vQuickNoteCat hwndHQNC,%CatBoxContents%
+	}
 	
 	DDLbgColor := strreplace(U_SBG,"0x")
 	DDLbgColorb2 := strreplace(U_MBG,"0x")
@@ -321,7 +352,27 @@ MakeFileList(ReFreshMyNoteArray){
 		IniRead, CheckedField, %NoteIni%, INFO, Checked,
 		IniRead, MarkedField, %NoteIni%, INFO, Marked,
 		IniRead, ExtraField, %NoteIni%, INFO, Extra,
-				
+		IniRead, ScriptField, %NoteIni%, INFO, RunType
+		IniRead, ClipField, %NoteIni%, INFO, Clip
+		IniRead, BookmarkField, %NoteIni%, INFO, Bookmark
+		
+		if	(ClipField == 1){
+			ClipField := SaveSymbol
+		}else{
+			ClipField := A_space
+		}
+		if (BookmarkField == 1){
+			BookmarkField := BookmarkSymbol
+		}else{
+			BookmarkField := A_space
+		}
+		if (ScriptField == "AHK") {
+			ScriptField := TypeAIcon	
+		}else if (ScriptField == "BAT"){
+			ScriptField := TypeBIcon
+		} else{
+			ScriptField := A_space
+		}
 		
 		FormatTime, UserTimeFormatA, %AddedField%, %UserTimeFormat%
 		FormatTime, UserTimeFormatM, %ModdedField%,%UserTimeFormat%
@@ -340,11 +391,11 @@ MakeFileList(ReFreshMyNoteArray){
 			StarFieldArray:= A_sapce
 		
 		if (ReFreshMyNoteArray = 1){
-			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField,TagsField,CatField,ParentField,CheckedField,MarkedField,ExtraField)
+			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField,TagsField,CatField,ParentField,CheckedField,MarkedField,ExtraField,ScriptField,ClipFeild,BookmarkField)
 			}
 
 		UsedStars .= StarFieldArray "|"
-		MyNotesArray.Push({1:StarFieldArray,2:NameField,3:NoteField,4:UserTimeFormatA,5:UserTimeFormatM,6:AddedField,7:ModdedField,8:A_LoopField,9:StarField,10:TagsField,11:CatField,12:ParentField,13:CheckedField,14:MarkedField,15:ExtraField})
+		MyNotesArray.Push({1:StarFieldArray,2:NameField,3:NoteField,4:UserTimeFormatA,5:UserTimeFormatM,6:AddedField,7:ModdedField,8:A_LoopField,9:StarField,10:TagsField,11:CatField,12:ParentField,13:CheckedField,14:MarkedField,15:ExtraField,16:ScriptField,17:ClipField,18:BookmarkField})
 	} ; File loop end
 	UsedStars := RemoveDups(UsedStars,"|")
 	UsedStars := StrReplace(UsedStars,"||","|")
@@ -376,6 +427,12 @@ MakeFileList(ReFreshMyNoteArray){
 	LV_ModifyCol(14, "Logical")
 	LV_ModifyCol(15, ExtraColW)
 	LV_ModifyCol(15, "Logical")
+	LV_ModifyCol(16, ScriptColW)
+	LV_ModifyCol(16, "Center")
+	LV_ModifyCol(17, ClipColW)
+	LV_ModifyCol(17, "Center")
+	LV_ModifyCol(18, BookmarkColW)
+	LV_ModifyCol(18, "Center")
 	
 	if (DeafultSort = 1)
 			LV_ModifyCol(2, "Sort")
@@ -423,7 +480,7 @@ GuiControl, 1:-Redraw, LV
 LV_Delete()
 For Each, Note In MyNotesArray
 {
-	 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12,Note.13,Note.14,Note.15)
+	 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12,Note.13,Note.14,Note.15,Note.16,Note.17,Note.18)
 }
 gosub SortNow
 TotalNotes := MyNotesArray.MaxIndex() 
@@ -490,7 +547,34 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 			}
 		}
 	}	
-	MyNotesArray.Push({1:StarFieldArray, 2:QuickNoteName,3:QuickNoteBody,4:UserTimeFormatA,5:UserTimeFormatM,6:CreatedDate,7:A_Now,8:FileNameTxt,9:NoteStar,10:QuickNoteTags,11:QuickNoteCat,12:QuickNoteParent})
+	
+	Iniread, Script, %detailsPath%%FileSafeName%.ini,INFO,RunType,%a_space%
+	Iniread, Clip, %detailsPath%%FileSafeName%.ini,INFO,Clip,%a_space%
+	Iniread, Bookmark, %detailsPath%%FileSafeName%.ini,INFO,Bookmark,%a_space%
+	Iniread, Checked, %detailsPath%%FileSafeName%.ini,INFO,Bookmark,%a_space%
+	Iniread, Marked, %detailsPath%%FileSafeName%.ini,INFO,Bookmark,%a_space%
+	Iniread, Extra, %detailsPath%%FileSafeName%.ini,INFO,Bookmark,%a_space%
+	
+		if	(Clip == 1){
+		Clip := SaveSymbol
+		}else{
+			Clip := A_space
+		}
+		if (Bookmark == 1){
+			Bookmark := BookmarkSymbol
+		}else{
+			Bookmark := A_space
+		}
+		if (Script == "AHK") {
+			Script := TypeAIcon	
+		}else if (ScriptField == "BAT"){
+			Script := TypeBIcon
+		} else{
+			Script := A_space
+		}
+	
+	
+	MyNotesArray.Push({1:StarFieldArray, 2:QuickNoteName,3:QuickNoteBody,4:UserTimeFormatA,5:UserTimeFormatM,6:CreatedDate,7:A_Now,8:FileNameTxt,9:NoteStar,10:QuickNoteTags,11:QuickNoteCat,12:QuickNoteParent,13:Checked,14:Marked,15:Extra,16:Script,17:Clip,18:Bookmark})
 	
 
 	iniWrite,%CreatedDate%,%detailsPath%%FileSafeName%.ini,INFO,Add

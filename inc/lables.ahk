@@ -128,7 +128,7 @@ return
 ;Hotkey to Cancel Rapid note taking.
 Label5:
 	istitle = yes
-	tooltip cancled
+	tooltip canceled
 	settimer,KillToolTip,-1000
 return
 
@@ -171,9 +171,63 @@ LabelS4:
 	gosub LibTemplateAdd
 return
 
+NewFromSearch:
+	GuiControlGet,NewNoteFromSearch,,SearchTerm
+	GuiControlget,CatFilter
+	if (NewNoteFromSearch){
+		TmpFileSafeName := NameEncode(NewNoteFromSearch)
+		if FileExist(U_NotePath TmpFileSafeName ".txt") {
+		
+		Loop % LV_GetCount()
+		{
+			LV_GetText(RetrievedText, A_Index,2)
+				if (RetrievedText==NewNoteFromSearch) {
+					LV_Modify(A_Index, "Select Focus Vis")
+				}
+		}
+			return
+		}
+		SaveFile(NewNoteFromSearch,TmpFileSafeName,"","","",CatFilter,"")
+		
+		
+		NoteIniName := TmpFileSafeName ".ini"
+		NoteIni = %detailsPath%%NoteIniName%
+		IniRead, StarField, %NoteIni%, INFO, Star,S
+		IniRead, NameField, %NoteIni%, INFO, Name
+		NameField := strreplace(NameField,"$#$")
+		IniRead, AddedField, %NoteIni%, INFO, Add
+		IniRead, ModdedField, %NoteIni%, INFO, Mod
+		IniRead, TagsField, %NoteIni%, INFO, Tags,
+		IniRead, CatField, %NoteIni%, INFO, Cat,
+		IniRead, ParentField, %NoteIni%, INFO, Parent,
+		IniRead, CheckedField, %NoteIni%, INFO, Checked,
+		IniRead, MarkedField, %NoteIni%, INFO, Marked,
+		IniRead, ExtraField, %NoteIni%, INFO, Extra,
+		
+		FormatTime, UserTimeFormatA, %C_Add%, %UserTimeFormat%
+		FormatTime, UserTimeFormatM, %C_Mod%,%UserTimeFormat%
+		
+		LV_Insert(1,Focus Select,StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField,TagsField,CatField,ParentField,CheckedField,MarkedField,ExtraField)
+
+		gosub, PreviewState
+
+		GuiControl,,PreviewBox,
+		GuiControl,,TagBox,
+		GuiControl,,NoteParent,
+		GuiControl,,TitleBar,%NewNoteFromSearch%
+		GuiControl,,StatusbarM,M: %UserTimeFormatM%
+		GuiControl,,StatusbarA,A: %UserTimeFormatA%
+		
+		
+		GuiControl, Focus,PreviewBox
+		
+		LVSelectedROW = 1
+	}
+return
+
 NewAndSaveHK:
 ControlGetFocus, OutputVar, FlatNotes - Library
-if (OutputVar = "Edit1"){
+if (OutputVar = "Edit1" or OutputVar = "Edit2" or Outputvar = "ComboBox1"){
 	GuiControlGet, SearchTerm
 	
 	GetCurrentNoteData(NameEncode(SearchTerm))
@@ -278,12 +332,32 @@ QuickSafeNameUpdate:
 	GuiControl,, FileSafeName,%NewFileSafeName%
 return
 
+PreviewState:
+	NoteCountCheck := LV_GetCount()
+	if (NoteCountCheck == 0){
+	GuiControl,+disabled ,PreviewBox
+	GuiControl,+disabled ,MakeSticky
+	GuiControl,+disabled ,StoreBookmark
+	GuiControl,+disabled ,StoreClipboard
+	GuiControl,+disabled ,StoreRun
+	GuiControl,+disabled ,AddTemplateText
+	}else{
+	GuiControl,-disabled ,PreviewBox
+	GuiControl,-disabled ,MakeSticky
+	GuiControl,-disabled ,StoreBookmark
+	GuiControl,-disabled ,StoreClipboard
+	GuiControl,-disabled ,StoreRun
+	GuiControl,-disabled ,AddTemplateText
+	}
+return
+
 Search:
 ;event helper tools
 ;z := ":" A_GuiEvent ":" errorlevel ":"A_EventInfo "::" LV@sel_col "`n"
 ;tooltip % z
 ;settimer,KillToolTip,-1000
 
+gosub, PreviewState
 
 	SelectedRows :=
 	if (unsaveddataEdit3 = 1)
@@ -433,10 +507,24 @@ SkipToEndOfSearch:
 	gosub CatFilter
 	gosub TagsFilter
 	gosub UpdateStatusBar
+	if (ClipFilterActive == 1){
+		gosub FilterClipSearch
+	}
+	if (BookmarkFilterActive == 1){
+		gosub FilterBookmarkSearch
+	}
+	if (ScriptFilterActive == 1){
+		gosub FilterScriptSearch
+	}
+	if (ScriptFilterActive == 2){
+		TypeBUpdate = 0
+		gosub FilterScriptSearch
+	}
+	gosub, PreviewState
 Return
 
 FoundSearchResult:
-	LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12)
+	LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12,Note.13,Note.14,Note.15,Note.16,Note.17,Note.18)
 Return
 
 
@@ -518,6 +606,30 @@ UpdateStatusBar:
 		LV_GetText(LastNoteParent, 1 , 12)
 		;LV_GetText(LastNoteCat, 1 , 11)
 		GuiControl,,TitleBar, %LastResultName%
+		IniName := RegExReplace(LastFileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
+
+		;update top status bar
+		Iniread, HasBookmark,%detailsPath%%IniName%, INFO,Bookmark
+		if (HasBookmark == 1){
+			GuiControl,text,StoreBookmark, %BookmarkSymbol%
+		} else {
+			GuiControl,text,StoreBookmark, %LinkSymbol%
+		}
+		Iniread, HasClip,%detailsPath%%IniName%, INFO,Clip
+		if (HasClip == 1){
+			GuiControl,text,StoreClipboard, %SaveSymbol%
+		}else {
+			GuiControl,text,StoreClipboard, %DiskSymbol%
+		}
+		Iniread, RunType,%detailsPath%%IniName%,INFO,RunType
+		if (RunType == "AHK"){
+			GuiControl,text,StoreRun, %TypeAIcon%
+		}else if (RunType == "BAT"){
+			GuiControl,text,StoreRun, %TypeBIcon%
+		}else {
+			GuiControl,text,StoreRun, %RunIcon%
+		}
+		
 		FileRead, LastResultBody,%U_NotePath%%LastFileName%
 		LastNoteIni := RegExReplace(LastFileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 
@@ -633,6 +745,18 @@ if (A_GuiEvent = "DoubleClick")
 		fileread,CopyText,%U_NotePath%%FileTmp%
 		clipboard := CopyText
 		Tooltip % ToolTipText "... Copied"
+	}
+	if (LV@sel_col=16) {
+		gosub RunStoredCommand
+		Tooltip % ToolTipText "Running Script..."
+	}
+	if (LV@sel_col=17) {
+		gosub RestoreClipboard
+		Tooltip % ToolTipText "Clipboard Loaded"
+	}
+	if (LV@sel_col=18) {
+		gosub GotoBookmark
+		Tooltip % ToolTipText "Opening Link..."
 	}
 
 	settimer,KillToolTip, -500
@@ -796,6 +920,18 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			gosub build_ColEdit
 			return
 		}
+		if (LV@sel_col == 16) {
+			RC16 = 1
+			goto GuiContextMenu
+		}
+		if (LV@sel_col == 17) {
+			RC17 = 1
+			goto GuiContextMenu
+		}
+		if (LV@sel_col == 18) {
+			RC18 = 1
+			goto GuiContextMenu
+		}
 	}
 return
 
@@ -820,6 +956,31 @@ UpdateLVSelected:
 	GuiControl,, TitleBar, %C_Name%
 	GuiControl,, StatusbarM,M: %C_Modded%
 	GuiControl,, StatusbarA,A: %C_Added%
+	
+	;check to see if clipboard exist and change icon accordingly.
+	FileSafeName := NameEncode(C_Name)
+	HasBookmark := a_space
+	Iniread,	 HasBookmark,%detailsPath%%FileSafeName%.ini, INFO,Bookmark
+	if (HasBookmark == 1){
+		GuiControl,text,StoreBookmark, %BookmarkSymbol%
+	} else {
+		GuiControl,text,StoreBookmark, %LinkSymbol%
+	}
+	Iniread, HasClip,%detailsPath%%FileSafeName%.ini, INFO,Clip
+	if (HasCLip == 1){
+		GuiControl,text,StoreClipboard, %SaveSymbol%
+	}else {
+		GuiControl,text,StoreClipboard, %DiskSymbol%
+	}
+	Iniread, RunType, %detailsPath%%FileSafeName%.ini,INFO,RunType
+	if (RunType == "AHK"){
+		GuiControl,text,StoreRun, %TypeAIcon%
+	}else if (RunType == "BAT"){
+		GuiControl,text,StoreRun, %TypeBIcon%
+	}else {
+		GuiControl,text,StoreRun, %RunIcon%
+	}
+	
 
 return
 
@@ -1295,6 +1456,7 @@ StarSaveChange:
 	Gui, star:Default
 	GUI, star:Submit
 	sNeedsSubmit = 0
+	NewStar := a_space
 	NewStar = %sEdit%
 	;msgbox 	% RapidStar "|" TmpName "," TmpFileSafeName "," C_Body "," NewStar "," StarOldFile
 	if (NewStar = "")
@@ -1326,7 +1488,6 @@ StarSaveChange:
 		ListStarToChange = 0
 		return
 	}
-		
 	FileRead, C_Body,%U_NotePath%%StarOldFile%
 	Iniread, TmpName,%detailsPath%%TmpFileINI%, INFO,Name
 	TmpName := strreplace(TmpName,"$#$")
@@ -1643,8 +1804,12 @@ Options:
 	Gui, 3:add,text, xs section, Unique stars list #2
 	Gui, 3:add,edit, xs section w300 vSelect_UniqueStarList2 gSet_UniqueStarList2, %UniqueStarList2% 
 	
-	Gui, 3:add,text, xs section, Pipe "|" sperated list of Categories. (Example: Black|White|Calico|..etc)
-	Gui, 3:add,edit, xs section w300 vSelect_CatBoxContents gSet_CatBoxContents, %CatBoxContents% 
+	Gui, 3:add,text, xs section, Pipe "|" separated list of Categories. (Example: Black|White|Calico|..etc)
+	
+	CatBoxLitter = %CatBoxContents%
+	CatboxLitter := Trim(CatBoxLitter, "|")
+	
+	Gui, 3:add,edit, xs section w300 vSelect_CatBoxContents gSet_CatBoxContents, %CatboxLitter% 
 
 	Gui, 3:Add,CheckBox, xs vSelect_OpenInQuickNote gSet_OpenInQuickNote, Use Quick Notes to edit on right click?
 	GuiControl,,Select_OpenInQuickNote,%OpenInQuickNote%
@@ -1773,6 +1938,9 @@ Options:
 	gui, 3:add, text, xp+55,Tags
 	gui, 3:add, text, xp+55,Cat
 	gui, 3:add, text, xp+55,Parent
+	gui, 3:add, text, xp+55,Run
+	gui, 3:add, text, xp+55,Clip
+	gui, 3:add, text, xp+55,Link
 
 	gui, 3:add, text, xs section
 	
@@ -1792,6 +1960,12 @@ Options:
 	Gui, 3:Add,UpDown,  vCatPercentSelect gSet_CatPercent Range0-100, %oCatPercent%
 	Gui, 3:Add, Edit, w50 x+5
 	Gui, 3:Add,UpDown,  vParentPercentSelect gSet_ParentPercent Range0-100, %oParentPercent%
+	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add,UpDown,  vScriptPercentSelect gSet_ScriptPercent Range0-100, %oScriptPercent%
+	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add,UpDown,  vClipPercentSelect gSet_ClipPercent Range0-100, %oClipPercent%
+	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add,UpDown,  vBookmarkPercentSelect gSet_BookmarkPercent Range0-100, %oBookmarkPercent%
 	
 	Gui, 3:Add,text,xs section, - Main Window -
 	
@@ -1817,6 +1991,18 @@ Options:
 
 	Gui, 3:Add,CheckBox, xs vSelect_ExtraInputInTemplatesHelper gSet_ExtraInputInTemplatesHelper, Show Preview Edit Box?
 	GuiControl,,Select_ExtraInputInTemplatesHelper,%ExtraInputInTemplatesHelper%
+	
+		Gui, 3:Add,CheckBox, xs vSelect_ShowQuickCatEditBoxHelper gSet_ShowQuickCatEditBoxHelper, Show Quick Category Edit Box?
+	GuiControl,,Select_ShowQuickCatEditBoxHelper,%ShowQuickCatEditBoxHelper%
+	
+	
+	Gui, 3:Add,CheckBox, xs vSelect_ShowQuickTagEditBoxHelper gSet_ShowQuickTagEditBoxHelper, Show Tag Edit Box?
+	GuiControl,,Select_ShowQuickTagEditBoxHelper,%ShowQuickTagEditBoxHelper%
+	
+	Gui, 3:Add,CheckBox, xs vSelect_ShowQuickParentEditBoxHelper gSet_ShowQuickParentEditBoxHelper, Show Quick Parent Edit Box?
+	GuiControl,,Select_ShowQuickParentEditBoxHelper,%ShowQuickParentEditBoxHelper%
+
+	
 	
 	;—-------------------------
 	;Window Size Options Tab
@@ -1899,6 +2085,14 @@ SaveAndReload:
 	IniWrite,%Select_ShowStarHelper%, %iniPath%, General, ShowStarHelper
 	GuiControlGet,Select_ShowCatFilterBoxHelper
 	IniWrite,%Select_ShowCatFilterBoxHelper%, %iniPath%, General, ShowCatFilterBoxHelper
+	
+	GuiControlGet,Select_ShowQuickCatEditBoxHelper
+	IniWrite,%Select_ShowQuickCatEditBoxHelper%, %iniPath%, General, ShowQuickCatEditBoxHelper
+	GuiControlGet,Select_ShowQuickParentEditBoxHelper
+	IniWrite,%Select_ShowQuickParentEditBoxHelper%, %iniPath%, General, ShowQuickParentEditBoxHelper
+	GuiControlGet,Select_ShowQuickTagEditBoxHelper
+	IniWrite,%Select_ShowQuickTagEditBoxHelper%, %iniPath%, General, ShowQuickTagEditBoxHelper
+	
 	GuiControlGet,Select_ShowTagFilterBoxHelper
 	IniWrite,%Select_ShowTagFilterBoxHelper%, %iniPath%, General, ShowCatFilterTagHelper
 	GuiControlGet,Select_ShowTagEditBoxHelper
@@ -1961,11 +2155,14 @@ SaveAndReload:
 	GuiControlGet, TagsPercentSelect
 	GuiControlGet, CatPercentSelect	
 	GuiControlGet, ParentPercentSelect
+	GuiControlGet, ScriptPercentSelect
+	GuiControlGet, ClipPercentSelect
+	GuiControlGet, BookmarkPercentSelect
 
 	
 		
 
-	is100 := StarPercentSelect+NamePercentSelect+BodyPercentSelect+AddedPercentSelect+ModdedPercentSelect+TagsPercentSelect+CatPercentSelect+ParentPercentSelect
+	is100 := StarPercentSelect+NamePercentSelect+BodyPercentSelect+AddedPercentSelect+ModdedPercentSelect+TagsPercentSelect+CatPercentSelect+ParentPercentSelect+ScriptPercentSelect+ClipPercentSelect+BookmarkPercentSelect
 	WinSet, AlwaysOnTop, Off, FlatNotes - Options
 	if (is100 >= 110){
 		msgbox Column total width above 110 please fix.
@@ -1979,6 +2176,10 @@ SaveAndReload:
 	IniWrite, %TagsPercentSelect%,%iniPath%,General, TagsPercent
 	IniWrite, %CatPercentSelect%,%iniPath%,General, CatPercent
 	IniWrite, %ParentPercentSelect%,%iniPath%,General, ParentPercent
+	IniWrite, %ScriptPercentSelect%,%iniPath%,General, ScriptPercent
+	IniWrite, %ClipPercentSelect%,%iniPath%,General, ClipPercent
+	IniWrite, %BookmarkPercentSelect%,%iniPath%,General, BookmarkPercent
+
 
 	GuiControlGet,Select_UserTimeFormat
 	IniWrite, %Select_UserTimeFormat%,%iniPath%,General, UserTimeFormat
@@ -2140,6 +2341,15 @@ Set_ShowCatFilterBoxHelper:
 	}
 return
 
+Set_ShowCatEditBoxHelper:
+	GuiControlGet,Select_ShowCatEditBoxHelper
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ShowCatEditBoxHelper%, %iniPath%, General, ShowCatEditBoxHelper
+		IniRead,ShowCatEditBoxHelper,%iniPath%,General,ShowCatEditBoxHelper
+	}
+return
+
 Set_ShowTagFilterBoxHelper:
 	GuiControlGet,Select_ShowTagFilterBoxHelper
 	
@@ -2155,6 +2365,33 @@ Set_ShowParentEditBoxHelper:
 	if (A_GuiEvent == "Normal"){
 		IniWrite,%Select_ShowParentEditBoxHelper%, %iniPath%, General, ShowParentEditBoxHelper
 		IniRead,ShowParentEditBoxHelper,%iniPath%,General,ShowParentEditBoxHelper
+	}
+return
+
+Set_ShowQuickParentEditBoxHelper:
+	GuiControlGet,Select_ShowQuickParentEditBoxHelper
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ShowQuickParentEditBoxHelper%, %iniPath%, General, ShowQuickParentEditBoxHelper
+		IniRead,ShowQuickParentEditBoxHelper,%iniPath%,General,ShowQuickParentEditBoxHelper
+	}
+return
+
+Set_ShowQuickTagEditBoxHelper:
+	GuiControlGet,Select_ShowQuickTagEditBoxHelper
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ShowQuickTagEditBoxHelper%, %iniPath%, General, ShowQuickTagEditBoxHelper
+		IniRead,ShowQuickTagEditBoxHelper,%iniPath%,General,ShowQuickTagEditBoxHelper
+	}
+return
+
+Set_ShowQuickCatEditBoxHelper:
+	GuiControlGet,Select_ShowQuickCatEditBoxHelper
+	
+	if (A_GuiEvent == "Normal"){
+		IniWrite,%Select_ShowQuickCatEditBoxHelper%, %iniPath%, General, ShowQuickCatEditBoxHelper
+		IniRead,ShowQuickCatEditBoxHelper,%iniPath%,General,ShowQuickCatEditBoxHelper
 	}
 return
 
@@ -2448,6 +2685,30 @@ Set_ParentPercent:
 	gosub DummyGUI1
 return
 
+Set_ScriptPercent:
+	GuiControlGet, ScriptPercentSelect	
+	IniWrite, %ScriptPercentSelect%,%iniPath%,General, ScriptPercent	
+	IniRead, oScriptPercent,%iniPath%, General,ScriptPercent
+	ScriptPercent = 0.%oScriptPercent%
+	gosub DummyGUI1
+return
+
+Set_ClipPercent:
+	GuiControlGet, ClipPercentSelect	
+	IniWrite, %ClipPercentSelect%,%iniPath%,General, ClipPercent	
+	IniRead, oClipPercent,%iniPath%, General,ClipPercent
+	ClipPercent = 0.%oClipPercent%
+	gosub DummyGUI1
+return
+
+Set_BookmarkPercent:
+	GuiControlGet, BookMarkPercentSelect	
+	IniWrite, %BookmarkPercentSelect%,%iniPath%,General, BookmarkPercent	
+	IniRead, oBookmarkPercent,%iniPath%, General,BookmarkPercent
+	BookmarkPercent = 0.%oBookmarkPercent%
+	gosub DummyGUI1
+return
+
 Label:
 	If %A_GuiControl% in +,^,!,+^,+!,^!,+^!    ;If the hotkey contains only modifiers, return to wait for a key.
 		return
@@ -2595,19 +2856,13 @@ Edit3SaveTimer:
 	if (LVSelectedROW=="")
 		LVSelectedROW = 1
 	GuiControlGet, PreviewBox
+	if (!PreviewBox){
+		;needed to ensure LV text is updated if the note is blanked.
+		PreviewBox := a_space
+	}
 	GuiControlGet, TagBox
 	GuiControlGet, NoteParent
 	LV_GetText(LVexists,1,2)
-	if (LVexists =="") {
-		; Trying to save new note through blank search.. not working.
-		
-		;GuiControlGet, SearchTerm
-		;FileSafeName := NameEncode(SearchTerm)
-		;C_Cat = Make Cat Box
-		;msgbox % "new note:" FileSafeName 
-		;SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,C_Cat,NoteParent)
-		return
-	}
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
 	iniRead,C_Cat,%detailsPath%%FileSafeName%.ini,INFO,Cat
@@ -2856,6 +3111,257 @@ while TV_GetCount() != TVneeded
 	}
 }
 } ;end of star parent else
+return
+
+GuiContextMenu:
+	LV_GetText(RowText, LVSelectedROW,2)
+	FileSafeName := NameEncode(RowText)
+	if (A_GuiControl=="StoreBookmark" OR RC18 == 1 ) {
+		RC18 = 0
+		if GetKeyState("Shift"){
+			MsgBox, 4404,Delete?,Delete Bookmark?
+				IfMsgBox No
+					return
+				FileRecycle,%bookmarkPath%%FileSafeName%.lnk
+				GuiControl,text,StoreBookmark, %LinkSymbol%
+				LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,,A_Space)
+				return
+		}
+	if (FileExist(bookmarkPath FileSafeName ".lnk")){
+	MsgBox, 4404, , Bookmark for: "%FileSafeName%.lnk" already exists overwrite it?
+	IfMsgBox No
+		return
+	FileRecycle,%bookmarkPath%%FileSafeName%.lnk
+	}
+	FileCreateShortcut, %clipboard%, %bookmarkPath%%FileSafeName%.lnk
+	Iniwrite, 1, %detailsPath%%FileSafeName%.ini,INFO,Bookmark
+	GuiControl,text,StoreBookmark, %BookmarkSymbol%
+	LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,,BookmarkSymbol)
+	GetCurrentNoteData(FileSafeName)
+	SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
+}
+if (A_GuiControl=="StoreClipboard" OR RC17 == 1 ) {
+	RC17 = 0
+	if GetKeyState("Shift"){
+		MsgBox, 4404,Delete?,Delete stored Clipboard?
+			IfMsgBox No
+				return
+			FileRecycle,%clipPath%%FileSafeName%.clipboard
+			Iniwrite, A_space, %detailsPath%%FileSafeName%.ini,INFO,Clip
+			GuiControl,text,StoreClipboard, %DiskSymbol%
+			LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,A_space)
+			return
+	}
+	if (FileExist(clipPath FileSafeName ".clipboard")){
+		MsgBox, 4404, , "%FileSafeName%.clipboard" already exists overwrite it?
+		IfMsgBox No
+			return
+		FileRecycle,%clipPath%%FileSafeName%.clipboard
+	}
+	Fileappend,%ClipboardAll%,%clipPath%%FileSafeName%.clipboard
+	Iniwrite, 1, %detailsPath%%FileSafeName%.ini,INFO,Clip
+	GuiControl,text,StoreClipboard, %SaveSymbol%
+	LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,SaveSymbol)
+	GetCurrentNoteData(FileSafeName)
+	SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
+}
+if (A_GuiControl=="StoreRun" OR RC16 == 1){
+	RC16 = 0
+	Iniread, ScriptExists, %detailsPath%%FileSafeName%.ini,INFO,RunType
+	if GetKeyState("Shift"){
+		MsgBox, 4404,Delete?,Delete stored Script?
+			IfMsgBox No
+				return
+			FileRecycle,%ScriptPath%%FileSafeName%.%RunType%
+			Iniwrite, A_Space, %detailsPath%%FileSafeName%.ini,INFO,RunType
+			GuiControl,text,StoreRun, %RunIcon%
+			LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,A_Space)
+			return
+	}
+	if (ScriptExists == "AHK"){
+		ExistsWARNING = WARNING: An .AHK file exists for this note.
+	} else if (ScriptExists == "BAT"){
+		ExistsWARNING = WARNING: A .BAT file exists for this note.
+	} else{
+		ExistsWARNING :=
+	}
+	
+	SetTimer, TypeMsgButtonNames, 50
+	MsgBox, 4387,Script Type, Save Clipboard content as...`n%ExistsWARNING%
+	IfMsgBox Yes
+		SaveTypeAs = AHK
+	IfMsgBox No 
+		SaveTypeAs = BAT
+	IfMsgBox Cancel
+		return
+	
+	FileRecycle,%ScriptPath%%FileSafeName%.AHK
+	FileRecycle,%ScriptPath%%FileSafeName%.BAT
+	
+	if (SaveTypeAs == "AHK"){
+		GuiControl,text,StoreRun, %TypeAIcon%
+		Iniwrite, AHK, %detailsPath%%FileSafeName%.ini,INFO,RunType
+		Fileappend,%Clipboard%,%ScriptPath%%FileSafeName%.%SaveTypeAs%
+		LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,TypeAIcon)
+	}else{
+		GuiControl,text,StoreRun, %TypeBIcon%
+		Iniwrite, BAT, %detailsPath%%FileSafeName%.ini,INFO,RunType
+		Fileappend,%Clipboard%,%ScriptPath%%FileSafeName%.%SaveTypeAs%
+		LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,TypeBIcon)
+		GetCurrentNoteData(FileSafeName)
+		SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
+	}
+}
+
+return
+
+TypeMsgButtonNames:
+IfWinNotExist, Script Type
+	return  ; Keep waiting.
+SetTimer, TypeMsgButtonNames, Off 
+WinActivate 
+ControlSetText, Button1, &AHK 
+ControlSetText, Button2, &BAT 
+return
+
+RestoreClipboard:
+	LV_GetText(RowText, LVSelectedROW,2)
+	FileSafeName := NameEncode(RowText)
+	if (FileExist(clipPath FileSafeName ".clipboard")){
+		FileRead, clipboard, *c %clipPath%%FileSafeName%.clipboard
+	}
+return
+
+FilterClip:
+	ClipFilterActive++
+	FilterClipSearch:
+	if (ClipFilterActive==1){
+		GuiControl,text,SortClip, %SaveSymbol%
+		Mloops := LV_GetCount()
+		while (Mloops--)
+		{
+			LV_GetText(RowVar,Mloops+1,17)
+			if (RowVar == a_space)
+				LV_Delete(Mloops+1)
+			if (Mloops = 0)
+				break
+		}
+		if (LV_GetCount()>0){
+			LV_Modify(1, "Select Focus Vis")
+		}
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortClip
+	}else {
+		GuiControl,text,SortClip, %DiskSymbol%
+		ClipFilterActive = 0
+		gosub Search
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortClip
+	}
+return
+
+GotoBookmark:
+	LV_GetText(RowText, LVSelectedROW,2)
+	FileSafeName := NameEncode(RowText)
+	if (FileExist(bookmarkPath FileSafeName ".lnk")){
+		Run % bookmarkPath FileSafeName ".lnk",,UseErrorLevel
+		if (ErrorLevel=="ERROR"){
+			msgbox,262160,ERROR, BAD .lnk
+		}
+	}
+return
+
+FilterBookmark:
+	BookmarkFilterActive++
+	FilterBookmarkSearch:
+	if (BookmarkFilterActive==1){
+		GuiControl,text,SortBookmark, %BookmarkSymbol%
+		Mloops := LV_GetCount()
+		while (Mloops--)
+		{
+			LV_GetText(RowVar,Mloops+1,18)
+			if (RowVar == a_space)
+				LV_Delete(Mloops+1)
+			if (Mloops = 0)
+				break
+		}
+		if (LV_GetCount()>0){
+			LV_Modify(1, "Select Focus Vis")
+		}
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortBookmark
+	}else {
+		GuiControl,text,SortBookmark, %LinkSymbol%
+		BookmarkFilterActive = 0
+		gosub Search
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortBookmark
+	}
+return
+
+RunStoredCommand:
+	LV_GetText(RowText, LVSelectedROW,2)
+	FileSafeName := NameEncode(RowText)
+	iniRead,RunTypeAs,%detailsPath%%FileSafeName%.ini,INFO,RunType
+	if (FileExist(scriptPath FileSafeName "." RunTypeAs)){
+		Run % scriptPath FileSafeName "." RunTypeAs
+	}
+return
+
+FilterScript:
+	ScriptFilterActive++
+	FilterScriptSearch:
+	if (ScriptFilterActive==1){
+		GuiControl,text,SortScript, %TypeAIcon%
+		Mloops := LV_GetCount()
+		while (Mloops--)
+		{
+			LV_GetText(RowVar,Mloops+1,16)
+			if (RowVar != TYpeAIcon)
+				LV_Delete(Mloops+1)
+			if (Mloops = 0)
+				break
+		}		
+		if (LV_GetCount()>0){
+			LV_Modify(1, "Select Focus Vis")
+		}
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortScript
+	} else if (ScriptFilterActive==2){
+		GuiControl,text,SortScript, %TypeBIcon%
+		
+		if (TypeBUpdate == 1) {
+		gosub Search
+		}
+		TypeBUpdate = 1
+		Mloops := LV_GetCount()
+		while (Mloops--)
+		{
+			LV_GetText(RowVar,Mloops+1,16)
+			if (RowVar != TypeBIcon)
+				LV_Delete(Mloops+1)
+			if (Mloops = 0)
+				break
+		}
+		if (LV_GetCount()>0){
+			LV_Modify(1, "Select Focus Vis")
+		}
+	} else {
+		GuiControl,text,SortScript, %RunIcon%
+		ScriptFilterActive = 0
+		gosub Search
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortScript
+	}
+return
+
+
+MakeSticky:
+	if !LastRowSelected
+		LastRowSelected=1
+	LV_GetText(StickyNoteName,LastRowSelected,2)
+	LV_GetText(StickyNoteFile,LastRowSelected,8)
+	Build_Stickynote_GUI(StickyNoteName,StickyNoteFile)
 return
 
 BuildTreeUI:
