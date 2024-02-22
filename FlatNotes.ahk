@@ -2,7 +2,7 @@
 ;Inialize FlatBase AHK v1
 ;-------------------------------------------------
 #SingleInstance Force
-FileEncoding ,UTF-8
+FileEncoding, UTF-8
 CoordMode, mouse, Screen
 DetectHiddenWindows, On
 
@@ -12,6 +12,7 @@ DetectHiddenWindows, On
 Menu, Tray, NoStandard
 Menu, Tray, Add 
 Menu, Tray, Add, Library
+Menu, Tray, Click, 1
 Menu, Tray, Add, Note Template Maker,NoteTemplateMaker
 Menu, Tray, Add, About
 Menu, Tray, Add, Options
@@ -137,6 +138,7 @@ global SortParent
 global SortScript
 global SortClip
 global SortBookmark
+global SortImage
 global NextSortAdded
 global NextSortBody
 global NextSortName
@@ -164,6 +166,7 @@ global ExtraPercent
 global ScriptPercent
 global ClipPercent
 global BookmarkPercent
+global ImagePercent
 global oStarPercent
 global oNamePercent
 global oBodyPercent
@@ -178,6 +181,7 @@ global oExtraPercent
 global oScriptPercent
 global oClipPercent
 global oBookmarkPercent
+global oImagePercent
 global ShowStatusBar
 global StatusBarM
 global StatusBarA
@@ -260,6 +264,7 @@ global FontRendering
 global detailsPath
 global scriptPath
 global bookmarkPath
+global ImagePath
 global clipPath
 global HideScrollbars
 global backupsToKeep
@@ -286,12 +291,14 @@ global TypeBUpdate,1
 global ScriptFilterActive
 global ClipFilterActive
 global BookmarkFilterActive
+global ImageFilterActive
 global SelectedRows
 global TemplateSymbol
 global RunSymbol
 global WebSymbol
 global WorldSymbol
 global LinkSymbol
+global PhotoframeSymbol
 global TreeSymbol
 global DiskSymbol
 global SaveSymbol
@@ -302,7 +309,9 @@ global RunIcon
 global StickyIcon
 global MakeSticky
 global BookmarkSymbol
+global ImageSymbol
 global StoreBookmark
+global StoreImage
 global StoreRun
 global AddTemplateText
 global ChangeRunType
@@ -338,9 +347,15 @@ global NoteNameToEdit
 LVSelectedROW = 1
 
 FileCreateDir, NoteDetails
+FileCreateDir, MyClipboards
+FileCreateDir, MyImages
+FileCreateDir, MyBookmarks
+FileCreateDir, MyScripts
+
 detailsPath := A_WorkingDir "\NoteDetails\"
 clipPath := A_WorkingDir "\MyClipboards\"
 bookmarkPath := A_WorkingDir "\MyBookmarks\"
+bookmarkPath := A_WorkingDir "\MyImages\"
 scriptpath := A_WorkingDir "\MyScripts\"
 iniPath = %A_WorkingDir%\settings.ini
 systemINI = %A_WorkingDir%\sys\system.ini
@@ -391,6 +406,7 @@ if (isFristRun = "1") {
 	IniWrite, 0,%iniPath%, General,ScriptPercent
 	IniWrite, 0,%iniPath%, General,ClipPercent
 	IniWrite, 0,%iniPath%, General,BookmarkPercent
+	IniWrite, 0,%iniPath%, General,ImagePercent
 
 	IniWrite, yy/MM/dd,%iniPath%, General,UserTimeFormat
 	IniWrite, 0, %iniPath%, General, isFristRun
@@ -422,6 +438,8 @@ if (isFristRun = "1") {
 	iniread, LinkSymbol,%systemINI%,SYS,LinkSymbol,🔗
 	iniread, WebSymbol,%systemINI%,SYS,WebSymbol,🕸️
 	iniread, BookmarkSymbol,%systemINI%,SYS,BookmarkSymbol,🔖
+	iniread, ImageSymbol,%systemINI%,SYS,ImageSymbol,📷
+	iniread, PhotoframeSymbol,%systemINI%,SYS,PhotoframeSymbol,🖼️
 	iniread, RunIcon, %systemINI%,SYS,RunIcon,👟
 	iniread, TypeAIcon, %systemINI%,SYS,TypeAIcon,🅰️
 	iniread, TypeBIcon, %systemINI%,SYS,TypeBIcon,🅱️
@@ -537,6 +555,7 @@ IniRead, oExtraPercent,%iniPath%, General,ExtraPercent,0
 IniRead, oScriptPercent,%iniPath%, General,ScriptPercent,0
 IniRead, oClipPercent,%iniPath%, General,ClipPercent,0
 IniRead, oBookmarkPercent,%iniPath%, General,BookmarkPercent,0
+IniRead, oImagePercent,%iniPath%, General,ImagePercent,0
 
 if oStarPercent between 0 and 9
 	oStarPercent = 0%oStarPercent%
@@ -564,6 +583,8 @@ if oClipPercent between 0 and 9
 	oClipPercent = 0%oClipPercent%
 if oBookMarkPercent between 0 and 9
 	oBookMarkPercent = 0%oBookmarkPercent%
+	if oImagePercent between 0 and 9
+	oImagePercent = 0%oImagePercent%
 	
 StarPercent = 0.%oStarPercent%
 NamePercent = 0.%oNamePercent%
@@ -579,6 +600,7 @@ ExtraPercent = 0.%oExtraPercent%
 ScriptPercent = 0.%oScriptPercent%
 ClipPercent = 0.%oClipPercent%
 BookmarkPercent = 0.%oBookmarkPercent%
+ImagePercent = 0.%oImagePercent%
 
 
 
@@ -657,6 +679,7 @@ global ExtraColW := Round(libWColAdjust*ExtraPercent)
 global ScriptColW := Round(libWColAdjust*ScriptPercent)
 global ClipColW := Round(libWColAdjust*ClipPercent)
 global BookmarkColW := Round(libWColAdjust*BookmarkPercent)
+global ImageColW := Round(libWColAdjust*ImagePercent)
 
 ;-------------------------------------------------
 ;Acitvate User Hotkeys if any & make INI for new files

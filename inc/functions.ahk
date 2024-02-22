@@ -82,13 +82,14 @@ BuildGUI1(){
 	Gui, 1:Add, text, yp0 xp+%ParentColW% w%ScriptColW% center c%U_SFC% gFilterScript vSortScript, %RunIcon%
 	Gui, 1:Add, text, yp0 xp+%ScriptColW% w%ClipColW% center c%U_SFC% gFilterClip vSortClip, %DiskSymbol%
 	Gui, 1:Add, text, yp0 xp+%ClipColW% w%BookmarkColW% center c%U_SFC% gFilterBookmark vSortBookmark,%LinkSymbol%
+	Gui, 1:Add, text, yp0 xp+%BookmarkColW% w%ImageColW% center c%U_SFC% gFilterImage vSortImage,%ImageSymbol%
 	
-	Gui, 1:Add, ListView,section -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar|Tags|Cat|Parent|checked|Marked|Extra|Script|Clip|Bookmark
+	Gui, 1:Add, ListView,section -E0x200 -hdr NoSort NoSortHdr LV0x10000 grid r%ResultRows% w%libWAdjust% x-3 C%U_MFC% vLV hwndHLV gNoteListView +altsubmit Report, Star|Title|Body|Added|Modified|RawAdded|RawModded|FileName|RawStar|Tags|Cat|Parent|checked|Marked|Extra|Script|Clip|Bookmark|Image
 
 
 	;Gui, 1:Add,edit, readonly h6 -E0x200
 	title_h := PreviewFontSize*1.8
-	TitleWAdjust := round(LibW*0.75)
+	TitleWAdjust := round(LibW*0.65)
 	
 	if (ShowPreviewEditBoxHelper) {
 	
@@ -110,10 +111,11 @@ BuildGUI1(){
 	
 	; Replaced Tree with clipboard copy
 	
-	StickyIconX := LibW - 100
-	RunIconX := LibW - 75
-	ClipIconX := LibW - 50
-	BookmarkIconX := LibW - 25
+	StickyIconX := LibW - 125
+	RunIconX := LibW - 100
+	ClipIconX := LibW - 75
+	BookmarkIconX := LibW - 50
+	ImageIconX := LibW - 25
 	
 		Gui, 1:Add,text, center yp0 x%StickyIconX% vMakeSticky c%U_SFC% -E0x200 w25 h%title_h% gMakeSticky, %StickyIcon%
 
@@ -124,6 +126,7 @@ BuildGUI1(){
 	
 	Gui, 1:Add,text, center yp0 x%BookmarkIconX% vStoreBookmark c%U_SFC% -E0x200 w25 h%title_h% gGotoBookmark, %LinkSymbol%
 	
+	Gui, 1:Add,text, center yp0 x%ImageIconX% vStoreImage c%U_SFC% -E0x200 w25 h%title_h% gGotoImage, %ImageSymbol%
 	
 	
 	
@@ -198,8 +201,6 @@ BuildGUI1(){
 	
 	Gui, 1:add, text, center backgroundTrans w15 h15 x%HelpIconx% y6 -E0x200 c%U_FBCA% gHelpWindow, [?]
 	
-	
-		
 	
 
 	if (HideScrollbars = 1) {
@@ -355,6 +356,7 @@ MakeFileList(ReFreshMyNoteArray){
 		IniRead, ScriptField, %NoteIni%, INFO, RunType
 		IniRead, ClipField, %NoteIni%, INFO, Clip
 		IniRead, BookmarkField, %NoteIni%, INFO, Bookmark
+		IniRead, ImageField, %NoteIni%, INFO, Image
 		
 		if	(ClipField == 1){
 			ClipField := SaveSymbol
@@ -365,6 +367,11 @@ MakeFileList(ReFreshMyNoteArray){
 			BookmarkField := BookmarkSymbol
 		}else{
 			BookmarkField := A_space
+		}
+		if (ImageField == 1){
+			ImageField := ImageSymbol
+		}else{
+			ImageField := A_space
 		}
 		if (ScriptField == "AHK") {
 			ScriptField := TypeAIcon	
@@ -391,11 +398,11 @@ MakeFileList(ReFreshMyNoteArray){
 			StarFieldArray:= A_sapce
 		
 		if (ReFreshMyNoteArray = 1){
-			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField,TagsField,CatField,ParentField,CheckedField,MarkedField,ExtraField,ScriptField,ClipFeild,BookmarkField)
+			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField,TagsField,CatField,ParentField,CheckedField,MarkedField,ExtraField,ScriptField,ClipFeild,BookmarkField,ImageFeild)
 			}
 
 		UsedStars .= StarFieldArray "|"
-		MyNotesArray.Push({1:StarFieldArray,2:NameField,3:NoteField,4:UserTimeFormatA,5:UserTimeFormatM,6:AddedField,7:ModdedField,8:A_LoopField,9:StarField,10:TagsField,11:CatField,12:ParentField,13:CheckedField,14:MarkedField,15:ExtraField,16:ScriptField,17:ClipField,18:BookmarkField})
+		MyNotesArray.Push({1:StarFieldArray,2:NameField,3:NoteField,4:UserTimeFormatA,5:UserTimeFormatM,6:AddedField,7:ModdedField,8:A_LoopField,9:StarField,10:TagsField,11:CatField,12:ParentField,13:CheckedField,14:MarkedField,15:ExtraField,16:ScriptField,17:ClipField,18:BookmarkField,19:ImageFeild})
 	} ; File loop end
 	UsedStars := RemoveDups(UsedStars,"|")
 	UsedStars := StrReplace(UsedStars,"||","|")
@@ -433,6 +440,8 @@ MakeFileList(ReFreshMyNoteArray){
 	LV_ModifyCol(17, "Center")
 	LV_ModifyCol(18, BookmarkColW)
 	LV_ModifyCol(18, "Center")
+	LV_ModifyCol(19, ImageColW)
+	LV_ModifyCol(19, "Center")
 	
 	if (DeafultSort = 1)
 			LV_ModifyCol(2, "Sort")
@@ -480,9 +489,9 @@ GuiControl, 1:-Redraw, LV
 LV_Delete()
 For Each, Note In MyNotesArray
 {
-	 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12,Note.13,Note.14,Note.15,Note.16,Note.17,Note.18)
+	 LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12,Note.13,Note.14,Note.15,Note.16,Note.17,Note.18,Note.19)
 }
-gosub SortNow
+;gosub SortNow
 TotalNotes := MyNotesArray.MaxIndex() 
 GuiControl, 1:+Redraw, LV
 return
@@ -551,6 +560,7 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 	Iniread, Script, %detailsPath%%FileSafeName%.ini,INFO,RunType,%a_space%
 	Iniread, Clip, %detailsPath%%FileSafeName%.ini,INFO,Clip,%a_space%
 	Iniread, Bookmark, %detailsPath%%FileSafeName%.ini,INFO,Bookmark,%a_space%
+	Iniread, Image, %detailsPath%%FileSafeName%.ini,INFO,Image,%a_space%
 	Iniread, Checked, %detailsPath%%FileSafeName%.ini,INFO,Bookmark,%a_space%
 	Iniread, Marked, %detailsPath%%FileSafeName%.ini,INFO,Bookmark,%a_space%
 	Iniread, Extra, %detailsPath%%FileSafeName%.ini,INFO,Bookmark,%a_space%
@@ -565,6 +575,11 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 		}else{
 			Bookmark := A_space
 		}
+		if (Image == 1){
+			Image := ImageSymbol
+		}else{
+			Image := A_space
+		}
 		if (Script == "AHK") {
 			Script := TypeAIcon	
 		}else if (ScriptField == "BAT"){
@@ -574,7 +589,7 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 		}
 	
 	
-	MyNotesArray.Push({1:StarFieldArray, 2:QuickNoteName,3:QuickNoteBody,4:UserTimeFormatA,5:UserTimeFormatM,6:CreatedDate,7:A_Now,8:FileNameTxt,9:NoteStar,10:QuickNoteTags,11:QuickNoteCat,12:QuickNoteParent,13:Checked,14:Marked,15:Extra,16:Script,17:Clip,18:Bookmark})
+	MyNotesArray.Push({1:StarFieldArray, 2:QuickNoteName,3:QuickNoteBody,4:UserTimeFormatA,5:UserTimeFormatM,6:CreatedDate,7:A_Now,8:FileNameTxt,9:NoteStar,10:QuickNoteTags,11:QuickNoteCat,12:QuickNoteParent,13:Checked,14:Marked,15:Extra,16:Script,17:Clip,18:Bookmark,19:Image})
 	
 
 	iniWrite,%CreatedDate%,%detailsPath%%FileSafeName%.ini,INFO,Add

@@ -187,6 +187,12 @@ NewFromSearch:
 		}
 			return
 		}
+		if (NewNoteFromSearch == ""){
+		return
+		}
+		if (TmpFileSafeName == ""){
+		return	
+		}
 		SaveFile(NewNoteFromSearch,TmpFileSafeName,"","","",CatFilter,"")
 		
 		
@@ -338,6 +344,7 @@ PreviewState:
 	GuiControl,+disabled ,PreviewBox
 	GuiControl,+disabled ,MakeSticky
 	GuiControl,+disabled ,StoreBookmark
+	GuiControl,+disabled ,StoreImage
 	GuiControl,+disabled ,StoreClipboard
 	GuiControl,+disabled ,StoreRun
 	GuiControl,+disabled ,AddTemplateText
@@ -345,6 +352,7 @@ PreviewState:
 	GuiControl,-disabled ,PreviewBox
 	GuiControl,-disabled ,MakeSticky
 	GuiControl,-disabled ,StoreBookmark
+	GuiControl,-disabled ,StoreImage
 	GuiControl,-disabled ,StoreClipboard
 	GuiControl,-disabled ,StoreRun
 	GuiControl,-disabled ,AddTemplateText
@@ -513,6 +521,9 @@ SkipToEndOfSearch:
 	if (BookmarkFilterActive == 1){
 		gosub FilterBookmarkSearch
 	}
+	if (ImageFilterActive == 1){
+		gosub FilterImageSearch
+	}
 	if (ScriptFilterActive == 1){
 		gosub FilterScriptSearch
 	}
@@ -615,6 +626,12 @@ UpdateStatusBar:
 		} else {
 			GuiControl,text,StoreBookmark, %LinkSymbol%
 		}
+		Iniread, HasImage,%detailsPath%%IniName%, INFO,Image
+		if (HasImage == 1){
+			GuiControl,text,StoreImage, %PhotoframeSymbol%
+		} else {
+			GuiControl,text,StoreImage, %ImageSymbol%
+		}
 		Iniread, HasClip,%detailsPath%%IniName%, INFO,Clip
 		if (HasClip == 1){
 			GuiControl,text,StoreClipboard, %SaveSymbol%
@@ -661,7 +678,6 @@ Return
 UnDoom:
 	Doom = 0
 return
-
 
 
 NoteListView:
@@ -757,6 +773,10 @@ if (A_GuiEvent = "DoubleClick")
 	if (LV@sel_col=18) {
 		gosub GotoBookmark
 		Tooltip % ToolTipText "Opening Link..."
+	}
+	if (LV@sel_col=19) {
+		gosub GotoImage
+		Tooltip % ToolTipText "Opening Image..."
 	}
 
 	settimer,KillToolTip, -500
@@ -960,11 +980,18 @@ UpdateLVSelected:
 	;check to see if clipboard exist and change icon accordingly.
 	FileSafeName := NameEncode(C_Name)
 	HasBookmark := a_space
+	HasImage := a_space
 	Iniread,	 HasBookmark,%detailsPath%%FileSafeName%.ini, INFO,Bookmark
 	if (HasBookmark == 1){
 		GuiControl,text,StoreBookmark, %BookmarkSymbol%
 	} else {
 		GuiControl,text,StoreBookmark, %LinkSymbol%
+	}
+	Iniread,	 HasImage,%detailsPath%%FileSafeName%.ini, INFO,Image
+	if (HasImage == 1){
+		GuiControl,text,StoreImage, %PhotoframeSymbol%
+	} else {
+		GuiControl,text,StoreImage, %ImageSymbol%
 	}
 	Iniread, HasClip,%detailsPath%%FileSafeName%.ini, INFO,Clip
 	if (HasCLip == 1){
@@ -1288,18 +1315,14 @@ ChangeCount := SelectedRowsArray.Length()
 SelectedRowsArray:=ObjectSort(SelectedRowsArray,,,false)
 	;v = row numbers
 	for RowKey, CRowNum in SelectedRowsArray{
-		LV_GetText(tmpName,CRowNum,8)
-		
-		tmpName := strreplace(tmpName,".txt",".ini")
-		Iniread, tmpName,%detailsPath%%tmpName%, INFO,Name
-		tmpname := strreplace(tmpName,"$#$")
-		C_SafeName := NameEncode(tmpName)
+		LV_GetText(tmpName,CRowNum,2)
+		C_SafeName := NameEncode(tmpName)		
 		if (CRowNum !=3)
 			GetFile = false ;don't get the body
 		GetCurrentNoteData(C_SafeName)
 		;Error Check
 		if !FileExist( U_NotePath C_SafeName ".txt"){
-			Msgbox % "Error Report Code FNF#001 Details: `n" U_NotePath C_SafeName ".txt"
+			Msgbox % "Error Report Code FNF#001 Details: `n" U_NotePath C_SafeName ".txt" " SelectedRows:" SelectedRows " Name: " tmpName " RowNum:" CRowNum
 			
 			break
 		}
@@ -1966,6 +1989,7 @@ Options:
 	Gui, 3:Add,UpDown,  vClipPercentSelect gSet_ClipPercent Range0-100, %oClipPercent%
 	Gui, 3:Add, Edit, w50 x+5
 	Gui, 3:Add,UpDown,  vBookmarkPercentSelect gSet_BookmarkPercent Range0-100, %oBookmarkPercent%
+	Gui, 3:Add,UpDown,  vImagePercentSelect gSet_ImagePercent Range0-100, %oImagePercent%
 	
 	Gui, 3:Add,text,xs section, - Main Window -
 	
@@ -2158,11 +2182,12 @@ SaveAndReload:
 	GuiControlGet, ScriptPercentSelect
 	GuiControlGet, ClipPercentSelect
 	GuiControlGet, BookmarkPercentSelect
+	GuiControlGet, ImagePercentSelect
 
 	
 		
 
-	is100 := StarPercentSelect+NamePercentSelect+BodyPercentSelect+AddedPercentSelect+ModdedPercentSelect+TagsPercentSelect+CatPercentSelect+ParentPercentSelect+ScriptPercentSelect+ClipPercentSelect+BookmarkPercentSelect
+	is100 := StarPercentSelect+NamePercentSelect+BodyPercentSelect+AddedPercentSelect+ModdedPercentSelect+TagsPercentSelect+CatPercentSelect+ParentPercentSelect+ScriptPercentSelect+ClipPercentSelect+BookmarkPercentSelect+ImagePercentSelect
 	WinSet, AlwaysOnTop, Off, FlatNotes - Options
 	if (is100 >= 110){
 		msgbox Column total width above 110 please fix.
@@ -2179,6 +2204,7 @@ SaveAndReload:
 	IniWrite, %ScriptPercentSelect%,%iniPath%,General, ScriptPercent
 	IniWrite, %ClipPercentSelect%,%iniPath%,General, ClipPercent
 	IniWrite, %BookmarkPercentSelect%,%iniPath%,General, BookmarkPercent
+	IniWrite, %ImagePercentSelect%,%iniPath%,General, ImagePercent
 
 
 	GuiControlGet,Select_UserTimeFormat
@@ -2702,10 +2728,18 @@ Set_ClipPercent:
 return
 
 Set_BookmarkPercent:
-	GuiControlGet, BookMarkPercentSelect	
+	GuiControlGet, BookmarkPercentSelect	
 	IniWrite, %BookmarkPercentSelect%,%iniPath%,General, BookmarkPercent	
 	IniRead, oBookmarkPercent,%iniPath%, General,BookmarkPercent
 	BookmarkPercent = 0.%oBookmarkPercent%
+	gosub DummyGUI1
+return
+
+Set_ImagePercent:
+	GuiControlGet, ImagePercentSelect	
+	IniWrite, %ImagePercentSelect%,%iniPath%,General, ImagePercent	
+	IniRead, oImagePercent,%iniPath%, General,ImagePercent
+	ImagePercent = 0.%oImagePercent%
 	gosub DummyGUI1
 return
 
@@ -2975,7 +3009,7 @@ Return
 
 
 HelpWindow:
-msgbox % "Advanced search: `nn::term = Search names only.[Also works for b:: t:: and p:: for body, tags, and parent]`ntermA||termB = find a or b.`nTermA&&TermB = find a and b`nNote: for || and && terms most be in the same field. eg. You can't search for terms in title and body, they most both be in that title or body.`n`n[Legend: + = Shift, ^ = Ctrl, ! = Alt, # = Win]`n`nGLOBAL HOTKEYS:`nOpen Library (if Capslock not used): " savedHK1 "`nQuick Note: " savedHK2 "`nQuick Note Alt: " savedHK3 "`nRapid Note: " savedHK4 "`nCancel Rapid Note: " savedHK5 "`nAppend to Rapid Note: " savedHK6 "`nAppend Template to Rapid Note" savedHK7 "`n`nMAIN WINDOW SHORTCUTS:`nFocus Search: "savedSK1 "`nFocus Results: " savedSK2 "`nFocus Edit/Preview: " savedSK3 "`nAdd Note From Template: " savedSK4 "`n`nINFO:`nQuick Note:`nSelect text and press the Quick Note hotkey to bring that text up as the body of a new blank note.`n`nRapid Note:`nUse the Rapid Note hotkey to quick add notes. Press the Rapid Note Hotkey once to copy the title, then again to copy the body or use the append hotkey to add any number of selected texts to the body of the note. When you are done use the Rapid Note hotekey to finish the note and select a star."
+msgbox % "Advanced search: `n Term;;n = Search names only.[Also works for Term;;b, term;;t, and term;;p for body, tags, and parent]`n`n[Legend: + = Shift, ^ = Ctrl, ! = Alt, # = Win]`n`nGLOBAL HOTKEYS:`nOpen Library (if Capslock not used): " savedHK1 "`nQuick Note: " savedHK2 "`nQuick Note Alt: " savedHK3 "`nRapid Note: " savedHK4 "`nCancel Rapid Note: " savedHK5 "`nAppend to Rapid Note: " savedHK6 "`nAppend Template to Rapid Note" savedHK7 "`n`nMAIN WINDOW SHORTCUTS:`nFocus Search: "savedSK1 "`nFocus Results: " savedSK2 "`nFocus Edit/Preview: " savedSK3 "`nAdd Note From Template: " savedSK4 "`n`nINFO:`nQuick Note:`nSelect text and press the Quick Note hotkey to bring that text up as the body of a new blank note.`n`nRapid Note:`nUse the Rapid Note hotkey to quick add notes. Press the Rapid Note Hotkey once to copy the title, then again to copy the body or use the append hotkey to add any number of selected texts to the body of the note. When you are done use the Rapid Note hotekey to finish the note and select a star."
 return
 
 
@@ -3113,6 +3147,7 @@ while TV_GetCount() != TVneeded
 } ;end of star parent else
 return
 
+; *ImageWork
 GuiContextMenu:
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
@@ -3271,6 +3306,18 @@ GotoBookmark:
 	}
 return
 
+; ImageWork
+GotoImage:
+	LV_GetText(RowText, LVSelectedROW,2)
+	FileSafeName := NameEncode(RowText)
+	if (FileExist(ImagePath FileSafeName ".png")){
+		Run % imagePath FileSafeName ".png",,UseErrorLevel
+		if (ErrorLevel=="ERROR"){
+			msgbox,262160,ERROR, BAD .png
+		}
+	}
+return
+
 FilterBookmark:
 	BookmarkFilterActive++
 	FilterBookmarkSearch:
@@ -3298,6 +3345,35 @@ FilterBookmark:
 		GuiControl, Font, SortBookmark
 	}
 return
+
+FilterImage:
+	ImageFilterActive++
+	FilterImageSearch:
+	if (ImageFilterActive==1){
+		GuiControl,text,SortImage, %ImageSymbol%
+		Mloops := LV_GetCount()
+		while (Mloops--)
+		{
+			LV_GetText(RowVar,Mloops+1,19)
+			if (RowVar == a_space)
+				LV_Delete(Mloops+1)
+			if (Mloops = 0)
+				break
+		}
+		if (LV_GetCount()>0){
+			LV_Modify(1, "Select Focus Vis")
+		}
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortImage
+	}else {
+		GuiControl,text,SortImage, %PhotoframeSymbol%
+		ImageFilterActive = 0
+		gosub Search
+		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%
+		GuiControl, Font, SortImage
+	}
+return
+
 
 RunStoredCommand:
 	LV_GetText(RowText, LVSelectedROW,2)

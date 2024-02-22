@@ -190,24 +190,30 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 			for k, v in SelectedRowsArray{
 				;error checking to see each row before it's deleted.
 				;msgbox % v
-				LV_GetText(FileName, v,8)
-				iniFileName := RegExReplace(FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
-				ClipFileName := RegExReplace(FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".clipboard")
-				BookmarkFileName := RegExReplace(FileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".lnk")
+				LV_GetText(FileName, v,2)
+				LV_GetText(RawName, v,2)
+				FileName := NameEncode(FileName)
 				
-				FileRecycle %U_NotePath%%FileName%
-				FileRecycle %detailsPath%%iniFileName%
-				FileRecycle %clipPath%%ClipFileName%
-				FileRecycle %bookmarkPath%%BookmarkFileName%
+				
+				if (FileName == "") {
+					msgbox, Error no name, can't delete.
+				}else {	
+								
+				FileRecycle %U_NotePath%%FileName%.txt
+				FileRecycle %U_NotePath%%FileName%.ini
+				FileRecycle %U_NotePath%%FileName%.clipboard
+				FileRecycle %U_NotePath%%FileName%.lnk
 				
 							; remove from MyNoteArray
 				for Each, Note in MyNotesArray{
-					If (Note.8 = FileName){
+					If (Note.2 == RawName){
+						tooltip, %FileName% has been deleted
 						MyNotesArray.RemoveAt(Each)
 					}
 				}
 				; remove from ListView
 				LV_Delete(v)
+				}
 			}
 			
 			;Display a new LV if any.
