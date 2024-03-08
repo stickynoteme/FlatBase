@@ -1859,7 +1859,7 @@ Options:
 		StringReplace, noMods, savedHK%A_Index%, ~                  
 		StringReplace, noMods, noMods, #,,UseErrorLevel              
 		Gui, 3:Add, Hotkey, section vHK%A_Index% gLabel, %noMods%           
-		Gui, 3:Add, CheckBox, x+6  vCB%A_Index% Checked%ErrorLevel%, Win
+		Gui, 3:Add, CheckBox, x+6  vCB%A_Index% gLabel Checked%ErrorLevel%, Win
 		Gui, 3:Add,text, h0 xs0 Disabled
 	}                                                        
 ;-------------------------------------------------
@@ -1874,7 +1874,7 @@ Options:
 		StringReplace, noMods, savedSK%A_Index%, ~                  
 		StringReplace, noMods, noMods, #,,UseErrorLevel              
 		Gui, 3:Add, Hotkey, section vSK%A_Index% gLabelS, %noMods%           
-		Gui, 3:Add, CheckBox, x+6  vSCB%A_Index% Checked%ErrorLevel%, Win
+		Gui, 3:Add, CheckBox, x+6  vSCB%A_Index% gLabelS Checked%ErrorLevel%, Win
 		Gui, 3:Add,text, h0 xs0 Disabled
 	}      
 ;-------------------------------------------------
