@@ -1585,7 +1585,7 @@ UseCapslockToggle:
 	if (UseCapslock = 0)
 		GuiControl, Enable, msctls_hotkey321
 	if (A_GuiEvent == "Normal"){
-		IniWrite,%UseCapslock%, %iniPath%, General, UserSetKey
+		IniWrite,%UseCapslock%, %iniPath%, General, U_Capslock
 		return
 	}
 return
@@ -2132,6 +2132,10 @@ SaveAndReload:
 	IniWrite, %Select_RapidStar%, %iniPath%, General, RapidStar
 	GuiControlGet, Select_UseStarsAsParents
 	IniWrite, %Select_UseStarsAsParents%, %iniPath%, General, UseStarsAsParents
+	
+	GuiControlGet, UseCapslock
+	IniWrite, %UseCapslock%, %iniPath%, General, U_Capslock
+	
 	GuiControlGet, U_QuickNoteWidth,,QuickWSelect	
 	IniWrite, %U_QuickNoteWidth%,%iniPath%,General, QuickNoteWidth
 	GuiControlGet, U_MainNoteWidth,,MainWSelect	

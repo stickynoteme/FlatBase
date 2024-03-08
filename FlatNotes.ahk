@@ -537,7 +537,7 @@ IniRead, StickyRows, %iniPath%, General, StickyRows ,8
 
 IniRead, StickyW, %iniPath%, General, StickyW ,250
 IniRead, LibW, %iniPath%, General, WindowWidth ,530
-IniRead, U_Capslock, %iniPath%, General, UseCapsLock , 1
+IniRead, U_Capslock, %iniPath%, General, U_Capslock , 1
 IniRead, sendCtrlC, %iniPath%, General, sendCtrlC, 1
 
 

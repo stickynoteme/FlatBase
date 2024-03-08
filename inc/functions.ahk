@@ -500,30 +500,34 @@ return
 SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNoteCat,QuickNoteParent) {
 	TVReDraw = 1
 	FileNameTxt := FileSafeName ".txt"
+	tmpFullPath = %U_NotePath%%FileNameTxt%
 	
-	FileSafeName = %U_NotePath%%FileSafeName%.txt
-	if (FileSafeName =".txt" or FileSafeName =" .txt" or Strlen(FileSafeName)<4) {
+	if (FileNameTxt =".txt" or FileNameTxt =" .txt" or Strlen(FileNameTxt)<4) {
 		msgbox BlankName error #01
 		return
 		}
-	if (FileSafeName =".txt.txt") {
+	if (FileNameTxt =".txt.txt" or FileNameTxt =" .txt.txt" or FileNameTxt =" .txt .txt" or FileNameTxt =".txt .txt") {
 		msgbox BlankName error #02
 		return
 		}
+		
 	if (QuickNoteBody != false)
 	{
-		FileRecycle, %FileSafeName%
-		FileAppend , %QuickNoteBody%, %FileSafeName%, UTF-8
+		;Save the File if it's not empty.
+		;First Recycle the old file.
+		FileRecycle, %tmpFullPath%
+		;Than remake it.
+		FileAppend , %QuickNoteBody%, %tmpFullPath%, UTF-8
 	} else {
-		FileRead, QuickNoteBody,%U_NotePath%%FileSafeName%.txt
+		;If this is a quick not read the contents back
+		FileRead, QuickNoteBody,%tmpFullPath%
 	}
 	
-	tmpFullPath = %U_NotePath%%FileSafeName%.txt
 
 	if !FileExist(tmpFullPath)
 	{
 		ProbablyTooLong := StrLen(tmpFullPath)
-		msgbox :!:NOTE SAVE FAILED:!: `n`nThis is normally due to your title being too long. Your file path length with the provided title was %ProbablyTooLong% and windows max file path size is 255 characters which you should aim to be well below in case you want to move your files someday. P/s The Note body text was copied to your clipboard if it wasn't blank.
+		msgbox :!:NOTE SAVE FAILED:!: `n`nThis is normally due to your title being too long. Your file path length with the provided title was %ProbablyTooLong% and windows max file path size is 255 characters which you should aim to be well below in case you want to move your files someday. P/s The Note body text was copied to your clipboard if it wasn't blank.`n`nNote Path: %tmpFullPath%
 		
 		if (QuickNoteBody)
 			Clipboard := QuickNoteBody
