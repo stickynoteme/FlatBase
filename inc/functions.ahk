@@ -501,19 +501,19 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 	TVReDraw = 1
 	FileNameTxt := FileSafeName ".txt"
 	
-	SaveFileName = %U_NotePath%%FileSafeName%.txt
-	if (SaveFileName =".txt" or Strlen(SaveFileName)<1) {
+	FileSafeName = %U_NotePath%%FileSafeName%.txt
+	if (FileSafeName =".txt" or FileSafeName =" .txt" or Strlen(FileSafeName)<4) {
 		msgbox Name error #01
 		return
 		}
-	if (SaveFileName =".txt.txt") {
+	if (FileSafeName =".txt.txt") {
 		msgbox Name error #02
 		return
 		}
 	if (QuickNoteBody != false)
 	{
-		FileRecycle, %SaveFileName%
-		FileAppend , %QuickNoteBody%, %SaveFileName%, UTF-8
+		FileRecycle, %FileSafeName%
+		FileAppend , %QuickNoteBody%, %FileSafeName%, UTF-8
 	} else {
 		FileRead, QuickNoteBody,%U_NotePath%%FileSafeName%.txt
 	}
