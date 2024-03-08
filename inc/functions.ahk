@@ -503,11 +503,11 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 	tmpFullPath = %U_NotePath%%FileNameTxt%
 	
 	if (FileNameTxt =".txt" or FileNameTxt =" .txt" or Strlen(FileNameTxt)<4) {
-		msgbox BlankName error #01
+		;msgbox BlankName error #01
 		return
 		}
 	if (FileNameTxt =".txt.txt" or FileNameTxt =" .txt.txt" or FileNameTxt =" .txt .txt" or FileNameTxt =".txt .txt") {
-		msgbox BlankName error #02
+		;msgbox BlankName error #02
 		return
 		}
 		
