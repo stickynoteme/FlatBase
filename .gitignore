@@ -9,3 +9,4 @@ settings.ini
 *.clipboard
 MyScripts/*
 MyBookmarks/*
+MyImages/*.png

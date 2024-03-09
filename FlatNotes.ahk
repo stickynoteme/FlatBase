@@ -291,6 +291,7 @@ if (A_ScreenDPI > 120)
 global RC16
 global RC17
 global RC18
+global RC19
 global TypeBUpdate,1
 global ScriptFilterActive
 global ClipFilterActive
@@ -359,7 +360,7 @@ FileCreateDir, MyScripts
 detailsPath := A_WorkingDir "\NoteDetails\"
 clipPath := A_WorkingDir "\MyClipboards\"
 bookmarkPath := A_WorkingDir "\MyBookmarks\"
-bookmarkPath := A_WorkingDir "\MyImages\"
+ImagePath := A_WorkingDir "\MyImages\"
 scriptpath := A_WorkingDir "\MyScripts\"
 iniPath = %A_WorkingDir%\settings.ini
 systemINI = %A_WorkingDir%\sys\system.ini
@@ -813,6 +814,7 @@ return
 #include inc\Object sort.ahk
 #include inc\string-object-file.ahk
 #include inc\Class_ImageButton.ahk
+#include inc\CaptureScreen.ahk
 ;-!- Return after fucntions so lables don't get exacuted
 return
 #Include inc\DummyGui.ahk

@@ -952,6 +952,10 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			RC18 = 1
 			goto GuiContextMenu
 		}
+		if (LV@sel_col == 19) {
+			RC19 = 1
+			goto GuiContextMenu
+		}
 	}
 return
 
@@ -3155,6 +3159,39 @@ return
 GuiContextMenu:
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
+	
+		if (A_GuiControl=="StoreImage" OR RC19 == 1 ) {
+		RC19 = 0
+		if GetKeyState("Shift"){
+			MsgBox, 4404,Delete?,Delete ScreenShot?
+				IfMsgBox No
+					return
+				FileRecycle,%ImagePath%%FileSafeName%.png
+				Iniwrite, A_Space, %detailsPath%%FileSafeName%.ini,INFO,Image
+				GuiControl,text,StoreImage, %ImageSymbol%
+				LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,,,A_Space)
+				return
+		}
+	if (FileExist(ImagePath FileSafeName ".png")){
+	MsgBox, 4404, , ScreenShot: "%FileSafeName%.png" already exists overwrite it?
+	IfMsgBox No
+		return
+	FileRecycle,%ImagePath%%FileSafeName%.png
+	}
+	WinHide, FlatNotes - Library
+	Sleep, 10
+	CaptureScreen(0, 0, ImagePath FileSafeName ".png")
+	; first parameter indicates full screen capture
+	; change 2nd parameter to 1 if you want mouse cursor in image
+	; change to desired path. can also change .png to .jpg or other
+	Iniwrite, 1, %detailsPath%%FileSafeName%.ini,INFO,Image
+	GuiControl,text,StoreImage, %PhotoframeSymbol%
+	WinShow, FlatNotes - Library
+	LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,,,PhotoframeSymbol)
+	GetCurrentNoteData(FileSafeName)
+	SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
+}
+	
 	if (A_GuiControl=="StoreBookmark" OR RC18 == 1 ) {
 		RC18 = 0
 		if GetKeyState("Shift"){
@@ -3162,6 +3199,7 @@ GuiContextMenu:
 				IfMsgBox No
 					return
 				FileRecycle,%bookmarkPath%%FileSafeName%.lnk
+				Iniwrite, A_Space, %detailsPath%%FileSafeName%.ini,INFO,Bookmark
 				GuiControl,text,StoreBookmark, %LinkSymbol%
 				LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,,A_Space)
 				return
