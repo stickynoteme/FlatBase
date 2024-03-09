@@ -3542,3 +3542,16 @@ treeGuiClose:
 treeGuiEscape:
 	Gui, tree:HIDE
 return
+
+
+TrayMenuHdlr_Reload:
+  Reload
+return
+
+TrayMenuHdlr_Suspend:
+  Suspend Toggle
+  if A_IsSuspended
+    Menu Tray, Check, Suspend Hotkeys
+  else
+    Menu Tray, Uncheck, Suspend Hotkeys
+return
