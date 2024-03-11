@@ -535,7 +535,7 @@ SkipToEndOfSearch:
 Return
 
 FoundSearchResult:
-	LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12,Note.13,Note.14,Note.15,Note.16,Note.17,Note.18)
+	LV_Add("", Note.1, Note.2,Note.3,Note.4,Note.5,Note.6,Note.7,Note.8,Note.9,Note.10,Note.11,Note.12,Note.13,Note.14,Note.15,Note.16,Note.17,Note.18,Note.19)
 Return
 
 
@@ -1968,6 +1968,7 @@ Options:
 	gui, 3:add, text, xp+55,Run
 	gui, 3:add, text, xp+55,Clip
 	gui, 3:add, text, xp+55,Link
+	gui, 3:add, text, xp+55,Img
 
 	gui, 3:add, text, xs section
 	
@@ -1993,6 +1994,7 @@ Options:
 	Gui, 3:Add,UpDown,  vClipPercentSelect gSet_ClipPercent Range0-100, %oClipPercent%
 	Gui, 3:Add, Edit, w50 x+5
 	Gui, 3:Add,UpDown,  vBookmarkPercentSelect gSet_BookmarkPercent Range0-100, %oBookmarkPercent%
+	Gui, 3:Add, Edit, w50 x+5
 	Gui, 3:Add,UpDown,  vImagePercentSelect gSet_ImagePercent Range0-100, %oImagePercent%
 	
 	Gui, 3:Add,text,xs section, - Main Window -
@@ -3167,7 +3169,7 @@ GuiContextMenu:
 				IfMsgBox No
 					return
 				FileRecycle,%ImagePath%%FileSafeName%.png
-				Iniwrite, A_Space, %detailsPath%%FileSafeName%.ini,INFO,Image
+				Iniwrite, %A_Space%, %detailsPath%%FileSafeName%.ini,INFO,Image
 				GuiControl,text,StoreImage, %ImageSymbol%
 				LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,,,A_Space)
 				return
@@ -3392,7 +3394,7 @@ FilterImage:
 	ImageFilterActive++
 	FilterImageSearch:
 	if (ImageFilterActive==1){
-		GuiControl,text,SortImage, %ImageSymbol%
+		GuiControl,text,SortImage, %PhotoframeSymbol%
 		Mloops := LV_GetCount()
 		while (Mloops--)
 		{
@@ -3408,7 +3410,7 @@ FilterImage:
 		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_MSFC%, %ResultFontFamily%, %U_SFC%
 		GuiControl, Font, SortImage
 	}else {
-		GuiControl,text,SortImage, %PhotoframeSymbol%
+		GuiControl,text,SortImage, %ImageSymbol%
 		ImageFilterActive = 0
 		gosub Search
 		Gui, Font, s%ResultFontSize% Q%FontRendering% c%U_SFC%, %ResultFontFamily%, %U_SFC%

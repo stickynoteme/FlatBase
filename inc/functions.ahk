@@ -369,7 +369,7 @@ MakeFileList(ReFreshMyNoteArray){
 			BookmarkField := A_space
 		}
 		if (ImageField == 1){
-			ImageField := ImageSymbol
+			ImageField := PhotoframeSymbol
 		}else{
 			ImageField := A_space
 		}
@@ -398,11 +398,11 @@ MakeFileList(ReFreshMyNoteArray){
 			StarFieldArray:= A_sapce
 		
 		if (ReFreshMyNoteArray = 1){
-			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField,TagsField,CatField,ParentField,CheckedField,MarkedField,ExtraField,ScriptField,ClipFeild,BookmarkField,ImageFeild)
+			LV_Add("",StarFieldArray ,NameField, NoteField, UserTimeFormatA,UserTimeFormatM,AddedField,ModdedField,A_LoopField,StarField,TagsField,CatField,ParentField,CheckedField,MarkedField,ExtraField,ScriptField,ClipFeild,BookmarkField,ImageField)
 			}
 
 		UsedStars .= StarFieldArray "|"
-		MyNotesArray.Push({1:StarFieldArray,2:NameField,3:NoteField,4:UserTimeFormatA,5:UserTimeFormatM,6:AddedField,7:ModdedField,8:A_LoopField,9:StarField,10:TagsField,11:CatField,12:ParentField,13:CheckedField,14:MarkedField,15:ExtraField,16:ScriptField,17:ClipField,18:BookmarkField,19:ImageFeild})
+		MyNotesArray.Push({1:StarFieldArray,2:NameField,3:NoteField,4:UserTimeFormatA,5:UserTimeFormatM,6:AddedField,7:ModdedField,8:A_LoopField,9:StarField,10:TagsField,11:CatField,12:ParentField,13:CheckedField,14:MarkedField,15:ExtraField,16:ScriptField,17:ClipField,18:BookmarkField,19:ImageField})
 	} ; File loop end
 	UsedStars := RemoveDups(UsedStars,"|")
 	UsedStars := StrReplace(UsedStars,"||","|")
@@ -565,9 +565,9 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 	Iniread, Clip, %detailsPath%%FileSafeName%.ini,INFO,Clip,%a_space%
 	Iniread, Bookmark, %detailsPath%%FileSafeName%.ini,INFO,Bookmark,%a_space%
 	Iniread, Image, %detailsPath%%FileSafeName%.ini,INFO,Image,%a_space%
-	Iniread, Checked, %detailsPath%%FileSafeName%.ini,INFO,Bookmark,%a_space%
-	Iniread, Marked, %detailsPath%%FileSafeName%.ini,INFO,Bookmark,%a_space%
-	Iniread, Extra, %detailsPath%%FileSafeName%.ini,INFO,Bookmark,%a_space%
+	Iniread, Checked, %detailsPath%%FileSafeName%.ini,INFO,Checked,%a_space%
+	Iniread, Marked, %detailsPath%%FileSafeName%.ini,INFO,Marked,%a_space%
+	Iniread, Extra, %detailsPath%%FileSafeName%.ini,INFO,Extra,%a_space%
 	
 		if	(Clip == 1){
 		Clip := SaveSymbol
@@ -575,12 +575,12 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 			Clip := A_space
 		}
 		if (Bookmark == 1){
-			Bookmark := BookmarkSymbol
+			Bookmark := BookmarkSymbol	
 		}else{
 			Bookmark := A_space
 		}
 		if (Image == 1){
-			Image := ImageSymbol
+			Image := PhotoframeSymbol
 		}else{
 			Image := A_space
 		}

@@ -16,6 +16,13 @@ GetCurrentNoteData(Fun_SafeName)
 	iniRead,C_Tags,%detailsPath%%C_SafeName%.ini,INFO,Tags,
 	iniRead,C_Cat,%detailsPath%%C_SafeName%.ini,INFO,Cat,
 	iniRead,C_Parent,%detailsPath%%C_SafeName%.ini,INFO,Parent,
+	iniRead,C_Image,%detailsPath%%C_SafeName%.ini,INFO,Image,
+	iniRead,C_Bookmark,%detailsPath%%C_SafeName%.ini,INFO,Bookmark,
+	iniRead,C_Checked,%detailsPath%%C_SafeName%.ini,INFO,Checked,
+	iniRead,C_Marked,%detailsPath%%C_SafeName%.ini,INFO,Marked,
+	iniRead,C_Clip,%detailsPath%%C_SafeName%.ini,INFO,Clip,
+	iniRead,C_Extra,%detailsPath%%C_SafeName%.ini,INFO,Extra,
+	iniRead,C_RunType,%detailsPath%%C_SafeName%.ini,INFO,RunType,
 	GetFile = true ;reset so it doesn't cause any strange issues and we can use it where ever we need it.
 return
 }
