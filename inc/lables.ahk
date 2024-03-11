@@ -102,7 +102,7 @@ Label4:
 		istitle = no
 		ztitleEncoded := NameEncode(ztitle)
 		tooltip T: %ztitle%
-		settimer, KillToolTip, -500
+		settimer, KillToolTip, -300
 		clipboard := MyOldClip
 		return
 	}
@@ -114,8 +114,8 @@ Label4:
 		SaveFile(ztitle,ztitleEncoded,zbody,0,"RapidNote",LastCatFilter,"")
 		gosub search
 		tooltip B: %zbody%
-		settimer, KillToolTip, -500
-		if (ShowStarOnRapidNoteSave != 1) {
+		settimer, KillToolTip, -300
+		if (PromptForRapidStar == 1) {
 			MouseGetPos, xPos, yPos
 			xPos := xPos+25
 			RapidStarNow = 1
@@ -1497,7 +1497,6 @@ StarSaveChange:
 	if (RapidStarNow == 1)
 	{
 		StarOldFile := ztitleEncoded ".txt"
-		RapidStarNow = 0
 	}
 	
 		if (ColEditStar == 1){
@@ -1529,13 +1528,14 @@ StarSaveChange:
 	}
 	SaveFile(TmpName,TmpFileSafeName,C_Body,1,TmpTags,TmpCat,TmpParent)
 	ListStarToChange = 1
-	if (RapidStarNow = 1){
+	if (RapidStarNow == 1){
 		ListStarToChange = 0
 		ListNeedsRefresh = 1
 		sNeedsSubmit = 0
 		ControlFocus , SysListView321, FlatNotes - Library
 	}
 	RapidStar = 0
+	RapidStarNow = 0
 	ControlFocus , Edit1, FlatNotes - Library
 	gosub search
 	StarOldFile := ""
@@ -1573,7 +1573,7 @@ return
 
 Set_RapidStar:
 	GuiControlGet, Select_RapidStar
-	IniWrite, %RapidStar%, %iniPath%, General, RapidStar
+	IniWrite, %PromptForRapidStar%, %iniPath%, General, PromptForRapidStar
 return
 
 Set_UseStarsAsParents:
@@ -2081,7 +2081,7 @@ Options:
 	;Quick/Rapid Save Tab
 	Gui, 3:Tab, Quick/Rapid Save
 	Gui, 3:Add,CheckBox, vSelect_RapidStar gSet_RapidStar, Prompt for star at end of Rapid note?
-	GuiControl,,Select_RapidStar,%RapidStar%
+	GuiControl,,Select_RapidStar,%PromptForRapidStar%
 	
 ;—-------------------------
 ;Tree View Options Tab
@@ -2135,7 +2135,7 @@ SaveAndReload:
 	GuiControlGet,Select_ExtraInputInTemplatesHelper
 	IniWrite,%Select_ExtraInputInTemplatesHelper%, %iniPath%, General, ShowCatEditPreviewHelper
 	GuiControlGet, Select_RapidStar
-	IniWrite, %Select_RapidStar%, %iniPath%, General, RapidStar
+	IniWrite, %Select_RapidStar%, %iniPath%, General, PromptForRapidStar
 	GuiControlGet, Select_UseStarsAsParents
 	IniWrite, %Select_UseStarsAsParents%, %iniPath%, General, UseStarsAsParents
 	

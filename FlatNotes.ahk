@@ -223,6 +223,7 @@ global QuickStar
 global SearchDates
 global ztitleEncoded
 global RapidStar
+global PromptForRapidStar
 global RapidStarNow
 global LVSelectedROW
 global StarOldFile
@@ -503,7 +504,7 @@ IniRead, ShowQuickTagEditBoxHelper,%iniPath%,General,ShowQuickTagEditBoxHelper,1
 
 IniRead, ExtraInputInTemplatesHelper,%iniPath%,General,ExtraInputInTemplatesHelper,1
 
-IniRead, RapidStar,%iniPath%,General,RapidStar,1
+IniRead, PromptForRapidStar,%iniPath%,General,PromptForRapidStar,1
 IniRead, UseStarsAsParents,%iniPath%,General,UseStarsAsParents,0
 
 Iniread, SearchWholeNote,%iniPath%,General,SearchWholeNote,1
