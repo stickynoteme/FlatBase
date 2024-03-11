@@ -19,12 +19,13 @@ BuildTemplateInsertUI:
 	for k, v in TemplateArr {
 		wTMP%k%:= ListBoxWarr[A_Index]
 		wwTMP := wTMP%k%
+		ShowExtraInput := ActiveInputBoxesArray[A_Index]
 		if (wwTMP = ""){
 			msgbox Width Row is missing a value.`n`nTry opening this template in the editor by right clicking it and using [Auto Width].
 			return
 		}
-		if (ExtraInputInTemplatesHelper)
-			Gui, nt:add, edit, % " -E0x200 c" U_MFC " x+3 ys0 w" wwTMP " vNTeB" k " r1", 
+		if (ExtraInputInTemplatesHelper and ShowExtraInput == 1	)
+			Gui, nt:add, edit, % " -E0x200 c" U_MFC " x+3 ys0 w" ExtraBoxWidth " vNTeB" k " r1", 
 		Gui, nt:add, listbox, % "Multi -E0x200 c" U_MFC " w" wwTMP " vNTLB" k " r10 ys0" , %v%
 	}
 	Gui, nt:add, text, c%U_SFC% center y+3 x3 section w%WindowW% -E0x200 gntInsertB, [ Insert At Bottom ]
@@ -101,29 +102,43 @@ NoteTemplateUI:
 		FileRead,TemplateToEdit,%templatePath%%Selected_NoteTemplate%
 		TemplateEditName := RegExReplace(Selected_NoteTemplate, "\.txt(?:^|$|\r\n|\r|\n)")
 		TTEArr := StrSplit(TemplateToEdit,"`n","`n")
+		ExtraBoxWidth := TTEArr[3]
 		Gui, ntm:new,hwndHNTM ,Template Maker - FlatNotes
 		Gui, ntm:Margin, 3,3
 		Gui, ntm:Font, s10, Courier New,
 		Gui, ntm:Color,%U_SBG%, %U_MBG%
 		Gui, ntm:add, text, c%U_SFC% section y+3 w50, Name:
-		Gui, ntm:add, Edit, center c%U_MFC% x+3 w300 r1 -E0x200 vTemplateFileName,%TemplateEditName%
+		Gui, ntm:add, Edit, center c%U_MFC% x+3 w400 r1 -E0x200 vTemplateFileName,%TemplateEditName%
 		Gui, ntm:add, text, c%U_SFC% x+3 w50, .txt
 		Gui, ntm:add, text, section xs center h0 w0 hidden
-		Gui, ntm:add, text, c%U_SFC% center w400, Width of each list: (50|70|100)
+		
+		Gui, ntm:add, text, center w450 c%U_SFC% x+5,Extra input box width. [Use checkboxes to activate]:
+		Gui, ntm:add, Edit, c%U_MFC% x+3 w50 r1 -E0x200  vTMIW, %ExtraBoxWidth%
+		
+		
+		Gui, ntm:add, text, section xs center h0 w0 hidden
+		Gui, ntm:add, text, c%U_SFC% center w500, Width of each list: (50|70|100)
 		Gui, ntm:add, text, c%U_SFC% center w200 gAutoWidth, [ Auto Width ]
 		Gui, ntm:add, text, c%U_SFC% center w200 x+3 gntSAVE, [ Save ]
 		TTEArrW := TTEArr[1]
-		Gui, ntm:add, Edit, center c%U_MFC% section xs w400 r1 -E0x200 vListBoxWidthRow,%TTEArrW%
+		Gui, ntm:add, Edit, center c%U_MFC% section xs w500 r1 -E0x200 vListBoxWidthRow,%TTEArrW%
+
+		TMPActiveInputEditBoxes := TTEArr[2]
+		StringSplit, ActiveInputEditBoxes, TMPActiveInputEditBoxes, "|","|")
+		TTEArr.RemoveAt(2)
+		TTEArr.RemoveAt(2)
 		TTEArr.RemoveAt(1)
 		
-		Gui, ntm:add, text, c%U_SFC%section xs center w400, List below here: (Red|Blue|Green) 
+		Gui, ntm:add, text, c%U_SFC%section xs center w500, List below here: (Red|Blue|Green) 
 		for, k,v  in TTEArr {
 			RowDetails := TTEArr[A_Index]
 			Gui, ntm:add, text, c%U_SFC% section xs w30, %a_index%:
 			;370 
+			Gui, ntm:Add,CheckBox, center x+5 vShowInputBox%a_index%
 			Gui, ntm:add, Edit, c%U_MFC% x+3 w350 r1 -E0x200  vTMLB%a_index%,%RowDetails%
 			Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMup%a_index%,%TemplateAboveSymbol%
 			Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMdown%a_index%,%TemplateBelowSymbol%
+			GuiControl,,ShowInputBox%a_index%,% ActiveInputEditBoxes%a_index%
 		}
 		BlankRows := TTEArr.MaxIndex()
 		GuiControlGet,TRowsOver,, %HTRowsOver%
@@ -132,6 +147,7 @@ NoteTemplateUI:
 			Loop %CheckRows% {
 				BlankRows++
 				Gui, ntm:add, text, c%U_SFC% section xs w30, %BlankRows%:
+				Gui, ntm:Add,CheckBox, center x+5 vShowInputBox%BlankRows%
 				Gui, ntm:add, Edit, c%U_MFC% x+3 w350 r1 -E0x200  vTMLB%BlankRows%,
 				Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMup%BlankRows%,%TemplateAboveSymbol%
 				Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMdown%BlankRows%,%TemplateBelowSymbol%
@@ -152,19 +168,7 @@ NoteTemplateUI:
 		xPos /= 1.15
 		yPos /= 1.15
 		WindowW := ""
-		FileRead, TemplateTMP, %templatePath%%Selected_NoteTemplate%
-		TemplateTMP := trim(TemplateTMP,"`n")
-		TemplateTMP := trim(TemplateTMP,"`r")
-		NewTemplateArr := SubStr(TemplateTMP, InStr(TemplateTMP, "`n") + 1)
-		TemplateArr := StrSplit(NewTemplateArr, "`n","`n")
-		FileReadLine ListBoxWs, %templatePath%%Selected_NoteTemplate%, 1
-		ListBoxWArr := StrSplit(ListBoxWs, "|","|")
-		for k, v in TemplateArr {
-			wTMP%k%:= ListBoxWarr[A_Index]
-			wwTMP := wTMP%k%
-			WindowW += wwTMP+3
-		}
-		gosub BuildTemplateInsertUI
+		gosub BuildTemplateArray
 		return
 	}
 	
@@ -179,19 +183,8 @@ NoteTemplateUI:
 		xPos /= 1.15
 		yPos /= 1.15
 		WindowW := ""
-		FileRead, TemplateTMP, %templatePath%%Selected_NoteTemplate%
-		TemplateTMP := trim(TemplateTMP,"`n")
-		TemplateTMP := trim(TemplateTMP,"`r")
-		NewTemplateArr := SubStr(TemplateTMP, InStr(TemplateTMP, "`n") + 1)
-		TemplateArr := StrSplit(NewTemplateArr, "`n","`n")
-		FileReadLine ListBoxWs, %templatePath%%Selected_NoteTemplate%, 1
-		ListBoxWArr := StrSplit(ListBoxWs, "|","|")
-		for k, v in TemplateArr {
-			wTMP%k%:= ListBoxWarr[A_Index]
-			wwTMP := wTMP%k%
-			WindowW += wwTMP+3
-		}
-		gosub BuildTemplateInsertUI
+
+		gosub BuildTemplateArray
 		return
 	}
 return
@@ -241,9 +234,15 @@ ntInsert:
 	NL := ""
 	NTBody := ""
 	WindowW := ""
+	ActiveInputBoxes := ""
+	InputBoxBooleanList := ""
 	TemplateArr := []
 	ListBoxWArr := []
 	NewTemplateArr :=[]
+	ActiveInputBoxesArray :=[]
+	ShowInputBox := []
+	ExtraBoxWidth := ""
+	
 return
 
 NoteTemplateEnterButton:
@@ -258,20 +257,7 @@ NoteTemplateEnterButton:
 		xPos /= 1.15
 		yPos /= 1.15
 		WindowW := ""
-		FileRead, TemplateTMP, %templatePath%%Selected_NoteTemplate%
-		TemplateTMP := trim(TemplateTMP,"`n")
-		TemplateTMP := trim(TemplateTMP,"`r")
-		NewTemplateArr := SubStr(TemplateTMP, InStr(TemplateTMP, "`n") + 1)
-		TemplateArr := StrSplit(NewTemplateArr, "`n","`n")
-		FileReadLine ListBoxWs, %templatePath%%Selected_NoteTemplate%, 1
-		ListBoxWArr := StrSplit(ListBoxWs, "|","|")
-		for k, v in TemplateArr {
-			wTMP%k%:= ListBoxWarr[A_Index]
-			wwTMP := wTMP%k%
-			WindowW += wwTMP+3
-		}
-		
-		gosub BuildTemplateInsertUI
+		gosub BuildTemplateArray
 return
 
 
@@ -339,17 +325,27 @@ NoteTemplateMaker:
 	Gui, ntm:Font, s10, Courier New,
 	Gui, ntm:Color,%U_SBG%, %U_MBG%
 	Gui, ntm:add, text, c%U_SFC% section y+3 w50, Name:
-	Gui, ntm:add, Edit, c%U_MFC% x+3 w300 r1 -E0x200 vTemplateFileName,
+	Gui, ntm:add, Edit, c%U_MFC% x+3 w400 r1 -E0x200 vTemplateFileName,
 	Gui, ntm:add, text, c%U_SFC% x+3 w50, .txt
+
 	Gui, ntm:add, text, section xs center h0 w0 hidden
-	Gui, ntm:add, text, c%U_SFC% center w400, Width of each list: (50|70|100)
+	Gui, ntm:add, text, center w450 c%U_SFC% x+5,Extra input box width. [Use checkboxes to activate]:
+	Gui, ntm:add, Edit, c%U_MFC% x+3 w50 r1 -E0x200  vTMIW, %ExtraBoxWidth%
+	
+	
+	Gui, ntm:add, text, section xs center h0 w0 hidden
+	Gui, ntm:add, text, c%U_SFC% center w500, Width of each list: (50|70|100)
 	Gui, ntm:add, text, c%U_SFC% center w200 gAutoWidth, [ Auto Width ]
 	Gui, ntm:add, text, c%U_SFC% center w200 x+3 gntSAVE, [ Save ]
-	Gui, ntm:add, Edit, c%U_MFC% section xs w400 r1 -E0x200 vListBoxWidthRow,
+	
+	Gui, ntm:add, text, section xs center h0 w0 hidden
+	Gui, ntm:add, Edit, center c%U_MFC% section w500 r1 -E0x200 vListBoxWidthRow
+	Gui, ntm:add, text, section xs center h0 w0 hidden
 
-	Gui, ntm:add, text, c%U_SFC%section xs center w400, List below here: (Red|Blue|Green) 
+	Gui, ntm:add, text, c%U_SFC%section xs center w500, List below here: (Red|Blue|Green) 
 	Loop %NewTemplateRows% {
 		Gui, ntm:add, text, c%U_SFC% section xs w30, %a_index%:
+		Gui, ntm:add, CheckBox, center x+5 vShowInputBox%a_index%
 		Gui, ntm:add, Edit, c%U_MFC% x+3 w370 r1 -E0x200  vTMLB%a_index%,
 		Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMup%a_index%,%TemplateAboveSymbol%
 		Gui, ntm:add, text, center c%U_SFC% x+5 w12 gTMdown%a_index%,%TemplateBelowSymbol%
@@ -397,6 +393,21 @@ ntSAVE:
 		}
 	GuiControlGet,ListBoxWidthRow
 	TemplateFileText := ListBoxWidthRow "`n"
+	
+	InputBoxBooleanList := ""
+	Loop %NewTemplateRows% {
+		GuiControlGet,ShowInputBox%a_index%
+		InputBoxBooleanList .=ShowInputBox%a_index% "|"
+	}
+	InputBoxBooleanList := trim(InputBoxBooleanList,"|")
+	TemplateFileText .= InputBoxBooleanList "`n"
+	
+	GuiControlGet,TMIW
+	if (TMIW <1) {
+		TMIW = 100
+	}
+	TemplateFileText .= TMIW "`n"
+	
 	Loop %NewTemplateRows% {
 		GuiControlGet,TMLB%a_index%
 		
@@ -419,6 +430,42 @@ ntSAVE:
 		}
 return
 
+BuildTemplateArray:
+		;Reset stuff for saftiy
+		ActiveInputBoxes := ""
+		InputBoxBooleanList := ""
+		TemplateArr := []
+		ListBoxWArr := []
+		NewTemplateArr :=[]
+		ActiveInputBoxesArray :=[]
+		ShowInputBox := []
+		ExtraBoxWidth := ""
+		ListBoxWs := ""
+		TemplateTMP := ""
+
+		;Build template details
+		FileReadLine ListBoxWs, %templatePath%%Selected_NoteTemplate%, 1
+		ListBoxWArr := StrSplit(ListBoxWs, "|","|")
+		FileReadLine ActiveInputBoxes, %templatePath%%Selected_NoteTemplate%, 2
+		ActiveInputBoxesArray := StrSplit(ActiveInputBoxes, "|","|")
+		FileReadLine ExtraBoxWidth, %templatePath%%Selected_NoteTemplate%, 3
+		
+		;Build Templatearray
+		FileRead, TemplateTMP, %templatePath%%Selected_NoteTemplate%
+		TemplateTMP := trim(TemplateTMP,"`n")
+		TemplateTMP := trim(TemplateTMP,"`r")
+		;skip line 1 & 2 as they are settings.
+		NewTemplateArr := SubStr(TemplateTMP, InStr(TemplateTMP,"`n",,,3))
+		NewTemplateArr := trim(NewTemplateArr,"`n")
+		NewTemplateArr := trim(NewTemplateArr,"`r")
+		TemplateArr := StrSplit(NewTemplateArr, "`n","`n")
+		for k, v in TemplateArr {
+			wTMP%k%:= ListBoxWarr[A_Index]
+			wwTMP := wTMP%k%
+			WindowW += wwTMP+3
+		}
+		gosub BuildTemplateInsertUI
+return
 
 ntGuiEscape:
 ntGuiClose:
