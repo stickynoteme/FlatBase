@@ -1784,7 +1784,13 @@ Options:
 	FileRead, FontFile, % Fontlist
 	FontOptionsArray := []
 	loop, parse, FontFile, `n
-		FontOptionsArray.push(A_LoopField)
+	{
+		CleanFontName := A_LoopField
+		;remove new line from font names in array
+		StringReplace,CleanFontName,CleanFontName,`n,,A
+		StringReplace,CleanFontName,CleanFontName,`r,,A
+		FontOptionsArray.push(CleanFontName)
+	}
 	For k, fonts in FontOptionsArray
 		FontDropDownOptions .= fonts "|"
 
@@ -1908,29 +1914,31 @@ Options:
 	C_StickyFont = 1
 	C_ResultFont = 1
 	C_SearchFont = 1
+	
 	for k, v in FontOptionsArray
 	{ 
-		if (v = FontFamily) 
-			CurrentFont := k
+	
+	if (v == FontFamily) 
+		CurrentFont := k
 	} 
 	for k, v in FontOptionsArray
 	{ 
-		if (v = PreviewFontFamily) 
+		if (v == PreviewFontFamily) 
 			C_PreviewFont := k
 	} 
 	for k, v in FontOptionsArray
 	{ 
-		if (v = ResultFontFamily) 
+		if (v == ResultFontFamily) 
 			C_ResultFont := k
 	} 
 	for k, v in FontOptionsArray
 	{ 
-		if (v = SearchFontFamily) 
+		if (v == SearchFontFamily) 
 			C_SearchFont := k
 	}
 	for k, v in FontOptionsArray
 	{ 
-		if (v = StickyFontFamily) 
+		if (v == StickyFontFamily) 
 			C_StickyFont := k
 	} 
 	Gui, 3:Add,text,section, Quick Note Interface font settings:
