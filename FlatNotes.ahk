@@ -27,29 +27,11 @@ Menu, Tray, Default, Library
 ;-------------------------------------------------
 global TemplateDisplayMode
 
-global TreeLibW = 500
-global TreeLibH = 300
-global TreeBorder = 2
 Global ScrollbarW = 0 
 
 global ColEditName
 global GetFile
 global ColList = ["Star", "Title", "Body", "Added", "Modified", "RawAdded", "RawModded", "FileName", "RawStar", "Tags","Cat","Parent", "Checked", "Marked", "Extra"]
-
-
-global TreeCol1W := 125 + ScrollbarW
-global TreeCol1WSBH := TreeCol1W - ScrollbarW
-global TreeCol1X := 0 - ScrollbarW
-global TreeCol1H := TreeLibH
-global TreeCol2W := TreeLibW - TreeCol1W - TreeBorder + ScrollbarW + ScrollbarW
-global TreeCol2X := TreeCol1W + TreeBorder - ScrollbarW
-global TreeNameH = 20
-global TreePreviewH := TreeLibH - TreeNameH - TreeBorder
-global TreePreviewY := TreeNameH + TreeBorder + TreeBorder + TreeBorder + TreeBorder
-
-
-
-
 
 
 ;hwnd
@@ -60,9 +42,6 @@ global HPB ;
 global HSF ; SearchFilter edit ID
 global HCF ; CatFilter edit ID
 global HNP ; Note Parent edit ID
-global HTV ; Tree:gui Treeview ID
-global HTVN ; TV Note Name ID
-global HTVB ; Tree:gui Edit Preview / Body ID
 global HTF ; Listview tag Filter search box
 global HQNUSL1
 global HQNUSl2
@@ -76,13 +55,6 @@ global HstarBox4
 global HTSLB ;Template Selection List Box
 global HTSGUI ;Template Select GUI
 global HTRowsOver ; Total Rows edit box for Template maker
-global TVBuilt
-global TVNoteName
-global TVNoteBody
-global TVNoteTags
-global TVNoteCat
-global TVNoteStar
-global TVNoteTree
 global StaticX
 global StaticY
 
@@ -326,9 +298,7 @@ global StoreClipboard
 global ColBase = ,6,7,8,9
 global ColOrder = 1,2,3,4,5
 global SearchWholeNote
-global TreeFristRun = 1
 global SearchClip = 0
-global TVReDraw
 global LoopCheck
 global UseCheckBoxesTrue
 global UseCheckBoxes = false
@@ -732,7 +702,6 @@ if (ShowMainWindowOnStartUp = 0 and ColOrder != "1,2,3,4,5"){
 ;-------------------------------------------------
 ;goto Options
 ;BuildGUI2()
-;gosub BuildTreeUI
 ;-------------------------------------------------
 ;Use Capslock if users has not changed the main window hotkey
 ;-------------------------------------------------

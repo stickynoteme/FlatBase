@@ -1790,7 +1790,7 @@ Options:
 
 
 	Gui, 3:New,,FlatNotes - Options
-	Gui, 3:Add, Tab3,, General|Hotkeys|Shortcuts|Appearance|Window Size|Quick/Rapid Save|Tree View
+	Gui, 3:Add, Tab3,, General|Hotkeys|Shortcuts|Appearance|Window Size|Quick/Rapid Save
 	Gui, 3:Tab, General
 	
 	Gui, 3:Add, CheckBox, section vSelect_ShowMainWindowOnStartUp gSet_ShowMainWindowOnStartUp, Show main window on startup?
@@ -2084,13 +2084,9 @@ Options:
 	GuiControl,,Select_RapidStar,%PromptForRapidStar%
 	
 ;—-------------------------
-;Tree View Options Tab
+;Below Tabs
 ;—--------------------------
-	Gui, 3:Tab, Tree View
-	Gui, 3:Add,CheckBox, vSelect_UseStarsAsParents gSet_UseStarsAsParents,Use stars for Tree View parents instead of user set parents.
-	GuiControl,,Select_UseStarsAsParents,%UseStarsAsParents%	
-	
-	
+
 	gui,3:Tab,
 	Gui, 3:Add, Button, Default gSaveAndReload, Save and Reload
 	
@@ -3023,140 +3019,6 @@ msgbox % "Advanced search: `n Term;;n = Search names only.[Also works for Term;;
 return
 
 
-RefreshTV:
-Gui, tree:Default
-TVcurrent := TV_GetCount()
-TV_Delete()
-TVcurrent = 0
-lastloopcheck = -1
-TVneeded := JEE_ObjCount(MyNotesArray)
-;msgbox % TVcurrent
-global TreeExpandByDeafultTrue = "Expand"
-if (UseStarsAsParents)
-{
-	None := TV_Add("- None -",,  TreeExpandByDeafultTrue  )
-	TVneeded++
-	For Each, Note In MyNotesArray
-	{
-		if (Note.1)
-		{
-			StarName := NameEncodeSticky(Note.1)
-			StarName := trim(StarName)
-			
-			TV_GetText(StarParentExists,%StarName%)
-
-			if (!StarParentExists)
-			{
-				%StarName% := TV_Add(Note.1,,"Bold " .  TreeExpandByDeafultTrue)
-				TVneeded++
-			}
-		}
-	}
-	For Each, Note In MyNotesArray
-	{
-		TreeNodeName := NameEncodeSticky(Note.2)
-		TreeNodeName := trim(TreeNodeName)
-		%TreeNodeName% := 0
-		StarName := NameEncodeSticky(Note.1)
-		StarName := trim(StarName)
-		
-		if (StarName)
-			%TreeNodeName% := TV_Add(Note.2,%StarName%,"Expand" )
-		if (!StarName)
-			%TreeNodeName% := TV_Add(Note.2,None,"Expand")
-	}
-}else{
-;Built The root Parents.
-For Each, Note In MyNotesArray
-{
-	ParentFileName := NameEncodeSticky(Note.12)
-	ParentFileName := trim(ParentFileName)
-	TreeNodeName := NameEncodeSticky(Note.2)
-	TreeNodeName := trim(TreeNodeName)
-	%TreeNodeName% := 0
-	
-	if (not Note.12)
-	{
-		%TreeNodeName% := TV_Add(Note.2,,"Expand" )
-	}
-}
-;TVcurrent := TV_GetCount()
-;msgbox % TVcurrent "::" TVneeded
-
-while TV_GetCount() != TVneeded
-{
-	LastCount := TV_GetCount()
-	For Each, Note In MyNotesArray
-	{
-		if (Note.12)
-		{
-		
-			RealParentFileName := NameEncode( Note.12)
-			RealParentFileName := trim(RealParentFileName)
-			ParentFileName := NameEncodeSticky( Note.12)
-			ParentFileName := trim(ParentFileName)
-			TreeNodeName := NameEncodeSticky(Note.2)
-			TreeNodeName := trim(TreeNodeName)
-			
-			
-			
-			TV_GetText(SelfExists,%TreeNodeName%)
-			;msgbox % SelfExists
-			TV_GetText(ParentExists,%ParentFileName%)
-			
-			if (!SelfExists)
-			{
-				IfExist, %U_NotePath%%RealParentFileName%.txt
-				{
-				if (ParentExists)
-					{
-						%TreeNodeName% := TV_Add( Note.2,%ParentFileName%,"Expand")
-					}
-				}else
-				{
-					if (!ParentExists)
-					{
-						%ParentFileName% := TV_Add( Note.12,,"Bold Expand")
-						TVneeded++
-					}
-				
-					%TreeNodeName% := TV_Add( Note.2,%ParentFileName%,"Expand")
-				}
-			}
-		}
-	}
-	;TVcurrent := TV_GetCount()
-	;msgbox % TVcurrent "::" TVneeded
-	if (TV_GetCount() == LastCount)
-	{
-		msgbox failed at %LastCount% of %TVneeded% 
-		For Each, Note In MyNotesArray
-		{
-			if (Note.12)
-			{
-				ParentFileName := NameEncodeSticky(Note.12)
-				ParentFileName := trim(ParentFileName)
-				TreeNodeName := NameEncodeSticky(Note.2)
-				TreeNodeName := trim(TreeNodeName)
-				
-				SelfExists := TV_Get(%TreeNodeName%,"Bold")
-				ParentExists := TV_Get(%ParentFileName%,"Bold")
-				if (ParentExists == 0)
-				{
-					msgbox Parent Failed: %TreeNodeName% Because: %ParentFileName%
-				}
-				if (SelfExists == 0)
-				{
-					msgbox Self Failed: %TreeNodeName% Because: %ParentFileName%
-				}
-			}
-		}
-		goto FailBreak
-	}
-}
-} ;end of star parent else
-return
-
 ; *ImageWork
 GuiContextMenu:
 	LV_GetText(RowText, LVSelectedROW,2)
@@ -3482,105 +3344,6 @@ MakeSticky:
 	LV_GetText(StickyNoteName,LastRowSelected,2)
 	LV_GetText(StickyNoteFile,LastRowSelected,8)
 	Build_Stickynote_GUI(StickyNoteName,StickyNoteFile)
-return
-
-BuildTreeUI:
-
-If (TreeFristRun == 1)
-{
-	Gui, tree:New,, FlatNote - Tree
-	Gui, tree:+Resize
-	Gui, tree:Margin , 2, 2 
-	Gui, tree:Font, s%TitleBarFontSize% Q%FontRendering%, Verdana, %U_MFC%
-	Gui, tree:Color,%U_SBG%, %U_MBG%
-
-	Gui, tree:Add, TreeView, h%TreeCol1H% w%TreeCol1W% x%TreeCol1X% y0 hwndHTV -Hscroll AltSubmit +0x2 +0x1000 +E0x4000 -E0x200 %UseCheckBoxesTrue% gTreeViewInteraction  vTVNoteTree c%U_FBCA%
-	
-	;needed to center in color if name is ediable. Currently it is not, because I don't care if it is.
-	;Gui, tree:Add, listbox, vTVBGLB1 +0x100 r1 w%TreeCol2W% x%TreeCol2X% y1 -E0x200 Disabled -Tabstop c000000
-	
-	
-	Gui, tree:Add,Edit, center y7 x%TreeCol2X% h%TreeNameH% w%TreeCol2W% vTVNoteName hwndHTVN c%U_FBCA% -E0x200 readonly, 
-	Gui, tree:Add, Edit, x%TreeCol2X% y%TreePreviewY% h%TreePreviewH% w%TreeCol2W% hwndHTVB vTVNotePreview -E0x200 c%U_FBCA%,
-	
-	gui, tree:add, button, default x-4000 y-4000 gTreeViewSave, &Save
-	;Gui, tree:Add, Button, x%TreeW% y15 h%TreePreviewH% w111,test
-	TreeFristRun = 0
-}
-
-if (TVReDraw == 1)
-{
-	TVReDraw = 0
-	gosub RefreshTV
-}
-FailBreak:
-TVBuilt = 1
-gosub TreeViewInteraction
-;LVM_ShowScrollBar(HTV,1,false)
-Gui, tree:SHOW, h%TreeLibH% w%TreeLibW%
-return
-
-TreeViewInteraction:
-;ttip := A_EventInfo "::" A_GuiEvent
-;tooltip, %ttip%
-;SetTimer, KillToolTip, -5000
-if (A_GuiEvent = "Normal" or A_GuiEvent = "F" or A_GuiEvent = "K")
-{
-;LVM_ShowScrollBar(HTV,1,true)
-}
-if (A_GuiEvent = "f")
-{
-;LVM_ShowScrollBar(HTV,1,false)
-}
-if (TVBuilt == 1)
-{
-	TVBuilt = 0
-	TopTV := TV_GetNext()
-	TV_GetText(SelectedName, TopTV)
-	FileSafeName := NameEncode(SelectedName)
-	gosub TreeViewUpdate
-}
-
-if (A_GuiEvent = "S")
-{
-	;msgbox % A_EventInfo
-	TV_GetText(SelectedName, A_EventInfo)
-	FileSafeName := NameEncode(SelectedName)
-	gosub TreeViewUpdate
-}
-return
-
-TreeViewUpdate:
-IfExist, %U_NotePath%%FileSafeName%.txt
-	{
-		FileRead, MyFile, %U_NotePath%%FileSafeName%.txt
-		IniRead, OldStarData, %detailsPath%%FileSafeName%.ini,INFO,Star
-		OldStarData := ConvertStar(OldStarData)
-		IniRead, OldCatData, %detailsPath%%FileSafeName%.ini,INFO,Cat
-		IniRead, OldTagsData, %detailsPath%%FileSafeName%.ini,INFO,Tags
-		IniRead, OldParentData, %detailsPath%%FileSafeName%.ini,INFO,Parent
-		;GuiControl,, QuickNoteParent, %OldParentData%
-		;GuiControl,, QuickNoteTags, %OldTagsData%
-		;GuiControl, ChooseString, QuickNoteCat, %OldCatData%
-		;GuiControl,, QuickNoteBody,%MyFile%
-		;GuiControl,, QuickStar,%OldStarData%
-		GuiControl,,TVNoteName,%SelectedName%
-		GuiControl,,TVNotePreview,%MyFile%
-	}
-return
-
-TreeViewSave:
-GuiControlGet, TVNoteName
-T_safename := NameEncode(TVNoteName)
-GetCurrentNoteData(T_safename)
-GuiControlget, TVNotePreview
-
-SaveFile(C_Name,C_SafeName,TVNotePreview,1,C_Tags,C_Cat,C_Parent)
-return
-
-treeGuiClose:
-treeGuiEscape:
-	Gui, tree:HIDE
 return
 
 

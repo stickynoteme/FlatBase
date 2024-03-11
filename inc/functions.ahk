@@ -105,11 +105,8 @@ BuildGUI1(){
 	SymbolFontSize := PreviewFontSize - 1
 	Gui, 1:Font, s%SymbolFontSize% Q%FontRendering%, Segoe UI Emoji, %U_SFC%
 	
-	; Disable Tree  Because it's too error prone.
-	;TreeIconX := LibW - 25
-	;Gui, 1:Add,text, center yp0 x%TreeIconX% c%U_SFC% -E0x200 w25 h%title_h% gBuildTreeUI, %TreeSymbol%
-	
-	; Replaced Tree with clipboard copy
+	; Setup toolbar Icons
+	; TODO: Make these hideable in the options.
 	
 	StickyIconX := LibW - 125
 	RunIconX := LibW - 100

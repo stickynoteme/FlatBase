@@ -1,29 +1,6 @@
 ; --------------------—
 ; Handle Window specific things.
 ; ---------------------
-;handle window resize
-treeGuiSize:
-  If A_EventInfo = 1  ; If minimized.
-    Return
-
- TreeLibW := A_GuiWidth
- TreeLibH := A_GuiHeight
-
-global TreeCol1W := 125 + ScrollbarW
-global TreeCol1WSBH := TreeCol1W - ScrollbarW
-global TreeCol1X := 0
-global TreeCol1H := TreeLibH
-global TreeCol2W := TreeLibW - TreeCol1W - TreeBorder + ScrollbarW + ScrollbarW
-global TreeCol2X := TreeCol1W + TreeBorder - ScrollbarW
-global TreeNameH = 20
-global TreePreviewH := TreeLibH - TreeNameH - TreeBorder
-global TreePreviewY := TreeNameH + TreeBorder + TreeBorder + TreeBorder + TreeBorder
-
-  GuiControl Move, TVNoteTree, h%TreeCol1H% w%TreeCol1W%
-  GuiControl Move, TVBGLB1, w%TreeCol2W%
-  GuiControl Move, TVNoteName, h%TreeNameH% w%TreeCol2W%
-  GuiControl Move, TVNotePreview, h%TreePreviewH% w%TreeCol2W%
-Return
 
 
 ;---------------------
@@ -45,19 +22,6 @@ Return
 	return
 +enter::
 	ControlClick,Button1,FlatNote - QuickNote
-	return
-}
-#IfWinActive, FlatNote - Tree
-{
-!enter::	
-	ControlClick,Button1,FlatNote - Tree
-	tooltip, saved
-	settimer, KillToolTip, -500
-	return
-+enter::
-	ControlClick,Button1,FlatNote - Tree
-	tooltip, saved
-	settimer, KillToolTip, -500
 	return
 }
 ;------------------------------------------
