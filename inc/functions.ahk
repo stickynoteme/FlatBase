@@ -569,6 +569,7 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 	Iniread, Marked, %detailsPath%%FileSafeName%.ini,INFO,Marked,%a_space%
 	Iniread, Extra, %detailsPath%%FileSafeName%.ini,INFO,Extra,%a_space%
 	
+	
 		if	(Clip == 1){
 		Clip := SaveSymbol
 		}else{
@@ -603,6 +604,23 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 	iniWrite,%QuickNoteTags%,%detailsPath%%FileSafeName%.ini,INFO,Tags
 	iniWrite,%QuickNoteCat%,%detailsPath%%FileSafeName%.ini,INFO,Cat
 	iniWrite,%QuickNoteParent%,%detailsPath%%FileSafeName%.ini,INFO,Parent
+	
+	;Clear data to avoid issues: [Only NoteStar was causing issues that I know of, but figure it's better safe than sorry for the rest.]
+	QuickNoteName :=
+	FileSafeName :=
+	QuickNoteBody :=
+	Modified :=
+	NoteStar :=
+	QuickNoteTags :=
+	QuickNoteCat :=
+	QuickNoteParent :=
+	Script :=
+	Clip :=
+	Bookmark :=
+	Image :=
+	Checked :=
+	Marked :=
+	Extra :=
 	
 gosub TagFilterUpdate
 return

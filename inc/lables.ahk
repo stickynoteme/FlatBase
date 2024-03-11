@@ -3181,7 +3181,7 @@ GuiContextMenu:
 	FileRecycle,%ImagePath%%FileSafeName%.png
 	}
 	WinHide, FlatNotes - Library
-	Sleep, 10
+	Sleep, 50
 	CaptureScreen(0, 0, ImagePath FileSafeName ".png")
 	; first parameter indicates full screen capture
 	; change 2nd parameter to 1 if you want mouse cursor in image
