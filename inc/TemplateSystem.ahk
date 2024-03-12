@@ -99,6 +99,7 @@ NoteTemplateUI:
 		gui,ts:destroy
 		return
 		}
+		Gui, ts:destroy
 		FileRead,TemplateToEdit,%templatePath%%Selected_NoteTemplate%
 		TemplateEditName := RegExReplace(Selected_NoteTemplate, "\.txt(?:^|$|\r\n|\r|\n)")
 		TTEArr := StrSplit(TemplateToEdit,"`n","`n")

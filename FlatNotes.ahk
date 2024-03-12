@@ -327,6 +327,7 @@ FileCreateDir, MyClipboards
 FileCreateDir, MyImages
 FileCreateDir, MyBookmarks
 FileCreateDir, MyScripts
+FileCreateDir, NoteTemplates
 
 detailsPath := A_WorkingDir "\NoteDetails\"
 clipPath := A_WorkingDir "\MyClipboards\"
