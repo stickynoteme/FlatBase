@@ -319,26 +319,38 @@ global C_Tags
 global C_Cat
 global C_Parent
 global NoteNameToEdit
+global U_NotePath
+global UserDataPath
+global UserDataFolder
 
 LVSelectedROW = 1
 
-FileCreateDir, NoteDetails
-FileCreateDir, MyClipboards
-FileCreateDir, MyImages
-FileCreateDir, MyBookmarks
-FileCreateDir, MyScripts
-FileCreateDir, NoteTemplates
-
-detailsPath := A_WorkingDir "\NoteDetails\"
-clipPath := A_WorkingDir "\MyClipboards\"
-bookmarkPath := A_WorkingDir "\MyBookmarks\"
-ImagePath := A_WorkingDir "\MyImages\"
-scriptpath := A_WorkingDir "\MyScripts\"
 iniPath = %A_WorkingDir%\settings.ini
 systemINI = %A_WorkingDir%\sys\system.ini
 themePath = %A_WorkingDir%\sys\Themes
-templatePath = %A_WorkingDir%\NoteTemplates\
-IniRead, U_NotePath, %iniPath%, General, MyNotePath,%A_WorkingDir%\MyNotes\
+IniRead, UserDataPath, %iniPath%, General, UserDataFolder,%A_WorkingDir%
+
+; check for note folder, and warn if it's not found.
+if !InStr(FileExist(UserDataPath "\MyNotes\"), "D") {
+	msgbox Notes folder in: %UserDataPath% could not be found. A new note folder will be created.
+}
+
+FileCreateDir, %UserDataPath%\NoteDetails
+FileCreateDir, %UserDataPath%\StoredClipboards
+FileCreateDir, %UserDataPath%\StoredImages
+FileCreateDir, %UserDataPath%\StoredBookmarks
+FileCreateDir, %UserDataPath%\StoredScripts
+FileCreateDir, %UserDataPath%\NoteTemplates
+FileCreateDir, %UserDataPath%\MyNotes
+
+
+detailsPath := UserDataPath "\NoteDetails\"
+clipPath := UserDataPath "\StoredClipboards\"
+bookmarkPath := UserDataPath "\StoredBookmarks\"
+ImagePath := UserDataPath "\StoredImages\"
+scriptpath := UserDataPath "\StoredScripts\"
+templatePath := UserDataPath "\NoteTemplates\"
+U_NotePath := UserDataPath "\MyNotes\"
 
 ;set tray icon
 if A_IsCompiled
@@ -346,23 +358,7 @@ if A_IsCompiled
 else 
 	Menu, Tray, Icon, %A_WorkingDir%\- Assets\FlatNotes.ico
 
-; check for note path, then reset to default and warn user if the path can't be found.
-if InStr(FileExist(U_NotePath), "D") {
-	if (U_NotePath = "") {
-	U_NotePath = %A_WorkingDir%\MyNotes\
-	FileCreateDir, MyNotes
-	}
-	if (U_NotePath ="\"){
-	U_NotePath = %A_WorkingDir%\MyNotes\
-	FileCreateDir, MyNotes
-	}
-}else {
-		msgbox Notes folder: %U_NotePath% could not be found. %A_WorkingDir%\MyNotes\ will be used instead.
-		FileCreateDir, MyNotes
-		IniWrite, %A_WorkingDir%\MyNotes\, %iniPath%, General, MyNotePath
-		U_NotePath = %A_WorkingDir%\MyNotes\
-		}
-global U_NotePath
+
 ;-------------------------------------------------
 ;Write settings.ini from system.ini
 ;-------------------------------------------------

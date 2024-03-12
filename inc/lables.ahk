@@ -1757,12 +1757,12 @@ return
 
 FolderSelect:
 	WinSet, AlwaysOnTop, Off, FlatNotes - Options
-	FileSelectFolder, NewNotesFolder, , 123
-	if NewNotesFolder = "")
-		GuiControl,,NotesStorageFolder,%U_NotePath%
+	FileSelectFolder, NewUserDataFolder, , 3
+	if NewUserDataFolder = "")
+		GuiControl,,UserDataFolder,%UserDataPath%
 	else {
-		GuiControl,,NotesStorageFolder,%NewNotesFolder%\
-		IniWrite, %NewNotesFolder%\, %iniPath%, General, MyNotePath
+		GuiControl,,UserDataFolder,%NewUserDataFolder%
+		IniWrite, %NewUserDataFolder%, %iniPath%, General, UserDataFolder
 	}
 	WinSet, AlwaysOnTop, On, FlatNotes - Options
 return
@@ -1808,8 +1808,8 @@ Options:
 	Gui, 3:Add, CheckBox, section vSelect_SearchWholeNote gSet_SearchWholeNote, Search whole note? (disable to search only the 1st line.)
 	GuiControl,,Select_SearchWholeNote,%SearchWholeNote%
 	
-	Gui, 3:Add,Text,section xs, Notes storage folder:
-	Gui, 3:Add,Edit, disabled r1 w300 vNotesStorageFolder, %U_NotePath%
+	Gui, 3:Add,Text,section xs, Data Storage Folder:
+	Gui, 3:Add,Edit, disabled r1 w300 vUserDataFolder, %UserDataPath%
 	Gui, 3:Add,Button, gFolderSelect, Select a folder.
 	
 	Gui, 3:Add,Text,xs section,How many daily backups to keep: (Default: 3)
