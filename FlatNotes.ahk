@@ -17,6 +17,7 @@ Menu, Tray, Add, Note Template Maker,NoteTemplateMaker
 Menu, Tray, Add, About
 Menu, Tray, Add, Options
 Menu Tray, Add, Suspend Hotkeys, TrayMenuHdlr_Suspend
+Menu Tray, Add, Fix Note Details, FixManuallyDeletedNoteAttachments
 Menu Tray, Add, Reload, TrayMenuHdlr_Reload
 Menu, Tray, Add, Exit
 Menu, Tray, Default, Library

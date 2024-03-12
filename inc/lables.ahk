@@ -3366,3 +3366,40 @@ TrayMenuHdlr_Suspend:
   else
     Menu Tray, Uncheck, Suspend Hotkeys
 return
+
+FixManuallyDeletedNoteAttachments:
+	Loop, Files, %U_NotePath%*.txt
+	{
+		
+		NoteIniName := RegExReplace(A_LoopFileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
+		NoteIni = %detailsPath%%NoteIniName%
+		
+		IniRead, NameField, %NoteIni%, INFO, Name
+		if (NameField)
+		IniRead, ScriptField, %NoteIni%, INFO, RunType
+		if (ScriptField)
+		{
+			if (!FileExist(scriptpath NameField ".bat") AND !FileExist(scriptpath NameField ".ahk"))
+				Iniwrite, %A_Space%, %NoteIni%,INFO,Script
+		}
+		IniRead, ClipField, %NoteIni%, INFO, Clip
+		if (ClipField)
+		{
+			if (!FileExist(clipPath NameField ".clipboard"))
+				Iniwrite, %A_Space%, %NoteIni%,INFO,Clip
+		}
+		IniRead, BookmarkField, %NoteIni%, INFO, Bookmark
+		if (BookmarkField)
+		{
+			if (!FileExist(bookmarkPath NameField ".lnk"))
+				Iniwrite, %A_Space%, %NoteIni%,INFO,Bookmark
+		}
+		IniRead, ImageField, %NoteIni%, INFO, Image
+		if (ImageField)
+		{
+			if (!FileExist(ImagePath NameField ".png"))
+				Iniwrite, %A_Space%, %NoteIni%,INFO,Image
+		}
+	}
+reload
+return

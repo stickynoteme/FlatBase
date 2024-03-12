@@ -315,9 +315,7 @@ BuildGUI2(){
 	return  
 }
 
-
 MakeFileList(ReFreshMyNoteArray){
-	TVReDraw = 1
 	FileList := ""
 	MyNotesArray := {}
 	Loop, Files, %U_NotePath%*.txt
@@ -481,7 +479,6 @@ GuiControl,,TagsFilter, %TagsFilterContents%
 return
 
 ReFreshLV(){
-TVReDraw = 1
 GuiControl, 1:-Redraw, LV
 LV_Delete()
 For Each, Note In MyNotesArray
