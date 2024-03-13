@@ -164,9 +164,12 @@ ControlGetFocus, OutputVar, FlatNotes - Library
 				}else {	
 								
 				FileRecycle %U_NotePath%%FileName%.txt
-				FileRecycle %U_NotePath%%FileName%.ini
-				FileRecycle %U_NotePath%%FileName%.clipboard
-				FileRecycle %U_NotePath%%FileName%.lnk
+				FileRecycle %detailsPath%%FileName%.ini
+				FileRecycle %clipPath%%FileName%.clipboard
+				FileRecycle %bookmarkPath%%FileName%.lnk
+				FileRecycle %ImagePath%%FileName%.png
+				FileRecycle %scriptpath%%FileName%.ahk
+				FileRecycle %scriptpath%%FileName%.bat
 				
 							; remove from MyNoteArray
 				for Each, Note in MyNotesArray{
