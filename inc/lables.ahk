@@ -3378,35 +3378,28 @@ FixManuallyDeletedNoteAttachments:
 	Loop, Files, %U_NotePath%*.txt
 	{
 		
-		NoteIniName := RegExReplace(A_LoopFileName, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
-		NoteIni = %detailsPath%%NoteIniName%
-		
-		IniRead, NameField, %NoteIni%, INFO, Name
-		if (NameField)
-		IniRead, ScriptField, %NoteIni%, INFO, RunType
-		if (ScriptField)
-		{
-			if (!FileExist(scriptpath NameField ".bat") AND !FileExist(scriptpath NameField ".ahk"))
-				Iniwrite, %A_Space%, %NoteIni%,INFO,Script
-		}
-		IniRead, ClipField, %NoteIni%, INFO, Clip
-		if (ClipField)
-		{
-			if (!FileExist(clipPath NameField ".clipboard"))
-				Iniwrite, %A_Space%, %NoteIni%,INFO,Clip
-		}
-		IniRead, BookmarkField, %NoteIni%, INFO, Bookmark
-		if (BookmarkField)
-		{
-			if (!FileExist(bookmarkPath NameField ".lnk"))
-				Iniwrite, %A_Space%, %NoteIni%,INFO,Bookmark
-		}
-		IniRead, ImageField, %NoteIni%, INFO, Image
-		if (ImageField)
-		{
-			if (!FileExist(ImagePath NameField ".png"))
-				Iniwrite, %A_Space%, %NoteIni%,INFO,Image
-		}
+		SplitPath, A_LoopFileName , , , , OutNameNoExt,
+		NoteIni = %detailsPath%%OutNameNoExt%.ini
+
+		;Remake .ini info for every note
+		if (!FileExist(scriptpath OutNameNoExt ".bat") AND !FileExist(scriptpath OutNameNoExt ".ahk"))
+				IniDelete, %NoteIni%, INFO, RunType
+		if (FileExist(scriptpath OutNameNoExt ".bat"))
+				Iniwrite,BAT, %NoteIni%, INFO, RunType
+		if (FileExist(scriptpath OutNameNoExt ".ahk"))
+				Iniwrite,AHK, %NoteIni%, INFO, RunType
+		if (!FileExist(clipPath OutNameNoExt ".clipboard"))
+				IniDelete, %NoteIni%, INFO, Clip
+		if (FileExist(clipPath OutNameNoExt ".clipboard"))
+				Iniwrite,1, %NoteIni%, INFO, Clip
+		if (!FileExist(bookmarkPath OutNameNoExt ".lnk"))
+				IniDelete, %NoteIni%, INFO, Bookmark
+		if (FileExist(bookmarkPath OutNameNoExt ".lnk"))
+				Iniwrite,1, %NoteIni%, INFO, Bookmark
+		if (!FileExist(ImagePath OutNameNoExt ".png"))
+			IniDelete,%NoteIni%, INFO, Image 
+		if (FileExist(ImagePath OutNameNoExt ".png"))
+			IniWrite,1, %NoteIni%, INFO, Image
 	}
 reload
 return

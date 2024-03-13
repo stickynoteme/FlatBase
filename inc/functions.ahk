@@ -616,7 +616,13 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 	Checked :=
 	Marked :=
 	Extra :=
-	
+
+
+Iniread, CheckLastUpdatedBy, %U_NotePath%_sync.ini,INFO,LastUpdatedBy,%a_space%
+if (CheckLastUpdatedBy != A_ComputerName)
+{
+	iniWrite,%A_ComputerName%,%U_NotePath%_sync.ini,INFO,LastUpdatedBy
+}
 gosub TagFilterUpdate
 return
 }
