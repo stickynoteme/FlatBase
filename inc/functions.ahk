@@ -113,8 +113,9 @@ BuildGUI1(){
 	ClipIconX := LibW - 75
 	BookmarkIconX := LibW - 50
 	ImageIconX := LibW - 25
+
 	
-		Gui, 1:Add,text, center yp0 x%StickyIconX% vMakeSticky c%U_SFC% -E0x200 w25 h%title_h% gMakeSticky, %StickyIcon%
+	Gui, 1:Add,text, center yp0 x%StickyIconX% vMakeSticky c%U_SFC% -E0x200 w25 h%title_h% gMakeSticky, %StickyIcon%
 
 	
 	Gui, 1:Add,text, center yp0 x%RunIconX% vStoreRun c%U_SFC% -E0x200 w25 h%title_h% gRunStoredCommand, %RunIcon%
