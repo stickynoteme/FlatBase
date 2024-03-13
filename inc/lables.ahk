@@ -359,6 +359,12 @@ PreviewState:
 	}
 return
 
+ReSync:
+	MakeAnyMissingINI()
+	MakeFileList(1)
+	goto Search
+return
+
 Search:
 ;event helper tools
 ;z := ":" A_GuiEvent ":" errorlevel ":"A_EventInfo "::" LV@sel_col "`n"
@@ -1797,7 +1803,7 @@ Options:
 
 	Gui, 3:New,,FlatNotes - Options
 	Gui, 3:Color, White
-	Gui, 3:Add, Tab3, 0x6, General|Hotkeys|Shortcuts|Appearance|Window Size|Quick/Rapid Save
+	Gui, 3:Add, Tab3,, General|Hotkeys|Shortcuts|Appearance|Window Size|Quick/Rapid Save
 	Gui, 3:Tab, General
 	
 	Gui, 3:Add, CheckBox, section vSelect_ShowMainWindowOnStartUp gSet_ShowMainWindowOnStartUp, Show main window on startup?
