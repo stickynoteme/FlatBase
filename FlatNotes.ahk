@@ -714,6 +714,12 @@ if (U_Capslock = "0"){
 	vk14::vk14
 	return
 }
+iniRead,CheckLastUpdatedBy,%U_NotePath%_sync.ini,INFO,LastUpdatedBy
+if (CheckLastUpdatedBy != A_ComputerName)
+{
+	gosub ReSync
+}
+
 SelectedRows :=
 if (g1Open=1) {
 	WinHide, FlatNotes - Library

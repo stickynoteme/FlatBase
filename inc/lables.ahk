@@ -3,6 +3,13 @@ Label1:
 	if (U_Capslock = "1"){
 		return
 	}
+	
+	iniRead,CheckLastUpdatedBy,%U_NotePath%_sync.ini,INFO,LastUpdatedBy
+	if (CheckLastUpdatedBy != A_ComputerName)
+	{
+		gosub ReSync
+	}
+	
 	if (g1Open=1) {
 		WinHide, FlatNotes - Library
 		g1Open=0
