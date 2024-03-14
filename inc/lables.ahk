@@ -925,6 +925,22 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 		LV_GetText(NoteNameToEdit, LVSelectedROW,2)
 		LV_GetText(StarOldFile, LVSelectedROW,8)
 		LV_GetText(TitleOldFile, LVSelectedROW,8)
+		
+		if (GetKeyState("Alt")) {
+			if (LV@sel_col == 3 OR LV@sel_col == 2) {
+				run % ExternalEditor  " " U_NotePath TitleOldFile 
+				if (g1Open=1) {
+				WinHide, FlatNotes - Library
+				g1Open=0 
+				GUI, star:destroy
+				GUI, t:destroy
+				gosub Edit3SaveTimer
+				return
+			}
+			}
+			
+		}
+		
 		if (LV@sel_col == 2) {
 			MouseGetPos, xPos, yPos
 			xPos := xPos+25
@@ -944,6 +960,8 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 				return
 			}
 		}
+		
+		
 		if (LV@sel_col == 1 or LV@sel_col == 3 or LV@sel_col == 10 or LV@sel_col == 11 or LV@sel_col == 12)
 		{
 			MouseGetPos, xPos, yPos
@@ -3049,7 +3067,7 @@ GuiContextMenu:
 	
 		if (A_GuiControl=="StoreImage" OR RC19 == 1 ) {
 		RC19 = 0
-		if GetKeyState("Shift"){
+		if GetKeyState("Alt"){
 			MsgBox, 4404,Delete?,Delete ScreenShot?
 				IfMsgBox No
 					return
@@ -3066,7 +3084,7 @@ GuiContextMenu:
 	FileRecycle,%ImagePath%%FileSafeName%.png
 	}
 	WinHide, FlatNotes - Library
-	Sleep, 50
+	Sleep, 100
 	CaptureScreen(0, 0, ImagePath FileSafeName ".png")
 	; first parameter indicates full screen capture
 	; change 2nd parameter to 1 if you want mouse cursor in image
@@ -3081,7 +3099,7 @@ GuiContextMenu:
 	
 	if (A_GuiControl=="StoreBookmark" OR RC18 == 1 ) {
 		RC18 = 0
-		if GetKeyState("Shift"){
+		if GetKeyState("Alt"){
 			MsgBox, 4404,Delete?,Delete Bookmark?
 				IfMsgBox No
 					return
@@ -3106,7 +3124,7 @@ GuiContextMenu:
 }
 if (A_GuiControl=="StoreClipboard" OR RC17 == 1 ) {
 	RC17 = 0
-	if GetKeyState("Shift"){
+	if GetKeyState("Cntl"){
 		MsgBox, 4404,Delete?,Delete stored Clipboard?
 			IfMsgBox No
 				return
@@ -3132,7 +3150,7 @@ if (A_GuiControl=="StoreClipboard" OR RC17 == 1 ) {
 if (A_GuiControl=="StoreRun" OR RC16 == 1){
 	RC16 = 0
 	Iniread, ScriptExists, %detailsPath%%FileSafeName%.ini,INFO,RunType
-	if GetKeyState("Shift"){
+	if GetKeyState("Alt"){
 		MsgBox, 4404,Delete?,Delete stored Script?
 			IfMsgBox No
 				return

@@ -76,6 +76,7 @@ global TRowsOver
 global OpenInQuickNote
 global NewTemplateRows
 global NewExternalEditor
+global ExternalEditor
 global CheckForOldNote 
 global OldStarData
 global FileList = ""
@@ -458,7 +459,12 @@ IniRead, savedSK4, %iniPath%, Shortcuts, 4,!t
 IniRead, NewTemplateRows,%iniPath%, General, NewTemplateRows, 8
 if (NewTemplateRows>30)
 	NewTemplateRows = 30
-IniRead, ExternalEditor, %iniPath%, General, ExternalEditor,NONE
+IniRead, ExternalEditor, %iniPath%, General, ExternalEditor,notepad
+
+if (%ExternalEditor%==NONE)
+	ExternalEditor = notepad
+
+
 IniRead, OpenInQuickNote, %iniPath%, General, OpenInQuickNote,1
 IniRead, ShowStarHelper,%iniPath%,General,ShowStarHelper,1
 IniRead, ShowCatFilterBoxHelper,%iniPath%,General,ShowCatFilterBoxHelper,1
