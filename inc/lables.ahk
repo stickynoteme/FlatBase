@@ -1846,7 +1846,7 @@ Options:
 	Gui, 3:Add,Button, gFolderSelect, Select a folder.
 	
 	Gui, 3:Add,Text,xs section,How many daily backups to keep: (Default: 3)
-	Gui, 3:Add,Edit, yp-5 x+5 w25 gSet_backupsToKeep
+	Gui, 3:Add,Edit, yp-5 x+5 w25 
 	Gui, 3:Add,UpDown,vbackupsToKeepSelect gSet_backupsToKeep range0-99, %backupsToKeep%
 	Gui, 3:Add,CheckBox, xs vShowStatusBarSelect gSetShowStatusBar, Show Library Window Statusbar?
 	GuiControl,,ShowStatusBarSelect,%ShowStatusBar%
@@ -1925,7 +1925,7 @@ Options:
 ;-------------------------------------------------
 	Gui, 3:Tab, Appearance
 	Gui, 3:Add,Text,,Font Rendering: (5 = ClearType)
-	Gui, Add, Edit, gSetFontRendering
+	Gui, Add, Edit,
 	Gui, 3:Add,UpDown, vFontRenderingSelect gSetFontRendering Range0-5, %FontRendering%
 	
 	Gui, 3:Add, CheckBox, vHideScrollbarsSelect gSetHideScrollbars, Hide Scroolbars where possible.
@@ -2083,37 +2083,37 @@ Options:
 	;—--------------------------
 	Gui, 3:Tab, Window Size
 	Gui, 3:Add,Text,section,Main Window Width: (Default: 530)
-	Gui, 3:Add,Edit, gSetMainW
+	Gui, 3:Add,Edit, 
 	Gui, 3:Add,UpDown,vMainWSelect gSetMainW range50-3000, %LibW%
 	
 	Gui, 3:Add,Text,xs,Result Rows: (Default: 8)
-	Gui, 3:Add,Edit, gSetResultRows
+	Gui, 3:Add,Edit, 
 	Gui, 3:Add,UpDown,vResultRowsSelect gSetResultRows range1-99, %ResultRows%
 	
 	Gui, 3:Add,Text,xs,Note Preview/Edit Rows: (Default: 8)
-	Gui, 3:Add,Edit, gSetPreviewRows
+	Gui, 3:Add,Edit,
 	Gui, 3:Add,UpDown,vPreviewRowsSelect gSetPreviewRows range1-99, %PreviewRows%
 	
 	Gui, 3:Add,Text,xs,Quick Note Window Width: (Default: 350)
 
-	Gui, 3:Add,Edit, gSetQuickW
+	Gui, 3:Add,Edit, 
 	Gui, 3:Add,UpDown,vQuickWSelect gSetQuickW range50-3000, %QuickNoteWidth%
 	
 	Gui, 3:Add,Text,xs,Quick Note Rows: (Default: 7)
-	Gui, 3:Add,Edit, gSetQuickNoteRows
+	Gui, 3:Add,Edit, 
 	Gui, 3:Add,UpDown,vQuickNoteRowsSelect gSetQuickNoteRows range1-99, %QuickNoteRows%
 	
 	Gui, 3:Add,Text,xs,Sticky Note Width: (Default: 250)
 	
-	Gui, 3:Add,Edit, gSet_StickyW
+	Gui, 3:Add,Edit, 
 	Gui, 3:Add,UpDown,vSelect_StickyW gSet_StickyW range50-3000, %StickyW%
 	
 	Gui, 3:Add,Text,xs,Sticky Note Rows: (Default: 8)
-	Gui, 3:Add,Edit, gSet_StickyRows
+	Gui, 3:Add,Edit, 
 	Gui, 3:Add,UpDown,vSelect_StickyRows gSet_StickyRows range1-99, %StickyRows%
 	
 	Gui, 3:Add,Text,xs,Unique Star List Rows: (Default: 10)
-	Gui, 3:Add,Edit, gSet_USSLR
+	Gui, 3:Add,Edit, 
 	Gui, 3:Add,UpDown,vSelect_USSLR gSet_USSLR range1-99, %USSLR%
 
 	Gui, 3:Add,Text,xs,Static X window location: (Default: Blank [which uses the mouse position.])
