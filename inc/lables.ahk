@@ -1846,7 +1846,7 @@ Options:
 	Gui, 3:Add,Button, gFolderSelect, Select a folder.
 	
 	Gui, 3:Add,Text,xs section,How many daily backups to keep: (Default: 3)
-	Gui, 3:Add,Edit, yp-5 x+5 w25
+	Gui, 3:Add,Edit, yp-5 x+5 w25 gSet_backupsToKeep
 	Gui, 3:Add,UpDown,vbackupsToKeepSelect gSet_backupsToKeep range0-99, %backupsToKeep%
 	Gui, 3:Add,CheckBox, xs vShowStatusBarSelect gSetShowStatusBar, Show Library Window Statusbar?
 	GuiControl,,ShowStatusBarSelect,%ShowStatusBar%
@@ -1925,7 +1925,7 @@ Options:
 ;-------------------------------------------------
 	Gui, 3:Tab, Appearance
 	Gui, 3:Add,Text,,Font Rendering: (5 = ClearType)
-	Gui, Add, Edit 
+	Gui, Add, Edit, gSetFontRendering
 	Gui, 3:Add,UpDown, vFontRenderingSelect gSetFontRendering Range0-5, %FontRendering%
 	
 	Gui, 3:Add, CheckBox, vHideScrollbarsSelect gSetHideScrollbars, Hide Scroolbars where possible.
@@ -1995,9 +1995,12 @@ Options:
 	Gui, 3:add,DropDownList, Choose%C_StickyFont% w100 vStickyFontFamilySelect gSetStickyFontFamily, %FontDropDownOptions%
 	CurrentStickyFontSize := StickyFontSize*0.5
 	Gui, 3:add,DropDownList, x+10 Choose%CurrentStickyFontSize% vStickyFontSizeSelect gSetStickyFontSize, 2|4|6|8|10|12|14|16|18|20|22|24|26|28|30|32|34|36|38|40|42|44|46|48|50|52|54|56|58|60|62|64|66|68|70|72|74|76|78|80|82|84|86|88|90|92|94|96|98|100
-	
 	Gui, 3:Add,Text, xs section
-
+	
+	gui, 3:add, text,,Total collumn space used [Should be 100]:
+	gui, 3:add, text,x+10 w100 vTotalColSize,
+		
+	Gui, 3:Add,Text, xs section
 	gui, 3:add, text,,Star
 	gui, 3:add, text, xp+55,Name
 	gui, 3:add, text, xp+55,Body
@@ -2013,29 +2016,29 @@ Options:
 
 	gui, 3:add, text, xs section
 	
-	Gui, 3:Add, Edit, w50
+	Gui, 3:Add, Edit, w50 gSet_StarPercent
 	Gui, 3:Add,UpDown, vStarPercentSelect gSet_StarPercent Range0-100, %oStarPercent%
-	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add, Edit, w50 x+5 gSet_NamePercent
 	Gui, 3:Add,UpDown, vNamePercentSelect gSet_NamePercent Range0-100, %oNamePercent%
-	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add, Edit, w50 x+5 gSet_BodyPercent
 	Gui, 3:Add,UpDown,  vBodyPercentSelect gSet_BodyPercent Range0-100, %oBodyPercent%
-	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add, Edit, w50 x+5 gSet_AddedPercent
 	Gui, 3:Add,UpDown,  vAddedPercentSelect gSet_AddedPercent Range0-100, %oAddedPercent%
-	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add, Edit, w50 x+5 gSet_ModdedPercent
 	Gui, 3:Add,UpDown,  vModdedPercentSelect gSet_ModdedPercent Range0-100, %oModdedPercent%
-	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add, Edit, w50 x+5 gSet_TagsPercent
 	Gui, 3:Add,UpDown,  vTagsPercentSelect gSet_TagsPercent Range0-100, %oTagsPercent%
-	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add, Edit, w50 x+5 gSet_CatPercent
 	Gui, 3:Add,UpDown,  vCatPercentSelect gSet_CatPercent Range0-100, %oCatPercent%
-	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add, Edit, w50 x+5 gSet_ParentPercent
 	Gui, 3:Add,UpDown,  vParentPercentSelect gSet_ParentPercent Range0-100, %oParentPercent%
-	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add, Edit, w50 x+5 gSet_ScriptPercent
 	Gui, 3:Add,UpDown,  vScriptPercentSelect gSet_ScriptPercent Range0-100, %oScriptPercent%
-	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add, Edit, w50 x+5 gSet_ClipPercent
 	Gui, 3:Add,UpDown,  vClipPercentSelect gSet_ClipPercent Range0-100, %oClipPercent%
-	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add, Edit, w50 x+5 gSet_BookmarkPercent
 	Gui, 3:Add,UpDown,  vBookmarkPercentSelect gSet_BookmarkPercent Range0-100, %oBookmarkPercent%
-	Gui, 3:Add, Edit, w50 x+5
+	Gui, 3:Add, Edit, w50 x+5 gSet_ImagePercent
 	Gui, 3:Add,UpDown,  vImagePercentSelect gSet_ImagePercent Range0-100, %oImagePercent%
 	
 	Gui, 3:Add,text,xs section, - Main Window -
@@ -2080,37 +2083,37 @@ Options:
 	;—--------------------------
 	Gui, 3:Tab, Window Size
 	Gui, 3:Add,Text,section,Main Window Width: (Default: 530)
-	Gui, 3:Add,Edit   
+	Gui, 3:Add,Edit, gSetMainW
 	Gui, 3:Add,UpDown,vMainWSelect gSetMainW range50-3000, %LibW%
 	
 	Gui, 3:Add,Text,xs,Result Rows: (Default: 8)
-	Gui, 3:Add,Edit   
+	Gui, 3:Add,Edit, gSetResultRows
 	Gui, 3:Add,UpDown,vResultRowsSelect gSetResultRows range1-99, %ResultRows%
 	
 	Gui, 3:Add,Text,xs,Note Preview/Edit Rows: (Default: 8)
-	Gui, 3:Add,Edit   
+	Gui, 3:Add,Edit, gSetPreviewRows
 	Gui, 3:Add,UpDown,vPreviewRowsSelect gSetPreviewRows range1-99, %PreviewRows%
 	
 	Gui, 3:Add,Text,xs,Quick Note Window Width: (Default: 350)
 
-	Gui, 3:Add,Edit   
+	Gui, 3:Add,Edit, gSetQuickW
 	Gui, 3:Add,UpDown,vQuickWSelect gSetQuickW range50-3000, %QuickNoteWidth%
 	
 	Gui, 3:Add,Text,xs,Quick Note Rows: (Default: 7)
-	Gui, 3:Add,Edit   
+	Gui, 3:Add,Edit, gSetQuickNoteRows
 	Gui, 3:Add,UpDown,vQuickNoteRowsSelect gSetQuickNoteRows range1-99, %QuickNoteRows%
 	
 	Gui, 3:Add,Text,xs,Sticky Note Width: (Default: 250)
 	
-	Gui, 3:Add,Edit   
+	Gui, 3:Add,Edit, gSet_StickyW
 	Gui, 3:Add,UpDown,vSelect_StickyW gSet_StickyW range50-3000, %StickyW%
 	
 	Gui, 3:Add,Text,xs,Sticky Note Rows: (Default: 8)
-	Gui, 3:Add,Edit   
+	Gui, 3:Add,Edit, gSet_StickyRows
 	Gui, 3:Add,UpDown,vSelect_StickyRows gSet_StickyRows range1-99, %StickyRows%
 	
 	Gui, 3:Add,Text,xs,Unique Star List Rows: (Default: 10)
-	Gui, 3:Add,Edit   
+	Gui, 3:Add,Edit, gSet_USSLR
 	Gui, 3:Add,UpDown,vSelect_USSLR gSet_USSLR range1-99, %USSLR%
 
 	Gui, 3:Add,Text,xs,Static X window location: (Default: Blank [which uses the mouse position.])
@@ -2694,12 +2697,30 @@ SetFontSize:
 	GuiControl,,QuickNoteParent, Sample Text
 return
 
+Update_Total_Column_Space_Used:
+GuiControlGet, StarPercentSelect
+GuiControlGet, NamePercentSelect
+GuiControlGet, BodyPercentSelect
+GuiControlGet, AddedPercentSelect
+GuiControlGet, ModdedPercentSelect
+GuiControlGet, TagsPercentSelect
+GuiControlGet, CatPercentSelect
+GuiControlGet, ScriptPercentSelect
+GuiControlGet, ClipPercentSelect
+GuiControlGet, BookmarkPercentSelect
+GuiControlGet, ImagePercentSelect
+
+NewColTotal :=StarPercentSelect+NamePercentSelect+BodyPercentSelect+AddedPercentSelect+ModdedPercentSelect+TagsPercentSelect+CatPercentSelect+ScriptPercentSelect+ClipPercentSelect+BookmarkPercentSelect+ImagePercentSelect
+
+GuiControl,,TotalColSize,%NewColTotal%
+return
+
 Set_StarPercent:
 	GuiControlGet, StarPercentSelect	
 	IniWrite, %StarPercentSelect%,%iniPath%,General, StarPercent		
 	IniRead, oNamePercent,%iniPath%, General,StarPercent
 	StarPercent = 0.%oStarPercent%
-	gosub DummyGUI1
+	gosub Update_Total_Column_Space_Used
 return
 
 Set_NamePercent:
@@ -2707,7 +2728,7 @@ Set_NamePercent:
 	IniWrite, %NamePercentSelect%,%iniPath%,General, NamePercent		
 	IniRead, oNamePercent,%iniPath%, General,NamePercent
 	NamePercent = 0.%oNamePercent%
-	gosub DummyGUI1
+	gosub Update_Total_Column_Space_Used
 return
 
 Set_BodyPercent:
@@ -2715,7 +2736,7 @@ Set_BodyPercent:
 	IniWrite, %BodyPercentSelect%,%iniPath%,General, BodyPercent		
 	IniRead, oBodyPercent,%iniPath%, General,BodyPercent
 	BodyPercent = 0.%oBodyPercent%
-	gosub DummyGUI1
+	gosub Update_Total_Column_Space_Used
 return
 
 Set_AddedPercent:
@@ -2723,7 +2744,7 @@ Set_AddedPercent:
 	IniWrite, %AddedPercentSelect%,%iniPath%,General, AddedPercent		
 	IniRead, oAddedPercent,%iniPath%, General,AddedPercent
 	AddedPercent = 0.%oAddedPercent%
-	gosub DummyGUI1
+	gosub Update_Total_Column_Space_Used
 return
 
 Set_ModdedPercent:
@@ -2731,7 +2752,7 @@ Set_ModdedPercent:
 	IniWrite, %ModdedPercentSelect%,%iniPath%,General, ModdedPercent	
 	IniRead, oModdedPercent,%iniPath%, General,ModdedPercent
 	ModdedPercent = 0.%oModdedPercent%
-	gosub DummyGUI1
+	gosub Update_Total_Column_Space_Used
 return
 
 Set_TagsPercent:
@@ -2739,7 +2760,7 @@ Set_TagsPercent:
 	IniWrite, %TagsPercentSelect%,%iniPath%,General, TagsPercent	
 	IniRead, oTagsPercent,%iniPath%, General,TagsPercent
 	TagsPercent = 0.%oTagsPercent%
-	gosub DummyGUI1
+	gosub Update_Total_Column_Space_Used
 return
 
 Set_CatPercent:
@@ -2747,7 +2768,7 @@ Set_CatPercent:
 	IniWrite, %CatPercentSelect%,%iniPath%,General, CatPercent	
 	IniRead, oCatPercent,%iniPath%, General,CatPercent
 	CatPercent = 0.%oCatPercent%
-	gosub DummyGUI1
+	gosub Update_Total_Column_Space_Used
 return
 
 Set_ParentPercent:
@@ -2755,7 +2776,7 @@ Set_ParentPercent:
 	IniWrite, %ParentPercentSelect%,%iniPath%,General, ParentPercent	
 	IniRead, oParentPercent,%iniPath%, General,ParentPercent
 	ParentPercent = 0.%oParentPercent%
-	gosub DummyGUI1
+	gosub Update_Total_Column_Space_Used
 return
 
 Set_ScriptPercent:
@@ -2763,7 +2784,7 @@ Set_ScriptPercent:
 	IniWrite, %ScriptPercentSelect%,%iniPath%,General, ScriptPercent	
 	IniRead, oScriptPercent,%iniPath%, General,ScriptPercent
 	ScriptPercent = 0.%oScriptPercent%
-	gosub DummyGUI1
+	gosub Update_Total_Column_Space_Used
 return
 
 Set_ClipPercent:
@@ -2771,7 +2792,7 @@ Set_ClipPercent:
 	IniWrite, %ClipPercentSelect%,%iniPath%,General, ClipPercent	
 	IniRead, oClipPercent,%iniPath%, General,ClipPercent
 	ClipPercent = 0.%oClipPercent%
-	gosub DummyGUI1
+	gosub Update_Total_Column_Space_Used
 return
 
 Set_BookmarkPercent:
@@ -2779,7 +2800,7 @@ Set_BookmarkPercent:
 	IniWrite, %BookmarkPercentSelect%,%iniPath%,General, BookmarkPercent	
 	IniRead, oBookmarkPercent,%iniPath%, General,BookmarkPercent
 	BookmarkPercent = 0.%oBookmarkPercent%
-	gosub DummyGUI1
+	gosub Update_Total_Column_Space_Used
 return
 
 Set_ImagePercent:
@@ -2787,7 +2808,7 @@ Set_ImagePercent:
 	IniWrite, %ImagePercentSelect%,%iniPath%,General, ImagePercent	
 	IniRead, oImagePercent,%iniPath%, General,ImagePercent
 	ImagePercent = 0.%oImagePercent%
-	gosub DummyGUI1
+	gosub Update_Total_Column_Space_Used
 return
 
 Label:
