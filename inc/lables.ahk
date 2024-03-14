@@ -1030,13 +1030,14 @@ return
 
 ;GUI for right click to edit name
 build_tEdit:
+	LV_GetText(TmpOldName, LVSelectedROW,2)
 	GUI, t:new, ,InlineNameEdit
 	Gui, t:Margin , 5, 5 
 	Gui, t:Font, s%SearchFontSize% Q%FontRendering%, %SearchFontFamily%, %U_MFC%
 	Gui, t:Color,%U_SBG%, %U_MBG%	
 
-	gui, t:add,text,w100 -E0x200 center c%U_SFC%,New Name
-	Gui, t:add,edit,w100 -E0x200 c%U_FBCA% vtEdit
+	gui, t:add,text,w%SearchW% -E0x200 center c%U_SFC%,New Name
+	Gui, t:add,edit,w%SearchW% -E0x200 c%U_FBCA% vtEdit, %TmpOldName%
 	gui, t:add,button, default gTitleSaveChange x-10000 y-10000
 	WinSet, Style,  -0xC00000,InlineNameEdit
 	GUI, t:Show, x%xPos% y%yPos%
