@@ -143,19 +143,12 @@ BuildGUI1(){
 	Gui, 1:Add,Edit, section x0 hwndHPB -E0x200  r%PreviewRows% w%LibW% C%U_MFC% gPreviewBox vPreviewBox,
 	}
 	
-	; The two listboxes act as centering backgrounds for the tags and parent edits.
-	if (ShowTagEditBoxHelper OR ShowParentEditBoxHelper) {
-		Gui, 1:Add, ListBox, +0x100 r1 w%TagLibW% x0 y+1 -E0x200 Disabled -Tabstop
-		Gui, 1:Add, ListBox, +0x100 r1 w%ParentLibW% xp%ParenetLibX% -E0x200 Disabled -Tabstop
-	}
-	
 	if (ShowTagEditBoxHelper) {	
-		Gui, 1:Add,Edit, section x0 yp+6 -E0x200 hwndHPT  r1 w%TagLibW% C%U_MFC% vTagBox center,	
+		TagBoxW := LibW - 50
+		Gui, 1:Add,text, section -E0x200 hwndHPT  r1 w50 C%U_SFC% center, Tags: 
+		Gui, 1:Add,text,  x+1 -E0x200 hwndHPT  r1 w%TagBoxW% C%U_SFC% vTagBox gTagBox center,	
 	}
 	
-	if (ShowParentEditBoxHelper) {
-		Gui, 1:Add, Edit,xp%ParenetLibX%  -E0x200 r1 center C%U_MFC% w%ParentLibW% vNoteParent HwndHNP,
-	}
 	
 	MakeFileList(1)
 	CLV := New LV_Colors(HLV)
@@ -222,10 +215,6 @@ BuildGUI1(){
 	if (ShowCatFilterBoxHelper == 1) {
 		CtlColors.Attach(HCF, DDLbgColor)
 		OD_Colors.Attach(HCF, {T: U_SFC})
-	}
-	if (ShowTagFilterBoxHelper = 1) {
-		CtlColors.Attach(HTF, DDLbgColorb2,DDLfontColorb2)
-		OD_Colors.Attach(HTF, {T: U_MFC})
 	}
 	Gui, 1:SHOW, Hide w%LibW% 
 	WinGet, g1ID,, FlatNotes - Library

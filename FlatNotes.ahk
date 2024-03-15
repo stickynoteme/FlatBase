@@ -303,6 +303,7 @@ global ColOrder = 1,2,3,4,5
 global SearchWholeNote
 global SearchClip = 0
 global LoopCheck
+global unsaveddatatags
 global UseCheckBoxesTrue
 global UseCheckBoxes = false
 if (UseCheckBoxes == true)

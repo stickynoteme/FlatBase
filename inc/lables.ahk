@@ -962,12 +962,11 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 			}
 		}
 		
-		
+
 		if (LV@sel_col == 1 or LV@sel_col == 3 or LV@sel_col == 10 or LV@sel_col == 11 or LV@sel_col == 12)
 		{
 			MouseGetPos, xPos, yPos
 			xPos := xPos+25
-	
 			ColEditName :=  ColList[LV@sel_col]
 			gosub build_ColEdit
 			return
@@ -1280,6 +1279,7 @@ return
 
 ;GUI for right click col 10-12 for now and doing bulk operations.
 build_ColEdit:
+	guicontrolget,TagBox
 	color1 = %U_SBG%
 	color2 = %U_SFC%
 	Opt1 := [0, color1, ,color2]
@@ -1311,6 +1311,10 @@ build_ColEdit:
 	}
 	else 
 		Gui, ce:add,edit,w200 -E0x200 c%U_FBCA% vceEdit r%ColEditRows% hwndHceEDIT
+	
+	if (LV@sel_col == 10){
+	guicontrol,,ceEdit,%TagBox%
+	}
 	
 	gui, ce:add,button, default gColEditSaveChange w200 hwndHIB1 vIB1, [ Apply ]
 	
@@ -2983,6 +2987,8 @@ return
 return
 
 TagBox:
+return
+
 PreviewBox:
 	unsaveddataEdit3 = 1
 if (savetimerrunning = 0) {
@@ -3089,6 +3095,19 @@ return
 GuiContextMenu:
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
+		if (A_GuiControl=="TagBox") {
+			SelectedRows := LVSelectedROW 
+			LV_GetText(NoteNameToEdit, LVSelectedROW,2)
+			LV_GetText(StarOldFile, LVSelectedROW,8)
+			LV_GetText(TitleOldFile, LVSelectedROW,8)
+			LV@sel_col = 10
+			MouseGetPos, xPos, yPos
+			xPos := xPos+25
+			ColEditName :=  ColList[LV@sel_col]
+			gosub build_ColEdit
+			return
+		}
+	
 	
 		if (A_GuiControl=="StoreImage" OR RC19 == 1 ) {
 		RC19 = 0
