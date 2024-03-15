@@ -150,7 +150,7 @@ BuildGUI1(){
 	}
 	
 	if (ShowTagEditBoxHelper) {	
-		Gui, 1:Add,Edit, section x0 yp+6 -E0x200 hwndHPT  r1 w%TagLibW% C%U_MFC% vTagBox gTagBox center,	
+		Gui, 1:Add,Edit, section x0 yp+6 -E0x200 hwndHPT  r1 w%TagLibW% C%U_MFC% vTagBox center,	
 	}
 	
 	if (ShowParentEditBoxHelper) {
@@ -222,6 +222,10 @@ BuildGUI1(){
 	if (ShowCatFilterBoxHelper == 1) {
 		CtlColors.Attach(HCF, DDLbgColor)
 		OD_Colors.Attach(HCF, {T: U_SFC})
+	}
+	if (ShowTagFilterBoxHelper = 1) {
+		CtlColors.Attach(HTF, DDLbgColorb2,DDLfontColorb2)
+		OD_Colors.Attach(HTF, {T: U_MFC})
 	}
 	Gui, 1:SHOW, Hide w%LibW% 
 	WinGet, g1ID,, FlatNotes - Library
