@@ -923,6 +923,8 @@ if (A_GuiEvent = "I" && InStr(ErrorLevel, "S", true))
 	if (A_GuiEvent == "RightClick" OR TriggedFromSK == 1)
 	{
 		LVSelectedROW := A_EventInfo
+		if (LVSelectedROW==0)
+			return
 		LV_GetText(NoteNameToEdit, LVSelectedROW,2)
 		LV_GetText(StarOldFile, LVSelectedROW,8)
 		LV_GetText(TitleOldFile, LVSelectedROW,8)
@@ -3094,6 +3096,8 @@ return
 ; *ImageWork
 GuiContextMenu:
 	LV_GetText(RowText, LVSelectedROW,2)
+	if (LVSelectedROW==0)
+		return
 	FileSafeName := NameEncode(RowText)
 		if (A_GuiControl=="TagBox") {
 			SelectedRows := LVSelectedROW 
@@ -3110,80 +3114,85 @@ GuiContextMenu:
 	
 	
 		if (A_GuiControl=="StoreImage" OR RC19 == 1 ) {
-		RC19 = 0
-		if GetKeyState("Alt"){
-			MsgBox, 4404,Delete?,Delete ScreenShot?
+			RC19 = 0
+			if GetKeyState("Alt"){
+				MsgBox, 4404,Delete?,Delete ScreenShot?
 				IfMsgBox No
 					return
 				FileRecycle,%ImagePath%%FileSafeName%.png
-				Iniwrite, %A_Space%, %detailsPath%%FileSafeName%.ini,INFO,Image
+				Inidelete,%detailsPath%%FileSafeName%.ini,INFO,Image
 				GuiControl,text,StoreImage, %ImageSymbol%
 				LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,,,A_Space)
+				GetCurrentNoteData(FileSafeName)
+				SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
 				return
+			}
+		if (FileExist(ImagePath FileSafeName ".png")){
+			MsgBox, 4404, , ScreenShot: "%FileSafeName%.png" already exists overwrite it?
+			IfMsgBox No
+			return
+			FileRecycle,%ImagePath%%FileSafeName%.png
 		}
-	if (FileExist(ImagePath FileSafeName ".png")){
-	MsgBox, 4404, , ScreenShot: "%FileSafeName%.png" already exists overwrite it?
-	IfMsgBox No
-		return
-	FileRecycle,%ImagePath%%FileSafeName%.png
+		WinHide, FlatNotes - Library
+		Sleep, 100
+		CaptureScreen(0, 0, ImagePath FileSafeName ".png")
+		; first parameter indicates full screen capture
+		; change 2nd parameter to 1 if you want mouse cursor in image
+		; change to desired path. can also change .png to .jpg or other
+		Iniwrite, 1, %detailsPath%%FileSafeName%.ini,INFO,Image
+		GuiControl,text,StoreImage, %PhotoframeSymbol%
+		WinShow, FlatNotes - Library
+		LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,,,PhotoframeSymbol)
+		GetCurrentNoteData(FileSafeName)
+		SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
 	}
-	WinHide, FlatNotes - Library
-	Sleep, 100
-	CaptureScreen(0, 0, ImagePath FileSafeName ".png")
-	; first parameter indicates full screen capture
-	; change 2nd parameter to 1 if you want mouse cursor in image
-	; change to desired path. can also change .png to .jpg or other
-	Iniwrite, 1, %detailsPath%%FileSafeName%.ini,INFO,Image
-	GuiControl,text,StoreImage, %PhotoframeSymbol%
-	WinShow, FlatNotes - Library
-	LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,,,PhotoframeSymbol)
-	GetCurrentNoteData(FileSafeName)
-	SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
-}
 	
 	if (A_GuiControl=="StoreBookmark" OR RC18 == 1 ) {
 		RC18 = 0
 		if GetKeyState("Alt"){
 			MsgBox, 4404,Delete?,Delete Bookmark?
-				IfMsgBox No
-					return
-				FileRecycle,%bookmarkPath%%FileSafeName%.lnk
-				Iniwrite, A_Space, %detailsPath%%FileSafeName%.ini,INFO,Bookmark
-				GuiControl,text,StoreBookmark, %LinkSymbol%
-				LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,,A_Space)
-				return
-		}
-	if (FileExist(bookmarkPath FileSafeName ".lnk")){
-	MsgBox, 4404, , Bookmark for: "%FileSafeName%.lnk" already exists overwrite it?
-	IfMsgBox No
-		return
-	FileRecycle,%bookmarkPath%%FileSafeName%.lnk
-	}
-	FileCreateShortcut, %clipboard%, %bookmarkPath%%FileSafeName%.lnk
-	Iniwrite, 1, %detailsPath%%FileSafeName%.ini,INFO,Bookmark
-	GuiControl,text,StoreBookmark, %BookmarkSymbol%
-	LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,,BookmarkSymbol)
-	GetCurrentNoteData(FileSafeName)
-	SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
-}
-if (A_GuiControl=="StoreClipboard" OR RC17 == 1 ) {
-	RC17 = 0
-	if GetKeyState("Cntl"){
-		MsgBox, 4404,Delete?,Delete stored Clipboard?
 			IfMsgBox No
 				return
-			FileRecycle,%clipPath%%FileSafeName%.clipboard
-			Iniwrite, A_space, %detailsPath%%FileSafeName%.ini,INFO,Clip
-			GuiControl,text,StoreClipboard, %DiskSymbol%
-			LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,A_space)
+			FileRecycle,%bookmarkPath%%FileSafeName%.lnk
+			Inidelete,%detailsPath%%FileSafeName%.ini,INFO,Bookmark
+			GuiControl,text,StoreBookmark, %LinkSymbol%
+			LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,,A_Space)
+			GetCurrentNoteData(FileSafeName)
+			SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
 			return
+		}
+		if (FileExist(bookmarkPath FileSafeName ".lnk")){
+			MsgBox, 4404, , Bookmark for: "%FileSafeName%.lnk" already exists overwrite it?
+			IfMsgBox No
+				return
+			FileRecycle,%bookmarkPath%%FileSafeName%.lnk
+		}
+		FileCreateShortcut, %clipboard%, %bookmarkPath%%FileSafeName%.lnk
+		Iniwrite, 1, %detailsPath%%FileSafeName%.ini,INFO,Bookmark
+		GuiControl,text,StoreBookmark, %BookmarkSymbol%
+		LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,,BookmarkSymbol)
+		GetCurrentNoteData(FileSafeName)
+		SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
 	}
-	if (FileExist(clipPath FileSafeName ".clipboard")){
-		MsgBox, 4404, , "%FileSafeName%.clipboard" already exists overwrite it?
+if (A_GuiControl=="StoreClipboard" OR RC17 == 1 ) {
+	RC17 = 0
+	if GetKeyState("alt"){
+		MsgBox, 4404,Delete?,Delete stored Clipboard?
 		IfMsgBox No
 			return
 		FileRecycle,%clipPath%%FileSafeName%.clipboard
+		Inidelete,%detailsPath%%FileSafeName%.ini,INFO,Clip
+		GuiControl,text,StoreClipboard, %DiskSymbol%
+		LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,,A_space)
+		GetCurrentNoteData(FileSafeName)
+		SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
+		return
+	}else if (FileExist(clipPath FileSafeName ".clipboard")){
+		MsgBox, 4404, , "%FileSafeName%.clipboard" already exists overwrite it?
+		IfMsgBox No
+			return
 	}
+	FileRecycle,%clipPath%%FileSafeName%.clipboard
 	Fileappend,%ClipboardAll%,%clipPath%%FileSafeName%.clipboard
 	Iniwrite, 1, %detailsPath%%FileSafeName%.ini,INFO,Clip
 	GuiControl,text,StoreClipboard, %SaveSymbol%
@@ -3193,16 +3202,20 @@ if (A_GuiControl=="StoreClipboard" OR RC17 == 1 ) {
 }
 if (A_GuiControl=="StoreRun" OR RC16 == 1){
 	RC16 = 0
+	
 	Iniread, ScriptExists, %detailsPath%%FileSafeName%.ini,INFO,RunType
 	if GetKeyState("Alt"){
 		MsgBox, 4404,Delete?,Delete stored Script?
-			IfMsgBox No
-				return
-			FileRecycle,%ScriptPath%%FileSafeName%.%RunType%
-			Iniwrite, A_Space, %detailsPath%%FileSafeName%.ini,INFO,RunType
-			GuiControl,text,StoreRun, %RunIcon%
-			LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,A_Space)
+		IfMsgBox No
 			return
+		FileRecycle,%ScriptPath%%FileSafeName%.AHK
+		FileRecycle,%ScriptPath%%FileSafeName%.BAT
+		Inidelete, %detailsPath%%FileSafeName%.ini,INFO,RunType
+		GuiControl,text,StoreRun, %RunIcon%
+		LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,A_Space)
+		GetCurrentNoteData(FileSafeName)
+		SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
+		return
 	}
 	if (ScriptExists == "AHK"){
 		ExistsWARNING = WARNING: An .AHK file exists for this note.
@@ -3234,11 +3247,10 @@ if (A_GuiControl=="StoreRun" OR RC16 == 1){
 		Iniwrite, BAT, %detailsPath%%FileSafeName%.ini,INFO,RunType
 		Fileappend,%Clipboard%,%ScriptPath%%FileSafeName%.%SaveTypeAs%
 		LV_Modify(LVSelectedROW,,,,,,,,,,,,,,,,,TypeBIcon)
-		GetCurrentNoteData(FileSafeName)
-		SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
 	}
+	GetCurrentNoteData(FileSafeName)
+	SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
 }
-
 return
 
 TypeMsgButtonNames:

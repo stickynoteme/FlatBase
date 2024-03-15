@@ -145,7 +145,7 @@ BuildGUI1(){
 	
 	if (ShowTagEditBoxHelper) {	
 		TagBoxW := LibW - 50
-		Gui, 1:Add,text, section -E0x200 hwndHPT  r1 w50 C%U_SFC% center, Tags: 
+		Gui, 1:Add,text, section -E0x200 r1 w50 C%U_SFC% center, Tags: 
 		Gui, 1:Add,text,  x+1 -E0x200 hwndHPT  r1 w%TagBoxW% C%U_SFC% vTagBox gTagBox center,	
 	}
 	
@@ -477,15 +477,22 @@ SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,Modified,QuickNoteTags,QuickNo
 	FileNameTxt := FileSafeName ".txt"
 	tmpFullPath = %U_NotePath%%FileNameTxt%
 	
-	if (FileNameTxt =".txt" or FileNameTxt =" .txt" or Strlen(FileNameTxt)<4) {
+	if (FileNameTxt==".txt" or FileNameTxt==" .txt" or Strlen(FileNameTxt)<4) {
 		;msgbox BlankName error #01
 		return
 		}
-	if (FileNameTxt =".txt.txt" or FileNameTxt =" .txt.txt" or FileNameTxt =" .txt .txt" or FileNameTxt =".txt .txt") {
+	if (FileNameTxt==".txt.txt" or FileNameTxt==" .txt.txt" or FileNameTxt==" .txt .txt" or FileNameTxt==".txt .txt") {
 		;msgbox BlankName error #02
 		return
 		}
-		
+	if (FileNameTxt=="Title.txt" or FileNameTxt=="title.txt") {
+		;msgbox BlankName error #02
+		return
+		}
+	if (FileNameTxt=="ERROR.txt" or FileNameTxt=="error.txt") {
+		;msgbox BlankName error #02
+		return
+		}	
 	if (QuickNoteBody != false)
 	{
 		;Save the File if it's not empty.
