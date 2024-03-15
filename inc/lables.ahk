@@ -15,7 +15,8 @@ Label1:
 		g1Open=0
 		GUI, star:destroy
 		GUI, t:destroy
-		gosub Edit3SaveTimer
+		if (unsaveddataEdit3 = 1)
+			gosub Edit3SaveTimer
 		return
 	}
 	if (g1Open=0) {
@@ -2930,15 +2931,21 @@ GuiEscape:
 	WinHide, ahk_id %g1ID%
 	g1Open=0
 	SelectedRows=
+	if (unsaveddataEdit3 = 1)
+		gosub Edit3SaveTimer
 return
 
 GuiClose:
 	WinHide, ahk_id %g1ID%
 	g1Open=0
 	SelectedRows=
+	if (unsaveddataEdit3 = 1)
+		gosub Edit3SaveTimer
 return
 
 Exit:
+	if (unsaveddataEdit3 = 1)
+		gosub Edit3SaveTimer
 	ExitApp
 
 CheckBackupLaterTimer:
@@ -2951,9 +2958,7 @@ SortNow:
 return
 
 
-
-
-Edit3SaveTimer:
+	Edit3SaveTimer:
 	global LVSelectedROW
 	if (LVSelectedROW=="")
 		LVSelectedROW = 1
@@ -2963,22 +2968,21 @@ Edit3SaveTimer:
 		PreviewBox := a_space
 	}
 	GuiControlGet, TagBox
+	iniRead,C_Cat,%detailsPath%%FileSafeName%.ini,INFO,Cat
 	GuiControlGet, NoteParent
 	LV_GetText(LVexists,1,2)
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
-	iniRead,C_Cat,%detailsPath%%FileSafeName%.ini,INFO,Cat
-	
 	SaveFile(RowText,FileSafeName,PreviewBox,1,TagBox,C_Cat,NoteParent)
 	iniRead,OldAdd,%detailsPath%%FileSafeName%.ini,INFO,Add
-
-	FileReadLine, NewBodyText, %U_NotePath%%FileSafeName%.txt,1
+	
 	LV_Modify(LVSelectedROW,,,RowText, NewBodyText,,,,,,,TagBox,,NoteParent)
 	savetimerrunning = 0
 	unsaveddataEdit3 = 0
 	ControlSend, Edit1,{left},FlatNotes - Library
 return
 
+TagBox:
 PreviewBox:
 	unsaveddataEdit3 = 1
 if (savetimerrunning = 0) {

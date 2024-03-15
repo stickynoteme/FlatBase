@@ -54,6 +54,14 @@ BuildGUI1(){
 		CatX := CatX + 27
 	}
 	
+	if (ShowCatFilterBoxHelper == 0 and ShowTagFilterBoxHelper == 0) {
+		SearchW := SearchW + CatW + TagsFilterW - 8
+	} else if (ShowCatFilterBoxHelper == 0) {
+		SearchW := SearchW + CatW - 8
+	}else{
+		SearchW := LibW * 0.75 - 50
+	}
+	
 	Gui, 1:Add,Edit, c%U_FBCA% w%SearchW% y%FontSize% x%searchX% y8 vSearchTerm gSearch -E0x200 HwndHSterm 
 	Gui, 1:Add, ListBox, vLB1 +0x100 h8 w%LibW% x0 y0 -E0x200 Disabled -Tabstop
 	Gui, 1:Add, ListBox, vlB2 +0x100 h15 w%LibW% x0 ys0 -E0x200 Disabled -Tabstop
@@ -68,8 +76,9 @@ BuildGUI1(){
 	}
 	
 	if (ShowTagFilterBoxHelper == 1) {
-		Gui, 1:Add, combobox, c%U_FBCA% xp%TagsFilterX% y7 -E0x200 +0x0210 r6 w%TagsFilterW% vTagsFilter gSearch HwndHTF , %TagsFilterContents%
+		Gui, 1:Add, Edit, c%U_FBCA% xp%TagsFilterX% y4 +Border -E0x200 +0x0210 r1 w%TagsFilterW% vTagsFilter gSearch HwndHTF,
 	}
+	
 	Gui, 1:Font, s%ResultFontSize% Q%FontRendering%, %ResultFontFamily%, %U_SFC%
 	Gui, 1:Add, text, x-3 c%U_SFC% w%StarColW% center gSortStar vSortStar, %Star1%
 	Gui, 1:Add, text, c%U_SFC% xp+%StarColW% w%NameColW% center gSortName vSortName, Name
@@ -141,7 +150,7 @@ BuildGUI1(){
 	}
 	
 	if (ShowTagEditBoxHelper) {	
-		Gui, 1:Add,Edit, section x0 yp+6 -E0x200 hwndHPT  r1 w%TagLibW% C%U_MFC% vTagBox center,	
+		Gui, 1:Add,Edit, section x0 yp+6 -E0x200 hwndHPT  r1 w%TagLibW% C%U_MFC% vTagBox gTagBox center,	
 	}
 	
 	if (ShowParentEditBoxHelper) {
@@ -213,10 +222,6 @@ BuildGUI1(){
 	if (ShowCatFilterBoxHelper == 1) {
 		CtlColors.Attach(HCF, DDLbgColor)
 		OD_Colors.Attach(HCF, {T: U_SFC})
-	}
-	if (ShowTagFilterBoxHelper = 1) {
-		CtlColors.Attach(HTF, DDLbgColorb2,DDLfontColorb2)
-		OD_Colors.Attach(HTF, {T: U_MFC})
 	}
 	Gui, 1:SHOW, Hide w%LibW% 
 	WinGet, g1ID,, FlatNotes - Library
@@ -457,27 +462,9 @@ MakeFileList(ReFreshMyNoteArray){
 			LV_ModifyCol(7, "SortDesc")
 	TotalNotes := MyNotesArray.MaxIndex()
 	gosub MakeOOKStarList
-	gosub TagFilterUpdate
 	return
 }
 
-TagFilterUpdate:
-TagsFilterContents := 
-for k, note in MyNotesArray 
-{
-	TmpTags := StrSplit(Note.10,[A_Tab, A_Space,","])
-	for k, v in TmpTags
-	{
-		v := trim(v)
-		strreplace(v,"\","\\")
-		if (!instr(TagsFilterContents,v))
-		{
-			TagsFilterContents .= "|" v 
-		}
-	}
-}
-GuiControl,,TagsFilter, %TagsFilterContents%
-return
 
 ReFreshLV(){
 GuiControl, 1:-Redraw, LV
@@ -623,7 +610,6 @@ if (CheckLastUpdatedBy != A_ComputerName)
 {
 	iniWrite,%A_ComputerName%,%U_NotePath%_sync.ini,INFO,LastUpdatedBy
 }
-gosub TagFilterUpdate
 return
 }
 MakeAnyMissingINI(){

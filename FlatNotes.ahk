@@ -732,7 +732,8 @@ if (g1Open=1) {
 	g1Open=0 
 	GUI, star:destroy
 	GUI, t:destroy
-	gosub Edit3SaveTimer
+	if (unsaveddataEdit3 = 1)
+		gosub Edit3SaveTimer	
 	return
 }
 if (g1Open=0) {
