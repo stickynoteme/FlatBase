@@ -1542,10 +1542,11 @@ StarSaveChange:
 		GuiControl,,%HceEDIT%,%NewStar%
 		return
 	}
-	
+	if (!StarOldFile)
+		StarOldFile:= NameEncode(NoteNameToEdit) ".txt"
 	TmpFileINI := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)", Replacement := ".ini")
 	TmpFileSafeName := RegExReplace(StarOldFile, "\.txt(?:^|$|\r\n|\r|\n)")
-	Iniread, OldStar,%detailsPath%%TmpFileINI%, INFO,Star
+	Iniread, OldStar,%detailsPath%%TmpFileINI%, INFO,Star,%A_Space%
 
 	;xthis
 	if (NewStar == OldStar or OldStar == "ERROR"){
