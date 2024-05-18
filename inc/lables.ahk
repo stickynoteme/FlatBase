@@ -334,7 +334,8 @@ SaveButton:
 		Random, NewSeed, 1, 4294911111
 		Random, , NewSeed
 		Random, RandomSalt, 1, 4294911199
-		QuickNoteBody := Crypt.Encrypt.String("AES", "CBC", QuickNoteBody, LastNotePassword, RandomSalt)
+		RandomSalt := RandomSalt + A_NowUTC
+		QuickNoteBody := Crypt.Encrypt.String("AES", "CBC", QuickNoteBody, LastNotePassword RandomSalt, RandomSalt)
 		LastNotePassword = Don't save passwords in ram plz
 		Iniwrite, %RandomSalt%, %detailsPath%%FileSafeName%.ini,INFO,RandomSalt
 		RandomSalt := A_Space
@@ -3516,7 +3517,7 @@ DecryptNote:
 	{
 		Try
 		{
-			C_File := Crypt.Decrypt.String("AES", "CBC", C_File, LastNotePassword, RandomSalt)
+			C_File := Crypt.Decrypt.String("AES", "CBC", C_File, LastNotePassword RandomSalt, RandomSalt)
 		}
 	}
 
@@ -3532,8 +3533,31 @@ DecryptNote:
 	GuiControl,, QuickNoteParent, %C_Parent%
 return
 
+;This function actually decrypts the note on right click
 EncryptNote:
-;SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
-
-MsgBox % Crypt.Encrypt.String("AES", "CBC", C_File, "1234567890123456", "1234567890123456")
+	LV_GetText(RowText, LVSelectedROW,2)
+	FileSafeName := NameEncode(RowText)
+	RandomSalt = %A_Space%
+	TmpSpace = %A_Space%
+	IniRead, RandomSalt, %detailsPath%%FileSafeName%.ini,INFO,RandomSalt, %A_Space%
+	if (RandomSalt != TmpSpace)
+	{
+		InputBox, TmpPassword, Enter Password,***WARNING*** By entering your password here you are permanently removing the select notes encryption and saving it in a plain text file on your hard drive. This is a very insecure thing to do., hide
+		LastNotePassword := Crypt.Hash.String("SHA256", TmpPassword)
+		TmpPassword := A_Space
+		GetCurrentNoteData(FileSafeName)
+		Try
+		{
+			C_File := Crypt.Decrypt.String("AES", "CBC", C_File, LastNotePassword RandomSalt, RandomSalt)
+		}
+		Inidelete, %detailsPath%%FileSafeName%.ini,INFO,RandomSalt
+		GuiControl,, PreviewBox, %C_File%
+		GuiControl,, TagBox, %C_Tags%
+		GuiControl,, NoteParent, %C_Parent%
+		GuiControl,, TitleBar, %C_Name%
+		GuiControl,, StatusbarM,M: %C_Mod%
+		GuiControl,, StatusbarA,A: %C_Add%
+		LV_Modify(LVSelectedROW,,,C_Name,C_File)
+		SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
+	}
 return
