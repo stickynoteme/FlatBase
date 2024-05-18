@@ -98,12 +98,14 @@ BuildGUI1(){
 
 	;Gui, 1:Add,edit, readonly h6 -E0x200
 	title_h := PreviewFontSize*1.8
-	TitleWAdjust := round(LibW*0.65)
+	TitleWAdjust := round(LibW*0.55)
 	
 	if (ShowPreviewEditBoxHelper) {
 	
 	;gLibTemplateAdd
 	Gui, 1:Add,text, center xs c%U_SFC% -E0x200 w25 h%title_h% gLibTemplateAdd vAddTemplateText, %TemplateSymbol%
+	
+	Gui, 1:Add,text, center x+1 c%U_SFC% -E0x200 w25 h%title_h% gDecryptNote vDecryptNote, %KeySymbol%
 		
 	
 	Gui, 1:Add,edit, readonly center x+15 -E0x200 vTitleBar C%U_SFC% w%TitleWAdjust% h%title_h% backgroundTrans -Tabstop,

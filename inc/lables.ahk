@@ -329,6 +329,16 @@ SaveButton:
 	SaveMod = 0
 	IfExist, %U_NotePath%%FileSafeName%.txt
 		SaveMod = 1
+	if (SaveEncrypted == 1)
+	{
+		Random, NewSeed, 1, 4294911111
+		Random, , NewSeed
+		Random, RandomSalt, 1, 4294911199
+		QuickNoteBody := Crypt.Encrypt.String("AES", "CBC", QuickNoteBody, LastNotePassword, RandomSalt)
+		LastNotePassword = Don't save passwords in ram plz
+		Iniwrite, %RandomSalt%, %detailsPath%%FileSafeName%.ini,INFO,RandomSalt
+		RandomSalt := A_Space
+	}
 	SaveFile(QuickNoteName,FileSafeName,QuickNoteBody,SaveMod,QuickNoteTags,QuickNoteCat,QuickNoteParent)
 	;horrible fix to LV to update
 
@@ -338,6 +348,7 @@ SaveButton:
 	tooltip Saved
 	ControlSend, Edit1,{ctrl down} {a} {ctrl up}
 	settimer, KillToolTip, -500
+	SaveEncrypted = 0
 return
 
 QuickSafeNameUpdate:
@@ -2917,6 +2928,7 @@ return
 
 2GuiEscape:
 2GuiClose:
+	SaveEncrypted = 0
 	GuiControlGet,working_QuickNote,,%HQNB%
 	GuiControlGet,working_QuickNoteSafeName,,%HQNFSN%
 	FileRead, CheckForOldNote, %U_NotePath%%working_QuickNoteSafeName%.txt
@@ -3112,7 +3124,10 @@ GuiContextMenu:
 			gosub build_ColEdit
 			return
 		}
-	
+		if (A_GuiControl=="DecryptNote") {
+		gosub EncryptNote
+		}
+		
 	
 		if (A_GuiControl=="StoreImage" OR RC19 == 1 ) {
 			RC19 = 0
@@ -3485,4 +3500,40 @@ FixManuallyDeletedNoteAttachments:
 			IniWrite,1, %NoteIni%, INFO, Image
 	}
 reload
+return
+
+DecryptNote:
+	SaveEncrypted = 1
+	LV_GetText(RowText, LVSelectedROW,2)
+	FileSafeName := NameEncode(RowText)
+	RandomSalt := A_Space
+	IniRead, RandomSalt, %detailsPath%%FileSafeName%.ini,INFO,RandomSalt
+	InputBox, TmpPassword, Enter Password,, hide
+	LastNotePassword := Crypt.Hash.String("SHA256", TmpPassword)
+	TmpPassword := A_Space
+	GetCurrentNoteData(FileSafeName)
+	if (RandomSalt)
+	{
+		Try
+		{
+			C_File := Crypt.Decrypt.String("AES", "CBC", C_File, LastNotePassword, RandomSalt)
+		}
+	}
+
+	BuildGUI2()
+	ControlFocus, Edit4, FlatNote - QuickNote
+	GuiControl,, QuickNoteName,%C_Name%
+	IniRead, OldStarData, %detailsPath%%FileSafeName%.ini,INFO,Star
+	OldStarData := ConvertStar(OldStarData)
+	GuiControl,, QuickNoteBody, %C_File%
+	GuiControl,, QuickStar,%OldStarData%
+	GuiControl, ChooseString, QuickNoteCat, %C_Cat%
+	GuiControl,, QuickNoteTags, %C_Tags%
+	GuiControl,, QuickNoteParent, %C_Parent%
+return
+
+EncryptNote:
+;SaveFile(C_Name,C_SafeName,C_File,1,C_Tags,C_Cat,C_Parent)
+
+MsgBox % Crypt.Encrypt.String("AES", "CBC", C_File, "1234567890123456", "1234567890123456")
 return

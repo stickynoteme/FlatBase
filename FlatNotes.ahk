@@ -71,6 +71,11 @@ global CatBoxContents
 global TagsFilterContents
 global NoteParent
 
+global DecryptNote
+global SaveEncrypted
+global Salt = Secret Salt Here
+global LastNotePassword
+global TmpPassword
 global ceEdit
 global TRowsOver
 global OpenInQuickNote
@@ -275,6 +280,7 @@ global BookmarkFilterActive
 global ImageFilterActive
 global SelectedRows
 global TemplateSymbol
+global KeySymbol
 global RunSymbol
 global WebSymbol
 global WorldSymbol
@@ -407,6 +413,7 @@ if (isFristRun = "1") {
 	iniread, TemplateAboveSymbol,%systemINI%,SYS,TemplateAboveSymbol,+
 	iniread, TemplateBelowSymbol,%systemINI%,SYS,TemplateBelowSymbol,-
 	iniread, TemplateSymbol,%systemINI%,SYS,TemplateSymbol,+
+	iniread, KeySymbol,%systemINI%,SYS,KeySymbol,🗝️
 	iniread, TreeSymbol,%systemINI%,SYS,TreeSymbol,🌳
 	iniread, SaveSymbol,%systemINI%,SYS,SaveSymbol,📦
 	iniread, LoadSymbol,%systemINI%,SYS,LoadSymbol,📋
@@ -798,6 +805,7 @@ return
 #include inc\string-object-file.ahk
 #include inc\Class_ImageButton.ahk
 #include inc\CaptureScreen.ahk
+#include inc\Class_CNG.ahk
 ;-!- Return after fucntions so lables don't get exacuted
 return
 #Include inc\DummyGui.ahk
