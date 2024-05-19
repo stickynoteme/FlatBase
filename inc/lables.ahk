@@ -3518,16 +3518,20 @@ DecryptNote:
 	LV_GetText(RowText, LVSelectedROW,2)
 	FileSafeName := NameEncode(RowText)
 	RandomSalt := A_Space
-	IniRead, RandomSalt, %detailsPath%%FileSafeName%.ini,INFO,RandomSalt
+	IniRead, RandomSalt, %detailsPath%%FileSafeName%.ini,INFO,RandomSalt,
 	InputBox, TmpPassword, Enter Password,, hide
 	LastNotePassword := Crypt.Hash.String("SHA256", TmpPassword)
 	TmpPassword := A_Space
 	GetCurrentNoteData(FileSafeName)
-	if (RandomSalt)
+	if (RandomSalt != "ERROR")
 	{
 		Try
 		{
 			C_File := Crypt.Decrypt.String("AES", "CBC", C_File, LastNotePassword RandomSalt, RandomSalt)
+		}
+		Catch
+		{
+			return
 		}
 	}
 
