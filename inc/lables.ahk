@@ -2929,20 +2929,20 @@ return
 
 2GuiEscape:
 2GuiClose:
+	SaveEncrypted = 0
 	GuiControlGet,working_QuickNote,,%HQNB%
 	GuiControlGet,working_QuickNoteSafeName,,%HQNFSN%
 	FileRead, CheckForOldNote, %U_NotePath%%working_QuickNoteSafeName%.txt
-	if (SaveEncrypted == 1)
-	{
-		if (RandomSalt)
+	RandomSalt := A_Space
+	IniRead, RandomSalt, %detailsPath%%working_QuickNoteSafeName%.ini,INFO,RandomSalt,%A_Space%
+	if (RandomSalt != A_Space)
 	{
 		Try
 		{
 			CheckForOldNote := Crypt.Decrypt.String("AES", "CBC", CheckForOldNote, LastNotePassword RandomSalt, RandomSalt)
-		}
-	}	
+		} 
 	}
-	SaveEncrypted = 0
+	CheckForOldNote := strreplace(working_QuickNote,"`n","`r`n")
 	working_QuickNote := strreplace(working_QuickNote,"`n","`r`n")
 	if (working_QuickNote != "" && working_QuickNote != CheckForOldNote) {
 		OnMessage(0x44, "OnMsgBox")
