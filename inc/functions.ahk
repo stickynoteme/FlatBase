@@ -228,8 +228,6 @@ BuildGUI1(){
 	return
 }
 BuildGUI2(){
-	QuickSubWidth := QuickNoteWidth-70
-	QuickNoteEditW := QuickNoteWidth-5
 	QuickNoteXOffset := 3
 	FileSafeClipBoard := NameEncode(clipboard)
 	CheckForOldNote = %U_NotePath%%FileSafeClipBoard%.txt
@@ -245,6 +243,20 @@ BuildGUI2(){
 		xPos = x%xPos%
 		yPos = y%yPos%
 	}
+	if WinExist("FlatNotes - Library") {
+		WinGetPos, xPos, yPos, , , FlatNotes - Library
+		xPos = x%xPos%
+		yPos = y%yPos%
+		QuickNoteWidthTmp := QuickNoteWidth
+		QuickNoteRowsTmp := QuickNoteRows
+		QuickNoteWidth := LibW
+		QuickNoteRows := ResultRows+PreviewRows+4
+	} else {
+		QuickNoteRows := QuickNoteRowsTmp
+		QuickNoteWidth := QuickNoteWidthTmp
+	}
+	QuickSubWidth := QuickNoteWidth-70
+	QuickNoteEditW := QuickNoteWidth-5
 	OD_LB  := "+0x0050" 
 	Gui, 2:New,-Caption, FlatNote - QuickNote
 	Gui, 2:Margin , 2, 2 

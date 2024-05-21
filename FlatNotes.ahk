@@ -77,6 +77,8 @@ global Salt = Secret Salt Here
 global LastNotePassword
 global TmpPassword
 global ceEdit
+global QuickNoteWidthTmp
+Global QuickNoteRowsTmp
 global TRowsOver
 global OpenInQuickNote
 global NewTemplateRows
